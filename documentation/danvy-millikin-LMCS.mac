@@ -1,0 +1,304 @@
+%
+
+\newcommand{\odnote}[1]{{\sf [Olivier: #1]}}
+\newcommand{\kmnote}[1]{{\sf [Kevin: #1]}}
+
+\newcommand{\eg}{e.g.}
+\newcommand{\ie}{i.e.}
+
+%
+
+\makeatletter
+
+%
+\def\verbatim{\small \@verbatim \frenchspacing\@vobeyspaces \@xverbatim}
+\let\endverbatim=\endtrivlist
+
+\makeatother
+
+\newcommand{\stt}[1]{{\small\tt #1}}
+
+\newcommand{\myurl}[1]{{\tt <}\url{#1}{\tt >}}
+
+%
+
+\def\doframeit#1{\vbox{%
+  \hrule height\fboxrule
+    \hbox{%
+      \vrule width\fboxrule \kern\fboxsep
+      \vbox{\kern\fboxvsep #1\kern\fboxvsep }%
+      \kern\fboxsep \vrule width\fboxrule }%
+    \hrule height\fboxrule }}
+
+  %
+  %
+
+\def\frameit{\smallskip \advance \linewidth by -7.5pt \setbox0=\vbox \bgroup
+\strut \ignorespaces }
+
+\def\endframeit{\ifhmode \par \nointerlineskip \fi \egroup
+\doframeit{\box0}}
+%
+
+\newdimen \fboxvsep
+\fboxvsep=\fboxsep
+\advance \fboxsep by -3.5pt
+
+%
+
+%
+%
+%
+%
+%
+%
+%
+%
+
+%
+
+\newcommand{\rawshift}{\ensuremath{\mathcal{S}}}
+\newcommand{\synshift}[2]{\ensuremath{\rawshift\lambda{#1}.{#2}}}
+\newcommand{\synshiftp}[2]{(\synshift{#1}{#2})}
+
+%
+\newcommand{\resetthickness}{\mbox{\hspace{-1.4mm}}}
+\newcommand{\langlethick}{\langle\resetthickness\langle\resetthickness\langle}
+\newcommand{\ranglethick}{\rangle\resetthickness\rangle\resetthickness\rangle}
+\newcommand{\synreset}[1]{\ensuremath{\langlethick{#1}\ranglethick}}
+\newcommand{\synresettwo}[1]{\synreset{#1}_2}
+\newcommand{\rawreset}{\ensuremath{\synreset{\cdot}}}
+
+\newcommand{\synshiftn}[3]{\rawshift_{#1}\lambda{#2}.{#3}}
+\newcommand{\synresetn}[2]{\synreset{#2}_{#1}}
+\newcommand{\rawshiftn}[1]{\ensuremath{\rawshift_{#1}}}
+
+\newcommand{\rawC}{\ensuremath{\mathcal{C}}}
+\newcommand{\synC}[2]{\ensuremath{\rawC\lambda{#1}.{#2}}}
+\newcommand{\synCp}[2]{(\synC{#1}{#2})}
+\newcommand{\synCn}[3]{\rawC_{#1}\lambda{#2}.{#3}}
+
+\newcommand{\synlam}[2]{\ensuremath{\lambda{#1}.{#2}}}
+\newcommand{\synlamp}[2]{(\synlam{#1}{#2})}
+\newcommand{\synapp}[2]{\ensuremath{{#1}\;{#2}}}
+\newcommand{\synappp}[2]{(\synapp{#1}{#2})}
+\newcommand{\rawJ}{\ensuremath{\mathbf{J}}}
+%
+\newcommand{\synJ}[2]{\ensuremath{\rawJ\:\lambda{#1}.{#2}}}
+\newcommand{\joperator}{\rawJ}
+
+\newcommand{\xform}[1]{\ensuremath{\llbracket{#1}\rrbracket}}
+
+%
+%
+%
+%
+\newcommand{\dms}[1]{\llbracket{#1}\rrbracket}
+\newcommand{\dmstwo}[1]{\dms{#1}''}
+\newcommand{\dmsone}[1]{\dms{#1}'}
+\newcommand{\dmszero}[1]{\dms{#1}}
+\newcommand{\dmszerop}[1]{(\dmszero{#1})}
+
+
+%
+\newcommand{\cont}{\ensuremath{\kappa}}
+\newcommand{\mcont}{\ensuremath{\gamma}}
+
+%
+
+\newcommand{\hts}[1]{\llbracket{#1}\rrbracket}
+\newcommand{\htszero}[1]{\hts{#1}}
+\newcommand{\htsone}[1]{\hts{#1}'}
+%
+\newcommand{\synvarjumpcont}{d}
+\newcommand{\rawJI}{\ensuremath{\mathbf{JI}}}
+
+%
+\newcommand{\mfs}[1]{\llbracket{#1}\rrbracket}
+\newcommand{\mfsone}[1]{\mfs{#1}'}
+\newcommand{\mfszero}[1]{\mfs{#1}}
+\newcommand{\rawcallcc}{\ensuremath{\mathbf{call/cc}}}
+\newcommand{\syncallcc}{\ensuremath{\mathbf{call/cc}}}
+\newcommand{\rawthrow}{\ensuremath{\mathbf{throw}}}
+\newcommand{\synthrow}[2]{\ensuremath{\rawthrow\;{#1}\;{#2}}}
+\newcommand{\synhlet}[3]{\ensuremath{\mathbf{let}\:{#1}={#2}\:\mathbf{in}\:{#3}}}
+\newcommand{\synhletp}[3]{(\synhlet{#1}{#2}{#3})}
+\newcommand{\synvlet}[3]{\ensuremath{\begin{array}[t]{@{}l}
+                                     \mathbf{let}\:{#1}={#2}\\
+                                     \mathbf{in}\:{#3}
+		            	 \end{array}}}
+\newcommand{\synescape}[2]
+  {\ensuremath{\mathbf{escape}\:{#1}\:\mathbf{in}\:{#2}}}
+\newcommand{\synescapep}[2]{(\synescape{#1}{#2})}
+
+\newcommand{\synlit}{\ensuremath{n}}
+\newcommand{\synvar}{\ensuremath{x}}
+\newcommand{\synvarp}{(\synvar)}
+\newcommand{\synvarcont}{\ensuremath{c}}
+\newcommand{\synvarmcont}{\ensuremath{d}}
+\newcommand{\synvardump}{\ensuremath{d}}
+\newcommand{\synvarkont}{\ensuremath{k}}
+\newcommand{\synvarfun}{\ensuremath{f}}
+\newcommand{\synvarval}{\ensuremath{v}}
+\newcommand{\synvarvalp}{(\synvarval)}
+\newcommand{\synterm}{\ensuremath{t}}
+
+%
+%
+%
+
+\newcommand{\jrscallcc}[1]{{#1}^*}
+\newcommand{\jrsJ}[1]{{#1}^{\circ}}
+
+%
+\newcommand{\inleft}[1]{\mathbf{inL}{#1}}
+\newcommand{\inleftp}[1]{(\inleft{#1})}
+%
+\newcommand{\inright}[1]{\mathbf{inR}{#1}}
+\newcommand{\inrightp}[1]{(\inright{#1})}
+
+\newcommand{\syncase}[5]{\begin{array}[t]{@{}r@{\ }l}
+                         \mathbf{case} & {#1}
+                         \\
+                         \mathbf{of}   & \inleft{#2} \Rightarrow {#3}
+                         \\
+                         \mathbf{\mid} & \inright{#4} \Rightarrow {#5}
+                         \end{array}}
+
+\newcommand{\synpair}[2]{({#1},{#2})}
+
+\newcommand{\ourbox}[1]{\fbox{\rule[-1ex]{0mm}{3.5ex}{\hspace{0.5mm}#1\hspace{0.5mm}}}}
+%
+\newcommand{\ourframebox}[1]{\framebox{\rule[-0.5ex]{0mm}{2.5ex}{\hspace{0.5mm}#1\hspace{0.5mm}}}}
+
+\newtheorem{proposition}{Proposition}
+\newtheorem{property}{Property}
+
+%
+%
+
+%
+
+\newcommand{\lrho}{\ensuremath{\lambda\rho}}
+\newcommand{\lrh}{\ensuremath{\lambda\widehat{\rho}}}
+\newcommand{\ctx}{\ensuremath{\mathit{C}}}
+\newcommand{\ctxone}{\ensuremath{\ctx_1}}
+\newcommand{\ctxtwo}{\ensuremath{\ctx_2}}
+\newcommand{\val}{\ensuremath{v}}
+\newcommand{\tm}{\ensuremath{t}}
+\newcommand{\tmone}{\ensuremath{t_0}}
+\newcommand{\tmtwo}{\ensuremath{t_1}}
+\newcommand{\clo}{\ensuremath{c}}
+%
+\newcommand{\sub}{\ensuremath{e}}
+\newcommand{\app}[2]{\ensuremath{{#1}\:{#2}}}
+\newcommand{\appp}[2]{(\app{#1}{#2})}
+%
+%
+\newcommand{\esub}[2]{\ensuremath{#1\lbrack#2\rbrack}}
+\newcommand{\esubp}[2]{(\esub{#1}{#2})}
+\newcommand{\comp}[2]{\ensuremath{#1\:#2}}
+\newcommand{\compp}[2]{(\comp{#1}{#2})}
+\newcommand{\mt}{\ensuremath{\bullet}}
+%
+\newcommand{\ctxhole}{\ensuremath{[\:]}}
+\newcommand{\argctx}[2]{\ensuremath{\plugctx{#1}{\app{\ctxhole}{#2}}}}
+\newcommand{\apctx}[2]{\ensuremath{\plugctx{#1}{\app{#2}{\ctxhole}}}}
+\newcommand{\plugctx}[2]{\ensuremath{#1[#2]}}
+\newcommand{\mtctx}{\ensuremath{[\:]}}
+\newcommand{\metactx}[2]{\ensuremath{#2 \cdot #1}}
+\newcommand{\mtmetactx}{\bullet}
+\newcommand{\cons}[2]{\ensuremath{#1\cdot#2}}
+\newcommand{\consq}[2]{(\cons{#1}{#2})}
+\newcommand{\Mid}{\:\mid\:}
+\newcommand{\labl}[1]{\ensuremath{(\textrm{#1})}}
+\newcommand{\dectwo}[2]{\ensuremath{\langle#1,\,#2\rangle}} %
+\newcommand{\decthree}[3]{\ensuremath{\langle#1,\,#2,\,#3\rangle}} %
+
+\newcommand{\namedevaluation}[3]{{#2} \, \Rightarrow^*_{#1} \, {#3}}
+\newcommand{\namedtransition}[3]{{#2} & \Rightarrow_{#1} & {#3}}
+\newcommand{\confpair}[2]{\langle{#1},\,{#2}\rangle}
+\newcommand{\conftriple}[3]{\langle{#1},\,{#2},\,{#3}\rangle}
+\newcommand{\confquadruple}[4]{\langle{#1},\,{#2},\,{#3},\,{#4}\rangle}
+\newcommand{\namedconftriple}[4]{\triple{#2}{#3}{#4}_{#1}}
+\newcommand{\namedconfquadruple}[5]{\quadruple{#2}{#3}{#4}{#5}_{#1}}
+\newcommand{\contractsto}[1]{\ensuremath{\rightarrow_{#1}}}
+%
+
+%
+\newcommand{\red}{\ensuremath{\mapsto}}
+\newcommand{\redtrans}{\ensuremath{\red^*}}
+
+\newcommand{\represent}[1]{\ensuremath{\ulcorner{\!#1\!}\urcorner}}
+\newcommand{\stateappend}[2]{\ensuremath{{#1} \circ {#2}}}
+\newcommand{\stateappendp}[2]{(\stateappend{#1}{#2})}
+
+\renewcommand{\ctxone}{C}
+\renewcommand{\ctxtwo}{D}
+
+\newcommand{\lrhJ}{\ensuremath{\lambda\widehat{\rho}J}}
+
+\newcommand{\shift}{J}
+
+\newcommand{\synsucc}{succ}
+\newcommand{\semsucc}{SUCC}
+
+%
+\newcommand{\envmeta}{e}
+\newcommand{\ctxtmeta}{k}
+\newcommand{\varmeta}{x}
+\newcommand{\termmeta}{t}
+\newcommand{\valmeta}{v}
+\newcommand{\stackmeta}{s}
+
+\newcommand{\closure}[3]{[{#1},{#2},{#3}]}
+
+\newcommand{\envempty}{\varnothing}
+%
+\newcommand{\envextend}[3]{\cons{({#1},{#2})}{#3}}
+\newcommand{\envlookup}[2]{{#2}({#1})}
+
+\newcommand{\stackempty}{\mathsf{nil}}
+\newcommand{\stackpush}[2]{{#1}:\,:{#2}}
+
+\newcommand{\rawend}{\ensuremath{\mathsf{END}}}
+\newcommand{\rawarg}{\ensuremath{\mathsf{ARG}}}
+\newcommand{\rawfun}{\ensuremath{\mathsf{FUN}}}
+\newcommand{\rawret}{\ensuremath{\mathsf{RET}}}
+
+\newcommand{\cekendctxt}{\rawend}
+\newcommand{\cekargctxt}[3]{\rawarg({#1},{#2},{#3})}
+\newcommand{\cekfunctxt}[2]{\rawfun({#1},{#2})}
+
+\newcommand{\cekeendctxt}{\rawend}
+\newcommand{\cekeargctxt}[2]{\rawarg({#1},{#2})}
+\newcommand{\cekefunctxt}[2]{\rawfun({#1},{#2})}
+\newcommand{\cekeretctxt}[2]{\rawret({#1},{#2})}
+
+\newcommand{\ceksendctxt}{\rawend}
+\newcommand{\ceksargctxt}[3]{\rawarg({#1},{#2},{#3})}
+\newcommand{\ceksfunctxt}[1]{\rawfun({#1})}
+\newcommand{\ceksretctxt}[2]{\rawret({#1},{#2})}
+
+%
+
+\newtheorem{definition}{Definition}
+\newtheorem{lemma}{Lemma}
+\newtheorem{theorem}{Theorem}
+
+\newcommand{\rawisrelated}{\mathcal{R}}
+\newcommand{\isrelated}[2]{\rawisrelated({#1},\,{#2})}
+
+\newcommand{\funcontide}{\mbox{\stt{k}}}
+\newcommand{\defcontide}{\mbox{\stt{c}}}
+\newcommand{\intide}{\mbox{\stt{n}}}
+\newcommand{\valide}{\mbox{\stt{v}}}
+\newcommand{\valideone}{\mbox{\stt{v1}}}
+\newcommand{\validetwo}{\mbox{\stt{v2}}}
+\newcommand{\traceide}{\mbox{\stt{T}}}
+
+\setlength\leftmargini  {1.5em}
+\setlength\leftmarginii  {1em}
+
+\newcommand{\myphantom}[1]{$\phantom{\mbox{#1}}$}
+
