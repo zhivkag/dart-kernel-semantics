@@ -2,6 +2,7 @@
 
 % Macros used below have been contributed in part by Olivier Danvy and Kevin Millikin
 \input{danvy-millikin-LMCS.mac}
+\usepackage{amsmath} 
 
 \begin{document}
 \title{Dart Kernel Semantics \\ (draft)}
@@ -12,9 +13,76 @@ The small-step operational semantics of Dart Kernel is given by an abstract mach
 
 \section{Definitions}
 \subsection{Conventions}
+\begin{itemize}
+\setlength{\itemsep}{0pt}
+\item Symbols ":" and $\in$ are used interchangeably.
+\item Names of variables are italicized.
+\item Names of variables of syntactic domains start with an upper case letter.
+\item Names of domains are written in bold (e.g. $\dexpr$).
+\item Names of configuration and continuation kinds are written in normal text (e.g. VarSetK).
+\item Names of meta-functions start with lower case letter (e.g. extend).
+\item Symbol ":=" is read as "denotes".
+\item "$\mlist{\mathbf{X}}$" := domain of meta-lists of elements from domain "$\mathbf{X}$". Note that the word "List" here is not in bold, so that it isn't confused with the domain $\mathbf{List}$ of Dart objects.
+\end{itemize}
 \subsection{Domains}
+\[
+\begin{array}{lcll}
+
+\expr, \expri{i} & : & \dexpr & \textrm{syntactic domain of expressions}\\
+\exprs & : & \mlist{\dexpr}  & \textrm{}\\[2mm]
+
+\stmt, \stmti{i} & : & \dstmt & \textrm{syntactic domain of statements}\\
+\stmts & : & \mlist{\dstmt}  & \textrm{}\\[2mm]
+
+\econt & : & \decont & \textrm{domain of expression continuations}\\
+\acont & : & \dacont & \textrm{domain of application continuations}\\
+\scont & : & \dscont & \textrm{domain of statement continuations}\\
+\bcont & : & \dbcont & \textrm{domain of break continuations}\\
+\switchcont & : & \dswitchcont & \textrm{domain of switch continuations}\\[2mm]
+
+\lbl & : & \dlbl & \textrm{domain of labels}\\
+\lbl & : & \mlist{\dlbl} \\
+\clbl & : & \dclbl & \textrm{domain of switch labels}\\
+\clbl & : & \mlist{\dclbl} \\[2mm]
+
+\handler & : & \dhandler & \textrm{syntactic domain of exception handlers} \\
+\strace & : & \mlist{\dexpr} & \textrm{domain of stack traces}\\
+\cex & : &  \emptyset + \dval & \textrm{domain of current expetion values}\\
+\cstrace & : & \emptyset + \mlist{\dexpr} & \textrm{domain of current exception stack traces}\\[2mm]
+
+\varmeta & : & \dvardecl & \textrm{domain of variable declarations}\\
+\loc & : & \dlocation & \textrm{domain of store locations}\\
+\val & : & \dval & \textrm{domain of values} \\ 
+\vals & : & \mlist{\dval}\\
+\env & : & \denv & \textrm{domain of environments}  
+
+\end{array}
+\]
 \subsection{Meta-functions}
+\subsubsection{Dereferencing}
+\label{subsubsection:dereferecing}
+Function "!" is used to "dereference" items stored in environments. It has an implicit argument which is the store of CESK machine.
+
+\begin{align*}
+\deref : \dlocation &\rightarrow \dval \\
+\deref\loc &=  \val, \textrm{ with $\val$ the value in store at location } \loc
+\end{align*}
+
+\subsubsection{String Concatenation}
+Function $StringValue$ concatenates strings from the given meta-list.
+
+\[StringValue : \mlist{\dstring} \rightarrow \dstring\]
+
+\subsubsection{Updating Environment}
+
+\[extend : \denv \times \dfunval \times \mlist{\dval} \rightarrow  \denv \]
+
 \subsection{Notations}
+\begin{align*}
+[]	&:= \textrm{empty list} \\
+X :: list	&:= \textrm{a meta-list that is constructed by adding element X to the head of the meta-list list}
+\end{align*}
+
 \subsection{Configurations for the CESK machine}
 The state space of the CESK machine contains various kinds of configurations, each containing components for applying the appropriate continuation in order to transition to the next configuration. 
 
@@ -26,7 +94,7 @@ The state space of the CESK machine contains various kinds of configurations, ea
 \evallistconf{\exprs}{\env}{st}{cex}{cst}{\econt} & : & 
 \textrm{EvalListConfiguration} \\
 
-\execconf{\stmt}{\env}{\lbls}{\clbls}{\handler}{\cex}{\cst}{\econt}{\scont}  & : & 
+\execconf{\stmt}{\env}{\lbls}{\clbls}{\handler}{\cex}{\cstrace}{\econt}{\scont}  & : & 
 \textrm{ExecConfiguration}\\[3mm]
 
 \contconf{\econt}{\val} & : & 
@@ -50,10 +118,34 @@ The state space of the CESK machine contains various kinds of configurations, ea
 \end{array}
 \]
 \subsection{Environment}
+The environment is a function that maps a variable to a location in the store.
+\[\env \in \denv = \dvardecl \rightarrow \dlocation\] 
 \subsection{Store}
+The store, $s$, maps a location, $\loc$, to a value, $\val$. The store is mutable and should not be confused with a function. It is possible to change the transition rules, so that the store is immutable, and right hand side configurations receive an updated copy of it. However, for the sake of simplicity, a global mutable store is assumed. 
+\[s : \dlocation \rightarrow \dval \]
+Therefore a variable look-up will consist of looking up the address of a variable from the environment with $\loc = \env(\varmeta)$ and reading the stored value $v$ with $\deref\loc$. For definition of "$\deref$" see Section~\ref{subsubsection:dereferecing} 
+
 \subsection{Continuations}
 
+Continuation is the function that represents the rest of the program and is has the information needed to resume the execution of the program. 
+There are various types of continuations depending on the next statement to be executed or next expression to be evaluated.
+
 \subsection{Values}
+\subsection{Literal values}
+\begin{align*}
+\val \in \dlitval &= \mathbf{int} + \mathbf{bool} + \mathbf{double} \\ &+ \mathbf{List} + \mathbf{Map} + \mathbf{String} + \mathbf{Symbol} + \mathbf{Type} 
+\end{align*} 
+\subsection{Object values}
+\begin{align*}
+ \dobjval &: \dclass \times \mlist{\dlocation}\\
+ \dclass &: superclass \times interfaces \times fields \times getters \times setters \times methods
+\end{align*}
+
+\subsection{Function values}
+\begin{align*}
+\dfunval : \dformals \times \dstmt \times \denv 
+\end{align*}
+
 \section{Semantics}
 \subsection{Expression evaluation}
 \subsection{Statement execution}

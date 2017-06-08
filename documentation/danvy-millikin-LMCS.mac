@@ -305,17 +305,26 @@
 
 \newcommand{\myphantom}[1]{$\phantom{\mbox{#1}}$}
 
-% Definitions for CESK
-\newcommand{\vals}{\ensuremath{vs}}
+% Kernel CESK
+\newcommand{\mlist}[1]{\textrm{List}\langle {#1} \rangle}
 
-\newcommand{\env}{\ensuremath{\rho}}
-\newcommand{\handler}{\ensuremath{H}}
+% Syn
 \newcommand{\expr}{\ensuremath{E}}
 \newcommand{\expri}[1]{\expr_\ensuremath{{#1}}}
 \newcommand{\exprs}{\expr\ensuremath{s}}
 \newcommand{\stmt}{\ensuremath{S}}
+\newcommand{\stmti}[1]{\stmt_\ensuremath{{#1}}}
+\newcommand{\stmts}{\stmt\ensuremath{s}}
+\newcommand{\handler}{\ensuremath{H}}
+\newcommand{\dexpr}{\mathbf{Expr}}
+\newcommand{\dstmt}{\mathbf{Stmt}}
+\newcommand{\dhandler}{\mathbf{Handler}}
+
+% Meta
+\newcommand{\vals}{\ensuremath{vs}}
+\newcommand{\env}{\ensuremath{\rho}}
 \newcommand{\strace}{\ensuremath{st}}
-\newcommand{\cst}{\ensuremath{c}\strace}
+\newcommand{\cstrace}{\ensuremath{c}\strace}
 \newcommand{\cex}{\ensuremath{cex}}
 \newcommand{\econt}{\cont_\ensuremath{E}}
 \newcommand{\acont}{\cont_\ensuremath{A}}
@@ -326,6 +335,25 @@
 \newcommand{\lbls}{\ensuremath{lbls}}
 \newcommand{\clbl}{\ensuremath{clbl}}
 \newcommand{\clbls}{\ensuremath{clbls}}
+\newcommand{\decont}{\mathbf{ExprCont}}
+\newcommand{\dscont}{\mathbf{StmtCont}}
+\newcommand{\dacont}{\mathbf{ApplCont}}
+\newcommand{\dbcont}{\mathbf{BreakCont}}
+\newcommand{\dswitchcont}{\mathbf{SwitchCont}}
+\newcommand{\dlbl}{\mathbf{Label}}
+\newcommand{\dclbl}{\mathbf{SwitchLabel}}
+\newcommand{\dval}{\mathbf{Value}}
+\newcommand{\dvardecl}{\mathbf{VariableDeclaration}}
+\newcommand{\denv}{\mathbf{Env}}
+\newcommand{\loc}{\ensuremath{\alpha}}
+\newcommand{\dlocation}{\mathbf{Location}}
+\newcommand{\deref}{!}
+\newcommand{\dstring}{\mathbf{StringValue}}
+\newcommand{\dfunval}{\mathbf{FunctionValue}}
+\newcommand{\dlitval}{\mathbf{LiteralValue}}
+\newcommand{\dobjval}{\mathbf{ObjectValue}}
+\newcommand{\dclass}{\mathbf{Class}}
+\newcommand{\dformals}{\mathbf{Formals}}
 
 % Named Configuration for CESK
 \newcommand{\breakconf}[1]{\confsingle{#1}_{\mathrm{breakCont}}}
@@ -334,9 +362,8 @@
 \newcommand{\scontconf}[2]{\confpair{#1}{#2}_{\mathrm{scont}}}
 \newcommand{\acontconf}[2]{\confpair{#1}{#2}_{\mathrm{acont}}}
 \newcommand{\throwconf}[3]{\conftriple{#1}{#2}{#3}_{\mathrm{throw}}}
-
 \newcommand{\aconf}[6]{\langle{#1},\,{#2},\,{#3},\handler,\,\,{#4},\,{#5},\,{#6}\rangle_{\mathrm{eval}}}
-\newcommand{\evallistconf}[6]{\langle{#1},\,{#2},\,{#3},\handler,\,\,{#4},\,{#5},\,{#6}\rangle_{\mathrm{evalList}}}
-\newcommand{\evalconf}[6]{\langle{#1},\,{#2},\,{#3},\handler,\,\,{#4},\,{#5},\,{#6}\rangle_{\mathrm{eval}}}
+\newcommand{\evallistconf}[6]{\langle{#1},\,{#2},\,{#3},\handler\,\,{#4},\,{#5},\,{#6}\rangle_{\mathrm{evalList}}}
+\newcommand{\evalconf}[6]{\langle{#1},\,{#2},\,{#3},\handler\,\,{#4},\,{#5},\,{#6}\rangle_{\mathrm{eval}}}
 \newcommand{\execconf}[9]{\langle{#1},\,{#2},\,{#3},\,{#4},\,\strace,\,{#5},\,{#6},\,{#7},\,{#8},\,{#9}\rangle_{\mathrm{exec}}}
 
