@@ -143,8 +143,6 @@ Therefore a variable look-up will consist of looking up the address of a variabl
 Continuation is the function that represents the rest of the program and is has the information needed to resume the execution of the program. 
 There are various types of continuations depending on the next statement to be executed or next expression to be evaluated.
 
-\newcommand{\varsetk}[3]{\mathrm{VarSetK}({#1},\,{#2},\,{#3})}
-
 \subsection{Values}
 \label{subsec:values}
 \subsection{Literal values}
@@ -229,7 +227,88 @@ A variable $\varmeta$ are accessed by reading the value stored at location $\env
   \end{array}
 \]
 
+\subsubsection{Boolean expresions}
+% exact notation TBD
+\newcommand{\true}{\mathrm{true}}
+\newcommand{\false}{\mathrm{false}}
+
+\[
+  \begin{array}{lll}
+	\evalconf{\neg\expr}{\env}{\strace}{\cstrace}{\cex}{\econt}
+	& \Rightarrow &
+	\evalconf{\expr}{\env}{\strace}{\cstrace}{\cex}{\notk{\econt}}\\[2mm]
+
+	\contconf{\notk{\econt}}{\true}
+	& \Rightarrow &
+	\contconf{\econt}{\false}\\[2mm]
+
+	\contconf{\notk{\econt}}{\false}
+	& \Rightarrow &
+	\contconf{\econt}{\true}
+  \end{array}
+\]
+
+\noindent
+Let $\econt' = \andk{\expri{2}}{\env}{\strace}{\cstrace}{\cex}{\econt}$ below:
+
+\[
+  \begin{array}{lcl}
+	\evalconf{\expri{1} \land \expri{2}}{\env}{\strace}{\cstrace}{\cex}{\econt}
+	& \Rightarrow &
+	\evalconf{\expri{1}}{\env}{\strace}{\cstrace}{\cex}{\econt'}\\[2mm]
+
+	\contconf{\andk{\expr}{\env}{\strace}{\cstrace}{\cex}{\econt}}{\true}
+	& \Rightarrow &
+	\evalconf{\expr}{\env}{\strace}{\cstrace}{\cex}{\econt}\\[2mm]
+
+	\contconf{\andk{\expr}{\env}{\strace}{\cstrace}{\cex}{\econt}}{\false}
+	& \Rightarrow &
+	\contconf{\econt}{\false}\\
+  \end{array}
+\]
+
+\noindent
+Let $\econt' = \ork{\expri{2}}{\env}{\strace}{\cstrace}{\cex}{\econt}$ below:
+
+\[
+  \begin{array}{lcl}
+	\evalconf{\expri{1} \lor \expri{2}}{\env}{\strace}{\cstrace}{\cex}{\econt}
+	& \Rightarrow &
+	\evalconf{\expri{1}}{\env}{\strace}{\cstrace}{\cex}{\econt'}\\[2mm]
+
+	\contconf{\ork{\expr}{\env}{\strace}{\cstrace}{\cex}{\econt}}{\false}
+	& \Rightarrow &
+	\evalconf{\expr}{\env}{\strace}{\cstrace}{\cex}{\econt}\\[2mm]
+
+	\contconf{\ork{\expr}{\env}{\strace}{\cstrace}{\cex}{\econt}}{\true}
+	& \Rightarrow &
+	\contconf{\econt}{\true}\\
+  \end{array}
+\]
+\noindent
+Let $\econt' = \conditionalk{\expri{1}}{\expri{2}}{\env}{\strace}{\cstrace}{\cex}{\econt}$ below:
+\[
+  \begin{array}{lcl}
+	\evalconf{\expr \textbf{ ? } \expri{1} \textbf{ : } \expri{2}}{\env}{\strace}{\cstrace}{\cex}{\econt}
+	& \Rightarrow &
+	\evalconf{\expr}{\env}{\strace}{\cstrace}{\cex}{\econt'}\\[2mm]
+
+
+	\contconf{\econt'}{\true}
+	& \Rightarrow &
+	\evalconf{\expri{1}}{\env}{\strace}{\cstrace}{\cex}{\econt}\\[2mm]
+
+	\contconf{\econt'}{\false}
+	& \Rightarrow &
+	\evalconf{\expri{2}}{\env}{\strace}{\cstrace}{\cex}{\econt}\\[2mm]
+  \end{array}
+\]
+
+\subsubsection{Let}
+\subsubsection{Static Invocation}
+\subsubsection{Evaluation of list of expressions}
 \subsection{Statement execution}
 \label{subsec:stmt-exectution}
+\subsubsection{Variable Declaration}
 
 \end{document}

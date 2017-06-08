@@ -364,11 +364,17 @@
 \newcommand{\scontconf}[2]{\confpair{#1}{#2}_{\mathrm{scont}}}
 \newcommand{\acontconf}[2]{\confpair{#1}{#2}_{\mathrm{acont}}}
 \newcommand{\throwconf}[3]{\conftriple{#1}{#2}{#3}_{\mathrm{throw}}}
-\newcommand{\aconf}[6]{\langle{#1},\,{#2},\,{#3},\handler,\,\,{#4},\,{#5},\,{#6}\rangle_{\mathrm{eval}}}
-\newcommand{\evallistconf}[6]{\langle{#1},\,{#2},\,{#3},\handler\,\,{#4},\,{#5},\,{#6}\rangle_{\mathrm{evalList}}}
-\newcommand{\evalconf}[6]{\langle{#1},\,{#2},\,{#3},\handler\,\,{#4},\,{#5},\,{#6}\rangle_{\mathrm{eval}}}
+\newcommand{\aconf}[6]{\langle{#1},\,{#2},\,{#3},\handler,\,{#4},\,{#5},\,{#6}\rangle_{\mathrm{eval}}}
+\newcommand{\evallistconf}[6]{\langle{#1},\,{#2},\,{#3},\handler,\,{#4},\,{#5},\,{#6}\rangle_{\mathrm{evalList}}}
+\newcommand{\evalconf}[6]{\langle{#1},\,{#2},\,{#3},\handler,\,{#4},\,{#5},\,{#6}\rangle_{\mathrm{eval}}}
 \newcommand{\execconf}[9]{\langle{#1},\,{#2},\,{#3},\,{#4},\,\strace,\,{#5},\,{#6},\,{#7},\,{#8},\,{#9}\rangle_{\mathrm{exec}}}
 
 %
 \newcommand{\cesktrans}[2]{{#1} \Rightarrow {#2}}
 
+% Continuation
+\newcommand{\varsetk}[3]{\mathrm{VarSetK}({#1},\,{#2},\,{#3})}
+\newcommand{\notk}[1]{\mathrm{NotK}({#1})}
+\newcommand{\andk}[6]{\mathrm{AndK}({#1},\,{#2},\,{#3},\,{\handler},\,{#4},\,{#5},\,{#6})}
+\newcommand{\ork}[6]{\mathrm{OrK}({#1},\,{#2},\,{#3},\,{\handler},\,{#4},\,{#5},\,{#6})}
+\newcommand{\conditionalk}[7]{\mathrm{ConditionalK}({#1},\,{#2},\,{#3},\,{#4},\,{\handler},\,{#5},\,{#6},\,{#7})}
