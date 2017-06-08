@@ -307,8 +307,9 @@
 
 % Kernel CESK
 \newcommand{\mlist}[1]{\textrm{List}\langle {#1} \rangle}
+\newcommand{\with}{\mathrm{with}}
 
-% Syn
+% Syntactic
 \newcommand{\expr}{\ensuremath{E}}
 \newcommand{\expri}[1]{\expr_\ensuremath{{#1}}}
 \newcommand{\exprs}{\expr\ensuremath{s}}
@@ -319,8 +320,9 @@
 \newcommand{\dexpr}{\mathbf{Expr}}
 \newcommand{\dstmt}{\mathbf{Stmt}}
 \newcommand{\dhandler}{\mathbf{Handler}}
+\newcommand{\synval}{V}
 
-% Meta
+% Semantic
 \newcommand{\vals}{\ensuremath{vs}}
 \newcommand{\env}{\ensuremath{\rho}}
 \newcommand{\strace}{\ensuremath{st}}
@@ -366,4 +368,7 @@
 \newcommand{\evallistconf}[6]{\langle{#1},\,{#2},\,{#3},\handler\,\,{#4},\,{#5},\,{#6}\rangle_{\mathrm{evalList}}}
 \newcommand{\evalconf}[6]{\langle{#1},\,{#2},\,{#3},\handler\,\,{#4},\,{#5},\,{#6}\rangle_{\mathrm{eval}}}
 \newcommand{\execconf}[9]{\langle{#1},\,{#2},\,{#3},\,{#4},\,\strace,\,{#5},\,{#6},\,{#7},\,{#8},\,{#9}\rangle_{\mathrm{exec}}}
+
+%
+\newcommand{\cesktrans}[2]{{#1} \Rightarrow {#2}}
 

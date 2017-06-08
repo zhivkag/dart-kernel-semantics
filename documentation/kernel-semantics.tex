@@ -29,37 +29,36 @@ The small-step operational semantics of Dart Kernel is given by an abstract mach
 \subsection{Domains}
 \label{subsec:domains}
 \[
-\begin{array}{lcll}
+  \begin{array}{lcll}
+	\expr, \expri{i} & : & \dexpr & \textrm{syntactic domain of expressions}\\
+	\exprs & : & \mlist{\dexpr}\\[2mm]
 
-\expr, \expri{i} & : & \dexpr & \textrm{syntactic domain of expressions}\\
-\exprs & : & \mlist{\dexpr}  & \textrm{}\\[2mm]
+	\stmt, \stmti{i} & : & \dstmt & \textrm{syntactic domain of statements}\\
+	\stmts & : & \mlist{\dstmt}  & \textrm{}\\[2mm]
 
-\stmt, \stmti{i} & : & \dstmt & \textrm{syntactic domain of statements}\\
-\stmts & : & \mlist{\dstmt}  & \textrm{}\\[2mm]
+	\econt & : & \decont & \textrm{domain of expression continuations}\\
+	\acont & : & \dacont & \textrm{domain of application continuations}\\
+	\scont & : & \dscont & \textrm{domain of statement continuations}\\
+	\bcont & : & \dbcont & \textrm{domain of break continuations}\\
+	\switchcont & : & \dswitchcont & \textrm{domain of switch continuations}\\[2mm]
 
-\econt & : & \decont & \textrm{domain of expression continuations}\\
-\acont & : & \dacont & \textrm{domain of application continuations}\\
-\scont & : & \dscont & \textrm{domain of statement continuations}\\
-\bcont & : & \dbcont & \textrm{domain of break continuations}\\
-\switchcont & : & \dswitchcont & \textrm{domain of switch continuations}\\[2mm]
+	\lbl & : & \dlbl & \textrm{domain of labels}\\
+	\lbl & : & \mlist{\dlbl} \\
+	\clbl & : & \dclbl & \textrm{domain of switch labels}\\
+	\clbl & : & \mlist{\dclbl} \\[2mm]
 
-\lbl & : & \dlbl & \textrm{domain of labels}\\
-\lbl & : & \mlist{\dlbl} \\
-\clbl & : & \dclbl & \textrm{domain of switch labels}\\
-\clbl & : & \mlist{\dclbl} \\[2mm]
+	\handler & : & \dhandler & \textrm{syntactic domain of exception handlers} \\
+	\strace & : & \mlist{\dexpr} & \textrm{domain of stack traces}\\
+	\cex & : &  \emptyset + \dval & \textrm{domain of current expetion values}\\
+	\cstrace & : & \emptyset + \mlist{\dexpr} & \textrm{domain of current exception stack traces}\\[2mm]
 
-\handler & : & \dhandler & \textrm{syntactic domain of exception handlers} \\
-\strace & : & \mlist{\dexpr} & \textrm{domain of stack traces}\\
-\cex & : &  \emptyset + \dval & \textrm{domain of current expetion values}\\
-\cstrace & : & \emptyset + \mlist{\dexpr} & \textrm{domain of current exception stack traces}\\[2mm]
+	\varmeta & : & \dvardecl & \textrm{domain of variable declarations}\\
+	\loc & : & \dlocation & \textrm{domain of store locations}\\
+	\val & : & \dval & \textrm{domain of values}\\
+	\vals & : & \mlist{\dval}\\
+	\env & : & \denv & \textrm{domain of environments}
 
-\varmeta & : & \dvardecl & \textrm{domain of variable declarations}\\
-\loc & : & \dlocation & \textrm{domain of store locations}\\
-\val & : & \dval & \textrm{domain of values} \\ 
-\vals & : & \mlist{\dval}\\
-\env & : & \denv & \textrm{domain of environments}  
-
-\end{array}
+  \end{array}
 \]
 \subsection{Meta-functions}
 \label{subsec:meta-functions}
@@ -68,8 +67,8 @@ The small-step operational semantics of Dart Kernel is given by an abstract mach
 Function "!" is used to "dereference" items stored in environments. It has an implicit argument which is the store of CESK machine.
 
 \begin{align*}
-\deref : \dlocation &\rightarrow \dval \\
-\deref\loc &=  \val, \textrm{ with $\val$ the value in store at location } \loc
+  \deref : \dlocation &\rightarrow \dval \\
+  \deref\loc &=  \val, \textrm{ with $\val$ the value in store at location } \loc
 \end{align*}
 
 \subsubsection{String Concatenation}
@@ -86,45 +85,47 @@ Function $stringValue$ concatenates strings from the given meta-list.
 \subsection{Notations}
 \label{subsec:notations}
 
-\begin{align*}
-[]	&:= \textrm{empty list} \\
-X :: list	&:= \textrm{a meta-list that is constructed by adding element X to the head of the meta-list list}
-\end{align*}
-
+\[
+  \begin{array}{lcl}
+    [] &:=& \textrm{empty list}\\
+    X :: list &:=& \textrm{a meta-list that is constructed by adding element X to the head}\\
+    && \textrm{of the meta-list list}
+  \end{array}
+\]
 \subsection{Configurations for the CESK machine}
 \label{subsec:cesk-configs}
 The state space of the CESK machine contains various kinds of configurations, each containing components for applying the appropriate continuation in order to transition to the next configuration. 
 
 \[
-\begin{array}{lcl}
-\evalconf{\expr}{\env}{st}{cex}{cst}{\econt} & : &
-\textrm{EvalConfiguration}\\
+  \begin{array}{lcl}
+	\evalconf{\expr}{\env}{st}{cex}{cst}{\econt} & : &
+	\textrm{EvalConfiguration}\\
 
-\evallistconf{\exprs}{\env}{st}{cex}{cst}{\econt} & : & 
-\textrm{EvalListConfiguration} \\
+	\evallistconf{\exprs}{\env}{st}{cex}{cst}{\econt} & : &
+	\textrm{EvalListConfiguration}\\
 
-\execconf{\stmt}{\env}{\lbls}{\clbls}{\handler}{\cex}{\cstrace}{\econt}{\scont}  & : & 
-\textrm{ExecConfiguration}\\[3mm]
+	\execconf{\stmt}{\env}{\lbls}{\clbls}{\handler}{\cex}{\cstrace}{\econt}{\scont}  & : &
+	\textrm{ExecConfiguration}\\[3mm]
 
-\contconf{\econt}{\val} & : & 
-\textrm{ValuePassingConfiguration} \\
+	\contconf{\econt}{\val} & : &
+	\textrm{ValuePassingConfiguration}\\
 
-\acontconf{\acont}{\vals}& : & 
-\textrm{ApplicationConfiguration} \\
+	\acontconf{\acont}{\vals} & : &
+	\textrm{ApplicationConfiguration}\\
 
-\acontconf{\scont}{\env} & : & 
-\textrm{ForwardConfiguration} \\[3mm]
+	\acontconf{\scont}{\env} & : &
+	\textrm{ForwardConfiguration}\\[3mm]
 
-\throwconf{\handler}{\val}{\strace} & : & 
-\textrm{ThrowConfiguration} \\
+	\throwconf{\handler}{\val}{\strace} & : &
+	\textrm{ThrowConfiguration}\\
 
-\breakconf{\bcont} & : & 
-\textrm{BreakConfiguration} \\
+	\breakconf{\bcont} & : &
+	\textrm{BreakConfiguration}\\
 
-\switchconf{\switchcont} & : & 
- \textrm{SwitchConfiguration}\\
+	\switchconf{\switchcont} & : &
+	\textrm{SwitchConfiguration}\\
 
-\end{array}
+  \end{array}
 \]
 \subsection{Environment}
 \label{subsec:env-definition}
@@ -137,35 +138,96 @@ The store, $s$, maps a location, $\loc$, to a value, $\val$. The store is mutabl
 Therefore a variable look-up will consist of looking up the address of a variable from the environment with $\loc = \env(\varmeta)$ and reading the stored value $v$ with $\deref\loc$. For definition of "$\deref$" see Section~\ref{subsubsection:dereferecing} 
 
 \subsection{Continuations}
-\label{subsec:continuations-defiontion}
+\label{subsec:continuations-definition}
 
 Continuation is the function that represents the rest of the program and is has the information needed to resume the execution of the program. 
 There are various types of continuations depending on the next statement to be executed or next expression to be evaluated.
+
+\newcommand{\varsetk}[3]{\mathrm{VarSetK}({#1},\,{#2},\,{#3})}
 
 \subsection{Values}
 \label{subsec:values}
 \subsection{Literal values}
 \label{subsubsec:literal-values}
-\begin{align*}
-\val \in \dlitval &= \mathbf{int} + \mathbf{bool} + \mathbf{double} \\ &+ \mathbf{List} + \mathbf{Map} + \mathbf{String} + \mathbf{Symbol} + \mathbf{Type} 
-\end{align*} 
+\[
+  \begin{array}{lcl}
+	\val \in \dlitval &=& \mathbf{int} + \mathbf{bool} + \mathbf{double}\\
+	&& + \mathbf{List} + \mathbf{Map} + \mathbf{String} + \mathbf{Symbol} + \mathbf{Type}
+  \end{array}
+\]
 \subsection{Object values}
 \label{subsec:object-values}
-\begin{align*}
- \dobjval &: \dclass \times \mlist{\dlocation}\\
- \dclass &: superclass \times interfaces \times fields \times getters \times setters \times methods
-\end{align*}
-
+\[
+  \begin{array}{lcl}
+	\dobjval &:& \dclass \times \mlist{\dlocation}\\
+	\dclass &:& superclass \times interfaces \times fields \times getters \times setters \times methods
+  \end{array}
+\]
 \subsection{Function values}
 \label{subsec:function-values}
-\begin{align*}
-\dfunval : \dformals \times \dstmt \times \denv 
-\end{align*}
+\[
+	\dfunval : \dformals \times \dstmt \times \denv
+\]
 
 \section{Semantics}
 \label{sec:semantics}
 \subsection{Expression evaluation}
 \label{subsec:expr-evaluation}
+\subsubsection{Basic literal evaluation}
+\label{subsubsec:basic-literal-eval}
+Kernel literals are evaluated to a value $\val \in \dlitval$. Transitions of the CESK machine for basic literals are presented below:
+\[
+  \begin{array}{lcll}
+	\evalconf{\mathrm{BasicLiteral(\synval)}}{\env}{\strace}{\cstrace}{\cex}{\econt}
+	& \Rightarrow &
+	\contconf{\econt}{\mathrm{LiteralValue(\synval)}}\\[2mm]
+
+	\evalconf{\mathrm{IntLiteral(\synval)}}{\env}{\strace}{\cstrace}{\cex}{\econt}
+	& \Rightarrow &
+	\contconf{\econt}{\mathrm{IntValue(\synval)}}\\[2mm]
+
+	\evalconf{\mathrm{DoubleLiteral(\synval)}}{\env}{\strace}{\cstrace}{\cex}{\econt}
+	& \Rightarrow &
+	\contconf{\econt}{\mathrm{DoubleValue(\synval)}}\\[2mm]
+
+	\evalconf{\mathrm{BoolLiteral(\synval)}}{\env}{\strace}{\cstrace}{\cex}{\econt}
+	& \Rightarrow &
+	\contconf{\econt}{\mathrm{BoolValue(\synval)}}\\[2mm]
+
+	\evalconf{\mathrm{StringLiteral(\synval)}}{\env}{\strace}{\cstrace}{\cex}{\econt}
+	& \Rightarrow &
+	\contconf{\econt}{\mathrm{StringValue(\synval)}}
+
+  \end{array}
+\]
+with:
+\[
+  \begin{array}{lcllcl}
+	\textrm{IntLiteral} &\in &\mathbf{int},  &\textrm{DoubleLiteral} &\in &\mathbf{double}\\
+	\textrm{BoolLiteral} &\in &\mathbf{bool}, &\textrm{StringLiteral} &\in &\mathbf{String}
+  \end{array}
+\]
+
+\subsubsection{Variable assignment and lookup}
+\label{subsubsec:variable-assignment-and-lookup}
+A variable $\varmeta$ are accessed by reading the value stored at location $\env(\varmeta)$ in the store $s$. Assigning a value to a variable will modify the store and the value stored at location  $\env(\varmeta)$.
+
+\[
+  \begin{array}{lcl}
+	\evalconf{\varmeta}{\env}{\strace}{\cstrace}{\cex}{\econt}
+	& \Rightarrow &
+	\contconf{\econt}{\deref\env(\varmeta)}\\[2mm]
+
+	\evalconf{\varmeta = \expr}{\env}{\strace}{\cstrace}{\cex}{\econt}
+	& \Rightarrow &
+	\evalconf{\expr}{\env}{\strace}{\cstrace}{\cex}{\varsetk{\env}{\varmeta}{\econt}}\\[2mm]
+
+	\contconf{\varsetk{\env}{\varmeta}{\econt}}{\val}
+	& \Rightarrow &
+	\contconf{\econt}{\val}, \hspace{5mm} \deref\env(\varmeta) = \val \textrm{ after transition}
+
+  \end{array}
+\]
 
 \subsection{Statement execution}
 \label{subsec:stmt-exectution}
