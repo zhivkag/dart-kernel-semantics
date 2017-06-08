@@ -12,7 +12,9 @@
 The small-step operational semantics of Dart Kernel is given by an abstract machine in the style of the CESK machine. The machine is defined by a single step transition function where each step of the machine starts in a configuration and deterministically gives a next configuration.
 
 \section{Definitions}
+\label{sec:definitions}
 \subsection{Conventions}
+\label{subsec:conventions}
 \begin{itemize}
 \setlength{\itemsep}{0pt}
 \item Symbols ":" and $\in$ are used interchangeably.
@@ -25,6 +27,7 @@ The small-step operational semantics of Dart Kernel is given by an abstract mach
 \item "$\mlist{\mathbf{X}}$" := domain of meta-lists of elements from domain "$\mathbf{X}$". Note that the word "List" here is not in bold, so that it isn't confused with the domain $\mathbf{List}$ of Dart objects.
 \end{itemize}
 \subsection{Domains}
+\label{subsec:domains}
 \[
 \begin{array}{lcll}
 
@@ -59,6 +62,7 @@ The small-step operational semantics of Dart Kernel is given by an abstract mach
 \end{array}
 \]
 \subsection{Meta-functions}
+\label{subsec:meta-functions}
 \subsubsection{Dereferencing}
 \label{subsubsection:dereferecing}
 Function "!" is used to "dereference" items stored in environments. It has an implicit argument which is the store of CESK machine.
@@ -69,21 +73,26 @@ Function "!" is used to "dereference" items stored in environments. It has an im
 \end{align*}
 
 \subsubsection{String Concatenation}
+\label{subsubsec:string-concatenation}
 Function $StringValue$ concatenates strings from the given meta-list.
 
 \[StringValue : \mlist{\dstring} \rightarrow \dstring\]
 
 \subsubsection{Updating Environment}
+\label{subsubsec:updating-env}
 
 \[extend : \denv \times \dfunval \times \mlist{\dval} \rightarrow  \denv \]
 
 \subsection{Notations}
+\label{subsec:notations}
+
 \begin{align*}
 []	&:= \textrm{empty list} \\
 X :: list	&:= \textrm{a meta-list that is constructed by adding element X to the head of the meta-list list}
 \end{align*}
 
 \subsection{Configurations for the CESK machine}
+\label{subsec:cesk-configs}
 The state space of the CESK machine contains various kinds of configurations, each containing components for applying the appropriate continuation in order to transition to the next configuration. 
 
 \[
@@ -118,35 +127,47 @@ The state space of the CESK machine contains various kinds of configurations, ea
 \end{array}
 \]
 \subsection{Environment}
+\label{subsec:env-definition}
 The environment is a function that maps a variable to a location in the store.
 \[\env \in \denv = \dvardecl \rightarrow \dlocation\] 
 \subsection{Store}
+\label{subsec:store-definition}
 The store, $s$, maps a location, $\loc$, to a value, $\val$. The store is mutable and should not be confused with a function. It is possible to change the transition rules, so that the store is immutable, and right hand side configurations receive an updated copy of it. However, for the sake of simplicity, a global mutable store is assumed. 
 \[s : \dlocation \rightarrow \dval \]
 Therefore a variable look-up will consist of looking up the address of a variable from the environment with $\loc = \env(\varmeta)$ and reading the stored value $v$ with $\deref\loc$. For definition of "$\deref$" see Section~\ref{subsubsection:dereferecing} 
 
 \subsection{Continuations}
+\label{subsec:continuations-defiontion}
 
 Continuation is the function that represents the rest of the program and is has the information needed to resume the execution of the program. 
 There are various types of continuations depending on the next statement to be executed or next expression to be evaluated.
 
 \subsection{Values}
+\label{subsec:values}
 \subsection{Literal values}
+\label{subsubsec:literal-values}
 \begin{align*}
 \val \in \dlitval &= \mathbf{int} + \mathbf{bool} + \mathbf{double} \\ &+ \mathbf{List} + \mathbf{Map} + \mathbf{String} + \mathbf{Symbol} + \mathbf{Type} 
 \end{align*} 
 \subsection{Object values}
+\label{subsec:object-values}
 \begin{align*}
  \dobjval &: \dclass \times \mlist{\dlocation}\\
  \dclass &: superclass \times interfaces \times fields \times getters \times setters \times methods
 \end{align*}
 
 \subsection{Function values}
+\label{subsec:function-values}
 \begin{align*}
 \dfunval : \dformals \times \dstmt \times \denv 
 \end{align*}
 
 \section{Semantics}
+\label{sec:semantics}
 \subsection{Expression evaluation}
+\label{subsec:expr-evaluation}
+
 \subsection{Statement execution}
+\label{subsec:stmt-exectution}
+
 \end{document}
