@@ -217,11 +217,14 @@
 
 \newcommand{\namedevaluation}[3]{{#2} \, \Rightarrow^*_{#1} \, {#3}}
 \newcommand{\namedtransition}[3]{{#2} & \Rightarrow_{#1} & {#3}}
+
+% Configuration tuples
+\newcommand{\confsingle}[1]{\langle{#1}\rangle}
 \newcommand{\confpair}[2]{\langle{#1},\,{#2}\rangle}
 \newcommand{\conftriple}[3]{\langle{#1},\,{#2},\,{#3}\rangle}
-\newcommand{\confquadruple}[4]{\langle{#1},\,{#2},\,{#3},\,{#4}\rangle}
-\newcommand{\namedconftriple}[4]{\triple{#2}{#3}{#4}_{#1}}
-\newcommand{\namedconfquadruple}[5]{\quadruple{#2}{#3}{#4}{#5}_{#1}}
+\newcommand{\confnonuple}[9]{\langle{#1},\,{#2},\,{#3},\,{#4,},\,{#5},\,{#6},\,{#7},\,{#8},\,{#9}\rangle}
+
+%
 \newcommand{\contractsto}[1]{\ensuremath{\rightarrow_{#1}}}
 %
 
@@ -301,4 +304,39 @@
 \setlength\leftmarginii  {1em}
 
 \newcommand{\myphantom}[1]{$\phantom{\mbox{#1}}$}
+
+% Definitions for CESK
+\newcommand{\vals}{\ensuremath{vs}}
+
+\newcommand{\env}{\ensuremath{\rho}}
+\newcommand{\handler}{\ensuremath{H}}
+\newcommand{\expr}{\ensuremath{E}}
+\newcommand{\expri}[1]{\expr_\ensuremath{{#1}}}
+\newcommand{\exprs}{\expr\ensuremath{s}}
+\newcommand{\stmt}{\ensuremath{S}}
+\newcommand{\strace}{\ensuremath{st}}
+\newcommand{\cst}{\ensuremath{c}\strace}
+\newcommand{\cex}{\ensuremath{cex}}
+\newcommand{\econt}{\cont_\ensuremath{E}}
+\newcommand{\acont}{\cont_\ensuremath{A}}
+\newcommand{\scont}{\cont_\ensuremath{S}}
+\newcommand{\bcont}{\cont_\ensuremath{B}}
+\newcommand{\switchcont}{\cont_{\ensuremath{switch}}}
+\newcommand{\lbl}{\ensuremath{lbl}}
+\newcommand{\lbls}{\ensuremath{lbls}}
+\newcommand{\clbl}{\ensuremath{clbl}}
+\newcommand{\clbls}{\ensuremath{clbls}}
+
+% Named Configuration for CESK
+\newcommand{\breakconf}[1]{\confsingle{#1}_{\mathrm{breakCont}}}
+\newcommand{\switchconf}[1]{\confsingle{#1}_{\mathrm{switchCont}}}
+\newcommand{\contconf}[2]{\confpair{#1}{#2}_{\mathrm{cont}}}
+\newcommand{\scontconf}[2]{\confpair{#1}{#2}_{\mathrm{scont}}}
+\newcommand{\acontconf}[2]{\confpair{#1}{#2}_{\mathrm{acont}}}
+\newcommand{\throwconf}[3]{\conftriple{#1}{#2}{#3}_{\mathrm{throw}}}
+
+\newcommand{\aconf}[6]{\langle{#1},\,{#2},\,{#3},\handler,\,\,{#4},\,{#5},\,{#6}\rangle_{\mathrm{eval}}}
+\newcommand{\evallistconf}[6]{\langle{#1},\,{#2},\,{#3},\handler,\,\,{#4},\,{#5},\,{#6}\rangle_{\mathrm{evalList}}}
+\newcommand{\evalconf}[6]{\langle{#1},\,{#2},\,{#3},\handler,\,\,{#4},\,{#5},\,{#6}\rangle_{\mathrm{eval}}}
+\newcommand{\execconf}[9]{\langle{#1},\,{#2},\,{#3},\,{#4},\,\strace,\,{#5},\,{#6},\,{#7},\,{#8},\,{#9}\rangle_{\mathrm{exec}}}
 

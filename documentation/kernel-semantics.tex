@@ -1,6 +1,6 @@
 \documentclass{article}
 
-% Macros used below have been contributed by Olivier Danvy and Kevin Millikin
+% Macros used below have been contributed in part by Olivier Danvy and Kevin Millikin
 \input{danvy-millikin-LMCS.mac}
 
 \begin{document}
@@ -16,9 +16,43 @@ The small-step operational semantics of Dart Kernel is given by an abstract mach
 \subsection{Meta-functions}
 \subsection{Notations}
 \subsection{Configurations for the CESK machine}
+The state space of the CESK machine contains various kinds of configurations, each containing components for applying the appropriate continuation in order to transition to the next configuration. 
+
+\[
+\begin{array}{lcl}
+\evalconf{\expr}{\env}{st}{cex}{cst}{\econt} & : &
+\textrm{EvalConfiguration}\\
+
+\evallistconf{\exprs}{\env}{st}{cex}{cst}{\econt} & : & 
+\textrm{EvalListConfiguration} \\
+
+\execconf{\stmt}{\env}{\lbls}{\clbls}{\handler}{\cex}{\cst}{\econt}{\scont}  & : & 
+\textrm{ExecConfiguration}\\[3mm]
+
+\contconf{\econt}{\val} & : & 
+\textrm{ValuePassingConfiguration} \\
+
+\acontconf{\acont}{\vals}& : & 
+\textrm{ApplicationConfiguration} \\
+
+\acontconf{\scont}{\env} & : & 
+\textrm{ForwardConfiguration} \\[3mm]
+
+\throwconf{\handler}{\val}{\strace} & : & 
+\textrm{ThrowConfiguration} \\
+
+\breakconf{\bcont} & : & 
+\textrm{BreakConfiguration} \\
+
+\switchconf{\switchcont} & : & 
+ \textrm{SwitchConfiguration}\\
+
+\end{array}
+\]
 \subsection{Environment}
 \subsection{Store}
 \subsection{Continuations}
+
 \subsection{Values}
 \section{Semantics}
 \subsection{Expression evaluation}
