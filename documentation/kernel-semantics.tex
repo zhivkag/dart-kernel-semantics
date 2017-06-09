@@ -71,7 +71,7 @@ The small-step operational semantics of Dart Kernel is given by an abstract mach
 \label{subsec:meta-functions}
 \subsubsection{Dereferencing}
 \label{subsubsection:dereferecing}
-Function "!" is used to "dereference" items stored in environments. It has an implicit argument which is the store of CESK machine.
+Function "$\deref{}$" is used to "dereference" items stored in environments. It has an implicit argument which is the store of CESK machine.
 
 \begin{align*}
   \deref : \dlocation &\rightarrow \dval \\
@@ -86,8 +86,9 @@ Function $stringValue$ concatenates strings from the given meta-list.
 
 \subsubsection{Updating Environment}
 \label{subsubsec:updating-env}
-
-\[extend : \denv \times \dformals \times \mlist{\dval} \rightarrow  \denv \]
+Function "$extend$" creates a new environment by extending the provided environment with new bindings for the variable declarations to fresh labels for each of the provided values.
+% Exact definition on how the sotre is modified to be added
+\[extend : \denv \times \mlist{\dvardecl} \times \mlist{\dval} \rightarrow  \denv \]
 
 \subsection{Notations}
 \label{subsec:notations}
@@ -311,9 +312,10 @@ Let $\econt' = \letk{\expri{2}}{\env}{\varmeta}{\strace}{\cstrace}{\cex}{\econt}
 	& \Rightarrow &
 	\evalconf{\expri{1}}{\env}{\strace}{\cstrace}{\cex}{\econt'}\\[2mm]
 
-	%\contconf{\econt'}{\val}
-	%& \Rightarrow &
-	%\evalconf{\expri{2}}{\env\lbrace\rbrace}{\strace}{\cstrace}{\cex}{\econt}\\[2mm]
+	\contconf{\econt'}{\val}
+	& \Rightarrow &
+	\evalconf{\expri{2}}{\env'}{\strace}{\cstrace}{\cex}{\econt}\\
+	&&\env'=\ext{\env}{\varmeta}{\val}\\[2mm]
 
   \end{array}
 \]

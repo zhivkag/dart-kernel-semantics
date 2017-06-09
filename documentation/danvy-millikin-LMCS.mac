@@ -307,7 +307,7 @@
 
 % Kernel CESK
 \newcommand{\mlist}[1]{\textrm{List}\langle {#1} \rangle}
-\newcommand{\with}{\mathrm{with}}
+\newcommand{\ext}[3]{\ensuremath{extend({#1},\,{#2},\,{#3})}}
 
 % Syntactic
 \newcommand{\expr}{\ensuremath{E}}
