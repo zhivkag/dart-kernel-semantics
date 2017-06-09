@@ -356,6 +356,9 @@
 \newcommand{\dobjval}{\mathbf{ObjectValue}}
 \newcommand{\dclass}{\mathbf{Class}}
 \newcommand{\dformals}{\mathbf{Formals}}
+\newcommand{\formal}{\ensuremath{A}}
+\newcommand{\formali}[1]{\ensuremath{A_{#1}}}
+\newcommand{\formals}{\ensuremath{As}}
 
 % Named Configuration for CESK
 \newcommand{\breakconf}[1]{\confsingle{#1}_{\mathrm{breakCont}}}

@@ -29,7 +29,7 @@ The small-step operational semantics of Dart Kernel is given by an abstract mach
 \subsection{Domains}
 \label{subsec:domains}
 \[
-  \begin{array}{lcll}
+  \begin{array}{ccll}
 	\expr, \expri{i} & : & \dexpr & \textrm{syntactic domain of expressions}\\
 	\exprs & : & \mlist{\dexpr}\\[2mm]
 
@@ -56,7 +56,14 @@ The small-step operational semantics of Dart Kernel is given by an abstract mach
 	\loc & : & \dlocation & \textrm{domain of store locations}\\
 	\val & : & \dval & \textrm{domain of values}\\
 	\vals & : & \mlist{\dval}\\
-	\env & : & \denv & \textrm{domain of environments}
+	\env & : & \denv & \textrm{domain of environments}\\[2mm]
+  \end{array}
+\]
+
+\[
+  \begin{array}{ccll}
+	\formal, \formali{i} & : & \dvardecl\\
+	\formals & : & \dformals = \mlist{\dvardecl} &\textrm{ domain of formals}\\
 
   \end{array}
 \]
@@ -80,7 +87,7 @@ Function $stringValue$ concatenates strings from the given meta-list.
 \subsubsection{Updating Environment}
 \label{subsubsec:updating-env}
 
-\[extend : \denv \times \dfunval \times \mlist{\dval} \rightarrow  \denv \]
+\[extend : \denv \times \dformals \times \mlist{\dval} \rightarrow  \denv \]
 
 \subsection{Notations}
 \label{subsec:notations}
@@ -220,6 +227,101 @@ A variable $\varmeta$ are accessed by reading the value stored at location $\env
   \end{array}
 \]
 
+\subsubsection{Boolean expresions}
+% exact notation TBD
+\newcommand{\true}{\mathrm{true}}
+\newcommand{\false}{\mathrm{false}}
+
+\[
+  \begin{array}{lll}
+	\evalconf{\neg\expr}{\env}{\strace}{\cstrace}{\cex}{\econt}
+	& \Rightarrow &
+	\evalconf{\expr}{\env}{\strace}{\cstrace}{\cex}{\notk{\econt}}\\[2mm]
+
+	\contconf{\notk{\econt}}{\true}
+	& \Rightarrow &
+	\contconf{\econt}{\false}\\[2mm]
+
+	\contconf{\notk{\econt}}{\false}
+	& \Rightarrow &
+	\contconf{\econt}{\true}
+  \end{array}
+\]
+
+\noindent
+Let $\econt' = \andk{\expri{2}}{\env}{\strace}{\cstrace}{\cex}{\econt}$ below:
+
+\[
+  \begin{array}{lcl}
+	\evalconf{\expri{1} \land \expri{2}}{\env}{\strace}{\cstrace}{\cex}{\econt}
+	& \Rightarrow &
+	\evalconf{\expri{1}}{\env}{\strace}{\cstrace}{\cex}{\econt'}\\[2mm]
+
+	\contconf{\andk{\expr}{\env}{\strace}{\cstrace}{\cex}{\econt}}{\true}
+	& \Rightarrow &
+	\evalconf{\expr}{\env}{\strace}{\cstrace}{\cex}{\econt}\\[2mm]
+
+	\contconf{\andk{\expr}{\env}{\strace}{\cstrace}{\cex}{\econt}}{\false}
+	& \Rightarrow &
+	\contconf{\econt}{\false}\\
+  \end{array}
+\]
+
+\noindent
+Let $\econt' = \ork{\expri{2}}{\env}{\strace}{\cstrace}{\cex}{\econt}$ below:
+
+\[
+  \begin{array}{lcl}
+	\evalconf{\expri{1} \lor \expri{2}}{\env}{\strace}{\cstrace}{\cex}{\econt}
+	& \Rightarrow &
+	\evalconf{\expri{1}}{\env}{\strace}{\cstrace}{\cex}{\econt'}\\[2mm]
+
+	\contconf{\ork{\expr}{\env}{\strace}{\cstrace}{\cex}{\econt}}{\false}
+	& \Rightarrow &
+	\evalconf{\expr}{\env}{\strace}{\cstrace}{\cex}{\econt}\\[2mm]
+
+	\contconf{\ork{\expr}{\env}{\strace}{\cstrace}{\cex}{\econt}}{\true}
+	& \Rightarrow &
+	\contconf{\econt}{\true}\\
+  \end{array}
+\]
+\noindent
+Let $\econt' = \conditionalk{\expri{1}}{\expri{2}}{\env}{\strace}{\cstrace}{\cex}{\econt}$ below:
+\[
+  \begin{array}{lcl}
+	\evalconf{\expr \textbf{ ? } \expri{1} \textbf{ : } \expri{2}}{\env}{\strace}{\cstrace}{\cex}{\econt}
+	& \Rightarrow &
+	\evalconf{\expr}{\env}{\strace}{\cstrace}{\cex}{\econt'}\\[2mm]
+
+	\contconf{\econt'}{\true}
+	& \Rightarrow &
+	\evalconf{\expri{1}}{\env}{\strace}{\cstrace}{\cex}{\econt}\\[2mm]
+
+	\contconf{\econt'}{\false}
+	& \Rightarrow &
+	\evalconf{\expri{2}}{\env}{\strace}{\cstrace}{\cex}{\econt}\\[2mm]
+  \end{array}
+\]
+
+\subsubsection{Let}
+Let $\econt' = \letk{\expri{2}}{\env}{\varmeta}{\strace}{\cstrace}{\cex}{\econt}$ below:
+\[
+  \begin{array}{lcl}
+	\evalconf{\textbf{let } \varmeta = \expri{1} \textbf{ in } \expri{2}}{\env}{\strace}{\cstrace}{\cex}{\econt}
+	& \Rightarrow &
+	\evalconf{\expri{1}}{\env}{\strace}{\cstrace}{\cex}{\econt'}\\[2mm]
+
+	%\contconf{\econt'}{\val}
+	%& \Rightarrow &
+	%\evalconf{\expri{2}}{\env\lbrace\rbrace}{\strace}{\cstrace}{\cex}{\econt}\\[2mm]
+
+  \end{array}
+\]
+\subsubsection{Static Invocation}
+\subsubsection{Evaluation of list of expressions}
+\subsection{Statement execution}
+\label{subsec:stmt-exectution}
+\subsubsection{Variable Declaration}
 \subsection{Statement execution}
 \label{subsec:stmt-exectution}
 
