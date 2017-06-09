@@ -320,6 +320,23 @@ Let $\econt' = \letk{\expri{2}}{\env}{\varmeta}{\strace}{\cstrace}{\cex}{\econt}
   \end{array}
 \]
 \subsubsection{Static Invocation}
+\[
+  \begin{array}{lcl}
+	\evalconf{\textbf{f }(\exprs)}{\env}{\strace}{\cstrace}{\cex}{\econt}
+	& \Rightarrow &
+	\evallistconf{\exprs}{\env}{\strace}{\cstrace}{\cex}{\acont'}\\
+  \end{array}
+\]
+with:
+\[
+  \begin{array}{lcl}
+	\textbf{f} = \mathrm{FunctionNode}(\formals, \stmt_{body}),\\
+	\acont' = \staticinvocapp{\formals}{\stmt_{body}}{\textbf{f }(\exprs)::\strace}{\cstrace}{\cex}{\econt}
+  \end{array}
+\]
+
+
+
 \subsubsection{Evaluation of list of expressions}
 \subsection{Statement execution}
 \label{subsec:stmt-exectution}

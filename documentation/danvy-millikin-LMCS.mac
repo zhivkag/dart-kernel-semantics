@@ -307,6 +307,7 @@
 
 % Kernel CESK
 \newcommand{\mlist}[1]{\textrm{List}\langle {#1} \rangle}
+\newcommand{\deref}{!}
 \newcommand{\ext}[3]{\ensuremath{extend({#1},\,{#2},\,{#3})}}
 
 % Syntactic
@@ -349,7 +350,6 @@
 \newcommand{\denv}{\mathbf{Env}}
 \newcommand{\loc}{\ensuremath{\alpha}}
 \newcommand{\dlocation}{\mathbf{Location}}
-\newcommand{\deref}{!}
 \newcommand{\dstring}{\mathbf{StringValue}}
 \newcommand{\dfunval}{\mathbf{FunctionValue}}
 \newcommand{\dlitval}{\mathbf{LiteralValue}}
@@ -382,3 +382,6 @@
 \newcommand{\ork}[6]{\mathrm{OrK}({#1},\,{#2},\,{#3},\,{\handler},\,{#4},\,{#5},\,{#6})}
 \newcommand{\conditionalk}[7]{\mathrm{ConditionalK}({#1},\,{#2},\,{#3},\,{#4},\,{\handler},\,{#5},\,{#6},\,{#7})}
 \newcommand{\letk}[7]{\mathrm{LetK}({#1},\,{#2},\,{#3},\,{#4},\,{\handler},\,{#5},\,{#6},\,{#7})}
+
+% Application continuation
+\newcommand{\staticinvocapp}[6]{\mathrm{StaticInvocationA}({#1},\,{#2},\,{#3},\,\handler,\,{#4},\,{#5},\,{#6})}
