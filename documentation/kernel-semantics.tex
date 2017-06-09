@@ -101,7 +101,7 @@ Function $stringValue$ concatenates strings from the given meta-list.
 \subsubsection{Updating Environment}
 \label{subsubsec:updating-env}
 Function "$extend$" creates a new environment by extending the provided environment with new bindings for the variable declarations to fresh labels for each of the provided values.
-% Exact definition on how the sotre is modified to be added
+% Exact definition on how the store is modified to be added
 \[extend : \denv \times \mlist{\dvardecl} \times \mlist{\dval} \rightarrow  \denv \]
 
 \subsection{Notations}
@@ -382,8 +382,53 @@ Expression list continuation application:
 \]
 \subsection{Statement execution}
 \label{subsec:stmt-exectution}
-\subsubsection{Variable Declaration}
-\subsection{Statement execution}
-\label{subsec:stmt-exectution}
 
+\subsubsection{Variable Declaration}
+
+Let $\econt' = \vardeclk{\env}{\varmeta}{\scont}$ below:
+\[
+  \begin{array}{lcl}
+	\execconf{\textbf{var } \varmeta = \expr}{\env}{\lbls}{\clbls}{\handler}{\cstrace}{\cex}{\econt}{\scont}
+	& \Rightarrow &
+	\evalconf{\expr}{\env}{\strace}{\cstrace}{\cex}{\econt'}\\[2mm]
+
+	\contconf{\econt'}{\synval}
+	& \Rightarrow &
+	\scontconf{\scont}{\ext{\env}{\varmeta}{\synval}}
+
+  \end{array}
+\]
+\subsubsection{Block statements}
+
+\[
+  \begin{array}{lcl}
+	\execconf{\lbrace\rbrace}{\env}{\lbls}{\clbls}{\handler}{\cstrace}{\cex}{\econt}{\scont}
+	& \Rightarrow &
+	\scontconf{\scont}{\env}\\[2mm]
+
+	\execconf{\lbrace\expr\rbrace}{\env}{\lbls}{\clbls}{\handler}{\cstrace}{\cex}{\econt}{\scont}
+	& \Rightarrow &
+	\evalconf{\expr}{\env}{\strace}{\cstrace}{\cex}{\exprk{\scont}{\env}}\\[2mm]
+
+	\execconf{\stmt :: \stmts}{\env}{\lbls}{\clbls}{\handler}{\cstrace}{\cex}{\econt}{\scont}
+	& \Rightarrow &
+	\execconf{\stmt}{\env}{\lbls}{\clbls}{\handler}{\cstrace}{\cex}{\econt}{\scont'}\\[2mm]
+
+	\scontconf{\blocksk{\stmt :: \stmts}{\env}}{\env'}
+	& \Rightarrow &
+	\execconf{\stmt}{\env'}{\lbls}{\clbls}{\handler}{\cstrace}{\cex}{\econt}{\scont'}\\[2mm]
+
+	\scontconf{\blocksk{[]}{\env}}{ \_ }
+	& \Rightarrow &
+	\scontconf{\scont}{\env}\\[2mm]
+
+  \end{array}
+\]
+
+with:
+\[
+  \begin{array}{@{}c}
+	\scont' = \blocksk{\stmts}{\env}
+  \end{array}
+\]
 \end{document}
