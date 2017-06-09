@@ -382,6 +382,9 @@
 \newcommand{\ork}[6]{\mathrm{OrK}({#1},\,{#2},\,{#3},\,{\handler},\,{#4},\,{#5},\,{#6})}
 \newcommand{\conditionalk}[7]{\mathrm{ConditionalK}({#1},\,{#2},\,{#3},\,{#4},\,{\handler},\,{#5},\,{#6},\,{#7})}
 \newcommand{\letk}[7]{\mathrm{LetK}({#1},\,{#2},\,{#3},\,{#4},\,{\handler},\,{#5},\,{#6},\,{#7})}
+\newcommand{\exprlistk}[6]{\mathrm{ExpressionListK}(({#1},\,{#2},\,{#3},\,{#4},\,{\handler},\,{#5},\,{#6})}
+
 
 % Application continuation
 \newcommand{\staticinvocapp}[6]{\mathrm{StaticInvocationA}({#1},\,{#2},\,{#3},\,\handler,\,{#4},\,{#5},\,{#6})}
+\newcommand{\valueapp}[2]{\mathrm{ValueA}({#1},\,{#2})}
