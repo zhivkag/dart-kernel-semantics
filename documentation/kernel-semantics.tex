@@ -425,12 +425,7 @@ Let $\econt' = \vardeclk{\env}{\varmeta}{\scont}$ below:
   \end{array}
 \]
 
-with:
-\[
-  \begin{array}{@{}c}
-	\scont' = \blocksk{\stmts}{\env}
-  \end{array}
-\]
+with $\scont' = \blocksk{\stmts}{\env}$.
 
 \subsubsection{If statement}
 
@@ -494,5 +489,19 @@ with $\econt', \scont' = \whilecondk$.
   \end{array}
 \]
 Loops \textbf{do while}, \textbf{for in}, for can be desugared to while loops with transformations performed before interpreting the program.
+
+\subsection{Labels}
+
+Kernel supports labelling statements, \textbf{L: $\stmt_{L}$}, and breaking to L, \textbf{break L}, which completes the execution of the labelled statement and proceeds to executing the rest of the program.
+To support breaking to a label, we add a labels component, $\lbls$, to statement configurations $\lbls$ represents a list of pairs mapping a labelled statement, \textbf{L: $\stmt_L$}, to a break statement continuation, $\bcont$. Executing a labelled statement introduces a new break label, $\lbl$ to the list of labels $\lbls$.
+
+\[
+  \begin{array}{lcl}
+	\execconf{\textbf{L: }\stmt_{L}}{\env}{\lbls}{\clbls}{\handler}{\cstrace}{\cex}{\econt}{\scont}
+	& \Rightarrow &
+	\execconf{\stmt_{L}}{\env}{\lbl :: \lbls}{\clbls}{\handler}{\cstrace}{\cex}{\econt}{\scont}
+  \end{array}
+\]
+with: \[\lbl = \mathrm{Label}(L, \mathrm{Break}(\env, \scont), \lbls)\]
 
 \end{document}
