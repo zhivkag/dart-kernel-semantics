@@ -535,6 +535,7 @@ with:
 \]
 A case clause is matching if is \textbf{default} or there is at least one of the constant expressions in the case clause identical to the target value of the switch.
 
+\noindent
 If a non-matching \textbf{case} clause, $\scase$, is the target of a continue statement, it installs a new continue label, in order to support execution of its statement with the appropriate configuration.
 
 \[
@@ -551,7 +552,7 @@ with:
 	\switchcont = \continuek
   \end{array}
 \]
-
+\noindent
 Otherwise, the execution continues as follows:
 \[
   \begin{array}{lcl}
@@ -564,8 +565,112 @@ Otherwise, the execution continues as follows:
 	\scontconf{\scont}{\env}
   \end{array}
 \]
+
 \subsection{Exceptions}
 
+Kernel supports structured exception handling with \textbf{try/catch} and \textbf{try/finally} statements. Exceptions are thrown with \textbf{throw} and \textbf{rethrow} expressions. To support throwing exceptions, we add a handler, $\handler$, and a stacktrace, $\strace$, component to expression configurations (and correspondingly, to statement configurations). To support \textbf{rethrow}, we add an optional current error, $\cex$, and current stack trace, $\cstrace$, which are set when inside a catch block and unset otherwise.
+
+\[
+  \begin{array}{lcl}
+	\evalconf{\textbf{throw } \expr}{\env}{\strace}{\cstrace}{\cex}{\econt}
+	& \Rightarrow &
+	\evalconf{\expr}{\env}{\strace}{\cstrace}{\cex}{\throwk{(\textbf{throw } \expr) :: \strace}{\handler}}\\[2mm]
+
+	\evalconf{\textbf{rethrow}}{\env}{\strace}{inr(\synval)}{\strace'}{\econt}
+	& \Rightarrow &
+	\throwconf{\handler}{\synval}{\strace'}\\[2mm]
+
+	\contconf{\throwk{\strace}{\handler}}{\synval}
+	& \Rightarrow &
+	\throwconf{\handler}{\synval}{\strace}\\[2mm]
+
+  \end{array}
+\]
+
+\noindent
+\textbf{try/catch} handlers contain a list of on-catch handlers, environment, break labels, continue switch labels, exception handler, stacktrace, return continuation, and statement continuation. The handlers are tried in order to see if they match against the type of the exception. If none match, the exception is rethrown.
+
+\noindent
+Let $\econt' = \catchk{(\textbf{on T catch (e, s) }\stmt) :: cs}$ be a catch continuation containing a non-empty list of on-catch handlers:
+\[
+  \begin{array}{lcll}
+	\throwconf{\econt'}{\synval}{\strace'}
+	& \Rightarrow &
+	\execconf{\stmt}{\env'}{\lbls}{\clbls}{\handler}{inr(\synval)}{inr(\strace')}{\econt}{\scont}
+	&\textrm{ if V is T}\\[1mm]
+
+	&&\textrm{with } \env' = extend(\env, e :: s :: [], \synval :: \strace' :: [])\\[2mm]
+
+	\throwconf{\econt'}{\synval}{\strace'}
+	& \Rightarrow &
+	\throwconf{\catchk{cs}}{\synval}{\strace'}	&\textrm{ otherwise}\\[2mm]
+	&&\textrm{with } \env' = extend(\env, e :: s :: [], \synval :: \strace' :: [])
+  \end{array}
+\]
+\noindent
+When a catch handler with no on-catch handlers is reached, the exception is rethrown.
+\[
+  \begin{array}{lcll}
+	\throwconf{\catchk{[]}}{\synval}{\strace'}
+	& \Rightarrow &
+	\throwconf{\handler}{\synval}{\strace'}\hspace{20mm}
+  \end{array}
+\]
+\noindent
+\textbf{try/finally} handlers contain a statement, environment, break labels, continue switch labels, exception handler, stacktrace, and return continuation. Note that they do not contain a statement continuation because when control falls off the end of the finally statement the exception is rethrown. The statement is unconditionally executed:
+
+\[
+  \begin{array}{lcl}
+	\throwconf{\finallyk{\stmt}}{\synval}{\strace'}
+	\Rightarrow \\
+	\hspace{10mm}\execconf{\stmt}{\env}{\lbls}{\clbls}{\handler}{inl()}{inl()}{\econt}{\rethrowsk{\synval}{\strace'}{\handler}}\hspace{20mm}\\[2mm]
+
+	\scontconf{\rethrowsk{\synval}{\strace}{\handler}}{\_}
+	\Rightarrow \throwconf{\handler}{\synval}{\strace}
+
+  \end{array}
+\]
+\noindent
+\textbf{try/catch} statements execute their body with a new handler:
+
+\[
+  \begin{array}{lcl}
+	\execconf{TryCatch(\stmt, cs)}{\env}{\lbls}{\clbls}{\handler}{\cex}{\cstrace}{\econt}{\scont}
+	\Rightarrow\\
+	\hspace{10mm}\execconf{\stmt}{\env}{\lbls}{\clbls}{\handler'}{\cex}{\cstrace}{\econt}
+	{\scont}\hspace{50mm}
+  \end{array}
+\]
+where $\handler' = \catchk{cs}$.
+
+
+\noindent
+\textbf{try/finally} statements execute their body with a new handler and additionally install new break and continue switch labels, a new return continuation, and a new statement continuation:
+
+\[
+  \begin{array}{lcl}
+	\execconf{TryFinally(\stmti{0}, \stmti{1})}{\env}{\lbls}{\clbls}{\handler}{\cex}{\cstrace}{\econt}{\scont}
+	\Rightarrow\\
+	\execconf{\stmti{0}}{\env}{\lbls'}{\clbls'}{\handler'}{\cex}{\cstrace}{\econt'}{\scont'}
+	  \end{array}
+\]
+where:
+
+\[
+  \begin{array}{lcl}
+	\handler' = \finallyk{\stmti{0}}\hspace{50mm}\\[2mm]
+
+	\econt' = \finallyretk{\stmti{1}}\\[2mm]
+
+	\scont' = \finallysk{\stmti{1}}\\[2mm]
+
+	\lbls' = \lbrace Label(L, \bcont') \mid Label(L, \bcont) \in \lbls\rbrace \\
+	\hspace{10mm}\textrm{where } \bcont = \finallybreak{\stmti{1}}{\bcont}\\[2mm]
+	\clbls' =  \lbrace SwitchLabel(C, \switchcont') \mid SwitchLabel(C, \switchcont) \in \clbls\rbrace\\
+	\hspace{10mm}\textrm{where } \switchcont' = \finallycontinue{\stmti{1}}{\switchcont}
+
+  \end{array}
+\]
 \subsection{Break}
 \subsection{Continue}
 

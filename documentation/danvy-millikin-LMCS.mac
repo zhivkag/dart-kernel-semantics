@@ -322,8 +322,10 @@
 \newcommand{\dstmt}{\mathbf{Stmt}}
 \newcommand{\dhandler}{\mathbf{Handler}}
 \newcommand{\synval}{V}
-\newcommand{\scase}{C}
+\newcommand{\scase}{SC}
 \newcommand{\scases}{\scase\ensuremath{s}}
+\newcommand{\ccase}{CC}
+\newcommand{\ccases}{\scase\ensuremath{s}}
 
 % Semantic
 \newcommand{\vals}{\ensuremath{vs}}
@@ -389,6 +391,17 @@
 \newcommand{\exprk}[2]{\mathrm{ExpressionK}({#1},\,{#2})}
 \newcommand{\ifcondk}[2]{\mathrm{IfConditionK}({#1},\,{#2},\,\env,\,\lbls,\,\clbls,\,\handler,\,\cstrace,\,\cex,\,\econt,\,\scont)}
 \newcommand{\switchk}[2]{\mathrm{SwitchK}({#1},\,\env,\,\lbls,\,{#2},\,\strace,\,\handler,\,\cstrace,\,\cex,\,\econt,\,\scont)}
+\newcommand{\finallybreak}[2]{\mathrm{FinallyBreak}({#1},\,\env,\,\lbls,\,\clbls,\,\strace,\,\handler,\,\cstrace,\,\cex,\,\econt,\,{#2})}
+\newcommand{\finallycontinue}[2]{\mathrm{FinallyContinue}({#1},\,\env,\,\lbls,\,\clbls,\,\strace,\,\handler,\,\cstrace,\,\cex,\,\econt,\,{#2})}
+
+
+% Exceptions
+\newcommand{\throwk}[2]{\mathrm{ThrowK}({#1},\,{#2})}
+\newcommand{\catchk}[1]{\mathrm{Catch}({#1},\,\env,\,\lbls,\,\clbls,\,\strace,\,\handler,\,\econt,\,\scont)}
+\newcommand{\finallyk}[1]{\mathrm{Finally}({#1},\,\env,\,\lbls,\,\clbls,\,\strace,\,\handler,\,\econt)}
+\newcommand{\rethrowsk}[3]{\mathrm{RethrowSK}({#1},\,{#2},\,{#3})}
+\newcommand{\finallyretk}[1]{\mathrm{FinallyReturnK}({#1},\,\env,\,\lbls,\,\clbls,\,\strace,\,\handler,\,\econt)}
+\newcommand{\finallysk}[1]{\mathrm{FinallySK}({#1},\,\env,\,\lbls,\,\clbls,\,\strace,\,\handler,\,\econt,\,\scont)}
 
 % With args
 \newcommand{\whilecondk}{\mathrm{WhileCondK}(\expr,\,\stmt,\,\env,\,\lbls,\,\clbls,\,\handler,\,\cstrace,\,\cex,\,\econt,\,\scont)}
