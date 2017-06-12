@@ -672,6 +672,30 @@ where:
   \end{array}
 \]
 \subsection{Break}
+Breaking to a label L with break L calls the break continuation corresponding to the label L in the list of labels Ls.
+
+%<break L, ρ, Ls, Lswitch, H, st, cex, cst, KErr, KE, KS>exec → <K’B>break	with Label(L’, K’B, Ls’) ∈ Ls s.t.  L’ == L
+%<Break(ρ, KS)>break → <KS, ρ>scont
+%<FinallyBreak(S1, ρ, Ls, Lswitch, H, st, cex, cst, KE, KB)>break → 
+%<S1, ρ, Ls, Lswitch, H, st, cex, cst, KE, BreakSK(KB)>exec
+%<BreakSK(KB), _>scont → <KB>break
 \subsection{Continue}
+
+%<continue C, ρ, L,  Lswitch,  H, st, cex, cst, KE, KS>exec → <K’>switch  	
+%with ContinueL(C’, K’, Ls’) ∈ Lswitch s.t.  C’ == C 
+
+%<ContinueSwitch(S, ρ, Ls, Lswitch, H, st, KE, KS)>switch  → <S, ρ, Ls, Lswitch, H, st, KE, KS>exec
+%<FinallyContinue(S, ρ, Ls, H, st, KE, Kswitch)>switch → <S, ρ, Ls, H, st, KE, SwitchSK(Kswitch)>exec
+%<SwitchSK(K), _>exec → <K>switch
+\subsection{Closures}
+\subsubsection{Function expressions}
+
+Kernel supports encapsulating an executable unit of code with function expressions. To support function expressions we introduce FunctionValue as a value that has the function node, f, and the environment, ρ,  in which the function literal was created. This ensures that there are no free variables in the body of f. A FunctionValue has only one method, call.
+ 
+%<f, ρ, KE>exec → <KE, FValue(f, α)>cont  with  !α = ρ
+\subsubsection{Function declaration}
+Kernel supports local function declaration, where a final variable stores a function value. 
+%< var x = f, ρ, Ls, Lswitch, H, st, cex, cst, KE, KS>exec → 
+%<KS, ρ[x → α’]>scont 	where !α’ = FValue(f, α), !α = ρ[x → α’]
 
 \end{document}
