@@ -468,4 +468,31 @@ Let $\econt' = \ifcondk{\stmti{1}}{\stmti{2}}$ below:
 	\contconf{\econt}{\textbf{null}}
   \end{array}
 \]
+
+\subsubsection{Loops}
+\[
+  \begin{array}{lcl}
+	\execconf{\textbf{while } (\expr) \stmt}{\env}{\lbls}{\clbls}{\handler}{\cstrace}{\cex}{\econt}{\scont}
+	& \Rightarrow &
+	\evalconf{\expr}{\env}{\strace}{\cstrace}{\cex}{\econt'}\\[2mm]
+  \end{array}
+\]
+with $\econt', \scont' = \whilecondk$.
+\[
+  \begin{array}{lcl}
+	\contconf{\econt'}{\false}
+	& \Rightarrow &
+	\scontconf{\scont}{\env}\\[2mm]
+
+	\contconf{\econt'}{\true}
+	& \Rightarrow &
+	\execconf{\stmt}{\env}{\lbls}{\clbls}{\handler}{\cstrace}{\cex}{\econt}{\scont'}\\[2mm]
+
+	\scontconf{\scont'}{\_}
+	& \Rightarrow &
+	\evalconf{\expr}{\env}{\strace}{\cstrace}{\cex}{\econt'}\\
+  \end{array}
+\]
+Loops \textbf{do while}, \textbf{for in}, for can be desugared to while loops with transformations performed before interpreting the program.
+
 \end{document}
