@@ -385,6 +385,7 @@
 \newcommand{\exprlistk}[6]{\mathrm{ExpressionListK}(({#1},\,{#2},\,{#3},\,{#4},\,{\handler},\,{#5},\,{#6})}
 \newcommand{\vardeclk}[3]{\mathrm{VarDeclarationK}({#1},\,{#2},\,{#3})}
 \newcommand{\exprk}[2]{\mathrm{ExpressionK}({#1},\,{#2})}
+\newcommand{\ifcondk}[2]{\mathrm{IfConditionK}({#1},\,{#2},\,\env,\,\lbls,\,\clbls,\,\handler,\,\cstrace,\,\cex,\,\econt,\,\scont)}
 
 % Statement continuation
 \newcommand{\blocksk}[2]{\mathrm{BlockSK}({#1},\,{#2},\,\lbls,\,\clbls,\,\handler,\,\cstrace,\,\cex,\,\econt,\,\scont)}

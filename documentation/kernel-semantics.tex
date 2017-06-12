@@ -431,4 +431,41 @@ with:
 	\scont' = \blocksk{\stmts}{\env}
   \end{array}
 \]
+
+\subsubsection{If statement}
+
+Let $\econt' = \ifcondk{\stmti{1}}{\stmti{2}}$ below:
+
+\[
+  \begin{array}{lcl}
+	\execconf{\textbf{if } \expr \textbf{ then } \stmti{1} \textbf{ else } \stmti{2} }{\env}{\lbls}{\clbls}{\handler}{\cstrace}{\cex}{\econt}{\scont}
+	& \Rightarrow &
+	\evalconf{\expr}{\env}{\strace}{\cstrace}{\cex}{\econt'}\\[2mm]
+  \end{array}
+\]
+\[
+  \begin{array}{lcl}
+	\contconf{\econt'}{\true} 
+	& \Rightarrow &
+	\execconf{\stmti{1}}{\env}{\lbls}{\clbls}{\handler}{\cstrace}{\cex}{\econt}{\scont}\\[2mm]
+
+	\contconf{\econt'}{\false} 
+	& \Rightarrow &
+	\execconf{\stmti{2}}{\env}{\lbls}{\clbls}{\handler}{\cstrace}{\cex}{\econt}{\scont}\\
+  \end{array}
+\]
+
+\subsubsection{Return statement}
+
+\[
+  \begin{array}{lcl}
+	\execconf{\textbf{return } \expr}{\env}{\lbls}{\clbls}{\handler}{\cstrace}{\cex}{\econt}{\scont}
+	& \Rightarrow &
+	\evalconf{\expr}{\env}{\strace}{\cstrace}{\cex}{\econt}\\[2mm]
+	
+	\execconf{\textbf{return}}{\env}{\lbls}{\clbls}{\handler}{\cstrace}{\cex}{\econt}{\scont}
+	& \Rightarrow &
+	\contconf{\econt}{\textbf{null}}
+  \end{array}
+\]
 \end{document}
