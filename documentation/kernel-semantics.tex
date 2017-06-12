@@ -425,12 +425,7 @@ Let $\econt' = \vardeclk{\env}{\varmeta}{\scont}$ below:
   \end{array}
 \]
 
-with:
-\[
-  \begin{array}{@{}c}
-	\scont' = \blocksk{\stmts}{\env}
-  \end{array}
-\]
+with $\scont' = \blocksk{\stmts}{\env}$.
 
 \subsubsection{If statement}
 
@@ -494,5 +489,41 @@ with $\econt', \scont' = \whilecondk$.
   \end{array}
 \]
 Loops \textbf{do while}, \textbf{for in}, for can be desugared to while loops with transformations performed before interpreting the program.
+
+\subsection{Labels}
+
+Kernel supports labelling statements, \textbf{L: $\stmt_{L}$}, and breaking to L, \textbf{break L}, which completes the execution of the labelled statement and proceeds to executing the rest of the program.
+To support breaking to a label, we add a labels component, $\lbls$, to statement configurations $\lbls$ represents a list of pairs mapping a labelled statement, \textbf{L: $\stmt_L$}, to a break statement continuation, $\bcont$. Executing a labelled statement introduces a new break label, $\lbl$ to the list of labels $\lbls$.
+
+\[
+  \begin{array}{lcl}
+	\execconf{\textbf{L: }\stmt_{L}}{\env}{\lbls}{\clbls}{\handler}{\cstrace}{\cex}{\econt}{\scont}
+	& \Rightarrow &
+	\execconf{\stmt_{L}}{\env}{\lbl :: \lbls}{\clbls}{\handler}{\cstrace}{\cex}{\econt}{\scont}
+  \end{array}
+\]
+with: \[\lbl = \mathrm{Label}(L, \mathrm{Break}(\env, \scont), \lbls)\]
+
+\subsection{Switch}
+Kernel supports dispatching control among a number of cases with \textbf{switch} statements, where the target expression $\expr$ is evaluated and matched against the different case clauses of the switch statement. 
+ 
+In Kernel, case clauses can have multiple constant expressions and there is no implicit fall-through between cases. Kernel supports continuing to execution of a preceding case clause with continue statements where the target of the continue statement is a preceding case clause, e.g, continue C with C = case $\expri{1..i}$: $\stmt$. To support continue, we add an optional $\clbls$ list, similar to the label list, which is set in a switch statement and unset otherwise. 
+
+The execution of a switch statement proceeds as follows: 
+
+\[
+  \begin{array}{lcl}
+       \execconf{\textbf{switch }\expr \}{\env}{\lbls}{\clbls}{\handler}{\cstrace}{\cex}{\econt}{\scont}
+       & \Rightarrow &
+       \evalcont{\expr}{\env}{\strace}{\cstrace}{\cex}{\econt'}\\
+  \end{array}
+\]
+with 
+%<switch E cs, ρ, L,  Lswitch,  H, st, cex, cst, KE, KS>exec → 
+%<E, ρ, Switch(cs, ρ, L,  Lswitch,  H, st, cex, cst, KE, KS)>eval
+\subsection{Exceptions}
+
+\subsection{Break}
+\subsection{Continue}
 
 \end{document}
