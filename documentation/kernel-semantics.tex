@@ -502,25 +502,68 @@ To support breaking to a label, we add a labels component, $\lbls$, to statement
 	\execconf{\stmt_{L}}{\env}{\lbl :: \lbls}{\clbls}{\handler}{\cstrace}{\cex}{\econt}{\scont}
   \end{array}
 \]
-with: \[\lbl = \mathrm{Label}(L, \mathrm{Break}(\env, \scont), \lbls)\]
-
+with:
+\[\lbl = \mathrm{Label}(L, \bcont), \bcont = \mathrm{Break}(\env, \scont)\]
 \subsection{Switch}
 Kernel supports dispatching control among a number of cases with \textbf{switch} statements, where the target expression $\expr$ is evaluated and matched against the different case clauses of the switch statement. 
  
-In Kernel, case clauses can have multiple constant expressions and there is no implicit fall-through between cases. Kernel supports continuing to execution of a preceding case clause with continue statements where the target of the continue statement is a preceding case clause, e.g, continue C with C = case $\expri{1..i}$: $\stmt$. To support continue, we add an optional $\clbls$ list, similar to the label list, which is set in a switch statement and unset otherwise. 
+In Kernel, case clauses can have multiple constant expressions and there is no implicit fall-through between cases. Kernel supports continuing to execution of a preceding case clause with continue statements where the target of the continue statement is a preceding case clause, e.g, continue C with C = case $\expri{1..i}$: $\stmt$. To support continue, we add an optional $\clbls$ list, similar to the label list, which is set in a switch statement and unset otherwise.
 
 The execution of a switch statement proceeds as follows: 
 
 \[
   \begin{array}{lcl}
-       \execconf{\textbf{switch }\expr \}{\env}{\lbls}{\clbls}{\handler}{\cstrace}{\cex}{\econt}{\scont}
-       & \Rightarrow &
-       \evalcont{\expr}{\env}{\strace}{\cstrace}{\cex}{\econt'}\\
+	\execconf{\textbf{switch }(\expr) \scases }{\env}{\lbls}{\clbls}{\handler}{\cstrace}{\cex}{\econt}{\scont}
+	& \Rightarrow &
+	\evalconf{\expr}{\env}{\strace}{\cstrace}{\cex}{\econt'}\\
   \end{array}
 \]
-with 
-%<switch E cs, ρ, L,  Lswitch,  H, st, cex, cst, KE, KS>exec → 
-%<E, ρ, Switch(cs, ρ, L,  Lswitch,  H, st, cex, cst, KE, KS)>eval
+with $\econt' = \switchk{\scases}{\clbls}$
+
+If there is a matching case clause, its statement is executed with a new statement continuation that will throw when reached. The new statement continuation is necessary because implicit fall-through is not supported and an explicit break of the flow is required (with either of \textbf{continue, break, return, throw}).
+
+\[
+  \begin{array}{lcl}
+	\contconf{\switchk{\scase :: \scases}{\clbls}}{\synval}
+	\Rightarrow \hspace{30mm}\\
+	\hspace{20mm}\execconf{\stmt}{\env}{\lbls}{\clbls}{\handler}{\cstrace}{\cex}{\econt}{\exitssk}
+  \end{array}
+\]
+with:
+\[
+	\scase = \textbf{case } \expri{1}, \dots, \expri{i} \textbf{ : } \stmt \textrm{ and } \scase \textrm{ is a matching \textbf{case} clause}
+\]
+A case clause is matching if is \textbf{default} or there is at least one of the constant expressions in the case clause identical to the target value of the switch.
+
+If a non-matching \textbf{case} clause, $\scase$, is the target of a continue statement, it installs a new continue label, in order to support execution of its statement with the appropriate configuration.
+
+\[
+  \begin{array}{lcl}
+	\contconf{\switchk{\scase :: \scases}{\clbls}}{\synval}
+	\Rightarrow \hspace{30mm}\\
+	\hspace{20mm}\contconf{\switchk{\scases}{\clbl :: \clbls}}{\synval}
+  \end{array}
+\]
+with:
+\[
+  \begin{array}{l}
+	\clbl = \continuel{\scase}{\switchcont},\\
+	\switchcont = \continuek
+  \end{array}
+\]
+
+Otherwise, the execution continues as follows:
+\[
+  \begin{array}{lcl}
+    \contconf{\switchk{\scase :: \scases}{\clbls}}{\synval}
+	\Rightarrow \hspace{30mm}\\
+	\hspace{20mm}\contconf{\switchk{\scases}{\clbls}}{\synval}\\[2mm]
+
+	\contconf{\switchk{[]}{\clbls}}{\synval}
+	\Rightarrow
+	\scontconf{\scont}{\env}
+  \end{array}
+\]
 \subsection{Exceptions}
 
 \subsection{Break}

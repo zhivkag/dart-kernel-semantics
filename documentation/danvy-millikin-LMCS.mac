@@ -322,6 +322,8 @@
 \newcommand{\dstmt}{\mathbf{Stmt}}
 \newcommand{\dhandler}{\mathbf{Handler}}
 \newcommand{\synval}{V}
+\newcommand{\scase}{C}
+\newcommand{\scases}{\scase\ensuremath{s}}
 
 % Semantic
 \newcommand{\vals}{\ensuremath{vs}}
@@ -360,7 +362,7 @@
 \newcommand{\formali}[1]{\ensuremath{A_{#1}}}
 \newcommand{\formals}{\ensuremath{As}}
 
-% Named Configuration for CESK
+% Named Configuration for CESK transitions
 \newcommand{\breakconf}[1]{\confsingle{#1}_{\mathrm{breakCont}}}
 \newcommand{\switchconf}[1]{\confsingle{#1}_{\mathrm{switchCont}}}
 \newcommand{\contconf}[2]{\confpair{#1}{#2}_{\mathrm{cont}}}
@@ -386,7 +388,7 @@
 \newcommand{\vardeclk}[3]{\mathrm{VarDeclarationK}({#1},\,{#2},\,{#3})}
 \newcommand{\exprk}[2]{\mathrm{ExpressionK}({#1},\,{#2})}
 \newcommand{\ifcondk}[2]{\mathrm{IfConditionK}({#1},\,{#2},\,\env,\,\lbls,\,\clbls,\,\handler,\,\cstrace,\,\cex,\,\econt,\,\scont)}
-\newcommand{\switchk}[2]{\mathrm{SwitchK}({#1},\,\env,\,\lbls,\,{#2},\,\handler,\,\cstrace,\,\cex,\,\econt,\,\scont)}
+\newcommand{\switchk}[2]{\mathrm{SwitchK}({#1},\,\env,\,\lbls,\,{#2},\,\strace,\,\handler,\,\cstrace,\,\cex,\,\econt,\,\scont)}
 
 % With args
 \newcommand{\whilecondk}{\mathrm{WhileCondK}(\expr,\,\stmt,\,\env,\,\lbls,\,\clbls,\,\handler,\,\cstrace,\,\cex,\,\econt,\,\scont)}
@@ -394,7 +396,15 @@
 
 
 % Statement continuation
+\newcommand{\exitssk}{\mathrm{ExitSwitchSK}()}
 \newcommand{\blocksk}[2]{\mathrm{BlockSK}({#1},\,{#2},\,\lbls,\,\clbls,\,\handler,\,\cstrace,\,\cex,\,\econt,\,\scont)}
+
+% Break, Switch
+\newcommand{\breakl}{}
+\newcommand{\breakk}{}
+\newcommand{\continuek}{\mathrm{SwitchContinueK}(\stmt,\,\env,\,\lbls,\,\clbls,\,\handler,\,\cstrace,\,\cex,\,\econt,\,\scont)}
+\newcommand{\continuel}[2]{\mathrm{ContinueL}({#1},\,{#2})}
+
 
 % Application continuation
 \newcommand{\staticinvocapp}[6]{\mathrm{StaticInvocationA}({#1},\,{#2},\,{#3},\,\handler,\,{#4},\,{#5},\,{#6})}
