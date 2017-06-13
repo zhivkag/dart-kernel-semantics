@@ -189,6 +189,120 @@ There are various types of continuations depending on the next statement to be e
 	\dfunval : \dformals \times \dstmt \times \denv
 \]
 
+\section{Abstract Syntax}
+\label{sec:abstract-syntax}
+
+\subsubsection{Expressions}
+\label{sec:expr-syntax}
+
+% Metavariables
+\newcommand{\expressionmeta}{\ensuremath{\mathit{E}}}
+\newcommand{\variablemeta}{\ensuremath{\mathit{X}}}
+\newcommand{\boolmeta}{\ensuremath{\mathit{B}}}
+\newcommand{\integermeta}{\ensuremath{\mathit{I}}}
+\newcommand{\doublemeta}{\ensuremath{\mathit{D}}}
+\newcommand{\stringmeta}{\ensuremath{\mathit{S}}}
+\newcommand{\idmeta}{\ensuremath{\mathit{X}}}
+\newcommand{\membermeta}{\ensuremath{\mathit{M}}}
+\newcommand{\typemeta}{\ensuremath{\mathit{T}}}
+
+% Syntax
+\newcommand{\VariableGet}[1]{#1}
+\newcommand{\VariableSet}[2]{#1=#2}
+
+% TODO(kmillikin): Names should not ignore the library.
+\newcommand{\PropertyGet}[2]{#1.#2}
+\newcommand{\PropertySet}[3]{#1.#2=#3}
+
+\newcommand{\DirectPropertyGet}[2]{#1.\{#2\}}
+\newcommand{\DirectPropertySet}[3]{#1.\{#2\}=#3}
+
+\newcommand{\SuperPropertyGet}[1]{\tt{super}.#1}
+\newcommand{\SuperPropertySet}[2]{\tt{super}.#1=#2}
+
+\newcommand{\StaticGet}[1]{#1}
+\newcommand{\StaticSet}[2]{#1=#2}
+
+%% MethodInvocation
+%% DirectMethodInvocation
+%% SuperMethodInvocation
+%% StaticInvocation
+%% ConstructorInvocation
+
+\newcommand{\Not}[1]{!#1}
+\newcommand{\AndExpression}[2]{#1\,\&\&\,#2}
+\newcommand{\OrExpression}[2]{#1\,||\,#2}
+\newcommand{\ConditionalExpression}[3]{#1\,?\,#2\,:\,#3}
+
+%% StringConcatenation
+
+\newcommand{\IsExpression}[2]{#1\,\tt{is}\,#2}
+\newcommand{\AsExpression}[2]{#1\,\tt{as}\,#2}
+
+%% SymbolLiteral
+%% TypeLiteral
+
+\newcommand{\ThisExpression}{\tt{this}}
+\newcommand{\Rethrow}{\tt{rethrow}}
+\newcommand{\Throw}[1]{\tt{throw}\,#1}
+
+%% ListLiteral
+%% MapLiteral
+
+\newcommand{\AwaitExpression}[1]{\tt{await\,#1}}
+
+%% FunctionExpression
+
+\newcommand{\StringLiteral}[1]{#1}
+\newcommand{\IntLiteral}[1]{#1}
+\newcommand{\DoubleLiteral}[1]{#1}
+\newcommand{\BoolLiteral}[1]{#1}
+\newcommand{\NullLiteral}{\tt{null}}
+\newcommand{\Let}[3]{\tt{let}\,#1=#2\,\tt{in}\,#3}
+
+%% LoadLibrary
+%% CheckLibraryIsLoaded
+%% VectorCreation
+%% VectorGet
+%% VectorSet
+%% VectorCopy
+%% ClosureCreation
+%% TypeInstantiation
+
+\[
+\begin{array}{rl}
+  \expressionmeta \in \mathit{Expression} ::=
+  & \VariableGet{\variablemeta} \\
+  & \VariableSet{\variablemeta}{\expressionmeta} \\
+  & \PropertyGet{\expressionmeta}{\idmeta} \\
+  & \PropertySet{\expressionmeta_0}{\idmeta}{\expressionmeta_1} \\
+  & \DirectPropertyGet{\expressionmeta}{\membermeta} \\
+  & \DirectPropertySet{\expressionmeta_0}{\membermeta}{\expressionmeta_1} \\
+  & \SuperPropertyGet{\idmeta} \\
+  & \SuperPropertySet{\idmeta}{\expressionmeta} \\
+  & \StaticGet{\membermeta} \\
+  & \StaticSet{\membermeta}{\expressionmeta} \\
+  & \Not{\expressionmeta} \\
+  & \AndExpression{\expressionmeta_0}{\expressionmeta_1} \\
+  & \OrExpression{\expressionmeta_0}{\expressionmeta_1} \\
+  & \ConditionalExpression{\expressionmeta_0}{\expressionmeta_1}{\expressionmeta_2} \\
+  & \IsExpression{\expressionmeta}{\typemeta} \\
+  & \AsExpression{\expressionmeta}{\typemeta} \\
+  & \ThisExpression \\
+  & \Rethrow \\
+  & \Throw{\expressionmeta} \\
+  & \AwaitExpression{\expressionmeta} \\
+  & \StringLiteral{\stringmeta} \\
+  & \IntLiteral{\integermeta} \\
+  & \DoubleLiteral{\doublemeta} \\
+  & \BoolLiteral{\tt{true}} \\
+  & \BoolLiteral{\tt{false}} \\
+  & \NullLiteral \\
+  & \Let{\variablemeta}{\expressionmeta_0}{\expressionmeta_1} \\
+\end{array}  
+\]
+
+
 \section{Semantics}
 \label{sec:semantics}
 \subsection{Expression evaluation}
