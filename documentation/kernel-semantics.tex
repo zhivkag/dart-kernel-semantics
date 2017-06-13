@@ -635,7 +635,7 @@ When a catch handler with no on-catch handlers is reached, the exception is reth
 
 \[
   \begin{array}{lcl}
-	\execconf{TryCatch(\stmt, cs)}{\env}{\lbls}{\clbls}{\handler}{\cex}{\cstrace}{\econt}{\scont}
+	\execconf{\mathrm{TryCatch}(\stmt, cs)}{\env}{\lbls}{\clbls}{\handler}{\cex}{\cstrace}{\econt}{\scont}
 	\Rightarrow\\
 	\hspace{10mm}\execconf{\stmt}{\env}{\lbls}{\clbls}{\handler'}{\cex}{\cstrace}{\econt}
 	{\scont}\hspace{50mm}
@@ -649,7 +649,7 @@ where $\handler' = \catchk{cs}$.
 
 \[
   \begin{array}{lcl}
-	\execconf{TryFinally(\stmti{0}, \stmti{1})}{\env}{\lbls}{\clbls}{\handler}{\cex}{\cstrace}{\econt}{\scont}
+	\execconf{\mathrm{TryFinally}(\stmti{0}, \stmti{1})}{\env}{\lbls}{\clbls}{\handler}{\cex}{\cstrace}{\econt}{\scont}
 	\Rightarrow\\
 	\execconf{\stmti{0}}{\env}{\lbls'}{\clbls'}{\handler'}{\cex}{\cstrace}{\econt'}{\scont'}
 	  \end{array}
@@ -664,29 +664,61 @@ where:
 
 	\scont' = \finallysk{\stmti{1}}\\[2mm]
 
-	\lbls' = \lbrace Label(L, \bcont') \mid Label(L, \bcont) \in \lbls\rbrace \\
+	\lbls' = \lbrace \mathrm{Label}(L, \bcont') \mid \mathrm{Label}(L, \bcont) \in \lbls\rbrace \\
 	\hspace{10mm}\textrm{where } \bcont = \finallybreak{\stmti{1}}{\bcont}\\[2mm]
-	\clbls' =  \lbrace SwitchLabel(C, \switchcont') \mid SwitchLabel(C, \switchcont) \in \clbls\rbrace\\
+	\clbls' =  \lbrace \continuel{C}{\switchcont'} \mid  \continuel{C}{\switchcont} \in \clbls\rbrace\\
 	\hspace{10mm}\textrm{where } \switchcont' = \finallycontinue{\stmti{1}}{\switchcont}
 
   \end{array}
 \]
 \subsection{Break}
-Breaking to a label L with break L calls the break continuation corresponding to the label L in the list of labels Ls.
+\textbf{break L} statements break from an enclosing label \textbf{L} and execute the break continuation corresponding to the label in the list of labels $\lbls$.
 
-%<break L, ρ, Ls, Lswitch, H, st, cex, cst, KErr, KE, KS>exec → <K’B>break	with Label(L’, K’B, Ls’) ∈ Ls s.t.  L’ == L
-%<Break(ρ, KS)>break → <KS, ρ>scont
-%<FinallyBreak(S1, ρ, Ls, Lswitch, H, st, cex, cst, KE, KB)>break → 
-%<S1, ρ, Ls, Lswitch, H, st, cex, cst, KE, BreakSK(KB)>exec
-%<BreakSK(KB), _>scont → <KB>break
+Let $\lbl = Label(L', \bcont) \in \lbls \textrm{ with } L' == \mathbf{L}$ below:
+\[
+  \begin{array}{lcl}
+	\execconf{\textbf{break L}}{\env}{\lbls}{\clbls}{\handler}{\cex}{\cstrace}{\econt}{\scont}
+	& \Rightarrow &
+	\breakconf{\bcont}\\[2mm]
+
+	\breakconf{\mathrm{Break}(\env, \scont)}
+	& \Rightarrow &
+	\scontconf{\scont}{\env}\\[2mm]
+
+	\breakconf{\finallybreak{\stmt}{\bcont}}
+	& \Rightarrow \\
+	\hspace{10mm}\execconf{\stmt}{\env}{\lbls}{\clbls}{\handler}{\cex}{\cstrace}{\econt}{\mathrm{BreakSK}(\bcont)}\\[2mm]
+
+	\scontconf{\mathrm{BreakSK}(\bcont)}{\env}
+	& \Rightarrow &
+	\breakconf{\bcont}
+
+  \end{array}
+\]
+
 \subsection{Continue}
+\textbf{continue L} statements continue to executing the statement of a preceding case clause, labelled with \textbf{L} and execute the continue continuation corresponding to the label in the list of labels $\clbls$.
 
-%<continue C, ρ, L,  Lswitch,  H, st, cex, cst, KE, KS>exec → <K’>switch  	
-%with ContinueL(C’, K’, Ls’) ∈ Lswitch s.t.  C’ == C 
+Let $\clbl = \continuel{L'}{\switchcont} \in \clbls \textrm{ with } L' == \mathbf{L}$ below:
+\[
+  \begin{array}{lcl}
+	\execconf{\textbf{continue L}}{\env}{\lbls}{\clbls}{\handler}{\cex}{\cstrace}{\econt}{\scont}
+	& \Rightarrow \\
+	\hspace{10mm}\switchconf{\switchcont}\\[2mm]
 
-%<ContinueSwitch(S, ρ, Ls, Lswitch, H, st, KE, KS)>switch  → <S, ρ, Ls, Lswitch, H, st, KE, KS>exec
-%<FinallyContinue(S, ρ, Ls, H, st, KE, Kswitch)>switch → <S, ρ, Ls, H, st, KE, SwitchSK(Kswitch)>exec
-%<SwitchSK(K), _>exec → <K>switch
+	\switchconf{\continuek}
+	& \Rightarrow \\
+	\hspace{10mm}\execconf{\stmt}{\env}{\lbls}{\clbls}{\handler}{\cex}{\cstrace}{\econt}{\scont}\\[2mm]
+
+	\switchconf{\finallycontinue{\stmt}{\switchcont}}
+	& \Rightarrow \\
+	\hspace{10mm}\execconf{\stmt}{\env}{\lbls}{\clbls}{\handler}{\cex}{\cstrace}{\econt}{\mathrm{SwitchContinueSK}(\switchcont)}\\[2mm]
+
+	\scontconf{\mathrm{SwitchContinueSK}(\switchcont)}{\env}
+	& \Rightarrow \\
+	\hspace{10mm}\switchconf{\switchcont}
+  \end{array}
+\]
 \subsection{Closures}
 \subsubsection{Function expressions}
 
