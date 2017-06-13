@@ -730,13 +730,19 @@ Let $F$ be a function expression with a body $\stmt_{body}$ and a list of formal
   \begin{array}{lcl}
 	\evalconf{F}{\env}{st}{cex}{cst}{\econt}
 	& \Rightarrow &
-	\contconf{\econt}{\funval{\stmt_{body}}{\formals}{\env}}
+	\contconf{\econt}{\funval{\formals}{\stmt_{body}}{\env}}
   \end{array}
 \]
 %<f, ρ, KE>exec → <KE, FValue(f, α)>cont  with  !α = ρ
 \subsubsection{Function declaration}
 Kernel supports local function declaration, where a final variable stores a function value. 
-%< var x = f, ρ, Ls, Lswitch, H, st, cex, cst, KE, KS>exec → 
-%<KS, ρ[x → α’]>scont 	where !α’ = FValue(f, α), !α = ρ[x → α’]
-
+Let $F$ be a function with a body $\stmt_{body}$ and a list of formal parameters, $\formals$, and let $fun \in \dvardecl$ be the corresponding final variable declaration.
+\[
+  \begin{array}{lcl}
+	\execconf{fun(\formals) \stmt_{body}}{\env}{\lbls}{\clbls}{\handler}{\cstrace}{\cex}{\econt}{\scont}
+	& \Rightarrow &
+	\contconf{\econt}{\funval{\stmt_{body}}{\formals}{\env'}}
+  \end{array}
+\]
+where $\env' = \ext{\env}{fun}{\funval{\stmt_{body}}{\formals}{\env'}}$.
 \end{document}
