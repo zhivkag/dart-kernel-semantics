@@ -355,6 +355,7 @@
 \newcommand{\loc}{\ensuremath{\alpha}}
 \newcommand{\dlocation}{\mathbf{Location}}
 \newcommand{\dstring}{\mathbf{StringValue}}
+\newcommand{\funval}[3]{\mathrm{FunctionValue}({#1},\,{#2},\,{#3})}
 \newcommand{\dfunval}{\mathbf{FunctionValue}}
 \newcommand{\dlitval}{\mathbf{LiteralValue}}
 \newcommand{\dobjval}{\mathbf{ObjectValue}}
@@ -393,7 +394,6 @@
 \newcommand{\switchk}[2]{\mathrm{SwitchK}({#1},\,\env,\,\lbls,\,{#2},\,\strace,\,\handler,\,\cstrace,\,\cex,\,\econt,\,\scont)}
 \newcommand{\finallybreak}[2]{\mathrm{FinallyBreak}({#1},\,\env,\,\lbls,\,\clbls,\,\strace,\,\handler,\,\cstrace,\,\cex,\,\econt,\,{#2})}
 \newcommand{\finallycontinue}[2]{\mathrm{FinallyContinue}({#1},\,\env,\,\lbls,\,\clbls,\,\strace,\,\handler,\,\cstrace,\,\cex,\,\econt,\,{#2})}
-
 
 % Exceptions
 \newcommand{\throwk}[2]{\mathrm{ThrowK}({#1},\,{#2})}

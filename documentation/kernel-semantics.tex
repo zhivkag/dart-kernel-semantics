@@ -722,8 +722,17 @@ Let $\clbl = \continuel{L'}{\switchcont} \in \clbls \textrm{ with } L' == \mathb
 \subsection{Closures}
 \subsubsection{Function expressions}
 
-Kernel supports encapsulating an executable unit of code with function expressions. To support function expressions we introduce FunctionValue as a value that has the function node, f, and the environment, ρ,  in which the function literal was created. This ensures that there are no free variables in the body of f. A FunctionValue has only one method, call.
- 
+Kernel supports encapsulating an executable unit of code with function expressions. To support function expressions we introduce $fv = \funval{\stmt_{body}}{\formals}{\env} \in \dfunval$ as a value that has the function statement body, $\stmt_{body} \in \dstmt$, its list of formal parameters, $\formals \in \dformals$, and the environment, $\env \in \denv$ in scope of the function expression. This ensures that there are no free variables in the body of $fv$. $fv \in \dfunval$ has only one method, $call$.
+
+Let $F$ be a function expression with a body $\stmt_{body}$ and a list of formal parameters, $\formals$.
+
+\[
+  \begin{array}{lcl}
+	\evalconf{F}{\env}{st}{cex}{cst}{\econt}
+	& \Rightarrow &
+	\contconf{\econt}{\funval{\stmt_{body}}{\formals}{\env}}
+  \end{array}
+\]
 %<f, ρ, KE>exec → <KE, FValue(f, α)>cont  with  !α = ρ
 \subsubsection{Function declaration}
 Kernel supports local function declaration, where a final variable stores a function value. 
