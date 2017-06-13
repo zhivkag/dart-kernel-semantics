@@ -373,7 +373,6 @@
 \newcommand{\scontconf}[2]{\confpair{#1}{#2}_{\mathrm{scont}}}
 \newcommand{\acontconf}[2]{\confpair{#1}{#2}_{\mathrm{acont}}}
 \newcommand{\throwconf}[3]{\conftriple{#1}{#2}{#3}_{\mathrm{throw}}}
-\newcommand{\aconf}[6]{\langle{#1},\,{#2},\,{#3},\handler,\,{#4},\,{#5},\,{#6}\rangle_{\mathrm{eval}}}
 \newcommand{\evallistconf}[6]{\langle{#1},\,{#2},\,{#3},\handler,\,{#4},\,{#5},\,{#6}\rangle_{\mathrm{evalList}}}
 \newcommand{\evalconf}[6]{\langle{#1},\,{#2},\,{#3},\handler,\,{#4},\,{#5},\,{#6}\rangle_{\mathrm{eval}}}
 \newcommand{\execconf}[9]{\langle{#1},\,{#2},\,{#3},\,{#4},\,\strace,\,{#5},\,{#6},\,{#7},\,{#8},\,{#9}\rangle_{\mathrm{exec}}}
@@ -430,5 +429,5 @@
 \newcommand{\redapp}[3]{\mathrm{RedirectingApp}({#1},\,{#2},\,\strace,\,\handler,\,\cstrace,\,\cex,\,{#3})}
 \newcommand{\initializerk}[4]{\mathrm{InitializerK}({#1},\,{#2},\,{#3},\,\strace,\,\handler,\,\cstrace,\,\cex,\,{#4})}
 \newcommand{\newsk}[2]{\mathrm{NewSK}({#1},\,{#2})}
-\newcommand{\fieldsapp}[3]{\mathrm{FieldsApp}({#1},\,{#2},\,\strace,\,\handler,\,\cstrace,\,\cex,\,{#3})}
+\newcommand{\fieldsapp}[4]{\mathrm{FieldsApp}({#1},\,{#2},\,{#3},\,\strace,\,\handler,\,\cstrace,\,\cex,\,{#4})}
 \newcommand{\bodysk}[3]{\mathrm{BodySK}({#1},\,{#2},\,\strace,\,\handler,\,\cstrace,\,\cex,\,{#3})}
