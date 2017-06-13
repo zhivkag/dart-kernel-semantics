@@ -123,7 +123,7 @@ The state space of the CESK machine contains various kinds of configurations, ea
 	\evalconf{\expr}{\env}{st}{cex}{cst}{\econt} & : &
 	\textrm{EvalConfiguration}\\
 
-	\evallistconf{\exprs}{\env}{st}{cex}{cst}{\econt} & : &
+	\evallistconf{\exprs}{\env}{st}{cex}{cst}{\acont} & : &
 	\textrm{EvalListConfiguration}\\
 
 	\execconf{\stmt}{\env}{\lbls}{\clbls}{\handler}{\cex}{\cstrace}{\econt}{\scont}  & : &
@@ -745,4 +745,103 @@ Let $F$ be a function with a body $\stmt_{body}$ and a list of formal parameters
   \end{array}
 \]
 where $\env' = \ext{\env}{fun}{\funval{\stmt_{body}}{\formals}{\env'}}$.
+
+\subsection{New instance creation}
+
+The expression \textbf{new} invokes a constructor to produce a new instance. The target constructor \textbf{Q} has a list of formal parameters, $\formals$, a list of initializers, $Izs$, and a statement body, $\stmt_{body}$. The invocation of a constructor \textbf{Q} with \textbf{new Q}($\exprs$) proceeds as follows:
+\[
+  \begin{array}{lcl}
+	\evalconf{\textbf{new Q}(\exprs)}{\env}{st}{cex}{cst}{\econt}
+	& \Rightarrow &
+	\evallistconf{\exprs}{\env}{st}{cex}{cst}{\acont'}\\[2mm]
+  \end{array}
+\]
+where $\acont' = \ctrapp{\textbf{Q}}{\econt}$.
+\[
+  \begin{array}{lcl}
+	\acontconf{\ctrapp{\textbf{Q}}{\econt}}{\synval{s}}
+	& \Rightarrow &
+	\contconf{\initk{Q}{\env}{\scont}}{!\loc}
+  \end{array}
+\]
+where $\loc$ is the location of the newly allocated instance in the store s.t.:
+\[
+  \begin{array}{l}
+	\deref\loc = \objval \in \dobjval\\
+	\env' = extend(\env_{empty}, \formals, \synval{s})\\
+	\scont = \newsk{\econt}{\loc} \\[2mm]
+
+	\scontconf{\newsk{\econt}{\loc}}{\env}
+	\Rightarrow
+	\contconf{\econt}{\deref\loc}
+  \end{array}
+\]
+
+\noindent
+Let $li = last(Izs)$ be the last initializer in the list of initializers, $Izs$, of constructor \textbf{Q}.
+
+\noindent
+When $li$ is a redirecting initializer to target constructor \textbf{G}, then execution of constructor \textbf{Q} proceeds immediately with execution of its initializer list, $Izs$.
+\[
+  \begin{array}{lcl}
+	\contconf{\initk{Q}{\env}{\scont}}{\synval}
+	& \Rightarrow &
+	\evallistconf{\exprs}{\env}{\strace}{\cstrace}{\cex}{\acont}\\	
+	&&
+	\textrm{if } Izs = RedirectingI(G, \exprs) :: []\\
+	\textrm{where:}\\
+	\acont = \redapp{G}{\loc}{\scont}\\
+	\deref\loc = \synval
+	\\[2mm]
+
+	\contconf{\initk{Q}{\env}{\scont}}{\synval}
+	& \Rightarrow &
+	\evalconf{\expr}{\env}{st}{cex}{cst}{\econt'}\\
+	&&
+	\textrm{otherwise}\\
+	\textrm{where:}\\
+
+	fi = Initializer(\expr) \textrm{, first initializer in }Izs\\
+	\econt' = \initializerk{Izs}{\loc}{\env}{\scont}\\
+	\deref\loc = \synval\\[2mm]
+
+	\acontconf{\redapp{G}{\loc}{\scont}}{\synval{s}}
+	& \Rightarrow &
+	\contconf{\initk{G}{\env'}{\scont}}{\deref\loc}\\[2mm]
+	\textrm{where:}\\
+	\env' = extend(\env_{empty}, \formals, \synval{s})
+  \end{array}
+\]
+\noindent
+Otherwise, \textbf{Q} is a non-redirecting generative constructor, and execution of \textbf{Q} proceeds with evaluation of field initializers in the immediately enclosing class.
+\noindent
+Let \textbf{Q} be a constructor with non empty initializer list, $Izs$ and a constructor body $\stmt_{body}$.
+\[
+  \begin{array}{lcl}
+	\contconf{\initk{Q}{\env}{\scont}}{\synval}
+	& \Rightarrow &
+	\evallistconf{\exprs}{\env}{\strace}{\cstrace}{\cex}{\acont}\\[2mm]
+
+	\textrm{where:}\\
+	\env' = \ext{\env}{\mathbf{this}}{\deref\loc}
+	&&
+	\exprs = \textrm{initializer expressions for instance fields}\\
+	\deref\loc = \synval
+	&&
+	\acont = \fieldsapp{\env}{Izs}{\scont'}\\
+	&&
+	\scont' = \bodysk{\stmt_{body}}{\env'}{\scont}
+  \end{array}
+\]
+\noindent
+To further initialize the new instance, the body of the constructor will be executed. In Kernel the body of a constructor is executed after the execution of the initializer list and its super constructor.
+\noindent
+To support this, we add a new statement continuation, $BodySK$, that has the constructor body statement, the environment, the error handlers and stacktraces, and the next statement continuation.
+\[
+  \begin{array}{lcl}
+	\scontconf{\bodysk{\stmt}{\env}{\scont}}{\_}
+	& \Rightarrow &
+	\execconf{\stmt}{\env}{[]}{[]}{\handler}{\cex}{\cstrace}{\econt}{\scont}
+  \end{array}
+\]
 \end{document}

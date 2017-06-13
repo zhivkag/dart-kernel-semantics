@@ -358,6 +358,7 @@
 \newcommand{\funval}[3]{\mathrm{FunctionValue}({#1},\,{#2},\,{#3})}
 \newcommand{\dfunval}{\mathbf{FunctionValue}}
 \newcommand{\dlitval}{\mathbf{LiteralValue}}
+\newcommand{\objval}{\mathrm{ObjectValue}(class, fields)}
 \newcommand{\dobjval}{\mathbf{ObjectValue}}
 \newcommand{\dclass}{\mathbf{Class}}
 \newcommand{\dformals}{\mathbf{Formals}}
@@ -422,3 +423,12 @@
 % Application continuation
 \newcommand{\staticinvocapp}[6]{\mathrm{StaticInvocationA}({#1},\,{#2},\,{#3},\,\handler,\,{#4},\,{#5},\,{#6})}
 \newcommand{\valueapp}[2]{\mathrm{ValueA}({#1},\,{#2})}
+
+% New instance
+\newcommand{\ctrapp}[2]{\mathrm{ConstructorApp}({#1},\,\strace,\,\handler,\,\cstrace,\,\cex,\,{#2})}
+\newcommand{\initk}[3]{\mathrm{InitiK}({#1},\,{#2},\,\strace,\,\handler,\,\cstrace,\,\cex,\,{#3})}
+\newcommand{\redapp}[3]{\mathrm{RedirectingApp}({#1},\,{#2},\,\strace,\,\handler,\,\cstrace,\,\cex,\,{#3})}
+\newcommand{\initializerk}[4]{\mathrm{InitializerK}({#1},\,{#2},\,{#3},\,\strace,\,\handler,\,\cstrace,\,\cex,\,{#4})}
+\newcommand{\newsk}[2]{\mathrm{NewSK}({#1},\,{#2})}
+\newcommand{\fieldsapp}[3]{\mathrm{FieldsApp}({#1},\,{#2},\,\strace,\,\handler,\,\cstrace,\,\cex,\,{#3})}
+\newcommand{\bodysk}[3]{\mathrm{BodySK}({#1},\,{#2},\,\strace,\,\handler,\,\cstrace,\,\cex,\,{#3})}
