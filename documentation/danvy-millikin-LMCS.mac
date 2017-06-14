@@ -431,3 +431,4 @@
 \newcommand{\newsk}[2]{\mathrm{NewSK}({#1},\,{#2})}
 \newcommand{\fieldsapp}[4]{\mathrm{FieldsApp}({#1},\,{#2},\,{#3},\,\strace,\,\handler,\,\cstrace,\,\cex,\,{#4})}
 \newcommand{\bodysk}[3]{\mathrm{BodySK}({#1},\,{#2},\,\strace,\,\handler,\,\cstrace,\,\cex,\,{#3})}
+\newcommand{\superapp}[3]{\mathrm{SuperApp}({#1},\,{#2},\,\strace,\,\handler,\,\cstrace,\,\cex,\,{#3})}

@@ -143,7 +143,7 @@ The state space of the CESK machine contains various kinds of configurations, ea
 	\acontconf{\acont}{\vals} & : &
 	\textrm{ApplicationConfiguration}\\
 
-	\acontconf{\scont}{\env} & : &
+	\scontconf{\scont}{\env} & : &
 	\textrm{ForwardConfiguration}\\[3mm]
 
 	\throwconf{\handler}{\val}{\strace} & : &
@@ -969,43 +969,125 @@ To support this, we add a new statement continuation, $BodySK$, that has the con
 \]
 
 \noindent
-After the evaluation of the initializer expressions, the labels for each field in the object value are updated accordingly. An update of field $f_i$, stored at location $\loc' = (\deref\loc)[f_i]$ with value $\synval_i$ is expressed as $\deref\loc' = \deref\deref\loc[f_i] = \synval_{i}$.
+After the evaluation of the initializer expressions, the labels for each field in the object value are updated accordingly. An update of field $f_i$, stored at location $\loc' = (\deref\loc)[f_i]$ with value $\synval_i$ is expressed as $\update{(\deref\loc)[f_i]}{\synval_{i}}$, so the following holds $\deref\loc' = \deref\deref\loc[f_i] = \synval_{i}$ after the update.
 
 \noindent
 Let $Fs$ be the list of fields for value $\deref\loc$ for the class immediately enclosing the current constructor below.
 
-If the initializer list, $Izs$ is empty,
+If the initializer list is empty, $Izs = []$, the next statement continuation is executed.
 \[
   \begin{array}{lcl@{\hspace{30mm}}}
 	\acontconf{\fieldsapp{\env}{Izs}{\loc}{\scont}}{\synval{s}}
 	& \Rightarrow &
-	\scontconf{\scont}{\env} \textrm{, } Izs = []\\[1mm]
-	\textrm{with }\deref\deref\loc[f_i] = \synval_{i}, \forall f_i \in Fs, \forall \synval_i \in \synval{s}
+	\scontconf{\scont}{\env}\\[2mm]
+	&&\textrm{with }\deref\deref\loc[f_i] = \synval_{i}, \forall f_i \in Fs, \forall \synval_i \in \synval{s}
+  \end{array}
+\]
+\noindent
+In Kernel, a super initializer or a redirecting initializer, when present, will appear last in the initializer list.\\
+If the initializer list contains at least two initializers, $Izs = Ininitalizer(E) :: Izs', Izs' \neq []$, we can assume that the next initializer to execute is a local or a field initializer.
+\[
+  \begin{array}{lcl@{\hspace{30mm}}}
+	\acontconf{\fieldsapp{\env}{Izs}{\loc}{\scont}}{\synval{s}}
+	& \Rightarrow &
+	\evalconf{\expr}{\env}{st}{cex}{cst}{\econt'}\\[2mm]
+	&&\textrm{with }\deref\deref\loc[f_i] = \synval_{i}, \forall f_i \in Fs, \forall \synval_i \in \synval{s}\\
+	\textrm{where:}\\
+	\hspace{5mm}\econt' = \initk{Izs}{\loc}{\env}
   \end{array}
 \]
 
-The initializer list of non-redirecting generative constructor is executed next.
-%<InstanceFields(Super(args, Q(Sbody, is))), ρ, α, KS), vs>acont ->
-%<args, ρ, SuperA(Sbody, is, α, KS)>evalList  	where  !α[fs -> vs] after transition
-%<InstanceFields(I(E) :: is, ρ, α, KS), vs>acont ->
-%<E, ρ, InitializerK(I, is, ↓ρ, α, KS)>eval, where !α[fs → vs] after transition
+\noindent
+Otherwise, there is only one initializer to execute in the initializer list, $li$: \\
+\begin{itemize}
 
-Local initializers are special initializers in Kernel and they extend the environment for the execution of the initializer list.
+\item When $li$ is field or local initializer, the transition is identical to the rule for non empty and non singleton initializer lists, described above.\\
+\item When the last initializer is a redirecting constructor, i.e. $li = RedirectingI(G, \exprs)$, the transition is as follows:
+\[
+  \begin{array}{lcl@{\hspace{30mm}}}
+	\acontconf{\fieldsapp{\env}{li::[]}{\loc}{\scont}}{\synval{s}}
+	& \Rightarrow &
+	\evallistconf{\exprs}{\env}{\strace}{\cstrace}{\cex}{\acont}\\	
+	&&\textrm{with }\deref\deref\loc[f_i] = \synval_{i}, \forall f_i \in Fs, \forall \synval_i \in \synval{s}\\
+	\textrm{where:}\\
+	\acont = \redapp{G}{\loc}{\scont}\\[2mm]
+  \end{array}
+\]
 
-%<InitializerK(L(x), [], ρ, α, KS), V>cont → <Ks, ↑ρ>scont
-%<InitializerK(L(x), I(E) :: is, ρ, α, KS), V>cont →
-%<E,  ρ[x → α’],  InitializerK(I, is, ρ, α, KS)>eval where α’ s.t. !α’ = V
-%<InitializerK(L(x), Super(args, Q(Sbody, is))) :: [], ρ, α, KS), V>cont →
-%<args,  ρ[x → α’], SuperA(Sbody, is, α, KS) >evalList 	where α’ s.t. !α’ = V
-%<InitializerK(L(x), Redirecting(args, Q) :: [], ρ, α, KS), V>cont →
-%<args, ρ[x → α’], RedirectingA(G, α, KS)>evalList  	where α’ s.t. !α’ = V
+\item Otherwise, the last initializer is a super initializer, $li = Super(G, \exprs)$:
+\[
+  \begin{array}{lcl@{\hspace{30mm}}}
+	\acontconf{\fieldsapp{\env}{li::[]}{\loc}{\scont}}{\synval{s}}
+	& \Rightarrow &
+	\evallistconf{\exprs}{\env}{\strace}{\cstrace}{\cex}{\acont}\\	
+	&&\textrm{with }\deref\deref\loc[f_i] = \synval_{i}, \forall f_i \in Fs, \forall \synval_i \in \synval{s}\\
+	\textrm{where:}\\
+	\acont = \superapp{G}{\loc}{\scont}\\[2mm]
+  \end{array}
+\]
+\end{itemize}
+The transitions for the initializer continuation are described below.\\[2mm]
+\noindent
+Besides redirecting and super initializers, in Kernel we also have field and local initializers, both containing an expression to evaluate, denoted as $Initializer(\expr) : LocalI(\variablemeta, \expr) + FieldI(f, \expr)$.\\[2mm]
+Local initializers are special initializers in Kernel and they extend the environment for the execution of the initializer list. The transition steps for initializer continuation are as follows:
+\[
+  \begin{array}{lcl@{\hspace{30mm}}}
+	\contconf{\initk{Local(\variablemeta, \expr) :: []}{\loc}{\scont}}{\synval}
+	& \Rightarrow &
+	\scontconf{\scont}{\env'}\\[1mm]
+	\textrm{where:}\\
+	\hspace{5mm}\env' = \ext{\env}{\variablemeta}{\synval}\\[2mm]
 
-Field initializers initialize of the fresh instance, i.e. they modify the value stored at location α in the store S, where !α = V, previously allocated fresh instance.
+	\contconf{\initk{Local(\variablemeta, \expr) :: li :: []}{\loc}{\scont}}{\synval}
+	& \Rightarrow &
+	\evallistconf{\exprs}{\env'}{\strace}{\cstrace}{\cex}{\acont}\\[1mm]
+	\textrm{where:}\\
+	\hspace{5mm}\env' = \ext{\env}{\variablemeta}{\synval}\\
+	\hspace{5mm}\textrm{if } li = Super(G, \exprs):\\
+	\hspace{8mm}\acont = \superapp{G}{\loc}{\scont}\\
+	\hspace{5mm}\textrm{if } li = Redirecting(G, \exprs):\\
+	\hspace{8mm}\acont = \redapp{G}{\loc}{\scont}\\[2mm]
 
-%<InitializerK(F(f), [], ρ, α, KS), V>cont → <Ks, ↑ρ>scont   	with !α[f → α’] and α’ s.t. !α’ = V	%<InitializerK(F(f), I(E) :: is, ρ, α, KS), V>cont →
-%<E,  ρ,  InitializerK(I, is, ρ, α, KS)>eval  with !α[f → α’] and α’ s.t. !α’ = V
-%<InitializerK(F(f), Super(args, Q(Sbody, is))) :: [], ρ, α, KS), V>cont →
-%<args,  ρ, SuperA(Sbody, is, α, KS) >evalList 		with !α[f → α’] and α’ s.t. !α’ = V
-%<InitializerK(F(f), Redirecting(args, Q) :: [], ρ, α, KS), V>cont →
-%<args, ρ, RedirectingA(G, α, KS)>evalList  		with !α[f → α’] and α’ s.t. !α’ = V
+	\contconf{\initk{Local(\variablemeta, \expri{0}) :: Izs}{\loc}{\scont}}{\synval}
+	& \Rightarrow &
+	\evalconf{\expri{1}}{\env'}{st}{cex}{cst}{\econt'}\\[2mm]
+	\textrm{where:}\\
+	\hspace{5mm}\env' = \ext{\env}{\variablemeta}{\synval}\\
+	\hspace{5mm}Izs = Initializer(\expri{1}) :: Izs'\\
+	\hspace{5mm}\econt' = \initk{Izs}{\loc}{\env'}
+  \end{array}
+\]
+\noindent
+Note that when a local initializer is last in the initializer list, the environment resulted after the transition is discarded. However, the corresponding expression has to be executed, because of side effects.
+\\[2mm]
+\noindent
+Field initializers further initialize fields of the fresh instance. Let $Field(f, \expr)$ be a field initializer. Then the value stored at location $\loc' = (\deref\loc)[f]$ in the store $S$ will be modified, where $\loc$ is the location of the previously allocated fresh instance for the object currently being initialized.
+
+\[
+  \begin{array}{lcl@{\hspace{30mm}}}
+	\contconf{\initk{Field(f, \expr) :: []}{\loc}{\scont}}{\synval}
+	& \Rightarrow &
+	\scontconf{\scont}{\env'}\\[1mm]
+	\textrm{where:}\\
+	\hspace{5mm}\update{(\deref\loc)[f]}{\synval}\\[2mm]
+
+	\contconf{\initk{Field(f, \expr) :: li :: []}{\loc}{\scont}}{\synval}
+	& \Rightarrow &
+	\evallistconf{\exprs}{\env}{\strace}{\cstrace}{\cex}{\acont}\\[1mm]
+	\textrm{where:}\\
+	\hspace{5mm}\update{(\deref\loc)[f]}{\synval}\\
+	\hspace{5mm}\textrm{if } li = Super(G, \exprs):\\
+	\hspace{8mm}\acont = \superapp{G}{\loc}{\scont}\\
+	\hspace{5mm}\textrm{if } li = Redirecting(G, \exprs):\\
+	\hspace{8mm}\acont = \redapp{G}{\loc}{\scont}\\[2mm]
+
+	\contconf{\initk{Field(f, \expri{0}) :: Izs}{\loc}{\scont}}{\synval}
+	& \Rightarrow &
+	\evalconf{\expri{1}}{\env}{st}{cex}{cst}{\econt}\\[2mm]
+	\textrm{where:}\\
+	\hspace{5mm}\update{(\deref\loc)[f]}{\synval}\\
+	\hspace{5mm}Izs = Initializer(\expri{1}) :: Izs'\\
+	\hspace{5mm}\econt' = \initk{Izs}{\loc}{\env}
+  \end{array}
+\]
 \end{document}
