@@ -511,8 +511,7 @@ Expression list continuation application:
 
 \subsubsection{Property extraction}
 \label{subsubsec:property-extraction}
-
-Kernel allows access of a member as a property, which can be either (1) getter access, which executes the getter, or (2) method extraction, which converts a method into a closure, also known as tear-off.
+Kernel allows access of a member as a property, which can be either getter access, which executes the getter, or method extraction, which converts a method into a closure, also known as tear-off.
 %% PropertyGetK
 \newcommand{\propertygetk}{\mathrm{PropertyGetK}(\idmeta,\,\strace,\,\handler,\,\cstrace,\,\cex,\,\econt)}
 
@@ -666,6 +665,39 @@ In Kernel a property can be set without lookup, by direct reference to the $AST$
 	\contconf{\econt}{\update{\synval_0[\membermeta]}{\synval_1}}\\
   \end{array}
 \]
+
+\subsubsection{Super property get}
+\label{subsubsec:super-property-get}
+%\newcommand{\SuperPropertyGet}[1]{\tt{super}.#1}
+Kernel allows access of a superclass member as a property, which can be either getter access, which executes the getter, or method extraction, which converts a method into a closure, also known as tear-off.
+\newcommand{\this}{\tt{this}}
+\newcommand{\superclass}[1]{superclass({#1})}
+
+\noindent
+Accessing a superclass member is enabled with the expression $\SuperPropertyGet{\idmeta}$ evaluated with the corresponding components: $\env$, $\strace$, $\handler$, $\cstrace$, $\cex$, $\econt$. Let $\val = \deref(\env(\this))$, $C = \superclass{\val}$ and $M$ the result of looking up $\idmeta$ in $C$.
+\[
+  \begin{array}{l@{\hspace{50mm}}}
+	\textrm{If }\membermeta \textrm{ is a member method with body }\stmt \textrm{ and formals }\formals:\\
+	\hspace{3mm}\evalconf{\SuperPropertyGet{\idmeta}}{\env}{\strace}{\cstrace}{\cex}{\econt}
+	\Rightarrow
+	\contconf{\econt}{\funval{\formals}{\stmt}{\env'}}\\
+	\hspace{5mm}\textrm{with }\env' = \ext{\env_{empty}}{\this}{\deref(\env(\this))}\\[2mm]
+
+	\textrm{If }\membermeta \textrm{ is a getter method with body }\stmt :\\
+	\hspace{3mm}\evalconf{\SuperPropertyGet{\idmeta}}{\env}{\strace}{\cstrace}{\cex}{\econt}
+	\Rightarrow
+	\execconf{\stmt}{\env'}{\lbls}{\clbls}{\handler}{\cstrace}{\cex}{\econt}{\scont}\\
+	\hspace{5mm}\textrm{with }\env' =  \ext{\env_{empty}}{\this}{\deref(\env(\this))}, \scont = \emptyset\\[2mm]
+
+	\textrm{If }\membermeta \textrm{ is a iplicit field getter} :\\
+	\hspace{3mm}\evalconf{\SuperPropertyGet{\idmeta}}{\env}{\strace}{\cstrace}{\cex}{\econt}
+	\Rightarrow
+	\contconf{\econt}{M(\deref(\env(\this)))}\\
+  \end{array}
+\]
+\subsubsection{Super property set}
+\label{subsubsec:super-property-set}
+%\newcommand{\SuperPropertySet}[2]{\tt{super}.#1=#2}
 
 \subsection{Statement execution}
 \label{subsec:stmt-exectution}
