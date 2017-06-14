@@ -742,7 +742,7 @@ Loops \textbf{do while}, \textbf{for in}, for can be desugared to while loops wi
 \subsection{Labels}
 
 Kernel supports labelling statements, \textbf{L: $\stmt_{L}$}, and breaking to L, \textbf{break L}, which completes the execution of the labelled statement and proceeds to executing the rest of the program.
-To support breaking to a label, we add a labels component, $\lbls$, to statement configurations. $\lbls$ represents a list of pairs mapping a labelled statement, \textbf{L: $\stmt_L$}, to a break statement continuation, $\bcont$. Executing a labelled statement inserts a new break label, $\lbl$ to the list of labels $\lbls$.
+To support breaking to a label, we add a labels component, $\lbls$, to statement configurations. $\lbls$ represents a list of pairs mapping a labelled statement, \textbf{L: $\stmt_L$}, to a break statement continuation, $\bcont$. Executing a labelled statement inserts a new break label, $\lbl$ in the list of labels $\lbls$.
 
 \[
   \begin{array}{lcl}
