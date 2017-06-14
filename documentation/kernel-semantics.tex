@@ -518,15 +518,21 @@ Kernel allows access of a member as a property, which can be either (1) getter a
 	\evalconf{\expressionmeta}{\env}{\strace}{\cstrace}{\cex}{\econt'}\\
 	\textrm{where:}\\
 	\hspace{5mm}\econt' = \propertygetk\\[2mm]
+  \end{array}
+\]
 
-	\textrm{if }\idmeta \textrm{ is a method with body }\stmt\textrm{ and formals }\formals :\\
+\noindent
+After the evaluation of the receiver expression to a value $\val$, the property $\idmeta$ is looked up in methods, getters and implicit getters for the value $\val$. Let R be the result of such lookup.
+\[
+  \begin{array}{lcl@{\hspace{30mm}}}
+	\textrm{if R is a method with body }\stmt\textrm{ and formals }\formals :\\
 	\hspace{2mm}\contconf{\propertygetk}{\synval}
 	& \Rightarrow &
 	\contconf{\econt}{\funval{\formals}{\stmt}{\env}}\\
 	\textrm{where:}\\
-	\hspace{5mm}\env = \ext{\env_{empty}}{\mathbf{this}}{\synval}\\
+	\hspace{5mm}\env = \ext{\env_{empty}}{\mathbf{this}}{\synval}\\[2mm]
 
-	\textrm{if }\idmeta \textrm{ is getter with statement body }\stmt :\\
+	\textrm{if R is getter with statement body }\stmt :\\
 	\hspace{2mm}\contconf{\propertygetk}{\synval}
 	& \Rightarrow &
 	\execconf{\stmt}{\env}{\lbls}{\clbls}{\handler}{\cstrace}{\cex}{\econt}{\scont}\\
@@ -534,16 +540,57 @@ Kernel allows access of a member as a property, which can be either (1) getter a
 	\hspace{5mm}\env = \ext{\env_{empty}}{\mathbf{this}}{\synval}\\
 	\hspace{5mm}\scont = \emptyset\\[2mm]
 
-	\textrm{if }\idmeta \textrm{ is an implicit getter for field }\idmeta :\\
+	\textrm{if R is an implicit getter for field }\idmeta :\\
 	\hspace{2mm}\contconf{\propertygetk}{\synval}
 	& \Rightarrow &
-	\contconf{\econt}{\deref(\synval[\idmeta])}\\
+	\contconf{\econt}{\deref(\textrm{R}(\synval))}\\
   \end{array}
 \]
 %If the lookup fails, noSuchMethod is created/invoked accordingly (TBD)
 
 \subsubsection{Direct property extraction}
 \label{subsubsec:direct-property-extraction}
+In Kernel a property can be accessed without lookup, by direct reference to the $AST$ node of said property. This implies that the lookup step above is bypassed.
+%% DirectPropertyGetK
+\newcommand{\dpropertygetk}{\mathrm{DPropertyGetK}(\membermeta,\,\strace,\,\handler,\,\cstrace,\,\cex,\,\econt)}
+\[
+  \begin{array}{lcl@{\hspace{30mm}}}
+	\evalconf{\DirectPropertyGet{\expressionmeta}{\membermeta}}{\env}{\strace}{\cstrace}{\cex}{\econt}
+	& \Rightarrow &
+	\evalconf{\expressionmeta}{\env}{\strace}{\cstrace}{\cex}{\econt'}\\
+	\textrm{where:}\\
+	\hspace{5mm}\econt' = \dpropertygetk\\[2mm]
+
+	\textrm{if }\membermeta \textrm{ is a method with body }\stmt\textrm{ and formals }\formals :\\
+	\hspace{2mm}\contconf{\dpropertygetk}{\synval}
+	& \Rightarrow &
+	\contconf{\econt}{\funval{\formals}{\stmt}{\env}}\\
+	\textrm{where:}\\
+	\hspace{5mm}\env = \ext{\env_{empty}}{\mathbf{this}}{\synval}\\[2mm]
+
+	\textrm{if }\membermeta \textrm{ is getter with statement body }\stmt :\\
+	\hspace{2mm}\contconf{\dpropertygetk}{\synval}
+	& \Rightarrow &
+	\execconf{\stmt}{\env}{\lbls}{\clbls}{\handler}{\cstrace}{\cex}{\econt}{\scont}\\
+	\textrm{where:}\\
+	\hspace{5mm}\env = \ext{\env_{empty}}{\mathbf{this}}{\synval}\\
+	\hspace{5mm}\scont = \emptyset\\[2mm]
+
+	\textrm{if }\membermeta \textrm{ is a field } :\\
+	\hspace{2mm}\contconf{\dpropertygetk}{\synval}
+	& \Rightarrow &
+	\contconf{\econt}{\deref(\synval[\membermeta])}\\
+  \end{array}
+\]
+%\newcommand{\DirectPropertyGet}[2]{#1.\{#2\}}
+
+\subsubsection{Property assignment}
+\label{subsubsec:property-assignment}
+% \newcommand{\PropertySet}[3]{#1.#2=#3}
+
+\subsubsection{Direct property assignment}
+\label{subsubsec:direct-property-assignment}
+% \newcommand{\DirectPropertySet}[3]{#1.\{#2\}=#3}
 
 \subsection{Statement execution}
 \label{subsec:stmt-exectution}
