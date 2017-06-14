@@ -543,7 +543,7 @@ After the evaluation of the receiver expression to a value $\val$, the property 
 	\textrm{if R is an implicit getter for field }\idmeta :\\
 	\hspace{2mm}\contconf{\propertygetk}{\synval}
 	& \Rightarrow &
-	\contconf{\econt}{\deref(\textrm{R}(\synval))}\\
+	\contconf{\econt}{\textrm{R}(\synval)}\\
   \end{array}
 \]
 %If the lookup fails, noSuchMethod is created/invoked accordingly (TBD)
@@ -582,11 +582,48 @@ In Kernel a property can be accessed without lookup, by direct reference to the 
 	\contconf{\econt}{\deref(\synval[\membermeta])}\\
   \end{array}
 \]
-%\newcommand{\DirectPropertyGet}[2]{#1.\{#2\}}
-
 \subsubsection{Property assignment}
 \label{subsubsec:property-assignment}
 % \newcommand{\PropertySet}[3]{#1.#2=#3}
+An assignment changes the value stored at the location of the provided property name.
+\newcommand{\propertysetk}{\mathrm{PropertySetK}(\idmeta,\,\expressionmeta_1,\,\env,\,\strace,\,\handler,\,\cstrace,\,\cex,\,\econt)}
+
+\newcommand{\propertysetvk}{\mathrm{PropertySetValueK}(\synval_0,\,\idmeta,\,\strace,\,\handler,\,\cstrace,\,\cex,\,\econt)}
+
+\[
+  \begin{array}{lcl@{\hspace{30mm}}}
+	\evalconf{\PropertySet{\expressionmeta_0}{\idmeta}{\expressionmeta_1}}{\env}{\strace}{\cstrace}{\cex}{\econt}
+	& \Rightarrow &
+	\evalconf{\expressionmeta_0}{\env}{\strace}{\cstrace}{\cex}{\econt'}\\
+	\textrm{where:}\\
+	\hspace{5mm}\econt' = \propertysetk\\[2mm]
+
+	\contconf{\propertysetk}{\synval_0}
+	& \Rightarrow &
+	\evalconf{\expressionmeta_1}{\env}{\strace}{\cstrace}{\cex}{\econt'}\\
+	\textrm{where:}\\
+	\hspace{5mm}\econt' = \propertysetvk\\[2mm]
+  \end{array}
+\]
+
+\noindent
+After the evaluation of the receiver expression to a value $\synval_0$ and the argument to value $\synval_1$, the property $\idmeta$ is looked up in setters and implicit setters for the value $\synval_0$. Let R be the result of such lookup.
+\[
+  \begin{array}{lcl@{\hspace{30mm}}}
+	\textrm{if R is setter with statement body }\stmt \textrm{ and formal }\formal :\\
+	\hspace{2mm}\contconf{\propertysetvk}{\synval_1}
+	& \Rightarrow &
+	\execconf{\stmt}{\env}{\lbls}{\clbls}{\handler}{\cstrace}{\cex}{\econt}{\scont}\\
+	\textrm{where:}\\
+	\hspace{5mm}\env = \ext{\env_{empty}}{\mathbf{this} :: \formal :: []}{\synval_0 :: \synval_1 :: []}\\
+	\hspace{5mm}\scont = \emptyset\\[2mm]
+
+	\textrm{if R is an implicit setter for field }\idmeta :\\
+	\hspace{2mm}\contconf{\propertygetk}{\synval}
+	& \Rightarrow &
+	\contconf{\econt}{\textrm{R}(\synval_0, \synval_1)}\\
+  \end{array}
+\]
 
 \subsubsection{Direct property assignment}
 \label{subsubsec:direct-property-assignment}
@@ -705,7 +742,7 @@ Loops \textbf{do while}, \textbf{for in}, for can be desugared to while loops wi
 \subsection{Labels}
 
 Kernel supports labelling statements, \textbf{L: $\stmt_{L}$}, and breaking to L, \textbf{break L}, which completes the execution of the labelled statement and proceeds to executing the rest of the program.
-To support breaking to a label, we add a labels component, $\lbls$, to statement configurations $\lbls$ represents a list of pairs mapping a labelled statement, \textbf{L: $\stmt_L$}, to a break statement continuation, $\bcont$. Executing a labelled statement introduces a new break label, $\lbl$ to the list of labels $\lbls$.
+To support breaking to a label, we add a labels component, $\lbls$, to statement configurations. $\lbls$ represents a list of pairs mapping a labelled statement, \textbf{L: $\stmt_L$}, to a break statement continuation, $\bcont$. Executing a labelled statement inserts a new break label, $\lbl$ to the list of labels $\lbls$.
 
 \[
   \begin{array}{lcl}
