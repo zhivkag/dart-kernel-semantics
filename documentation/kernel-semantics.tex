@@ -502,6 +502,49 @@ Expression list continuation application:
 
   \end{array}
 \]
+
+
+\subsubsection{Property extraction}
+\label{subsubsec:property-extraction}
+
+Kernel allows access of a member as a property, which can be either (1) getter access, which executes the getter, or (2) method extraction, which converts a method into a closure, also known as tear-off.
+%% PropertyGetK
+\newcommand{\propertygetk}{\mathrm{PropertyGetK}(\idmeta,\,\strace,\,\handler,\,\cstrace,\,\cex,\,\econt)}
+
+\[
+  \begin{array}{lcl@{\hspace{30mm}}}
+	\evalconf{\PropertyGet{\expressionmeta}{\idmeta}}{\env}{\strace}{\cstrace}{\cex}{\econt}
+	& \Rightarrow &
+	\evalconf{\expressionmeta}{\env}{\strace}{\cstrace}{\cex}{\econt'}\\
+	\textrm{where:}\\
+	\hspace{5mm}\econt' = \propertygetk\\[2mm]
+
+	\textrm{if }\idmeta \textrm{ is a method with body }\stmt\textrm{ and formals }\formals :\\
+	\hspace{2mm}\contconf{\propertygetk}{\synval}
+	& \Rightarrow &
+	\contconf{\econt}{\funval{\formals}{\stmt}{\env}}\\
+	\textrm{where:}\\
+	\hspace{5mm}\env = \ext{\env_{empty}}{\mathbf{this}}{\synval}\\
+
+	\textrm{if }\idmeta \textrm{ is getter with statement body }\stmt :\\
+	\hspace{2mm}\contconf{\propertygetk}{\synval}
+	& \Rightarrow &
+	\execconf{\stmt}{\env}{\lbls}{\clbls}{\handler}{\cstrace}{\cex}{\econt}{\scont}\\
+	\textrm{where:}\\
+	\hspace{5mm}\env = \ext{\env_{empty}}{\mathbf{this}}{\synval}\\
+	\hspace{5mm}\scont = \emptyset\\[2mm]
+
+	\textrm{if }\idmeta \textrm{ is an implicit getter for field }\idmeta :\\
+	\hspace{2mm}\contconf{\propertygetk}{\synval}
+	& \Rightarrow &
+	\contconf{\econt}{\deref(\synval[\idmeta])}\\
+  \end{array}
+\]
+%If the lookup fails, noSuchMethod is created/invoked accordingly (TBD)
+
+\subsubsection{Direct property extraction}
+\label{subsubsec:direct-property-extraction}
+
 \subsection{Statement execution}
 \label{subsec:stmt-exectution}
 
@@ -1090,4 +1133,7 @@ Field initializers further initialize fields of the fresh instance. Let $Field(f
 	\hspace{5mm}\econt' = \initk{Izs}{\loc}{\env}
   \end{array}
 \]
+
+
+
 \end{document}
