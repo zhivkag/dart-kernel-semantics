@@ -674,7 +674,7 @@ Kernel allows access of a superclass member as a property, which can be either g
 \newcommand{\superclass}[1]{superclass({#1})}
 
 \noindent
-Accessing a superclass member is enabled with the expression $\SuperPropertyGet{\idmeta}$ evaluated with the corresponding components: $\env$, $\strace$, $\handler$, $\cstrace$, $\cex$, $\econt$. Let $\val = \deref(\env(\this))$, $C = \superclass{\val}$ and $M$ the result of looking up $\idmeta$ in $C$.
+Accessing a superclass member is accessed with the expression $\SuperPropertyGet{\idmeta}$ evaluated with the corresponding components: $\env$, $\strace$, $\handler$, $\cstrace$, $\cex$, $\econt$. Let $\val = \deref(\env(\this))$, $C = \superclass{\val}$ and $M$ the result of looking up $\idmeta$ in $C$.
 \[
   \begin{array}{l@{\hspace{50mm}}}
 	\textrm{If }\membermeta \textrm{ is a member method with body }\stmt \textrm{ and formals }\formals:\\
@@ -687,9 +687,9 @@ Accessing a superclass member is enabled with the expression $\SuperPropertyGet{
 	\hspace{3mm}\evalconf{\SuperPropertyGet{\idmeta}}{\env}{\strace}{\cstrace}{\cex}{\econt}
 	\Rightarrow
 	\execconf{\stmt}{\env'}{\lbls}{\clbls}{\handler}{\cstrace}{\cex}{\econt}{\scont}\\
-	\hspace{5mm}\textrm{with }\env' =  \ext{\env_{empty}}{\this}{\deref(\env(\this))}, \scont = \emptyset\\[2mm]
+	\hspace{5mm}\textrm{with }\env' =  \ext{\env_{empty}}{\this}{\deref(\env(\this))}, \hspace{2mm}\scont = \emptyset\\[2mm]
 
-	\textrm{If }\membermeta \textrm{ is a iplicit field getter} :\\
+	\textrm{If }\membermeta \textrm{ is a implicit field getter} :\\
 	\hspace{3mm}\evalconf{\SuperPropertyGet{\idmeta}}{\env}{\strace}{\cstrace}{\cex}{\econt}
 	\Rightarrow
 	\contconf{\econt}{M(\deref(\env(\this)))}\\
@@ -698,6 +698,33 @@ Accessing a superclass member is enabled with the expression $\SuperPropertyGet{
 \subsubsection{Super property set}
 \label{subsubsec:super-property-set}
 %\newcommand{\SuperPropertySet}[2]{\tt{super}.#1=#2}
+\newcommand{\superpropertysetk}{\mathrm{SuperPropertySetK}(\idmeta,\,\env,\,\strace,\,\handler,\,\cstrace,\,\cex,\,\econt)}
+Kernel supports assignment of a super member with the expression $\SuperPropertySet{\idmeta}{\expressionmeta}$. The transition is defined as follows:
+\[
+  \begin{array}{l@{\hspace{30mm}}}
+	\evalconf{\SuperPropertySet{\idmeta}{\expressionmeta}}{\env}{\strace}{\cstrace}{\cex}{\econt}
+	\Rightarrow
+	\evalconf{\expressionmeta}{\env}{\strace}{\cstrace}{\cex}{\econt'}\\
+	\textrm{with }\econt' = \superpropertysetk
+  \end{array}
+\]
+
+Let $\val = \deref(\env(\this))$, $C = \superclass{\val}$ and $M$ the result of looking up $\idmeta$ in $C$.
+
+\[
+  \begin{array}{l@{\hspace{50mm}}}
+	\textrm{If }\membermeta \textrm{ is a setter method with body }\stmt\textrm{ and formal }\formal:\\
+	\hspace{3mm}\contconf{\superpropertysetk}{\synval}
+	\Rightarrow
+	\execconf{\stmt}{\env'}{\lbls}{\clbls}{\handler}{\cstrace}{\cex}{\econt}{\scont}\\
+	\hspace{5mm}\textrm{with }\env' =  \ext{\env_{empty}}{\this :: \formal :: []}{\deref(\env(\this)) :: \synval :: []}, \hspace{2mm}\scont = \emptyset\\[2mm]
+
+	\textrm{If }\membermeta \textrm{ is a implicit field setter} :\\
+	\hspace{3mm}\contconf{\superpropertysetk}{\synval}
+	\Rightarrow
+	\contconf{\econt}{M(\deref(\env(\this)), \synval)}\\
+  \end{array}
+\]
 
 \subsection{Statement execution}
 \label{subsec:stmt-exectution}
