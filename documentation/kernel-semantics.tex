@@ -110,7 +110,11 @@ Function "$extend$" creates a new environment by extending the provided environm
 % Exact definition on how the store is modified to be added
 \[extend : \denv \times \mlist{\dvardecl} \times \mlist{\dval} \rightarrow  \denv \]
 
+\subsubsection{Property Lookup}
+\label{subsubsec:property-lookup}
 
+\subsubsection{Method Lookup}
+\label{subsubsec:method-lookup}
 
 \subsection{Notations}
 \label{subsec:notations}
@@ -376,9 +380,9 @@ A variable $\varmeta$ are accessed by reading the value stored at location $\env
 
 \[
   \begin{array}{lll}
-	\evalconf{\neg\expr}{\env}{\strace}{\cstrace}{\cex}{\econt}
+	\evalconf{\Not{\expressionmeta}}{\env}{\strace}{\cstrace}{\cex}{\econt}
 	& \Rightarrow &
-	\evalconf{\expr}{\env}{\strace}{\cstrace}{\cex}{\notk{\econt}}\\[2mm]
+	\evalconf{\expressionmeta}{\env}{\strace}{\cstrace}{\cex}{\notk{\econt}}\\[2mm]
 
 	\contconf{\notk{\econt}}{\true}
 	& \Rightarrow &
@@ -392,18 +396,17 @@ A variable $\varmeta$ are accessed by reading the value stored at location $\env
 
 \noindent
 Let $\econt' = \andk{\expri{2}}{\env}{\strace}{\cstrace}{\cex}{\econt}$ below:
-
 \[
   \begin{array}{lcl}
-	\evalconf{\expri{1} \land \expri{2}}{\env}{\strace}{\cstrace}{\cex}{\econt}
+	\evalconf{\AndExpression{\expressionmeta_0}{\expressionmeta_1}}{\env}{\strace}{\cstrace}{\cex}{\econt}
 	& \Rightarrow &
-	\evalconf{\expri{1}}{\env}{\strace}{\cstrace}{\cex}{\econt'}\\[2mm]
+	\evalconf{\expressionmeta_0}{\env}{\strace}{\cstrace}{\cex}{\econt'}\\[2mm]
 
-	\contconf{\andk{\expr}{\env}{\strace}{\cstrace}{\cex}{\econt}}{\true}
+	\contconf{\andk{\expressionmeta}{\env}{\strace}{\cstrace}{\cex}{\econt}}{\true}
 	& \Rightarrow &
-	\evalconf{\expr}{\env}{\strace}{\cstrace}{\cex}{\econt}\\[2mm]
+	\evalconf{\expressionmeta}{\env}{\strace}{\cstrace}{\cex}{\econt}\\[2mm]
 
-	\contconf{\andk{\expr}{\env}{\strace}{\cstrace}{\cex}{\econt}}{\false}
+	\contconf{\andk{\expressionmeta}{\env}{\strace}{\cstrace}{\cex}{\econt}}{\false}
 	& \Rightarrow &
 	\contconf{\econt}{\false}\\
   \end{array}
@@ -411,18 +414,17 @@ Let $\econt' = \andk{\expri{2}}{\env}{\strace}{\cstrace}{\cex}{\econt}$ below:
 
 \noindent
 Let $\econt' = \ork{\expri{2}}{\env}{\strace}{\cstrace}{\cex}{\econt}$ below:
-
 \[
   \begin{array}{lcl}
-	\evalconf{\expri{1} \lor \expri{2}}{\env}{\strace}{\cstrace}{\cex}{\econt}
+	\evalconf{\OrExpression{\expressionmeta_0}{\expressionmeta_1}}{\env}{\strace}{\cstrace}{\cex}{\econt}
 	& \Rightarrow &
-	\evalconf{\expri{1}}{\env}{\strace}{\cstrace}{\cex}{\econt'}\\[2mm]
+	\evalconf{\expressionmeta_0}{\env}{\strace}{\cstrace}{\cex}{\econt'}\\[2mm]
 
-	\contconf{\ork{\expr}{\env}{\strace}{\cstrace}{\cex}{\econt}}{\false}
+	\contconf{\ork{\expressionmeta}{\env}{\strace}{\cstrace}{\cex}{\econt}}{\false}
 	& \Rightarrow &
-	\evalconf{\expr}{\env}{\strace}{\cstrace}{\cex}{\econt}\\[2mm]
+	\evalconf{\expressionmeta}{\env}{\strace}{\cstrace}{\cex}{\econt}\\[2mm]
 
-	\contconf{\ork{\expr}{\env}{\strace}{\cstrace}{\cex}{\econt}}{\true}
+	\contconf{\ork{\expressionmeta}{\env}{\strace}{\cstrace}{\cex}{\econt}}{\true}
 	& \Rightarrow &
 	\contconf{\econt}{\true}\\
   \end{array}
@@ -725,6 +727,15 @@ Let $\val = \deref(\env(\this))$, $C = \superclass{\val}$ and $M$ the result of 
 	\contconf{\econt}{M(\deref(\env(\this)), \synval)}\\
   \end{array}
 \]
+\subsubsection{Instance method invocation}
+
+%MethodInvocationApp(V, methodName, args, ρ, KE) → 
+%<DirectMethodInvocApp(V, method, args, ρ, KE), vs>acont
+%where method = C.lookup(methodName)
+ 
+Direct instance method invocation
+%<DirectMethodInvocApp(V, (fs) { Sbody }, args, ρ, KE), vs>acont  → 
+%<Sbody , {fs → as, this → α}, … , KE, ExitSK(KE)>exec where !α = V, as = list of αi  s.t. !αi = Vi 
 
 \subsection{Statement execution}
 \label{subsec:stmt-exectution}
