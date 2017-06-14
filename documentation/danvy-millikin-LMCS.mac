@@ -321,7 +321,7 @@
 \newcommand{\dexpr}{\mathbf{Expr}}
 \newcommand{\dstmt}{\mathbf{Stmt}}
 \newcommand{\dhandler}{\mathbf{Handler}}
-\newcommand{\synval}{V}
+\newcommand{\synval}{\mathit{v}}
 \newcommand{\scase}{SC}
 \newcommand{\scases}{\scase\ensuremath{s}}
 \newcommand{\ccase}{CC}

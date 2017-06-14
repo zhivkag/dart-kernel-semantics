@@ -320,25 +320,30 @@ There are various types of continuations depending on the next statement to be e
 Kernel literals are evaluated to a value $\synval \in \dlitval$. Transitions of the CESK machine for basic literals are presented below:
 \[
   \begin{array}{lcll}
-	\evalconf{\mathrm{IntLiteral(\val)}}{\env}{\strace}{\cstrace}{\cex}{\econt}
+	\evalconf{\IntLiteral{\integermeta}}{\env}{\strace}{\cstrace}{\cex}{\econt}
 	& \Rightarrow &
 	\contconf{\econt}{\synval},
-	\hspace{2mm}\synval = \mathrm{IntLiteral(\val)} \in \mathbf{int}\\[2mm]
+	\hspace{2mm}\synval = \mathrm{IntLiteral(\integermeta)} \in \mathbf{int}\\[2mm]
 
-	\evalconf{\mathrm{DoubleLiteral(\val)}}{\env}{\strace}{\cstrace}{\cex}{\econt}
+	\evalconf{\DoubleLiteral{\doublemeta} }{\env}{\strace}{\cstrace}{\cex}{\econt}
 	& \Rightarrow &
 	\contconf{\econt}{\synval},
-	\hspace{2mm}\synval = \mathrm{DoubleLiteral(\val)} \in \mathbf{double}\\[2mm]
+	\hspace{2mm}\synval = \mathrm{DoubleLiteral(\doublemeta)} \in \mathbf{double}\\[2mm]
 
-	\evalconf{\mathrm{BoolLiteral(\val)}}{\env}{\strace}{\cstrace}{\cex}{\econt}
+	\evalconf{\BoolLiteral{\tt{true}}}{\env}{\strace}{\cstrace}{\cex}{\econt}
 	& \Rightarrow &
 	\contconf{\econt}{\synval},
-	\hspace{2mm}\synval = \mathrm{BoolValue(\val)} \in \mathbf{bool}\\[2mm]
+	\hspace{2mm}\synval = \mathrm{BoolValue(\tt{true})} = \tt{true}\in \mathbf{bool}\\[2mm]
 
-	\evalconf{\mathrm{StringLiteral(\val)}}{\env}{\strace}{\cstrace}{\cex}{\econt}
+	\evalconf{\BoolLiteral{\tt{false}}}{\env}{\strace}{\cstrace}{\cex}{\econt}
 	& \Rightarrow &
 	\contconf{\econt}{\synval},
-	\hspace{2mm}\synval = \mathrm{StringValue(\val)} \in \mathbf{String}
+	\hspace{2mm}\synval = \mathrm{BoolValue(\tt{false})} = \tt{false}\in \mathbf{bool}\\[2mm]
+
+	\evalconf{\StringLiteral{\stringmeta}}{\env}{\strace}{\cstrace}{\cex}{\econt}
+	& \Rightarrow &
+	\contconf{\econt}{\synval},
+	\hspace{2mm}\synval = \mathrm{StringValue(\stringmeta)} \in \mathbf{String}
 
   \end{array}
 \]
@@ -366,8 +371,8 @@ A variable $\varmeta$ are accessed by reading the value stored at location $\env
 
 \subsubsection{Boolean expressions}
 % exact notation TBD
-\newcommand{\true}{\mathrm{true}}
-\newcommand{\false}{\mathrm{false}}
+\newcommand{\true}{\tt{true}}
+\newcommand{\false}{\tt{false}}
 
 \[
   \begin{array}{lll}
