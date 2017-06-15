@@ -528,17 +528,17 @@ Kernel allows access of a member as a property, which can be either getter acces
 \]
 
 \noindent
-After the evaluation of the receiver expression to a value $\val$, the property $\idmeta$ is looked up in methods, getters and implicit getters for the value $\val$. Let R be the result of such lookup.
+After the evaluation of the receiver expression to a value $\val$, the property $\idmeta$ is looked up in methods, getters and implicit getters for the value $\val$. Let $\membermeta$ be the result of such lookup.
 \[
   \begin{array}{lcl@{\hspace{30mm}}}
-	\textrm{if R is a method with body }\stmt\textrm{ and formals }\formals :\\
+	\textrm{if M is a method with body }\stmt\textrm{ and formals }\formals :\\
 	\hspace{2mm}\contconf{\propertygetk}{\synval}
 	& \Rightarrow &
 	\contconf{\econt}{\funval{\formals}{\stmt}{\env}}\\
 	\textrm{where:}\\
 	\hspace{5mm}\env = \ext{\env_{empty}}{\mathbf{this}}{\synval}\\[2mm]
 
-	\textrm{if R is getter with statement body }\stmt :\\
+	\textrm{if M is getter with statement body }\stmt :\\
 	\hspace{2mm}\contconf{\propertygetk}{\synval}
 	& \Rightarrow &
 	\execconf{\stmt}{\env}{\lbls}{\clbls}{\handler}{\cstrace}{\cex}{\econt}{\scont}\\
@@ -546,7 +546,7 @@ After the evaluation of the receiver expression to a value $\val$, the property 
 	\hspace{5mm}\env = \ext{\env_{empty}}{\mathbf{this}}{\synval}\\
 	\hspace{5mm}\scont = \emptyset\\[2mm]
 
-	\textrm{if R is an implicit getter for field }\idmeta :\\
+	\textrm{if M is an implicit getter for field }\idmeta :\\
 	\hspace{2mm}\contconf{\propertygetk}{\synval}
 	& \Rightarrow &
 	\contconf{\econt}{\textrm{R}(\synval)}\\
@@ -728,12 +728,76 @@ Let $\val = \deref(\env(\this))$, $C = \superclass{\val}$ and $M$ the result of 
   \end{array}
 \]
 \subsubsection{Instance method invocation}
+\label{subsubsec:instance-method-invoc}
+\newcommand{\InstanceMethodInvocation}[3]{#1.#2(#3)}
+\newcommand{\expressionsmeta}{\expressionmeta{s}}
+\newcommand{\InstanceMethodInvocationK}{\mathrm{InstanceMethodInvocationK(\expressionsmeta,\,\idmeta,\,\env,\,\strace,\,\handler,\,\cstrace,\,\cex,\,\econt)}}
+Method invocation is supported with $\InstanceMethodInvocation{\expressionmeta}{\idmeta}{\expressionsmeta}$.
+\[
+  \begin{array}{l}
+	\evalconf{\InstanceMethodInvocation{\expressionmeta}{\idmeta}{\expressionsmeta}}{\env}{\strace}{\cstrace}{\cex}{\econt}
+	\Rightarrow
+	\evalconf{\expressionmeta}{\env}{\strace}{\cstrace}{\cex}{\econt'}
+	\\[2mm]
+	\hspace{3mm}\textrm{with } \econt' = \InstanceMethodInvocationK
+  \end{array}
+\]
 
-%MethodInvocationApp(V, methodName, args, ρ, KE) → 
-%<DirectMethodInvocApp(V, method, args, ρ, KE), vs>acont
-%where method = C.lookup(methodName)
- 
-Direct instance method invocation
+The arguments $\expressionsmeta$ are evaluated after the evaluation of the receiver.
+\newcommand{\InstanceMethodInvocationArgsApp}{\mathrm{InstanceMethodInvocationArgsApp(\idmeta,\,\synval,\,\strace,\,\handler,\,\cstrace,\,\cex,\,\econt)}}
+\[
+  \begin{array}{l}
+	\contconf{\InstanceMethodInvocationK}{\synval}
+	\Rightarrow
+	\evallistconf{\expressionsmeta}{\env}{\strace}{\cstrace}{\cex}{\acont'}
+	\\[2mm]
+	\hspace{3mm}\textrm{with } \acont' = \InstanceMethodInvocationArgsApp
+  \end{array}
+\]
+\noindent
+After the evaluation of the receiver expression to a value $\val$, the instance method $\idmeta$ is looked up in methods for the value $\val$. Let $\membermeta$ be the result of such lookup. Let $\membermeta$ be a method with statement body $\stmt$ and formal parameters $\formals$:
+\newcommand{\ExitSK}[1]{\mathrm{ExitSK(\econt,\,#1)}}
+\[
+  \begin{array}{l}
+	\contconf{\InstanceMethodInvocationArgsApp}{\synval{s}}
+	\Rightarrow \\
+	\hspace{5mm}\execconf{\stmt}{\env}{[]}{[]}{\handler}{\cstrace}{\cex}{\econt}{\scont}
+	\\[2mm]
+	\hspace{3mm}\textrm{with } \scont = \ExitSK{\tt{null}}, \env = \ext{\env_{empty}}{\this :: \formals}{\synval :: \synval{s}}\\[2mm]
+	\scontconf{\ExitSK{\synval}}{\env} \Rightarrow \contconf{\econt}{\synval}
+  \end{array}
+\]
+When a $\tt{return}$ statement is missing in the statement body $\stmt$ of the instance method $\membermeta$, the statement continuation $\ExitSK{\synval}$ ensures that the execution will proceed to the corresponding expression continuation, in this case with $\synval = \tt{null}$.
+
+\subsubsection{Direct instance method invocation}
+\label{subsubsec:direct-instance-method-invoc}
+Direct method invocation allows invocation of instance method by providing directly the member method to be invoked and bypass the lookup step described above. Let $\membermeta$ be the target method, $\stmt$ the statement body and $\formals$ the corresponding formal parameters.
+\newcommand{\DInstanceMethodInvocation}[3]{#1.\{#2\}(#3)}
+\newcommand{\DInstanceMethodInvocationK}{\mathrm{DInstanceMethodInvocationK(\expressionsmeta,\,\membermeta,\,\env,\,\strace,\,\handler,\,\cstrace,\,\cex,\,\econt)}}
+\newcommand{\DInstanceMethodInvocationArgsApp}{\mathrm{DInstanceMethodInvocationArgsApp(\membermeta,\,\synval,\,\strace,\,\handler,\,\cstrace,\,\cex,\,\econt)}}
+\[
+  \begin{array}{l}
+  \evalconf{\DInstanceMethodInvocation{\expressionmeta}{\membermeta}{\expressionsmeta}}{\env}{\strace}{\cstrace}{\cex}{\econt}
+	\Rightarrow
+	\evalconf{\expressionmeta}{\env}{\strace}{\cstrace}{\cex}{\econt'}
+	\\[2mm]
+	\hspace{3mm}\textrm{with } \econt' = \DInstanceMethodInvocationK\\[2mm]
+
+  \contconf{\DInstanceMethodInvocationK}{\synval}
+	\Rightarrow \\
+	\hspace{5mm}\evallistconf{\expressionsmeta}{\env}{\strace}{\cstrace}{\cex}{\acont'}
+	\\[2mm]
+	\hspace{3mm}\textrm{with } \acont' = \DInstanceMethodInvocationArgsApp\\[2mm]
+
+	\contconf{\DInstanceMethodInvocationArgsApp}{\synval{s}}
+	\Rightarrow \\
+	\hspace{5mm}\execconf{\stmt}{\env}{[]}{[]}{\handler}{\cstrace}{\cex}{\econt}{\scont}
+	\\[2mm]
+	\hspace{3mm}\textrm{with } \scont = \ExitSK{\tt{null}}, \env = \ext{\env_{empty}}{\this :: \formals}{\synval :: \synval{s}}\\[2mm]
+  \end{array}
+\]
+
+
 %<DirectMethodInvocApp(V, (fs) { Sbody }, args, ρ, KE), vs>acont  → 
 %<Sbody , {fs → as, this → α}, … , KE, ExitSK(KE)>exec where !α = V, as = list of αi  s.t. !αi = Vi 
 
