@@ -493,17 +493,18 @@ Let $\econt' = \letk{\expri{2}}{\env}{\varmeta}{\strace}{\cstrace}{\cex}{\econt}
 	&&\env'=\ext{\env}{\varmeta}{\synval}\\[2mm]
   \end{array}
 \]
+\newcommand{\ExitSK}[1]{\mathrm{ExitSK(\econt,\,#1)}}
 
-\subsubsection{Static and library variables}
-Static and library variables are accessed with $\StaticGet{\idmeta}$. Let $\env^{M}$ be the global environment that stores bindings for all static and library variables previously accessed or set during the execution of the program. \\
-Let $\idmeta$ be a static or library variable and $\expressionmeta_{\idmeta}$ its initializer expression.
-\newcommand{\StaticGetK}{\mathrm{StaticGetK}(\idmeta,\,\econt)}
+\subsubsection{Static and library fields}
+Let $\env^{M}$ be the global environment that stores bindings for static and library fields to labels for all static and library fields previously accessed or set during the execution of the program.\\
+Static and library variables are accessed with $\StaticGet{\membermeta}$. Let $\membermeta$ be a static or library field and $\expressionmeta_{\membermeta}$ its initializer expression.
+\newcommand{\StaticGetK}{\mathrm{StaticGetK}(\membermeta,\,\econt)}
 \[
   \begin{array}{llcl}
-	\textrm{If }\idmeta \in \env^{M}:
-	&\evalconf{\StaticGet{\idmeta}}{\env}{\strace}{\cstrace}{\cex}{\econt}
+	\textrm{If }\membermeta \in \env^{M}:
+	&\evalconf{\StaticGet{\membermeta}}{\env}{\strace}{\cstrace}{\cex}{\econt}
 	& \Rightarrow &
-	\contconf{\econt}{\deref\env^{M}(\idmeta)}\\[2mm]
+	\contconf{\econt}{\deref\env^{M}(\membermeta)}\\[2mm]
 
 	\textrm{If }\idmeta \notin \env^{M}, \expressionmeta_{\idmeta} = \tt{null}:
 	&\evalconf{\StaticGet{\idmeta}}{\env}{\strace}{\cstrace}{\cex}{\econt}
@@ -512,38 +513,62 @@ Let $\idmeta$ be a static or library variable and $\expressionmeta_{\idmeta}$ it
 	&\textrm{with }\env^{M} = \ext{\env^{M}}{\idmeta}{\tt{null}}\\[2mm]
 
 	\textrm{Otherwise }:
-	&\evalconf{\StaticGet{\idmeta}}{\env}{\strace}{\cstrace}{\cex}{\econt}
+	&\evalconf{\StaticGet{\membermeta}}{\env}{\strace}{\cstrace}{\cex}{\econt}
 	& \Rightarrow &
-	\evalconf{\expressionmeta_{\idmeta}}{\env}{\strace}{\cstrace}{\cex}{\econt'}\\[2mm]
+	\evalconf{\expressionmeta_{\membermeta}}{\env}{\strace}{\cstrace}{\cex}{\econt'}\\[2mm]
 	&\textrm{with }\econt' = \StaticGetK\\[2mm]
 
 	&\contconf{\StaticGetK}{\synval}
 	& \Rightarrow &
 	\contconf{\econt}{\synval}\\[2mm]
-	&\textrm{with }\env^{M} = \ext{\env^{M}}{\idmeta}{\synval}\\[2mm]
+	&\textrm{with }\env^{M} = \ext{\env^{M}}{\membermeta}{\synval}\\[2mm]
   \end{array}
 \]
-Static and library variables are set with $\StaticSet{\idmeta}{\expressionmeta}$.
-\newcommand{\StaticSetK}{\mathrm{StaticSetK}(\idmeta,\,\econt)}
+Otherwise, $\membermeta$ is a static or library getter with statement body $\stmt$.
 \[
   \begin{array}{lcl}
-	\evalconf{\StaticSet{\idmeta}{\expressionmeta}}{\env}{\strace}{\cstrace}{\cex}{\econt}
+	\evalconf{\StaticGet{\membermeta}}{\env}{\strace}{\cstrace}{\cex}{\econt}
+	& \Rightarrow &
+	\execconf{\stmt}{\env_{empty}}{[]}{[]}{\handler}{\cstrace}{\cex}{\econt}{\scont}\\
+	\textrm{where }\scont = \emptyset\\[2mm]
+   \end{array}
+\]
+Static and library variables are set with $\StaticSet{\membermeta}{\expressionmeta}$.
+\newcommand{\StaticSetK}{\mathrm{StaticSetK}(\membermeta,\,\econt)}
+\[
+  \begin{array}{lcl}
+	\evalconf{\StaticSet{\membermeta}{\expressionmeta}}{\env}{\strace}{\cstrace}{\cex}{\econt}
 	& \Rightarrow &
 	\evalconf{\expressionmeta}{\env}{\strace}{\cstrace}{\cex}{\econt'}\\[2mm]
 	\textrm{with }\econt' = \StaticSetK\\[2mm]
-
+  \end{array}
+\]
+\noindent
+Let $\membermeta$ be a static or library field.
+\[
+  \begin{array}{lcl}
 	\contconf{\StaticSetK}{\synval}
 	& \Rightarrow &
 	\contconf{\econt}{\synval}\\[2mm]
-	\textrm{with }\env^{M} = \ext{\env^{M}}{\idmeta}{\synval}
-	\textrm{ if }\idmeta \notin \env^M,
+	\textrm{with }\env^{M} = \ext{\env^{M}}{\membermeta}{\synval}
+	\textrm{ if }\membermeta \notin \env^M,
 	&&
 	\update{\env^{M}}{\synval} \textrm{ otherwise}
 	\\[2mm]
   \end{array}
 \]
+Otherwise, $\membermeta$ is a static or library setter with body $\stmt$ and formal parameter $\formal$.
+\[
+  \begin{array}{lcl}
+	\contconf{\StaticSetK}{\synval}
+	& \Rightarrow &
+	\execconf{\stmt}{\env}{[]}{[]}{\handler}{\cstrace}{\cex}{\econt}{\scont}\\
+	\textrm{where }\\[2mm]
+	\scont = \ExitSK{\synval}\\[2mm]
+	\env = \ext{\env_{empty}}{\formal}{\synval}
+  \end{array}
+\]
 \subsubsection{Static Invocation}
-\newcommand{\ExitSK}[1]{\mathrm{ExitSK(\econt,\,#1)}}
 
 \newcommand{\StaticInvocation}[2]{#1(#2)}
 Static invocation is supported with $\StaticInvocation{\{\membermeta\}}{\expressionsmeta}$ where $\membermeta$ is a function with statement body $\stmt$ and formal parameters $\formals$.
