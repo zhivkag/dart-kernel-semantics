@@ -890,17 +890,33 @@ Similarly to \ref{subsubsec:instance-method-invoc}, $\ExitSK{\synval}$ is added 
 
 	\contconf{\IsExpressionK}{\synval}
 	& \Rightarrow &
-	\contconf{\econt}{\true}, \textrm{if }\synval \textrm{ is } \tt{T}\\[2mm]
+	\contconf{\econt}{\true}, \textrm{ if }\synval \textrm{ is } \tt{T}\\[2mm]
 
 	\contconf{\IsExpressionK}{\synval}
 	& \Rightarrow &
-	\contconf{\econt}{\false}, \textrm{otherwise}
+	\contconf{\econt}{\false}, \textrm{ otherwise}
   \end{array}
 \]
 
 \subsubsection{Type cast}
 \label{subsubsec:type-cast}
 %\newcommand{\AsExpression}[2]{#1\,\tt{as}\,#2}
+\newcommand{\AsExpressionK}{\mathrm{AsExpressionK}(\tt{T},\,\econt)}
+\[
+  \begin{array}{lcl}
+	\evalconf{\AsExpression{\expressionmeta}{\tt{T}}}{\env}{\strace}{\cstrace}{\cex}{\econt}
+	& \Rightarrow &
+	\evalconf{\expressionmeta}{\env}{\strace}{\cstrace}{\cex}{\AsExpressionK}\\[2mm]
+
+	\contconf{\AsExpressionK}{\synval}
+	& \Rightarrow &
+	\contconf{\econt}{\synval}, \textrm{if }\synval \textrm{ is } \tt{T}\\[2mm]
+
+	\contconf{\AsExpressionK}{\synval}
+	& \Rightarrow &
+	\dots, \textrm{ otherwise}
+    \end{array}
+\]
 
 \subsubsection{This}
 \[
