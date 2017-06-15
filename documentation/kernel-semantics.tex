@@ -388,7 +388,7 @@ Kernel literals are evaluated to a value $\synval \in \dlitval$. Transitions of 
 
 \subsubsection{Variable assignment and lookup}
 \label{subsubsec:variable-assignment-and-lookup}
-A variable $\varmeta$ are accessed by reading the value stored at location $\env(\varmeta)$ in the store $s$. Assigning a value to a variable will modify the store and the value stored at location  $\env(\varmeta)$.
+A variable $\varmeta$ is accessed by reading the value stored at location $\env(\varmeta)$ in the store $s$. Assigning a value to a variable will modify the store and the value stored at location  $\env(\varmeta)$.
 
 \[
   \begin{array}{lcl}
@@ -491,6 +491,55 @@ Let $\econt' = \letk{\expri{2}}{\env}{\varmeta}{\strace}{\cstrace}{\cex}{\econt}
 	& \Rightarrow &
 	\evalconf{\expri{2}}{\env'}{\strace}{\cstrace}{\cex}{\econt}\\
 	&&\env'=\ext{\env}{\varmeta}{\synval}\\[2mm]
+  \end{array}
+\]
+
+\subsubsection{Static and library variables}
+Static and library variables are accessed with $\StaticGet{\idmeta}$. Let $\env^{M}$ be the global environment that stores bindings for all static and library variables previously accessed or set during the execution of the program. \\
+Let $\idmeta$ be a static or library variable and $\expressionmeta_{\idmeta}$ its initializer expression.
+\newcommand{\StaticGetK}{\mathrm{StaticGetK}(\idmeta,\,\econt)}
+\[
+  \begin{array}{llcl}
+	\textrm{If }\idmeta \in \env^{M}:
+	&\evalconf{\StaticGet{\idmeta}}{\env}{\strace}{\cstrace}{\cex}{\econt}
+	& \Rightarrow &
+	\contconf{\econt}{\deref\env^{M}(\idmeta)}\\[2mm]
+
+	\textrm{If }\idmeta \notin \env^{M}, \expressionmeta_{\idmeta} = \tt{null}:
+	&\evalconf{\StaticGet{\idmeta}}{\env}{\strace}{\cstrace}{\cex}{\econt}
+	& \Rightarrow &
+	\contconf{\econt}{\tt{null}},\\[2mm]
+	&\textrm{with }\env^{M} = \ext{\env^{M}}{\idmeta}{\tt{null}}\\[2mm]
+
+	\textrm{Otherwise }:
+	&\evalconf{\StaticGet{\idmeta}}{\env}{\strace}{\cstrace}{\cex}{\econt}
+	& \Rightarrow &
+	\evalconf{\expressionmeta_{\idmeta}}{\env}{\strace}{\cstrace}{\cex}{\econt'}\\[2mm]
+	&\textrm{with }\econt' = \StaticGetK\\[2mm]
+
+	&\contconf{\StaticGetK}{\synval}
+	& \Rightarrow &
+	\contconf{\econt}{\synval}\\[2mm]
+	&\textrm{with }\env^{M} = \ext{\env^{M}}{\idmeta}{\synval}\\[2mm]
+  \end{array}
+\]
+Static and library variables are set with $\StaticSet{\idmeta}{\expressionmeta}$.
+\newcommand{\StaticSetK}{\mathrm{StaticSetK}(\idmeta,\,\econt)}
+\[
+  \begin{array}{lcl}
+	\evalconf{\StaticSet{\idmeta}{\expressionmeta}}{\env}{\strace}{\cstrace}{\cex}{\econt}
+	& \Rightarrow &
+	\evalconf{\expressionmeta}{\env}{\strace}{\cstrace}{\cex}{\econt'}\\[2mm]
+	\textrm{with }\econt' = \StaticSetK\\[2mm]
+
+	\contconf{\StaticSetK}{\synval}
+	& \Rightarrow &
+	\contconf{\econt}{\synval}\\[2mm]
+	\textrm{with }\env^{M} = \ext{\env^{M}}{\idmeta}{\synval}
+	\textrm{ if }\idmeta \notin \env^M,
+	&&
+	\update{\env^{M}}{\synval} \textrm{ otherwise}
+	\\[2mm]
   \end{array}
 \]
 \subsubsection{Static Invocation}
