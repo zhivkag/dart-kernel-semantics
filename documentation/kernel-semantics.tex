@@ -755,7 +755,7 @@ The arguments $\expressionsmeta$ are evaluated after the evaluation of the recei
   \end{array}
 \]
 \noindent
-After the evaluation of the receiver expression to a value $\val$, the instance method $\idmeta$ is looked up in methods for the value $\val$. Let $\membermeta$ be the result of such lookup. Let $\membermeta$ be a method with statement body $\stmt$ and formal parameters $\formals$:
+After the evaluation of the receiver expression to a value $\val$ and the argument expressions to $\synval{s}$, the instance method $\idmeta$ is looked up in methods for the value $\val$. Let $\membermeta$ be the result of such lookup. Let $\membermeta$ be a method with statement body $\stmt$ and formal parameters $\formals$:
 \newcommand{\ExitSK}[1]{\mathrm{ExitSK(\econt,\,#1)}}
 \[
   \begin{array}{l}
@@ -773,8 +773,8 @@ When a $\tt{return}$ statement is missing in the statement body $\stmt$ of the i
 \label{subsubsec:direct-instance-method-invoc}
 Direct method invocation allows invocation of instance method by providing directly the member method to be invoked and bypass the lookup step described above. Let $\membermeta$ be the target method, $\stmt$ the statement body and $\formals$ the corresponding formal parameters.
 \newcommand{\DInstanceMethodInvocation}[3]{#1.\{#2\}(#3)}
-\newcommand{\DInstanceMethodInvocationK}{\mathrm{DInstanceMethodInvocationK(\expressionsmeta,\,\membermeta,\,\env,\,\strace,\,\handler,\,\cstrace,\,\cex,\,\econt)}}
-\newcommand{\DInstanceMethodInvocationArgsApp}{\mathrm{DInstanceMethodInvocationArgsApp(\membermeta,\,\synval,\,\strace,\,\handler,\,\cstrace,\,\cex,\,\econt)}}
+\newcommand{\DInstanceMethodInvocationK}{\mathrm{DInstanceMethodInvocationK}(\expressionsmeta,\,\membermeta,\,\env,\,\strace,\,\handler,\,\cstrace,\,\cex,\,\econt)}
+\newcommand{\DInstanceMethodInvocationArgsApp}{\mathrm{DInstanceMethodInvocationArgsApp}(\membermeta,\,\synval,\,\strace,\,\handler,\,\cstrace,\,\cex,\,\econt)}
 \[
   \begin{array}{l}
   \evalconf{\DInstanceMethodInvocation{\expressionmeta}{\membermeta}{\expressionsmeta}}{\env}{\strace}{\cstrace}{\cex}{\econt}
@@ -796,11 +796,34 @@ Direct method invocation allows invocation of instance method by providing direc
 	\hspace{3mm}\textrm{with } \scont = \ExitSK{\tt{null}}, \env = \ext{\env_{empty}}{\this :: \formals}{\synval :: \synval{s}}\\[2mm]
   \end{array}
 \]
-
-
-%<DirectMethodInvocApp(V, (fs) { Sbody }, args, ρ, KE), vs>acont  → 
-%<Sbody , {fs → as, this → α}, … , KE, ExitSK(KE)>exec where !α = V, as = list of αi  s.t. !αi = Vi 
-
+Similarly to \ref{subsubsec:instance-method-invoc}, $\ExitSK{\synval}$ is added as next statement continuation.
+\subsubsection{Super method invocation}
+\label{subsubsec:super-method-invocation}
+\newcommand{\SuperMethodInvocation}[2]{\tt{super}.#1(#2)}
+\newcommand{\SuperMethodInvocationApp}{\mathrm{SuperMethodInvocationApp}(\idmeta,\,\env,\,\strace,\,\handler,\,\cstrace,\,\cex,\,\econt)}
+Super method invocation is supported with $\SuperMethodInvocation{\idmeta}{\expressionsmeta}$ and the transition step is as follows:
+\[
+  \begin{array}{l}
+	\evalconf{\SuperMethodInvocation{\idmeta}{\expressionsmeta}}{\env}{\strace}{\cstrace}{\cex}{\econt}
+	\Rightarrow
+	\evallistconf{\expressionsmeta}{\env}{\strace}{\cstrace}{\cex}{\acont}
+	\\[2mm]
+	\hspace{3mm}\textrm{with } \acont = \SuperMethodInvocationApp
+  \end{array}
+\]
+After the evaluation of the expressions $\expressionsmeta$ to values $\synval{s}$ for the super method invocation, the method $\idmeta$ is looked up. Let $\val = \deref(\env(\this))$, $C = \superclass{\val}$ and $M$ the result of looking up $\idmeta$ in $C$. Let $\stmt$ be the statement body and $\formals$ the formal parameters for $\membermeta$ below:
+\[
+  \begin{array}{l}
+	\contconf{\SuperMethodInvocationApp}{\synval{s}}
+	\Rightarrow \\
+	\hspace{5mm}\execconf{\stmt}{\env'}{[]}{[]}{\handler}{\cstrace}{\cex}{\econt}{\scont}
+	\\[2mm]
+	\textrm{with }\\
+	\hspace{3mm}\scont = \ExitSK{\tt{null}},\\
+	\hspace{3mm}\env' = \ext{\env_{empty}}{\this :: \formals}{\deref(\env(\this)) :: \synval{s}}\\[2mm]
+  \end{array}
+\]
+Similarly to \ref{subsubsec:instance-method-invoc}, $\ExitSK{\synval}$ is added as next statement continuation.
 \subsection{Statement execution}
 \label{subsec:stmt-exectution}
 
