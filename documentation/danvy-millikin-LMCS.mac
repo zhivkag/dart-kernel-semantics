@@ -307,64 +307,12 @@
 
 % Kernel CESK
 \newcommand{\mlist}[1]{\textrm{List}\langle {#1} \rangle}
-\newcommand{\deref}{!}
 \newcommand{\ext}[3]{\ensuremath{extend({#1},\,{#2},\,{#3})}}
 
 % Syntactic
-\newcommand{\expr}{\ensuremath{E}}
-\newcommand{\expri}[1]{\expr_\ensuremath{{#1}}}
-\newcommand{\exprs}{\expr\ensuremath{s}}
-\newcommand{\stmt}{\ensuremath{S}}
-\newcommand{\stmti}[1]{\stmt_\ensuremath{{#1}}}
-\newcommand{\stmts}{\stmt\ensuremath{s}}
-\newcommand{\handler}{\ensuremath{H}}
-\newcommand{\dexpr}{\mathbf{Expr}}
-\newcommand{\dstmt}{\mathbf{Stmt}}
-\newcommand{\dhandler}{\mathbf{Handler}}
-\newcommand{\synval}{\mathit{v}}
-\newcommand{\scase}{SC}
-\newcommand{\scases}{\scase\ensuremath{s}}
-\newcommand{\ccase}{CC}
-\newcommand{\ccases}{\scase\ensuremath{s}}
+
 
 % Semantic
-\newcommand{\vals}{\ensuremath{vs}}
-\newcommand{\env}{\ensuremath{\rho}}
-\newcommand{\strace}{\ensuremath{st}}
-\newcommand{\cstrace}{\ensuremath{c}\strace}
-\newcommand{\cex}{\ensuremath{cex}}
-\newcommand{\econt}{\cont_\ensuremath{E}}
-\newcommand{\acont}{\cont_\ensuremath{A}}
-\newcommand{\scont}{\cont_\ensuremath{S}}
-\newcommand{\bcont}{\cont_\ensuremath{B}}
-\newcommand{\switchcont}{\cont_{\ensuremath{switch}}}
-\newcommand{\lbl}{\ensuremath{lbl}}
-\newcommand{\lbls}{\ensuremath{lbls}}
-\newcommand{\clbl}{\ensuremath{clbl}}
-\newcommand{\clbls}{\ensuremath{clbls}}
-\newcommand{\decont}{\mathbf{ExprCont}}
-\newcommand{\dscont}{\mathbf{StmtCont}}
-\newcommand{\dacont}{\mathbf{ApplCont}}
-\newcommand{\dbcont}{\mathbf{BreakCont}}
-\newcommand{\dswitchcont}{\mathbf{SwitchCont}}
-\newcommand{\dlbl}{\mathbf{Label}}
-\newcommand{\dclbl}{\mathbf{SwitchLabel}}
-\newcommand{\dval}{\mathbf{Value}}
-\newcommand{\dvardecl}{\mathbf{VariableDeclaration}}
-\newcommand{\denv}{\mathbf{Env}}
-\newcommand{\loc}{\ensuremath{\alpha}}
-\newcommand{\dlocation}{\mathbf{Location}}
-\newcommand{\dstring}{\mathbf{StringValue}}
-\newcommand{\funval}[3]{\mathrm{FunctionValue}({#1},\,{#2},\,{#3})}
-\newcommand{\dfunval}{\mathbf{FunctionValue}}
-\newcommand{\dlitval}{\mathbf{LiteralValue}}
-\newcommand{\objval}{\mathrm{ObjectValue}(class, fields)}
-\newcommand{\dobjval}{\mathbf{ObjectValue}}
-\newcommand{\dclass}{\mathbf{Class}}
-\newcommand{\dformals}{\mathbf{Formals}}
-\newcommand{\formal}{\ensuremath{A}}
-\newcommand{\formali}[1]{\ensuremath{A_{#1}}}
-\newcommand{\formals}{\ensuremath{As}}
 
 % Named Configuration for CESK transitions
 \newcommand{\breakconf}[1]{\confsingle{#1}_{\mathrm{breakCont}}}

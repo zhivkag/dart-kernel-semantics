@@ -23,7 +23,7 @@
 
 \maketitle
 
-The small-step operational semantics of Dart Kernel is given by an abstract machine in the style of the CESK machine. The machine is defined by a single step transition function where each step of the machine starts in a configuration and deterministically gives a next configuration.
+The small-step operational semantics of Dart Kernel is given by an abstract machine in the style of the CESK machine. The machine is defined by a single step transition function where each step of the machine starts in a configuration and deterministically gives the next configuration.
 
 \section{Definitions}
 \label{sec:definitions}
@@ -34,43 +34,127 @@ The small-step operational semantics of Dart Kernel is given by an abstract mach
 \item Symbols ":" and $\in$ are used interchangeably.
 \item Names of variables are italicized.
 \item Names of variables of syntactic domains start with an upper case letter.
-\item Names of domains are written in bold (e.g. $\dexpr$).
-\item Names of configuration and continuation kinds are written in normal text (e.g. VarSetK).
-\item Names of meta-functions start with lower case letter (e.g. extend).
-\item Symbol ":=" is read as "denotes".
-\item "$\mlist{\mathbf{X}}$" := domain of meta-lists of elements from domain "$\mathbf{X}$". Note that the word "List" here is not in bold, so that it isn't confused with the domain $\mathbf{List}$ of Dart objects.
+\item Names of domains are written in bold (e.g. "$\mathbf{X}$").
+\item Names of continuation kinds are written in normal text (e.g. VarSetK).
+\item Names of meta-functions start with lower case letter (e.g. $\mathit{extend}$).
+\item "$\mlist{\mathbf{X}}$" denotes the domain of meta-lists of elements from domain "$\mathbf{X}$". Note that the word "List" here is not in bold, so that it isn't confused with the domain $\mathbf{List}$ of Dart objects.
 \end{itemize}
 \subsection{Domains}
 \label{subsec:domains}
+% Variables
+\newcommand{\expr}{\ensuremath{\mathit{E}}}
+\newcommand{\expri}[1]{\expr_\ensuremath{\mathit{#1}}}
+\newcommand{\exprs}{\expr\ensuremath{\mathit{s}}}
+
+\newcommand{\stmt}{\ensuremath{\mathit{S}}}
+\newcommand{\stmti}[1]{\stmt_\ensuremath{#1}}
+\newcommand{\stmts}{\stmt\ensuremath{\mathit{s}}}
+
+\newcommand{\handler}{\ensuremath{\mathit{H}}}
+\newcommand{\strace}{\ensuremath{st}}
+\newcommand{\cstrace}{\ensuremath{c}\strace}
+\newcommand{\cex}{\ensuremath{cex}}
+
+\newcommand{\scase}{\mathit{SC}}
+\newcommand{\scases}{\scase\ensuremath{\mathit{s}}}
+\newcommand{\ccase}{\mathit{CC}}
+\newcommand{\ccases}{\scase\ensuremath{\mathit{s}}}
+
+\newcommand{\vals}{\ensuremath{vs}}
+\newcommand{\env}{\ensuremath{\rho}}
+\newcommand{\loc}{\ensuremath{\alpha}}
+
+\newcommand{\lbl}{\ensuremath{lbl}}
+\newcommand{\lbls}{\ensuremath{lbls}}
+\newcommand{\clbl}{\ensuremath{clbl}}
+\newcommand{\clbls}{\ensuremath{clbls}}
+
+\newcommand{\econt}{\cont_\ensuremath{E}}
+\newcommand{\acont}{\cont_\ensuremath{A}}
+\newcommand{\scont}{\cont_\ensuremath{S}}
+\newcommand{\bcont}{\cont_\ensuremath{B}}
+\newcommand{\switchcont}{\cont_{\ensuremath{switch}}}
+
+\newcommand{\funval}[3]{\mathrm{FunctionValue}({#1},\,{#2},\,{#3})}
+\newcommand{\objval}{\mathrm{ObjectValue}(class, fields)}
+
+\newcommand{\formal}{\ensuremath{A}}
+\newcommand{\formali}[1]{\ensuremath{A_{#1}}}
+\newcommand{\formals}{\ensuremath{As}}
+
+% Domains
+\newcommand{\dexpr}{\mathbf{Expr}}
+\newcommand{\dstmt}{\mathbf{Stmt}}
+\newcommand{\dhandler}{\mathbf{Handler}}
+
+\newcommand{\decont}{\mathbf{ExprCont}}
+\newcommand{\dscont}{\mathbf{StmtCont}}
+\newcommand{\dacont}{\mathbf{ApplCont}}
+\newcommand{\dbcont}{\mathbf{BreakCont}}
+\newcommand{\dswitchcont}{\mathbf{SwitchCont}}
+
+\newcommand{\dlbl}{\mathbf{Label}}
+\newcommand{\dclbl}{\mathbf{SwitchLabel}}
+
+\newcommand{\denv}{\mathbf{Env}}
+\newcommand{\dlocation}{\mathbf{Location}}
+
+\newcommand{\dval}{\mathbf{Value}}
+\newcommand{\dvardecl}{\mathbf{VariableDeclaration}}
+\newcommand{\dstring}{\mathbf{StringValue}}
+\newcommand{\dfunval}{\mathbf{FunctionValue}}
+\newcommand{\dlitval}{\mathbf{LiteralValue}}
+\newcommand{\dobjval}{\mathbf{ObjectValue}}
+
+\newcommand{\dclass}{\mathbf{Class}}
+\newcommand{\dformals}{\mathbf{Formals}}
 \[
   \begin{array}{ccll}
-	\expr, \expri{i} & : & \dexpr & \textrm{syntactic domain of expressions}\\
-	\exprs & : & \mlist{\dexpr}\\[2mm]
+	\expr, \expri{i}
+	& : & \dexpr & \textrm{syntactic domain of expressions}\\
+	\exprs
+	& : & \mlist{\dexpr}\\[2mm]
 
-	\stmt, \stmti{i} & : & \dstmt & \textrm{syntactic domain of statements}\\
-	\stmts & : & \mlist{\dstmt}  & \textrm{}\\[2mm]
+	\stmt, \stmti{i}
+	& : & \dstmt & \textrm{syntactic domain of statements}\\
+	\stmts
+	& : & \mlist{\dstmt}  & \textrm{}\\[2mm]
 
-	\econt & : & \decont & \textrm{domain of expression continuations}\\
-	\acont & : & \dacont & \textrm{domain of application continuations}\\
-	\scont & : & \dscont & \textrm{domain of statement continuations}\\
-	\bcont & : & \dbcont & \textrm{domain of break continuations}\\
-	\switchcont & : & \dswitchcont & \textrm{domain of switch continuations}\\[2mm]
+	\econt
+	& : & \decont & \textrm{domain of expression continuations}\\
+	\acont
+	& : & \dacont & \textrm{domain of application continuations}\\
+	\scont
+	& : & \dscont & \textrm{domain of statement continuations}\\
+	\bcont
+	& : & \dbcont & \textrm{domain of break continuations}\\
+	\switchcont
+	& : & \dswitchcont & \textrm{domain of switch continuations}\\[2mm]
 
 	\lbl & : & \dlbl & \textrm{domain of labels}\\
-	\lbl & : & \mlist{\dlbl} \\
+	\lbls & : & \mlist{\dlbl} \\
 	\clbl & : & \dclbl & \textrm{domain of switch labels}\\
-	\clbl & : & \mlist{\dclbl} \\[2mm]
+	\clbls & : & \mlist{\dclbl} \\[2mm]
 
-	\handler & : & \dhandler & \textrm{syntactic domain of exception handlers} \\
-	\strace & : & \mlist{\dexpr} & \textrm{domain of stack traces}\\
-	\cex & : &  \emptyset + \dval & \textrm{domain of current expetion values}\\
-	\cstrace & : & \emptyset + \mlist{\dexpr} & \textrm{domain of current exception stack traces}\\[2mm]
+	\handler
+	& : & \dhandler & \textrm{syntactic domain of exception handlers} \\
+	\strace
+	& : & \mlist{\dexpr} & \textrm{domain of stack traces}\\
+	\cex
+	& : &  \emptyset + \dval & \textrm{domain of current expetion values}\\
+	\cstrace
+	& : & \emptyset + \mlist{\dexpr} & \textrm{domain of current exception stack traces}\\[2mm]
 
-	\varmeta & : & \dvardecl & \textrm{domain of variable declarations}\\
-	\loc & : & \dlocation & \textrm{domain of store locations}\\
-	\val & : & \dval & \textrm{domain of values}\\
-	\vals & : & \mlist{\dval}\\
-	\env & : & \denv & \textrm{domain of environments}\\[2mm]
+	\varmeta
+	& : & \dvardecl & \textrm{domain of variable declarations}\\
+	\loc
+	& : & \dlocation & \textrm{domain of store locations}\\
+	\val
+	& : & \dval & \textrm{domain of values}\\
+	\vals
+	& : & \mlist{\dval}\\
+	\env
+	& : & \denv & \textrm{domain of environments}\\[2mm]
   \end{array}
 \]
 
@@ -81,40 +165,6 @@ The small-step operational semantics of Dart Kernel is given by an abstract mach
 
   \end{array}
 \]
-\subsection{Meta-functions}
-\label{subsec:meta-functions}
-\subsubsection{Dereferencing}
-\label{subsubsection:dereferecing}
-Function "$\deref{}$" is used to "dereference" items stored in environments. It has an implicit argument which is the store of CESK machine.
-
-\begin{align*}
-  \deref : \dlocation &\rightarrow \dval \\
-  \deref\loc &=  \val, \textrm{ with $\val$ the value in store at location } \loc
-\end{align*}
-
-\subsubsection{String Concatenation}
-\label{subsubsec:string-concatenation}
-Function $stringValue$ concatenates strings from the given meta-list.
-
-\[stringValue : \mlist{\dstring} \rightarrow \dstring\]
-
-\subsubsection{Update}
-\label{subsubsec:store-update}
-\newcommand{\update}[2]{{#1} := {#2}}
-Function "$\update{\loc}{\synval}$" updates the store at location $\loc \in \dlocation$ with value $\synval \in \dval$.
-
-\subsubsection{Extend Environment}
-\label{subsubsec:extend-env}
-
-Function "$extend$" creates a new environment by extending the provided environment with new bindings for the variable declarations to fresh labels for each of the provided values.
-% Exact definition on how the store is modified to be added
-\[extend : \denv \times \mlist{\dvardecl} \times \mlist{\dval} \rightarrow  \denv \]
-
-\subsubsection{Property Lookup}
-\label{subsubsec:property-lookup}
-
-\subsubsection{Method Lookup}
-\label{subsubsec:method-lookup}
 
 \subsection{Notations}
 \label{subsec:notations}
@@ -126,10 +176,59 @@ Function "$extend$" creates a new environment by extending the provided environm
     && \textrm{of the meta-list list}
   \end{array}
 \]
+
+\subsection{Store}
+\label{subsec:store-definition}
+The store, $s$, is a map that maps a location, $\loc$, to a value, $\val$. The store is a mutable map and should not be confused with a function. A global store is assumed and locations reachable from a given scope are defined by the current environment function.
+\[s : \dlocation \rightarrow \dval \]
+\subsubsection{Dereferencing}
+\label{subsubsection:dereferecing}
+\newcommand{\deref}[1]{!#1}
+Function "$\deref{}$" is used to "dereference" items stored in environments. It has an implicit argument which is the store of CESK machine.
+
+\begin{align*}
+  \deref{} \in \dlocation &\rightarrow \dval \\
+  \deref{\loc} &=  \val, \textrm{ with $\val$ the value in store at location } \loc
+\end{align*}
+\subsubsection{Update}
+\label{subsubsec:store-update}
+\newcommand{\update}[2]{{#1} := {#2}}
+Function "$\update{\loc}{\val}$" updates the store at location $\loc \in \dlocation$ with value $\val \in \dval$. It has an implicit argument which is the store of the CESK machine.
+\begin{align*}
+  \update{}{} \in \dlocation \times \dval &\rightarrow  \dval\\
+  \update{\loc}{\val} &= \val, \textrm{ with $\val$ the value in store at location $\loc$}
+\end{align*}
+\subsection{Environment}
+\label{subsec:env-definition}
+The environment is a function that maps a variable to a location in the store.
+\[\env \in \denv = \dvardecl \rightarrow \dlocation\]
+When an environment is needed to further execute the program, it is saved by the caller in the corresponding continuation.
+
+\subsubsection{Extend}
+\label{subsubsec:extend-env}
+
+Function "$extend$" creates a new environment by extending the provided environment with new bindings for the variable declarations to fresh labels for each of the provided values.
+% Exact definition on how the store is modified to be added
+\begin{align*}
+  extend \in \denv \times \mlist{\dvardecl} \times \mlist{\dval} &\rightarrow  \denv \hspace{100mm} \\
+  \ext{\env}{\varmeta{s}}{\vals} &= \env'
+\end{align*}
+with 
+\[
+	\env'(\varmeta) =\begin{cases}
+	\loc_i & \textrm{with }\deref{\loc_i} = \val_i\textrm{ if }\exists\varmeta_i \in \varmeta{s} \textrm{ s.t. } \varmeta_i = \varmeta\\
+	\env(\varmeta) &\textrm{otherwise}
+	\end{cases}
+\]
+
+For simpler notation, we allow $extend$ to be called with singleton lists as $\ext{\env}{\varmeta}{\val}$, which is the same as $\ext{\env}{\varmeta :: []}{\val :: []}$.
+\subsubsection{Variable lookup}
+\label{subsubsec:variable-lookup}
+A variable lookup consists of looking up the address of a variable from the environment with $\loc = \env(\varmeta)$ and reading the stored value $v$ with $\deref{\loc} = \deref{\env(\varmeta)}$. For definition of "$\deref{}$" see Section~\ref{subsubsection:dereferecing}.
+
 \subsection{Configurations for the CESK machine}
 \label{subsec:cesk-configs}
-The state space of the CESK machine contains various kinds of configurations, each containing components for applying the appropriate continuation in order to transition to the next configuration. 
-
+The state space of the CESK machine contains various kinds of configurations, each containing components for applying the appropriate continuation in order to transition to the next configuration.
 \[
   \begin{array}{lcl}
 	\evalconf{\expr}{\env}{st}{cex}{cst}{\econt} & : &
@@ -161,15 +260,6 @@ The state space of the CESK machine contains various kinds of configurations, ea
 
   \end{array}
 \]
-\subsection{Environment}
-\label{subsec:env-definition}
-The environment is a function that maps a variable to a location in the store.
-\[\env \in \denv = \dvardecl \rightarrow \dlocation\] 
-\subsection{Store}
-\label{subsec:store-definition}
-The store, $s$, maps a location, $\loc$, to a value, $\val$. The store is mutable and should not be confused with a function. It is possible to change the transition rules, so that the store is immutable, and right hand side configurations receive an updated copy of it. However, for the sake of simplicity, a global mutable store is assumed. 
-\[s : \dlocation \rightarrow \dval \]
-Therefore a variable look-up will consist of looking up the address of a variable from the environment with $\loc = \env(\varmeta)$ and reading the stored value $v$ with $\deref\loc$. For definition of "$\deref$" see Section~\ref{subsubsection:dereferecing} 
 
 \subsection{Continuations}
 \label{subsec:continuations-definition}
@@ -195,6 +285,13 @@ There are various types of continuations depending on the next statement to be e
 	\dclass &:& superclass \times interfaces \times fields \times getters \times setters \times methods
   \end{array}
 \]
+
+\subsubsection{Property Lookup}
+\label{subsubsec:property-lookup}
+
+\subsubsection{Method Lookup}
+\label{subsubsec:method-lookup}
+
 \subsection{Function values}
 \label{subsec:function-values}
 \[
@@ -342,46 +439,46 @@ with:
 Expression list continuation application:
 \[
   \begin{array}{lcl}
-	\contconf{\exprlistk{\exprs}{\env}{\strace}{\cstrace}{\cex}{\acont}}{\synval}
+	\contconf{\exprlistk{\exprs}{\env}{\strace}{\cstrace}{\cex}{\acont}}{\val}
 	& \Rightarrow &
-	\evallistconf{\exprs}{\env}{\strace}{\cstrace}{\cex}{\valueapp{\synval}{\acont}}\\[2mm]
+	\evallistconf{\exprs}{\env}{\strace}{\cstrace}{\cex}{\valueapp{\val}{\acont}}\\[2mm]
 
-	\acontconf{\valueapp{\synval}{\acont}}{\synval s}
+	\acontconf{\valueapp{\val}{\acont}}{\val s}
 	& \Rightarrow &
-	\acontconf{\acont}{\synval :: \synval s}
+	\acontconf{\acont}{\val :: \val s}
 
   \end{array}
 \]
 
 \subsubsection{Basic literal evaluation}
 \label{subsubsec:basic-literal-eval}
-Kernel literals are evaluated to a value $\synval \in \dlitval$. Transitions of the CESK machine for basic literals are presented below:
+Kernel literals are evaluated to a value $\val \in \dlitval$. Transitions of the CESK machine for basic literals are presented below:
 \[
   \begin{array}{lcll}
 	\evalconf{\IntLiteral{\integermeta}}{\env}{\strace}{\cstrace}{\cex}{\econt}
 	& \Rightarrow &
-	\contconf{\econt}{\synval},
-	\hspace{2mm}\synval = \mathrm{IntLiteral(\integermeta)} \in \mathbf{int}\\[2mm]
+	\contconf{\econt}{\val},
+	\hspace{2mm}\val = \mathrm{IntLiteral(\integermeta)} \in \mathbf{int}\\[2mm]
 
 	\evalconf{\DoubleLiteral{\doublemeta} }{\env}{\strace}{\cstrace}{\cex}{\econt}
 	& \Rightarrow &
-	\contconf{\econt}{\synval},
-	\hspace{2mm}\synval = \mathrm{DoubleLiteral(\doublemeta)} \in \mathbf{double}\\[2mm]
+	\contconf{\econt}{\val},
+	\hspace{2mm}\val = \mathrm{DoubleLiteral(\doublemeta)} \in \mathbf{double}\\[2mm]
 
 	\evalconf{\BoolLiteral{\tt{true}}}{\env}{\strace}{\cstrace}{\cex}{\econt}
 	& \Rightarrow &
-	\contconf{\econt}{\synval},
-	\hspace{2mm}\synval = \mathrm{BoolValue(\tt{true})} = \tt{true}\in \mathbf{bool}\\[2mm]
+	\contconf{\econt}{\val},
+	\hspace{2mm}\val = \mathrm{BoolValue(\tt{true})} = \tt{true}\in \mathbf{bool}\\[2mm]
 
 	\evalconf{\BoolLiteral{\tt{false}}}{\env}{\strace}{\cstrace}{\cex}{\econt}
 	& \Rightarrow &
-	\contconf{\econt}{\synval},
-	\hspace{2mm}\synval = \mathrm{BoolValue(\tt{false})} = \tt{false}\in \mathbf{bool}\\[2mm]
+	\contconf{\econt}{\val},
+	\hspace{2mm}\val = \mathrm{BoolValue(\tt{false})} = \tt{false}\in \mathbf{bool}\\[2mm]
 
 	\evalconf{\StringLiteral{\stringmeta}}{\env}{\strace}{\cstrace}{\cex}{\econt}
 	& \Rightarrow &
-	\contconf{\econt}{\synval},
-	\hspace{2mm}\synval = \mathrm{StringValue(\stringmeta)} \in \mathbf{String}
+	\contconf{\econt}{\val},
+	\hspace{2mm}\val = \mathrm{StringValue(\stringmeta)} \in \mathbf{String}
 
   \end{array}
 \]
@@ -389,20 +486,19 @@ Kernel literals are evaluated to a value $\synval \in \dlitval$. Transitions of 
 \subsubsection{Variable assignment and lookup}
 \label{subsubsec:variable-assignment-and-lookup}
 A variable $\varmeta$ is accessed by reading the value stored at location $\env(\varmeta)$ in the store $s$. Assigning a value to a variable will modify the store and the value stored at location  $\env(\varmeta)$.
-
 \[
   \begin{array}{lcl}
 	\evalconf{\varmeta}{\env}{\strace}{\cstrace}{\cex}{\econt}
 	& \Rightarrow &
-	\contconf{\econt}{\deref\env(\varmeta)}\\[2mm]
+	\contconf{\econt}{\deref{\env(\varmeta)}}\\[2mm]
 
 	\evalconf{\varmeta = \expr}{\env}{\strace}{\cstrace}{\cex}{\econt}
 	& \Rightarrow &
 	\evalconf{\expr}{\env}{\strace}{\cstrace}{\cex}{\varsetk{\env}{\varmeta}{\econt}}\\[2mm]
 
-	\contconf{\varsetk{\env}{\varmeta}{\econt}}{\synval}
+	\contconf{\varsetk{\env}{\varmeta}{\econt}}{\val}
 	& \Rightarrow &
-	\contconf{\econt}{\synval}, \hspace{5mm} \deref\env(\varmeta) = \synval \textrm{ after transition}
+	\contconf{\econt}{\val}, \hspace{5mm} \deref{\env(\varmeta)} = \val \textrm{ after transition}
 
   \end{array}
 \]
@@ -487,14 +583,19 @@ Let $\econt' = \letk{\expri{2}}{\env}{\varmeta}{\strace}{\cstrace}{\cex}{\econt}
 	& \Rightarrow &
 	\evalconf{\expri{1}}{\env}{\strace}{\cstrace}{\cex}{\econt'}\\[2mm]
 
-	\contconf{\econt'}{\synval}
+	\contconf{\econt'}{\val}
 	& \Rightarrow &
 	\evalconf{\expri{2}}{\env'}{\strace}{\cstrace}{\cex}{\econt}\\
-	&&\env'=\ext{\env}{\varmeta}{\synval}\\[2mm]
+	&&\env'=\ext{\env}{\varmeta}{\val}\\[2mm]
   \end{array}
 \]
 \newcommand{\ExitSK}[1]{\mathrm{ExitSK(\econt,\,#1)}}
 
+\subsubsection{String Concatenation}
+\label{subsubsec:string-concatenation}
+Function $stringValue$ concatenates strings from the given meta-list.
+
+\[stringValue : \mlist{\dstring} \rightarrow \dstring\]
 \subsubsection{Static and library fields}
 Let $\env^{M}$ be the global environment that stores bindings for static and library fields to labels for all static and library fields previously accessed or set during the execution of the program.\\
 Static and library variables are accessed with $\StaticGet{\membermeta}$. Let $\membermeta$ be a static or library field and $\expressionmeta_{\membermeta}$ its initializer expression.
@@ -504,7 +605,7 @@ Static and library variables are accessed with $\StaticGet{\membermeta}$. Let $\
 	\textrm{If }\membermeta \in \env^{M}:
 	&\evalconf{\StaticGet{\membermeta}}{\env}{\strace}{\cstrace}{\cex}{\econt}
 	& \Rightarrow &
-	\contconf{\econt}{\deref\env^{M}(\membermeta)}\\[2mm]
+	\contconf{\econt}{\deref{\env^{M}(\membermeta)}}\\[2mm]
 
 	\textrm{If }\idmeta \notin \env^{M}, \expressionmeta_{\idmeta} = \tt{null}:
 	&\evalconf{\StaticGet{\idmeta}}{\env}{\strace}{\cstrace}{\cex}{\econt}
@@ -518,10 +619,10 @@ Static and library variables are accessed with $\StaticGet{\membermeta}$. Let $\
 	\evalconf{\expressionmeta_{\membermeta}}{\env}{\strace}{\cstrace}{\cex}{\econt'}\\[2mm]
 	&\textrm{with }\econt' = \StaticGetK\\[2mm]
 
-	&\contconf{\StaticGetK}{\synval}
+	&\contconf{\StaticGetK}{\val}
 	& \Rightarrow &
-	\contconf{\econt}{\synval}\\[2mm]
-	&\textrm{with }\env^{M} = \ext{\env^{M}}{\membermeta}{\synval}\\[2mm]
+	\contconf{\econt}{\val}\\[2mm]
+	&\textrm{with }\env^{M} = \ext{\env^{M}}{\membermeta}{\val}\\[2mm]
   \end{array}
 \]
 Otherwise, $\membermeta$ is a static or library getter with statement body $\stmt$.
@@ -547,25 +648,25 @@ Static and library variables are set with $\StaticSet{\membermeta}{\expressionme
 Let $\membermeta$ be a static or library field.
 \[
   \begin{array}{lcl}
-	\contconf{\StaticSetK}{\synval}
+	\contconf{\StaticSetK}{\val}
 	& \Rightarrow &
-	\contconf{\econt}{\synval}\\[2mm]
-	\textrm{with }\env^{M} = \ext{\env^{M}}{\membermeta}{\synval}
+	\contconf{\econt}{\val}\\[2mm]
+	\textrm{with }\env^{M} = \ext{\env^{M}}{\membermeta}{\val}
 	\textrm{ if }\membermeta \notin \env^M,
 	&&
-	\update{\env^{M}}{\synval} \textrm{ otherwise}
+	\update{\env^{M}}{\val} \textrm{ otherwise}
 	\\[2mm]
   \end{array}
 \]
 Otherwise, $\membermeta$ is a static or library setter with body $\stmt$ and formal parameter $\formal$.
 \[
   \begin{array}{lcl}
-	\contconf{\StaticSetK}{\synval}
+	\contconf{\StaticSetK}{\val}
 	& \Rightarrow &
 	\execconf{\stmt}{\env}{[]}{[]}{\handler}{\cstrace}{\cex}{\econt}{\scont}\\
 	\textrm{where }\\[2mm]
-	\scont = \ExitSK{\synval}\\[2mm]
-	\env = \ext{\env_{empty}}{\formal}{\synval}
+	\scont = \ExitSK{\val}\\[2mm]
+	\env = \ext{\env_{empty}}{\formal}{\val}
   \end{array}
 \]
 \subsubsection{Static Invocation}
@@ -583,13 +684,13 @@ Static invocation is supported with $\StaticInvocation{\{\membermeta\}}{\express
 	\hspace{3mm}\strace' = \StaticInvocation{\{\membermeta\}}{\expressionsmeta}::\strace\\[2mm]
 
 	\acontconf{ \staticinvocapp{\formals}{\stmt}{\strace}{\cstrace}{\cex}
-{\econt}}{\synval{s}}
+{\econt}}{\val{s}}
 	& \Rightarrow &
 	\execconf{\stmt}{\env'}{[]}{[]}{\handler}{\cstrace}{\cex}{\econt}{\scont}
 	\\[2mm]
 	\textrm{with }\\
 	\hspace{3mm}\scont = \ExitSK{\tt{null}},\\
-	\hspace{3mm}\env' = \ext{\env_{empty}}{\formals}{\synval{s}}\\[2mm]
+	\hspace{3mm}\env' = \ext{\env_{empty}}{\formals}{\val{s}}\\[2mm]
   \end{array}
 \]
 
@@ -615,24 +716,24 @@ After the evaluation of the receiver expression to a value $\val$, the property 
 \[
   \begin{array}{lcl@{\hspace{30mm}}}
 	\textrm{if M is a method with body }\stmt\textrm{ and formals }\formals :\\
-	\hspace{2mm}\contconf{\propertygetk}{\synval}
+	\hspace{2mm}\contconf{\propertygetk}{\val}
 	& \Rightarrow &
 	\contconf{\econt}{\funval{\formals}{\stmt}{\env}}\\
 	\textrm{where:}\\
-	\hspace{5mm}\env = \ext{\env_{empty}}{\mathbf{this}}{\synval}\\[2mm]
+	\hspace{5mm}\env = \ext{\env_{empty}}{\mathbf{this}}{\val}\\[2mm]
 
 	\textrm{if M is getter with statement body }\stmt :\\
-	\hspace{2mm}\contconf{\propertygetk}{\synval}
+	\hspace{2mm}\contconf{\propertygetk}{\val}
 	& \Rightarrow &
 	\execconf{\stmt}{\env}{\lbls}{\clbls}{\handler}{\cstrace}{\cex}{\econt}{\scont}\\
 	\textrm{where:}\\
-	\hspace{5mm}\env = \ext{\env_{empty}}{\mathbf{this}}{\synval}\\
+	\hspace{5mm}\env = \ext{\env_{empty}}{\mathbf{this}}{\val}\\
 	\hspace{5mm}\scont = \emptyset\\[2mm]
 
 	\textrm{if M is an implicit getter for field }\idmeta :\\
-	\hspace{2mm}\contconf{\propertygetk}{\synval}
+	\hspace{2mm}\contconf{\propertygetk}{\val}
 	& \Rightarrow &
-	\contconf{\econt}{\textrm{R}(\synval)}\\
+	\contconf{\econt}{\textrm{R}(\val)}\\
   \end{array}
 \]
 %If the lookup fails, noSuchMethod is created/invoked accordingly (TBD)
@@ -651,24 +752,24 @@ In Kernel a property can be accessed without lookup, by direct reference to the 
 	\hspace{5mm}\econt' = \dpropertygetk\\[2mm]
 
 	\textrm{if }\membermeta \textrm{ is a method with body }\stmt\textrm{ and formals }\formals :\\
-	\hspace{2mm}\contconf{\dpropertygetk}{\synval}
+	\hspace{2mm}\contconf{\dpropertygetk}{\val}
 	& \Rightarrow &
 	\contconf{\econt}{\funval{\formals}{\stmt}{\env}}\\
 	\textrm{where:}\\
-	\hspace{5mm}\env = \ext{\env_{empty}}{\mathbf{this}}{\synval}\\[2mm]
+	\hspace{5mm}\env = \ext{\env_{empty}}{\mathbf{this}}{\val}\\[2mm]
 
 	\textrm{if }\membermeta \textrm{ is getter with statement body }\stmt :\\
-	\hspace{2mm}\contconf{\dpropertygetk}{\synval}
+	\hspace{2mm}\contconf{\dpropertygetk}{\val}
 	& \Rightarrow &
 	\execconf{\stmt}{\env}{\lbls}{\clbls}{\handler}{\cstrace}{\cex}{\econt}{\scont}\\
 	\textrm{where:}\\
-	\hspace{5mm}\env = \ext{\env_{empty}}{\mathbf{this}}{\synval}\\
+	\hspace{5mm}\env = \ext{\env_{empty}}{\mathbf{this}}{\val}\\
 	\hspace{5mm}\scont = \emptyset\\[2mm]
 
 	\textrm{if }\membermeta \textrm{ is a field } :\\
-	\hspace{2mm}\contconf{\dpropertygetk}{\synval}
+	\hspace{2mm}\contconf{\dpropertygetk}{\val}
 	& \Rightarrow &
-	\contconf{\econt}{\deref(\synval[\membermeta])}\\
+	\contconf{\econt}{\deref{\val[\membermeta]}}\\
   \end{array}
 \]
 \subsubsection{Property assignment}
@@ -677,7 +778,7 @@ In Kernel a property can be accessed without lookup, by direct reference to the 
 An assignment changes the value stored at the location of the provided property name.
 A property assignment in Kernel can be done by executing a setter or accessing an instance variable and setting its value.
 \newcommand{\propertysetk}{\mathrm{PropertySetK}(\idmeta,\,\expressionmeta_1,\,\env,\,\strace,\,\handler,\,\cstrace,\,\cex,\,\econt)}
-\newcommand{\propertysetvk}{\mathrm{PropertySetValueK}(\synval_0,\,\idmeta,\,\strace,\,\handler,\,\cstrace,\,\cex,\,\econt)}
+\newcommand{\propertysetvk}{\mathrm{PropertySetValueK}(\val_0,\,\idmeta,\,\strace,\,\handler,\,\cstrace,\,\cex,\,\econt)}
 
 \[
   \begin{array}{lcl@{\hspace{30mm}}}
@@ -687,7 +788,7 @@ A property assignment in Kernel can be done by executing a setter or accessing a
 	\textrm{where:}\\
 	\hspace{5mm}\econt' = \propertysetk\\[2mm]
 
-	\contconf{\propertysetk}{\synval_0}
+	\contconf{\propertysetk}{\val_0}
 	& \Rightarrow &
 	\evalconf{\expressionmeta_1}{\env}{\strace}{\cstrace}{\cex}{\econt'}\\
 	\textrm{where:}\\
@@ -696,21 +797,21 @@ A property assignment in Kernel can be done by executing a setter or accessing a
 \]
 
 \noindent
-After the evaluation of the receiver expression to a value $\synval_0$ and the argument to value $\synval_1$, the property $\idmeta$ is looked up in setters and implicit setters for the value $\synval_0$. Let R be the result of such lookup.
+After the evaluation of the receiver expression to a value $\val_0$ and the argument to value $\val_1$, the property $\idmeta$ is looked up in setters and implicit setters for the value $\val_0$. Let R be the result of such lookup.
 \[
   \begin{array}{lcl@{\hspace{30mm}}}
 	\textrm{if R is setter with statement body }\stmt \textrm{ and formal }\formal :\\
-	\hspace{2mm}\contconf{\propertysetvk}{\synval_1}
+	\hspace{2mm}\contconf{\propertysetvk}{\val_1}
 	& \Rightarrow &
 	\execconf{\stmt}{\env}{\lbls}{\clbls}{\handler}{\cstrace}{\cex}{\econt}{\scont}\\
 	\textrm{where:}\\
-	\hspace{5mm}\env = \ext{\env_{empty}}{\mathbf{this} :: \formal :: []}{\synval_0 :: \synval_1 :: []}\\
+	\hspace{5mm}\env = \ext{\env_{empty}}{\mathbf{this} :: \formal :: []}{\val_0 :: \val_1 :: []}\\
 	\hspace{5mm}\scont = \emptyset\\[2mm]
 
 	\textrm{if R is an implicit setter for field }\idmeta :\\
-	\hspace{2mm}\contconf{\propertygetk}{\synval}
+	\hspace{2mm}\contconf{\propertygetk}{\val}
 	& \Rightarrow &
-	\contconf{\econt}{\textrm{R}(\synval_0, \synval_1)}\\
+	\contconf{\econt}{\textrm{R}(\val_0, \val_1)}\\
   \end{array}
 \]
 
@@ -719,7 +820,7 @@ After the evaluation of the receiver expression to a value $\synval_0$ and the a
 In Kernel a property can be set without lookup, by direct reference to the $AST$ node of said property. This implies that the lookup step above is bypassed.
 %% DirectPropertyGetK
 \newcommand{\dpropertysetk}{\mathrm{DPropertySetK}(\membermeta,\,\expressionmeta_1,\,\env,\,\strace,\,\handler,\,\cstrace,\,\cex,\,\econt)}
-\newcommand{\dpropertysetvk}{\mathrm{DPropertySetValueK}(\synval_0,\,\membermeta,\,\strace,\,\handler,\,\cstrace,\,\cex,\,\econt)}
+\newcommand{\dpropertysetvk}{\mathrm{DPropertySetValueK}(\val_0,\,\membermeta,\,\strace,\,\handler,\,\cstrace,\,\cex,\,\econt)}
 \[
   \begin{array}{lcl@{\hspace{30mm}}}
 	\evalconf{\DirectPropertySet{\expressionmeta_0}{\membermeta}{\expressionmeta_1}}{\env}{\strace}{\cstrace}{\cex}{\econt}
@@ -728,24 +829,24 @@ In Kernel a property can be set without lookup, by direct reference to the $AST$
 	\textrm{where:}\\
 	\hspace{5mm}\econt' = \dpropertysetk\\[2mm]
 
-	\contconf{\dpropertysetk}{\synval_0}
+	\contconf{\dpropertysetk}{\val_0}
 	& \Rightarrow &
 	\evalconf{\expressionmeta_1}{\env}{\strace}{\cstrace}{\cex}{\econt'}\\
 	\textrm{where:}\\
 	\hspace{5mm}\econt' = \dpropertysetvk\\[2mm]
 
 	\textrm{if }\membermeta \textrm{ is setter with statement body }\stmt \textrm{ and formal }\formal :\\
-	\hspace{2mm}\contconf{\dpropertysetvk}{\synval_1}
+	\hspace{2mm}\contconf{\dpropertysetvk}{\val_1}
 	& \Rightarrow &
 	\execconf{\stmt}{\env}{\lbls}{\clbls}{\handler}{\cstrace}{\cex}{\econt}{\scont}\\
 	\textrm{where:}\\
-	\hspace{5mm}\env = \ext{\env_{empty}}{\mathbf{this} :: \formal :: []}{\synval_0 :: \synval_1 :: []}\\
+	\hspace{5mm}\env = \ext{\env_{empty}}{\mathbf{this} :: \formal :: []}{\val_0 :: \val_1 :: []}\\
 	\hspace{5mm}\scont = \emptyset\\[2mm]
 
 	\textrm{if }\membermeta \textrm{ is a field } :\\
-	\hspace{2mm}\contconf{\dpropertysetvk}{\synval_1}
+	\hspace{2mm}\contconf{\dpropertysetvk}{\val_1}
 	& \Rightarrow &
-	\contconf{\econt}{\update{\synval_0[\membermeta]}{\synval_1}}\\
+	\contconf{\econt}{\update{\val_0[\membermeta]}{\val_1}}\\
   \end{array}
 \]
 
@@ -757,25 +858,25 @@ Kernel allows access of a superclass member as a property, which can be either g
 \newcommand{\superclass}[1]{superclass({#1})}
 
 \noindent
-Accessing a superclass member is accessed with the expression $\SuperPropertyGet{\idmeta}$ evaluated with the corresponding components: $\env$, $\strace$, $\handler$, $\cstrace$, $\cex$, $\econt$. Let $\val = \deref(\env(\this))$, $C = \superclass{\val}$ and $M$ the result of looking up $\idmeta$ in $C$.
+Accessing a superclass member is accessed with the expression $\SuperPropertyGet{\idmeta}$ evaluated with the corresponding components: $\env$, $\strace$, $\handler$, $\cstrace$, $\cex$, $\econt$. Let $\val = \deref{(\env(\this))}$, $C = \superclass{\val}$ and $M$ the result of looking up $\idmeta$ in $C$.
 \[
   \begin{array}{l@{\hspace{50mm}}}
 	\textrm{If }\membermeta \textrm{ is a member method with body }\stmt \textrm{ and formals }\formals:\\
 	\hspace{3mm}\evalconf{\SuperPropertyGet{\idmeta}}{\env}{\strace}{\cstrace}{\cex}{\econt}
 	\Rightarrow
 	\contconf{\econt}{\funval{\formals}{\stmt}{\env'}}\\
-	\hspace{5mm}\textrm{with }\env' = \ext{\env_{empty}}{\this}{\deref(\env(\this))}\\[2mm]
+	\hspace{5mm}\textrm{with }\env' = \ext{\env_{empty}}{\this}{\deref{(\env(\this))}}\\[2mm]
 
 	\textrm{If }\membermeta \textrm{ is a getter method with body }\stmt :\\
 	\hspace{3mm}\evalconf{\SuperPropertyGet{\idmeta}}{\env}{\strace}{\cstrace}{\cex}{\econt}
 	\Rightarrow
 	\execconf{\stmt}{\env'}{\lbls}{\clbls}{\handler}{\cstrace}{\cex}{\econt}{\scont}\\
-	\hspace{5mm}\textrm{with }\env' =  \ext{\env_{empty}}{\this}{\deref(\env(\this))}, \hspace{2mm}\scont = \emptyset\\[2mm]
+	\hspace{5mm}\textrm{with }\env' =  \ext{\env_{empty}}{\this}{\deref{(\env(\this))}}, \hspace{2mm}\scont = \emptyset\\[2mm]
 
 	\textrm{If }\membermeta \textrm{ is a implicit field getter} :\\
 	\hspace{3mm}\evalconf{\SuperPropertyGet{\idmeta}}{\env}{\strace}{\cstrace}{\cex}{\econt}
 	\Rightarrow
-	\contconf{\econt}{M(\deref(\env(\this)))}\\
+	\contconf{\econt}{M(\deref{(\env(\this))})}\\
   \end{array}
 \]
 \subsubsection{Super property set}
@@ -792,20 +893,20 @@ Kernel supports assignment of a super member with the expression $\SuperProperty
   \end{array}
 \]
 
-Let $\val = \deref(\env(\this))$, $C = \superclass{\val}$ and $M$ the result of looking up $\idmeta$ in $C$.
+Let $\val = \deref{(\env(\this))}$, $C = \superclass{\val}$ and $M$ the result of looking up $\idmeta$ in $C$.
 
 \[
   \begin{array}{l@{\hspace{50mm}}}
 	\textrm{If }\membermeta \textrm{ is a setter method with body }\stmt\textrm{ and formal }\formal:\\
-	\hspace{3mm}\contconf{\superpropertysetk}{\synval}
+	\hspace{3mm}\contconf{\superpropertysetk}{\val}
 	\Rightarrow
 	\execconf{\stmt}{\env'}{\lbls}{\clbls}{\handler}{\cstrace}{\cex}{\econt}{\scont}\\
-	\hspace{5mm}\textrm{with }\env' =  \ext{\env_{empty}}{\this :: \formal :: []}{\deref(\env(\this)) :: \synval :: []}, \hspace{2mm}\scont = \emptyset\\[2mm]
+	\hspace{5mm}\textrm{with }\env' =  \ext{\env_{empty}}{\this :: \formal :: []}{\deref{(\env(\this))} :: \val :: []}, \hspace{2mm}\scont = \emptyset\\[2mm]
 
 	\textrm{If }\membermeta \textrm{ is a implicit field setter} :\\
-	\hspace{3mm}\contconf{\superpropertysetk}{\synval}
+	\hspace{3mm}\contconf{\superpropertysetk}{\val}
 	\Rightarrow
-	\contconf{\econt}{M(\deref(\env(\this)), \synval)}\\
+	\contconf{\econt}{M(\deref{(\env(\this))}, \val)}\\
   \end{array}
 \]
 \subsubsection{Instance method invocation}
@@ -824,10 +925,10 @@ Method invocation is supported with $\InstanceMethodInvocation{\expressionmeta}{
 \]
 
 The arguments $\expressionsmeta$ are evaluated after the evaluation of the receiver.
-\newcommand{\InstanceMethodInvocationArgsApp}{\mathrm{InstanceMethodInvocationArgsApp(\idmeta,\,\synval,\,\strace,\,\handler,\,\cstrace,\,\cex,\,\econt)}}
+\newcommand{\InstanceMethodInvocationArgsApp}{\mathrm{InstanceMethodInvocationArgsApp(\idmeta,\,\val,\,\strace,\,\handler,\,\cstrace,\,\cex,\,\econt)}}
 \[
   \begin{array}{l}
-	\contconf{\InstanceMethodInvocationK}{\synval}
+	\contconf{\InstanceMethodInvocationK}{\val}
 	\Rightarrow
 	\evallistconf{\expressionsmeta}{\env}{\strace}{\cstrace}{\cex}{\acont'}
 	\\[2mm]
@@ -835,25 +936,25 @@ The arguments $\expressionsmeta$ are evaluated after the evaluation of the recei
   \end{array}
 \]
 \noindent
-After the evaluation of the receiver expression to a value $\val$ and the argument expressions to $\synval{s}$, the instance method $\idmeta$ is looked up in methods for the value $\val$. Let $\membermeta$ be the result of such lookup. Let $\membermeta$ be a method with statement body $\stmt$ and formal parameters $\formals$:
+After the evaluation of the receiver expression to a value $\val$ and the argument expressions to $\val{s}$, the instance method $\idmeta$ is looked up in methods for the value $\val$. Let $\membermeta$ be the result of such lookup. Let $\membermeta$ be a method with statement body $\stmt$ and formal parameters $\formals$:
 \[
   \begin{array}{l}
-	\contconf{\InstanceMethodInvocationArgsApp}{\synval{s}}
+	\contconf{\InstanceMethodInvocationArgsApp}{\val{s}}
 	\Rightarrow \\
 	\hspace{5mm}\execconf{\stmt}{\env}{[]}{[]}{\handler}{\cstrace}{\cex}{\econt}{\scont}
 	\\[2mm]
-	\hspace{3mm}\textrm{with } \scont = \ExitSK{\tt{null}}, \env = \ext{\env_{empty}}{\this :: \formals}{\synval :: \synval{s}}\\[2mm]
-	\scontconf{\ExitSK{\synval}}{\env} \Rightarrow \contconf{\econt}{\synval}
+	\hspace{3mm}\textrm{with } \scont = \ExitSK{\tt{null}}, \env = \ext{\env_{empty}}{\this :: \formals}{\val :: \val{s}}\\[2mm]
+	\scontconf{\ExitSK{\val}}{\env} \Rightarrow \contconf{\econt}{\val}
   \end{array}
 \]
-When a $\tt{return}$ statement is missing in the statement body $\stmt$ of the instance method $\membermeta$, the statement continuation $\ExitSK{\synval}$ ensures that the execution will proceed to the corresponding expression continuation, in this case with $\synval = \tt{null}$.
+When a $\tt{return}$ statement is missing in the statement body $\stmt$ of the instance method $\membermeta$, the statement continuation $\ExitSK{\val}$ ensures that the execution will proceed to the corresponding expression continuation, in this case with $\val = \tt{null}$.
 
 \subsubsection{Direct instance method invocation}
 \label{subsubsec:direct-instance-method-invoc}
 Direct method invocation allows invocation of instance method by providing directly the member method to be invoked and bypass the lookup step described above. Let $\membermeta$ be the target method, $\stmt$ the statement body and $\formals$ the corresponding formal parameters.
 \newcommand{\DInstanceMethodInvocation}[3]{#1.\{#2\}(#3)}
 \newcommand{\DInstanceMethodInvocationK}{\mathrm{DInstanceMethodInvocationK}(\expressionsmeta,\,\membermeta,\,\env,\,\strace,\,\handler,\,\cstrace,\,\cex,\,\econt)}
-\newcommand{\DInstanceMethodInvocationArgsApp}{\mathrm{DInstanceMethodInvocationArgsApp}(\membermeta,\,\synval,\,\strace,\,\handler,\,\cstrace,\,\cex,\,\econt)}
+\newcommand{\DInstanceMethodInvocationArgsApp}{\mathrm{DInstanceMethodInvocationArgsApp}(\membermeta,\,\val,\,\strace,\,\handler,\,\cstrace,\,\cex,\,\econt)}
 \[
   \begin{array}{l}
   \evalconf{\DInstanceMethodInvocation{\expressionmeta}{\membermeta}{\expressionsmeta}}{\env}{\strace}{\cstrace}{\cex}{\econt}
@@ -862,20 +963,20 @@ Direct method invocation allows invocation of instance method by providing direc
 	\\[2mm]
 	\hspace{3mm}\textrm{with } \econt' = \DInstanceMethodInvocationK\\[2mm]
 
-  \contconf{\DInstanceMethodInvocationK}{\synval}
+  \contconf{\DInstanceMethodInvocationK}{\val}
 	\Rightarrow \\
 	\hspace{5mm}\evallistconf{\expressionsmeta}{\env}{\strace}{\cstrace}{\cex}{\acont'}
 	\\[2mm]
 	\hspace{3mm}\textrm{with } \acont' = \DInstanceMethodInvocationArgsApp\\[2mm]
 
-	\contconf{\DInstanceMethodInvocationArgsApp}{\synval{s}}
+	\contconf{\DInstanceMethodInvocationArgsApp}{\val{s}}
 	\Rightarrow \\
 	\hspace{5mm}\execconf{\stmt}{\env}{[]}{[]}{\handler}{\cstrace}{\cex}{\econt}{\scont}
 	\\[2mm]
-	\hspace{3mm}\textrm{with } \scont = \ExitSK{\tt{null}}, \env = \ext{\env_{empty}}{\this :: \formals}{\synval :: \synval{s}}\\[2mm]
+	\hspace{3mm}\textrm{with } \scont = \ExitSK{\tt{null}}, \env = \ext{\env_{empty}}{\this :: \formals}{\val :: \val{s}}\\[2mm]
   \end{array}
 \]
-Similarly to \ref{subsubsec:instance-method-invoc}, $\ExitSK{\synval}$ is added as next statement continuation.
+Similarly to \ref{subsubsec:instance-method-invoc}, $\ExitSK{\val}$ is added as next statement continuation.
 \subsubsection{Super method invocation}
 \label{subsubsec:super-method-invocation}
 \newcommand{\SuperMethodInvocation}[2]{\tt{super}.#1(#2)}
@@ -890,19 +991,19 @@ Super method invocation is supported with $\SuperMethodInvocation{\idmeta}{\expr
 	\hspace{3mm}\textrm{with } \acont = \SuperMethodInvocationApp
   \end{array}
 \]
-After the evaluation of the expressions $\expressionsmeta$ to values $\synval{s}$ for the super method invocation, the method $\idmeta$ is looked up. Let $\val = \deref(\env(\this))$, $C = \superclass{\val}$ and $M$ the result of looking up $\idmeta$ in $C$. Let $\stmt$ be the statement body and $\formals$ the formal parameters for $\membermeta$ below:
+After the evaluation of the expressions $\expressionsmeta$ to values $\val{s}$ for the super method invocation, the method $\idmeta$ is looked up. Let $\val = \deref{(\env(\this))}$, $C = \superclass{\val}$ and $M$ the result of looking up $\idmeta$ in $C$. Let $\stmt$ be the statement body and $\formals$ the formal parameters for $\membermeta$ below:
 \[
   \begin{array}{l}
-	\contconf{\SuperMethodInvocationApp}{\synval{s}}
+	\contconf{\SuperMethodInvocationApp}{\val{s}}
 	\Rightarrow \\
 	\hspace{5mm}\execconf{\stmt}{\env'}{[]}{[]}{\handler}{\cstrace}{\cex}{\econt}{\scont}
 	\\[2mm]
 	\textrm{with }\\
 	\hspace{3mm}\scont = \ExitSK{\tt{null}},\\
-	\hspace{3mm}\env' = \ext{\env_{empty}}{\this :: \formals}{\deref(\env(\this)) :: \synval{s}}\\[2mm]
+	\hspace{3mm}\env' = \ext{\env_{empty}}{\this :: \formals}{\deref{(\env(\this))} :: \val{s}}\\[2mm]
   \end{array}
 \]
-Similarly to \ref{subsubsec:instance-method-invoc}, $\ExitSK{\synval}$ is added as next statement continuation.
+Similarly to \ref{subsubsec:instance-method-invoc}, $\ExitSK{\val}$ is added as next statement continuation.
 
 \subsubsection{Type test}
 \label{subsubsec:type-test}
@@ -913,11 +1014,11 @@ Similarly to \ref{subsubsec:instance-method-invoc}, $\ExitSK{\synval}$ is added 
 	& \Rightarrow &
 	\evalconf{\expressionmeta}{\env}{\strace}{\cstrace}{\cex}{\IsExpressionK}\\[2mm]
 
-	\contconf{\IsExpressionK}{\synval}
+	\contconf{\IsExpressionK}{\val}
 	& \Rightarrow &
-	\contconf{\econt}{\true}, \textrm{ if }\synval \textrm{ is } \tt{T}\\[2mm]
+	\contconf{\econt}{\true}, \textrm{ if }\val \textrm{ is } \tt{T}\\[2mm]
 
-	\contconf{\IsExpressionK}{\synval}
+	\contconf{\IsExpressionK}{\val}
 	& \Rightarrow &
 	\contconf{\econt}{\false}, \textrm{ otherwise}
   \end{array}
@@ -933,11 +1034,11 @@ Similarly to \ref{subsubsec:instance-method-invoc}, $\ExitSK{\synval}$ is added 
 	& \Rightarrow &
 	\evalconf{\expressionmeta}{\env}{\strace}{\cstrace}{\cex}{\AsExpressionK}\\[2mm]
 
-	\contconf{\AsExpressionK}{\synval}
+	\contconf{\AsExpressionK}{\val}
 	& \Rightarrow &
-	\contconf{\econt}{\synval}, \textrm{if }\synval \textrm{ is } \tt{T}\\[2mm]
+	\contconf{\econt}{\val}, \textrm{if }\val \textrm{ is } \tt{T}\\[2mm]
 
-	\contconf{\AsExpressionK}{\synval}
+	\contconf{\AsExpressionK}{\val}
 	& \Rightarrow &
 	\dots, \textrm{ otherwise}
     \end{array}
@@ -947,7 +1048,7 @@ Similarly to \ref{subsubsec:instance-method-invoc}, $\ExitSK{\synval}$ is added 
 \[
 	\evalconf{\ThisExpression}{\env}{\strace}{\cstrace}{\cex}{\econt}
 	\Rightarrow
-	\contconf{\econt}{\deref\env(\this)}
+	\contconf{\econt}{\deref{\env(\this)}}
 \]
 \subsection{Statement execution}
 \label{subsec:stmt-exectution}
@@ -961,9 +1062,9 @@ Let $\econt' = \vardeclk{\env}{\varmeta}{\scont}$ below:
 	& \Rightarrow &
 	\evalconf{\expr}{\env}{\strace}{\cstrace}{\cex}{\econt'}\\[2mm]
 
-	\contconf{\econt'}{\synval}
+	\contconf{\econt'}{\val}
 	& \Rightarrow &
-	\scontconf{\scont}{\ext{\env}{\varmeta}{\synval}}
+	\scontconf{\scont}{\ext{\env}{\varmeta}{\val}}
 
   \end{array}
 \]
@@ -1093,7 +1194,7 @@ If there is a matching case clause, its statement is executed with a new stateme
 
 \[
   \begin{array}{lcl}
-	\contconf{\switchk{\scase :: \scases}{\clbls}}{\synval}
+	\contconf{\switchk{\scase :: \scases}{\clbls}}{\val}
 	\Rightarrow \hspace{30mm}\\
 	\hspace{20mm}\execconf{\stmt}{\env}{\lbls}{\clbls}{\handler}{\cstrace}{\cex}{\econt}{\exitssk}
   \end{array}
@@ -1109,9 +1210,9 @@ If a non-matching \textbf{case} clause, $\scase$, is the target of a continue st
 
 \[
   \begin{array}{lcl}
-	\contconf{\switchk{\scase :: \scases}{\clbls}}{\synval}
+	\contconf{\switchk{\scase :: \scases}{\clbls}}{\val}
 	\Rightarrow \hspace{30mm}\\
-	\hspace{20mm}\contconf{\switchk{\scases}{\clbl :: \clbls}}{\synval}
+	\hspace{20mm}\contconf{\switchk{\scases}{\clbl :: \clbls}}{\val}
   \end{array}
 \]
 with:
@@ -1125,11 +1226,11 @@ with:
 Otherwise, the execution continues as follows:
 \[
   \begin{array}{lcl}
-    \contconf{\switchk{\scase :: \scases}{\clbls}}{\synval}
+    \contconf{\switchk{\scase :: \scases}{\clbls}}{\val}
 	\Rightarrow \hspace{30mm}\\
-	\hspace{20mm}\contconf{\switchk{\scases}{\clbls}}{\synval}\\[2mm]
+	\hspace{20mm}\contconf{\switchk{\scases}{\clbls}}{\val}\\[2mm]
 
-	\contconf{\switchk{[]}{\clbls}}{\synval}
+	\contconf{\switchk{[]}{\clbls}}{\val}
 	\Rightarrow
 	\scontconf{\scont}{\env}
   \end{array}
@@ -1145,13 +1246,13 @@ Kernel supports structured exception handling with \textbf{try/catch} and \textb
 	& \Rightarrow &
 	\evalconf{\expr}{\env}{\strace}{\cstrace}{\cex}{\throwk{(\textbf{throw } \expr) :: \strace}{\handler}}\\[2mm]
 
-	\evalconf{\textbf{rethrow}}{\env}{\strace}{inr(\synval)}{\strace'}{\econt}
+	\evalconf{\textbf{rethrow}}{\env}{\strace}{inr(\val)}{\strace'}{\econt}
 	& \Rightarrow &
-	\throwconf{\handler}{\synval}{\strace'}\\[2mm]
+	\throwconf{\handler}{\val}{\strace'}\\[2mm]
 
-	\contconf{\throwk{\strace}{\handler}}{\synval}
+	\contconf{\throwk{\strace}{\handler}}{\val}
 	& \Rightarrow &
-	\throwconf{\handler}{\synval}{\strace}\\[2mm]
+	\throwconf{\handler}{\val}{\strace}\\[2mm]
 
   \end{array}
 \]
@@ -1163,26 +1264,26 @@ Kernel supports structured exception handling with \textbf{try/catch} and \textb
 Let $\econt' = \catchk{(\textbf{on T catch (e, s) }\stmt) :: cs}$ be a catch continuation containing a non-empty list of on-catch handlers:
 \[
   \begin{array}{lcll}
-	\throwconf{\econt'}{\synval}{\strace'}
+	\throwconf{\econt'}{\val}{\strace'}
 	& \Rightarrow &
-	\execconf{\stmt}{\env'}{\lbls}{\clbls}{\handler}{inr(\synval)}{inr(\strace')}{\econt}{\scont}
+	\execconf{\stmt}{\env'}{\lbls}{\clbls}{\handler}{inr(\val)}{inr(\strace')}{\econt}{\scont}
 	&\textrm{ if V is T}\\[1mm]
 
-	&&\textrm{with } \env' = extend(\env, e :: s :: [], \synval :: \strace' :: [])\\[2mm]
+	&&\textrm{with } \env' = extend(\env, e :: s :: [], \val :: \strace' :: [])\\[2mm]
 
-	\throwconf{\econt'}{\synval}{\strace'}
+	\throwconf{\econt'}{\val}{\strace'}
 	& \Rightarrow &
-	\throwconf{\catchk{cs}}{\synval}{\strace'}	&\textrm{ otherwise}\\[2mm]
-	&&\textrm{with } \env' = extend(\env, e :: s :: [], \synval :: \strace' :: [])
+	\throwconf{\catchk{cs}}{\val}{\strace'}	&\textrm{ otherwise}\\[2mm]
+	&&\textrm{with } \env' = extend(\env, e :: s :: [], \val :: \strace' :: [])
   \end{array}
 \]
 \noindent
 When a catch handler with no on-catch handlers is reached, the exception is rethrown.
 \[
   \begin{array}{lcll}
-	\throwconf{\catchk{[]}}{\synval}{\strace'}
+	\throwconf{\catchk{[]}}{\val}{\strace'}
 	& \Rightarrow &
-	\throwconf{\handler}{\synval}{\strace'}\hspace{20mm}
+	\throwconf{\handler}{\val}{\strace'}\hspace{20mm}
   \end{array}
 \]
 \noindent
@@ -1190,12 +1291,12 @@ When a catch handler with no on-catch handlers is reached, the exception is reth
 
 \[
   \begin{array}{lcl}
-	\throwconf{\finallyk{\stmt}}{\synval}{\strace'}
+	\throwconf{\finallyk{\stmt}}{\val}{\strace'}
 	\Rightarrow \\
-	\hspace{10mm}\execconf{\stmt}{\env}{\lbls}{\clbls}{\handler}{inl()}{inl()}{\econt}{\rethrowsk{\synval}{\strace'}{\handler}}\hspace{20mm}\\[2mm]
+	\hspace{10mm}\execconf{\stmt}{\env}{\lbls}{\clbls}{\handler}{inl()}{inl()}{\econt}{\rethrowsk{\val}{\strace'}{\handler}}\hspace{20mm}\\[2mm]
 
-	\scontconf{\rethrowsk{\synval}{\strace}{\handler}}{\_}
-	\Rightarrow \throwconf{\handler}{\synval}{\strace}
+	\scontconf{\rethrowsk{\val}{\strace}{\handler}}{\_}
+	\Rightarrow \throwconf{\handler}{\val}{\strace}
 
   \end{array}
 \]
@@ -1328,7 +1429,7 @@ The expression \textbf{new} invokes a constructor to produce a new instance. The
 where $\acont' = \ctrapp{\textbf{Q}}{\econt}$.
 \[
   \begin{array}{lcl}
-	\acontconf{\ctrapp{\textbf{Q}}{\econt}}{\synval{s}}
+	\acontconf{\ctrapp{\textbf{Q}}{\econt}}{\val{s}}
 	& \Rightarrow &
 	\contconf{\initk{Q}{\env}{\scont}}{!\loc}
   \end{array}
@@ -1337,13 +1438,13 @@ where $\acont' = \ctrapp{\textbf{Q}}{\econt}$.
 where $\loc$ is the location of the newly allocated instance, $\val \in \dobjval$, in the store. The value $\val$ stores the class of the object and the fields, as a list of freshly allocated labels for each field of the new instance.
 \[
   \begin{array}{l}
-	\deref\loc = \objval \in \dobjval, fields \in \mlist{\dlocation}\\
-	\env' = extend(\env_{empty}, \formals, \synval{s})\\
+	\deref{\loc} = \objval \in \dobjval, fields \in \mlist{\dlocation}\\
+	\env' = extend(\env_{empty}, \formals, \val{s})\\
 	\scont = \newsk{\econt}{\loc} \\[2mm]
 
 	\scontconf{\newsk{\econt}{\loc}}{\env}
 	\Rightarrow
-	\contconf{\econt}{\deref\loc}
+	\contconf{\econt}{\deref{\loc}}
   \end{array}
 \]
 
@@ -1354,17 +1455,17 @@ Let $li = last(Izs)$ be the last initializer in the list of initializers, $Izs$,
 When $li$ is a redirecting initializer to target constructor \textbf{G}, then execution of constructor \textbf{Q} proceeds immediately with execution of its initializer list, $Izs$.
 \[
   \begin{array}{lcl}
-	\contconf{\initk{Q}{\env}{\scont}}{\synval}
+	\contconf{\initk{Q}{\env}{\scont}}{\val}
 	& \Rightarrow &
 	\evallistconf{\exprs}{\env}{\strace}{\cstrace}{\cex}{\acont}\\	
 	&&
 	\textrm{if } Izs = RedirectingI(G, \exprs) :: []\\
 	\textrm{where:}\\
 	\acont = \redapp{G}{\loc}{\scont}\\
-	\deref\loc = \synval
+	\deref{\loc} = \val
 	\\[2mm]
 
-	\contconf{\initk{Q}{\env}{\scont}}{\synval}
+	\contconf{\initk{Q}{\env}{\scont}}{\val}
 	& \Rightarrow &
 	\evalconf{\expr}{\env}{st}{cex}{cst}{\econt'}\\
 	&&
@@ -1373,13 +1474,13 @@ When $li$ is a redirecting initializer to target constructor \textbf{G}, then ex
 
 	fi = Initializer(\expr) \textrm{, first initializer in }Izs\\
 	\econt' = \initializerk{Izs}{\loc}{\env}{\scont}\\
-	\deref\loc = \synval\\[2mm]
+	\deref{\loc} = \val\\[2mm]
 
-	\acontconf{\redapp{G}{\loc}{\scont}}{\synval{s}}
+	\acontconf{\redapp{G}{\loc}{\scont}}{\val{s}}
 	& \Rightarrow &
-	\contconf{\initk{G}{\env'}{\scont}}{\deref\loc}\\[2mm]
+	\contconf{\initk{G}{\env'}{\scont}}{\deref{\loc}}\\[2mm]
 	\textrm{where:}\\
-	\env' = extend(\env_{empty}, \formals, \synval{s})
+	\env' = extend(\env_{empty}, \formals, \val{s})
   \end{array}
 \]
 \noindent
@@ -1388,15 +1489,15 @@ Otherwise, \textbf{Q} is a non-redirecting generative constructor, and execution
 Let \textbf{Q} be a constructor with non empty initializer list, $Izs$ and a constructor body $\stmt_{body}$.
 \[
   \begin{array}{lcl}
-	\contconf{\initk{Q}{\env}{\scont}}{\synval}
+	\contconf{\initk{Q}{\env}{\scont}}{\val}
 	& \Rightarrow &
 	\evallistconf{\exprs}{\env}{\strace}{\cstrace}{\cex}{\acont}\\[2mm]
 
 	\textrm{where:}\\
-	\env' = \ext{\env}{\mathbf{this}}{\deref\loc}
+	\env' = \ext{\env}{\mathbf{this}}{\deref{\loc}}
 	&&
 	\exprs = \textrm{initializer expressions for instance fields}\\
-	\deref\loc = \synval
+	\deref{\loc} = \val
 	&&
 	\acont = \fieldsapp{\env}{Izs}{\loc}{\scont'}\\
 	&&
@@ -1416,18 +1517,18 @@ To support this, we add a new statement continuation, $BodySK$, that has the con
 \]
 
 \noindent
-After the evaluation of the initializer expressions, the labels for each field in the object value are updated accordingly. An update of field $f_i$, stored at location $\loc' = (\deref\loc)[f_i]$ with value $\synval_i$ is expressed as $\update{(\deref\loc)[f_i]}{\synval_{i}}$, so the following holds $\deref\loc' = \deref\deref\loc[f_i] = \synval_{i}$ after the update.
+After the evaluation of the initializer expressions, the labels for each field in the object value are updated accordingly. An update of field $f_i$, stored at location $\loc' = (\deref{\loc})[f_i]$ with value $\val_i$ is expressed as $\update{(\deref{\loc})[f_i]}{\val_{i}}$, so the following holds $\deref{\loc'} = \deref{\deref{\loc[f_i]}} = \val_{i}$ after the update.
 
 \noindent
-Let $Fs$ be the list of fields for value $\deref\loc$ for the class immediately enclosing the current constructor below.
+Let $Fs$ be the list of fields for value $\deref{\loc}$ for the class immediately enclosing the current constructor below.
 
 If the initializer list is empty, $Izs = []$, the next statement continuation is executed.
 \[
   \begin{array}{lcl@{\hspace{30mm}}}
-	\acontconf{\fieldsapp{\env}{Izs}{\loc}{\scont}}{\synval{s}}
+	\acontconf{\fieldsapp{\env}{Izs}{\loc}{\scont}}{\val{s}}
 	& \Rightarrow &
 	\scontconf{\scont}{\env}\\[2mm]
-	&&\textrm{with }\deref\deref\loc[f_i] = \synval_{i}, \forall f_i \in Fs, \forall \synval_i \in \synval{s}
+	&&\textrm{with }\deref{\deref\loc[f_i]} = \val_{i}, \forall f_i \in Fs, \forall \val_i \in \val{s}
   \end{array}
 \]
 \noindent
@@ -1435,10 +1536,10 @@ In Kernel, a super initializer or a redirecting initializer, when present, will 
 If the initializer list contains at least two initializers, $Izs = Ininitalizer(E) :: Izs', Izs' \neq []$, we can assume that the next initializer to execute is a local or a field initializer.
 \[
   \begin{array}{lcl@{\hspace{30mm}}}
-	\acontconf{\fieldsapp{\env}{Izs}{\loc}{\scont}}{\synval{s}}
+	\acontconf{\fieldsapp{\env}{Izs}{\loc}{\scont}}{\val{s}}
 	& \Rightarrow &
 	\evalconf{\expr}{\env}{st}{cex}{cst}{\econt'}\\[2mm]
-	&&\textrm{with }\deref\deref\loc[f_i] = \synval_{i}, \forall f_i \in Fs, \forall \synval_i \in \synval{s}\\
+	&&\textrm{with }\deref{\deref{\loc[f_i]}} = \val_{i}, \forall f_i \in Fs, \forall \val_i \in \val{s}\\
 	\textrm{where:}\\
 	\hspace{5mm}\econt' = \initk{Izs}{\loc}{\env}
   \end{array}
@@ -1452,10 +1553,10 @@ Otherwise, there is only one initializer to execute in the initializer list, $li
 \item When the last initializer is a redirecting constructor, i.e. $li = RedirectingI(G, \exprs)$, the transition is as follows:
 \[
   \begin{array}{lcl@{\hspace{30mm}}}
-	\acontconf{\fieldsapp{\env}{li::[]}{\loc}{\scont}}{\synval{s}}
+	\acontconf{\fieldsapp{\env}{li::[]}{\loc}{\scont}}{\val{s}}
 	& \Rightarrow &
 	\evallistconf{\exprs}{\env}{\strace}{\cstrace}{\cex}{\acont}\\	
-	&&\textrm{with }\deref\deref\loc[f_i] = \synval_{i}, \forall f_i \in Fs, \forall \synval_i \in \synval{s}\\
+	&&\textrm{with }\deref{\deref{\loc[f_i]}} = \val_{i}, \forall f_i \in Fs, \forall \val_i \in \val{s}\\
 	\textrm{where:}\\
 	\acont = \redapp{G}{\loc}{\scont}\\[2mm]
   \end{array}
@@ -1464,10 +1565,10 @@ Otherwise, there is only one initializer to execute in the initializer list, $li
 \item Otherwise, the last initializer is a super initializer, $li = Super(G, \exprs)$:
 \[
   \begin{array}{lcl@{\hspace{30mm}}}
-	\acontconf{\fieldsapp{\env}{li::[]}{\loc}{\scont}}{\synval{s}}
+	\acontconf{\fieldsapp{\env}{li::[]}{\loc}{\scont}}{\val{s}}
 	& \Rightarrow &
 	\evallistconf{\exprs}{\env}{\strace}{\cstrace}{\cex}{\acont}\\	
-	&&\textrm{with }\deref\deref\loc[f_i] = \synval_{i}, \forall f_i \in Fs, \forall \synval_i \in \synval{s}\\
+	&&\textrm{with }\deref{\deref{\loc[f_i]}} = \val_{i}, \forall f_i \in Fs, \forall \val_i \in \val{s}\\
 	\textrm{where:}\\
 	\acont = \superapp{G}{\loc}{\scont}\\[2mm]
   \end{array}
@@ -1479,27 +1580,27 @@ Besides redirecting and super initializers, in Kernel we also have field and loc
 Local initializers are special initializers in Kernel and they extend the environment for the execution of the initializer list. The transition steps for initializer continuation are as follows:
 \[
   \begin{array}{lcl@{\hspace{30mm}}}
-	\contconf{\initk{Local(\variablemeta, \expr) :: []}{\loc}{\scont}}{\synval}
+	\contconf{\initk{Local(\variablemeta, \expr) :: []}{\loc}{\scont}}{\val}
 	& \Rightarrow &
 	\scontconf{\scont}{\env'}\\[1mm]
 	\textrm{where:}\\
-	\hspace{5mm}\env' = \ext{\env}{\variablemeta}{\synval}\\[2mm]
+	\hspace{5mm}\env' = \ext{\env}{\variablemeta}{\val}\\[2mm]
 
-	\contconf{\initk{Local(\variablemeta, \expr) :: li :: []}{\loc}{\scont}}{\synval}
+	\contconf{\initk{Local(\variablemeta, \expr) :: li :: []}{\loc}{\scont}}{\val}
 	& \Rightarrow &
 	\evallistconf{\exprs}{\env'}{\strace}{\cstrace}{\cex}{\acont}\\[1mm]
 	\textrm{where:}\\
-	\hspace{5mm}\env' = \ext{\env}{\variablemeta}{\synval}\\
+	\hspace{5mm}\env' = \ext{\env}{\variablemeta}{\val}\\
 	\hspace{5mm}\textrm{if } li = Super(G, \exprs):\\
 	\hspace{8mm}\acont = \superapp{G}{\loc}{\scont}\\
 	\hspace{5mm}\textrm{if } li = Redirecting(G, \exprs):\\
 	\hspace{8mm}\acont = \redapp{G}{\loc}{\scont}\\[2mm]
 
-	\contconf{\initk{Local(\variablemeta, \expri{0}) :: Izs}{\loc}{\scont}}{\synval}
+	\contconf{\initk{Local(\variablemeta, \expri{0}) :: Izs}{\loc}{\scont}}{\val}
 	& \Rightarrow &
 	\evalconf{\expri{1}}{\env'}{st}{cex}{cst}{\econt'}\\[2mm]
 	\textrm{where:}\\
-	\hspace{5mm}\env' = \ext{\env}{\variablemeta}{\synval}\\
+	\hspace{5mm}\env' = \ext{\env}{\variablemeta}{\val}\\
 	\hspace{5mm}Izs = Initializer(\expri{1}) :: Izs'\\
 	\hspace{5mm}\econt' = \initk{Izs}{\loc}{\env'}
   \end{array}
@@ -1508,31 +1609,31 @@ Local initializers are special initializers in Kernel and they extend the enviro
 Note that when a local initializer is last in the initializer list, the environment resulted after the transition is discarded. However, the corresponding expression has to be executed, because of side effects.
 \\[2mm]
 \noindent
-Field initializers further initialize fields of the fresh instance. Let $Field(f, \expr)$ be a field initializer. Then the value stored at location $\loc' = (\deref\loc)[f]$ in the store $S$ will be modified, where $\loc$ is the location of the previously allocated fresh instance for the object currently being initialized.
+Field initializers further initialize fields of the fresh instance. Let $Field(f, \expr)$ be a field initializer. Then the value stored at location $\loc' = (\deref{\loc})[f]$ in the store $S$ will be modified, where $\loc$ is the location of the previously allocated fresh instance for the object currently being initialized.
 
 \[
   \begin{array}{lcl@{\hspace{30mm}}}
-	\contconf{\initk{Field(f, \expr) :: []}{\loc}{\scont}}{\synval}
+	\contconf{\initk{Field(f, \expr) :: []}{\loc}{\scont}}{\val}
 	& \Rightarrow &
 	\scontconf{\scont}{\env'}\\[1mm]
 	\textrm{where:}\\
-	\hspace{5mm}\update{(\deref\loc)[f]}{\synval}\\[2mm]
+	\hspace{5mm}\update{(\deref{\loc})[f]}{\val}\\[2mm]
 
-	\contconf{\initk{Field(f, \expr) :: li :: []}{\loc}{\scont}}{\synval}
+	\contconf{\initk{Field(f, \expr) :: li :: []}{\loc}{\scont}}{\val}
 	& \Rightarrow &
 	\evallistconf{\exprs}{\env}{\strace}{\cstrace}{\cex}{\acont}\\[1mm]
 	\textrm{where:}\\
-	\hspace{5mm}\update{(\deref\loc)[f]}{\synval}\\
+	\hspace{5mm}\update{(\deref{\loc})[f]}{\val}\\
 	\hspace{5mm}\textrm{if } li = Super(G, \exprs):\\
 	\hspace{8mm}\acont = \superapp{G}{\loc}{\scont}\\
 	\hspace{5mm}\textrm{if } li = Redirecting(G, \exprs):\\
 	\hspace{8mm}\acont = \redapp{G}{\loc}{\scont}\\[2mm]
 
-	\contconf{\initk{Field(f, \expri{0}) :: Izs}{\loc}{\scont}}{\synval}
+	\contconf{\initk{Field(f, \expri{0}) :: Izs}{\loc}{\scont}}{\val}
 	& \Rightarrow &
 	\evalconf{\expri{1}}{\env}{st}{cex}{cst}{\econt}\\[2mm]
 	\textrm{where:}\\
-	\hspace{5mm}\update{(\deref\loc)[f]}{\synval}\\
+	\hspace{5mm}\update{(\deref\loc)[f]}{\val}\\
 	\hspace{5mm}Izs = Initializer(\expri{1}) :: Izs'\\
 	\hspace{5mm}\econt' = \initk{Izs}{\loc}{\env}
   \end{array}
