@@ -679,7 +679,7 @@ Static and library variables are accessed with $\StaticGet{\membermeta}$. Let $\
 	&\textrm{with }\env^{M} = \ext{\env^{M}}{\membermeta}{\val}\\[2mm]
   \end{array}
 \]
-Otherwise, $\membermeta$ is a static or library getter with statement body $\stmt$.
+Otherwise, if $\membermeta$ is a static or library getter with statement body $\stmt$.
 \[
   \begin{array}{lcl}
 	\evalconf{\StaticGet{\membermeta}}{\env}{\strace}{\cstrace}{\cex}{\econt}
@@ -688,6 +688,15 @@ Otherwise, $\membermeta$ is a static or library getter with statement body $\stm
 	\textrm{where }\scont = \emptyset\\[2mm]
    \end{array}
 \]
+Otherwise, $\membermeta$ is a method tear-off with statement body $\stmt$ and formal parameters $\formals$.
+\[
+  \begin{array}{lcl}
+	\evalconf{\StaticGet{\membermeta}}{\env}{\strace}{\cstrace}{\cex}{\econt}
+	& \Rightarrow &
+	\contconf{\econt}{\funval{\formals}{\stmt}{\env_{empty}}}
+   \end{array}
+\]
+
 Static and library variables are set with $\StaticSet{\membermeta}{\expressionmeta}$.
 \newcommand{\StaticSetK}{\mathrm{StaticSetK}(\membermeta,\,\econt)}
 \[
@@ -1692,6 +1701,8 @@ Field initializers further initialize fields of the fresh instance. Let $Field(f
 	\hspace{5mm}\econt' = \initk{Izs}{\loc}{\env}
   \end{array}
 \]
+
+\subsection{Yield}
 
 
 
