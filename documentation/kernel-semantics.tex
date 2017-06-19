@@ -229,6 +229,20 @@ A variable lookup consists of looking up the address of a variable from the envi
 \label{subsec:cesk-configs}
 The state space of the CESK machine contains various kinds of configurations. Configurations contain different components and the transition step dispatches to the next configuration based on one of the components of the configuration.
 
+% Named Configuration for CESK transitions
+\newcommand{\breakconf}[1]{\confsingle{#1}_{\mathrm{breakCont}}}
+\newcommand{\switchconf}[1]{\confsingle{#1}_{\mathrm{switchCont}}}
+\newcommand{\contconf}[2]{\confpair{#1}{#2}_{\mathrm{cont}}}
+\newcommand{\scontconf}[2]{\confpair{#1}{#2}_{\mathrm{scont}}}
+\newcommand{\acontconf}[2]{\confpair{#1}{#2}_{\mathrm{acont}}}
+\newcommand{\throwconf}[3]{\conftriple{#1}{#2}{#3}_{\mathrm{throw}}}
+\newcommand{\evallistconf}[6]{\langle{#1},\,{#2},\,{#3},\handler,\,{#4},\,{#5},\,{#6}\rangle_{\mathrm{evalList}}}
+\newcommand{\evalconf}[6]{\langle{#1},\,{#2},\,{#3},\handler,\,{#4},\,{#5},\,{#6}\rangle_{\mathrm{eval}}}
+\newcommand{\execconf}[9]{\langle{#1},\,{#2},\,{#3},\,{#4},\,\strace,\,{#5},\,{#6},\,{#7},\,{#8},\,{#9}\rangle_{\mathrm{exec}}}
+
+% Transition
+\newcommand{\cesktrans}[2]{{#1} & \Rightarrow & {#2}}
+
 \[
   \begin{array}{lcl}
 	\evalconf{\expr}{\env}{st}{cex}{cst}{\econt} & : &
@@ -263,7 +277,7 @@ The state space of the CESK machine contains various kinds of configurations. Co
 
 \subsubsection{EvalConfiguration}
 \label{subsubsec:evalconfig}
-%\newcommand{\evallistconf}[6]{\langle{#1},\,{#2},\,{#3},\handler,\,{#4},\,{#5},\,{#6}\rangle_{\mathrm{evalList}}}
+
 For the EvalConfiguration the transition step dispatches on the expression component, $\expr$. The next configuration is:
 \begin{itemize}
 %% Eval configuration can result with:
@@ -276,42 +290,42 @@ For the EvalConfiguration the transition step dispatches on the expression compo
 
 \subsubsection{EvalListConfigruation}
 \label{subsubsec:evallistconfig}
-%\newcommand{\evallistconf}[6]{\langle{#1},\,{#2},\,{#3},\handler,\,{#4},\,{#5},\,{#6}\rangle_{\mathrm{evalList}}}
-For the EvalList configuration the transition step dispatches on the expression list, $\exprs$. The next configuration is either a EvalConfiguration or ApplicationConfiguration, see Section~\ref{subsubsec:eval-list-expressions}.
+
+For the EvalList configuration the transition step dispatches on the expression list, $\exprs$. The next configuration is either a EvalConfiguration or ApplicationConfiguration, see Section~\ref{subsec:eval-list-expressions}.
 
 \subsubsection{ExecConfiguration}
 \label{subsubsec:execconfig}
-%\newcommand{\execconf}[9]{\langle{#1},\,{#2},\,{#3},\,{#4},\,\strace,\,{#5},\,{#6},\,{#7},\,{#8},\,{#9}\rangle_{\mathrm{exec}}}
+
 For the ExecConfiguration the transition step dispatches on the statement expression, $\stmt$. The next configuration is either an ExecConfiguration or EvalConfiguration.
 
 \subsubsection{ValuePassingConfiguration}
 \label{suubsubsec:valuepassingconfig}
-%\newcommand{\contconf}[2]{\confpair{#1}{#2}_{\mathrm{cont}}}
+
 The ValuePassingConfiguration applies the expression continuation component to its value component.
 
 \subsubsection{ApplicationConfiguration}
 \label{subsubsec:applicationconfig}
-% \newcommand{\acontconf}[2]{\confpair{#1}{#2}_{\mathrm{acont}}}
+
 The ApplicationConfiguration applies the application continuation component to its list of values component.
 
 \subsubsection{ForwardConfiguration}
 \label{subsubsec:forwardconfig}
-% \newcommand{\acontconf}[2]{\confpair{#1}{#2}_{\mathrm{acont}}}
+
 The ForwardConfiguration applies the statement continuation component to its environment component.
 
 \subsubsection{ThrowCongfiguration}
 \label{subsubsec:throwconfig}
-% \newcommand{\throwconf}[3]{\conftriple{#1}{#2}{#3}_{\mathrm{throw}}}
+
 For the ThrowConfiguration the transition step dispatches its continuation component.  It results with either a ThrowConfiguration, when  the exception cant be handled in the head of the non empty catch list or a ExecConfiguration, for the statement body of the matching catch or the finally statement.
 
 \subsubsection{BreakConfiguration}
 \label{subsubsec:breakconfig}
-%\newcommand{\breakconf}[1]{\confsingle{#1}_{\mathrm{breakCont}}}
+
 For the BreakConfiguration the transition step dispatches on the continuation component. It results with a ForwardConfiguration corresponding to the target break label.
 
 \subsubsection{SwitchConfiguration}
 \label{subsubsec:switchconfig}
-% \newcommand{\switchconf}[1]{\confsingle{#1}_{\mathrm{switchCont}}}
+
 For the SwitchConfiguration the transition step dispatches on the continuation component. It results with a ExecConfiguration.
 
 \subsection{Continuations}
@@ -324,16 +338,13 @@ There are various types of continuations depending on the next statement to be e
 
 Expression continuations, $\econt$, capture the steps after the evaluation of a given expression. They accept a value and produce the next configuration. We suffix the names of expression continuations with "$K$".
 
-There are various kinds of configurations, two more general types can be distinguished.
+There are various kinds of configurations, two more general types can be distinguished:
 \begin{itemize}
-\item Continuations with holes, i.e. expressions to be evaluated
-
-Expression continuations with expressions will produce EvalConfiguration for evaluation of the next expression. For example, $\conditionalk{\expri{1}}{\expri{2}}{\env}{\strace}{\cstrace}{\cex}{\econt}$, will proceed to the next configuration depending on the input value and produce an EvalConfiguration for the evaluation of the expression $\expri{1}$ or $\expri{2}$ accordingly.
-
-\noindent
+\item Continuations with holes, i.e. expressions to be evaluated\\
+Expression continuations with expressions will produce EvalConfiguration for evaluation of the next expression.
 Note that some continuation will not evaluate the captured expression, when this is not necessary (e.g., Section~\ref{subsubsec:bool-expressions}).
 
-\item Continuations without holes
+\item Continuations without holes\\
 Continuations without holes dispatch on the provided value and produce the next configuration, a ValuePassingConfiguration.
 \end{itemize}
 
@@ -532,68 +543,75 @@ FinallyContinue continuations are added when a try/finally statement is encounte
 \label{sec:semantics}
 \subsection{Expression evaluation}
 \label{subsec:expr-evaluation}
-%% todo: add about EvalConfig and EvalListConfig
-\subsubsection{Evaluation of list of expressions}
-\label{subsubsec:eval-list-expressions}
+\newcommand{\ExpressionsK}[6]{\mathrm{ExpressionsK}({#1},\,{#2},\,{#3},\,{#4},\,{\handler},\,{#5},\,{#6})}
+\newcommand{\ExpressionK}[2]{\mathrm{ExpressionK}({#1},\,{#2})}
+\newcommand{\ValueA}[2]{\mathrm{ValueA}({#1},\,{#2})}
+
+Expressions are evaluated by dispatching according to the expression component in EvalConfiguration, Section~\ref{subsubsec:evalconfig}, and EvalListConfiguration, Section~\ref{subsubsec:evallistconfig}.
+
+\noindent
+The rules for evaluation of list of expressions, i.e., transition steps from EvalListConfiguration, are the following:
+\label{subsec:eval-list-expressions}
 \[
   \begin{array}{lcl}
-	\evallistconf{\expr :: \exprs}{\env}{\strace}{\cstrace}{\cex}{\acont}
-	& \Rightarrow &
-	\evalconf{\expr}{\env}{\strace}{\cstrace}{\cex}{\econt'}\\[2mm]
+	\cesktrans{
+		\evallistconf{\expr :: \exprs}{\env}{\strace}{\cstrace}{\cex}{\acont}}{
+		\evalconf{\expr}{\env}{\strace}{\cstrace}{\cex}{\econt'}}
+		\\[2mm]
 
-	\evallistconf{[]}{\env}{\strace}{\cstrace}{\cex}{\acont}
-	& \Rightarrow &
-	\acontconf{\acont}{[]}
-  \end{array}
-\]
-with:
-\[
-  \begin{array}{@{}c}
-	\econt' = \exprlistk{\exprs}{\env}{\strace}{\cstrace}{\cex}{\acont}
-  \end{array}
-\]
-Expression list continuation application:
-\[
-  \begin{array}{lcl}
-	\contconf{\exprlistk{\exprs}{\env}{\strace}{\cstrace}{\cex}{\acont}}{\val}
-	& \Rightarrow &
-	\evallistconf{\exprs}{\env}{\strace}{\cstrace}{\cex}{\valueapp{\val}{\acont}}\\[2mm]
+	\cesktrans{
+		\evallistconf{[]}{\env}{\strace}{\cstrace}{\cex}{\acont}}{
+		\acontconf{\acont}{[]}}
+		\\[2mm]
+	\textrm{with:}\\
+	\hspace{3mm}\econt' = \ExpressionsK{\exprs}{\env}{\strace}{\cstrace}{\cex}{\acont}
+	\\[2mm]
 
-	\acontconf{\valueapp{\val}{\acont}}{\val s}
-	& \Rightarrow &
-	\acontconf{\acont}{\val :: \val s}
+	\cesktrans{
+		\contconf{\ExpressionsK{\exprs}{\env}{\strace}{\cstrace}{\cex}{\acont}}{\val}}{
+		\evallistconf{\exprs}{\env}{\strace}{\cstrace}{\cex}{\ValueA{\val}{\acont}}}
+		\\[2mm]
+
+	\cesktrans{
+		\acontconf{\ValueA{\val}{\acont}}{\val s}}{
+		\acontconf{\acont}{\val :: \val s}}
 
   \end{array}
 \]
-
+The value corresponding to the evaluated expression is captured by the application continuation ValueA and eventually added to the list of values corresponding to the expressions.
 \subsubsection{Basic literal evaluation}
 \label{subsubsec:basic-literal-eval}
+
 Kernel literals are evaluated to a value $\val \in \dlitval$. Transitions of the CESK machine for basic literals are presented below:
 \[
   \begin{array}{lcll}
-	\evalconf{\IntLiteral{\integermeta}}{\env}{\strace}{\cstrace}{\cex}{\econt}
-	& \Rightarrow &
-	\contconf{\econt}{\val},
-	\hspace{2mm}\val = \mathrm{IntLiteral(\integermeta)} \in \mathbf{int}\\[2mm]
+	\cesktrans{
+		\evalconf{\IntLiteral{\integermeta}}{\env}{\strace}{\cstrace}{\cex}{\econt}}{
+		\contconf{\econt}{\val}},
+	\hspace{2mm}\val = \mathrm{IntLiteral(\integermeta)} \in \mathbf{int}
+	\\[2mm]
 
-	\evalconf{\DoubleLiteral{\doublemeta} }{\env}{\strace}{\cstrace}{\cex}{\econt}
-	& \Rightarrow &
-	\contconf{\econt}{\val},
-	\hspace{2mm}\val = \mathrm{DoubleLiteral(\doublemeta)} \in \mathbf{double}\\[2mm]
+	\cesktrans{
+		\evalconf{\DoubleLiteral{\doublemeta}}{\env}{\strace}{\cstrace}{\cex}{\econt}}{
+		\contconf{\econt}{\val}},
+	\hspace{2mm}\val = \mathrm{DoubleLiteral(\doublemeta)} \in \mathbf{double}
+	\\[2mm]
 
-	\evalconf{\BoolLiteral{\tt{true}}}{\env}{\strace}{\cstrace}{\cex}{\econt}
-	& \Rightarrow &
-	\contconf{\econt}{\val},
-	\hspace{2mm}\val = \mathrm{BoolValue(\tt{true})} = \tt{true}\in \mathbf{bool}\\[2mm]
+	\cesktrans{
+		\evalconf{\BoolLiteral{\tt{true}}}{\env}{\strace}{\cstrace}{\cex}{\econt}}{
+		\contconf{\econt}{\val}},
+	\hspace{2mm}\val = \mathrm{BoolValue(\tt{true})} = \tt{true}\in \mathbf{bool}
+	\\[2mm]
 
-	\evalconf{\BoolLiteral{\tt{false}}}{\env}{\strace}{\cstrace}{\cex}{\econt}
-	& \Rightarrow &
-	\contconf{\econt}{\val},
-	\hspace{2mm}\val = \mathrm{BoolValue(\tt{false})} = \tt{false}\in \mathbf{bool}\\[2mm]
+	\cesktrans{
+		\evalconf{\BoolLiteral{\tt{false}}}{\env}{\strace}{\cstrace}{\cex}{\econt}}{
+		\contconf{\econt}{\val}},
+	\hspace{2mm}\val = \mathrm{BoolValue(\tt{false})} = \tt{false}\in \mathbf{bool}
+	\\[2mm]
 
-	\evalconf{\StringLiteral{\stringmeta}}{\env}{\strace}{\cstrace}{\cex}{\econt}
-	& \Rightarrow &
-	\contconf{\econt}{\val},
+	\cesktrans{
+		\evalconf{\StringLiteral{\stringmeta}}{\env}{\strace}{\cstrace}{\cex}{\econt}}{
+		\contconf{\econt}{\val}},
 	\hspace{2mm}\val = \mathrm{StringValue(\stringmeta)} \in \mathbf{String}
 
   \end{array}
@@ -602,20 +620,24 @@ Kernel literals are evaluated to a value $\val \in \dlitval$. Transitions of the
 \subsubsection{Variable assignment and lookup}
 \label{subsubsec:variable-assignment-and-lookup}
 A variable $\varmeta$ is accessed by reading the value stored at location $\env(\varmeta)$ in the store $s$. Assigning a value to a variable will modify the store and the value stored at location  $\env(\varmeta)$.
+\newcommand{\VarSetK}[3]{\mathrm{VarSetK}({#1},\,{#2},\,{#3})}
 \[
   \begin{array}{lcl}
-	\evalconf{\varmeta}{\env}{\strace}{\cstrace}{\cex}{\econt}
-	& \Rightarrow &
-	\contconf{\econt}{\deref{\env(\varmeta)}}\\[2mm]
+	\cesktrans{
+		\evalconf{\varmeta}{\env}{\strace}{\cstrace}{\cex}{\econt}}{
+		\contconf{\econt}{\deref{\env(\varmeta)}}}
+		\\[2mm]
 
-	\evalconf{\varmeta = \expr}{\env}{\strace}{\cstrace}{\cex}{\econt}
-	& \Rightarrow &
-	\evalconf{\expr}{\env}{\strace}{\cstrace}{\cex}{\varsetk{\env}{\varmeta}{\econt}}\\[2mm]
+	\cesktrans{
+		\evalconf{\varmeta = \expr}{\env}{\strace}{\cstrace}{\cex}{\econt}}{
+		\evalconf{\expr}{\env}{\strace}{\cstrace}{\cex}{\VarSetK{\env}{\varmeta}{\econt}}}
+		\\[2mm]
 
-	\contconf{\varsetk{\env}{\varmeta}{\econt}}{\val}
-	& \Rightarrow &
-	\contconf{\econt}{\val}, \hspace{5mm} \deref{\env(\varmeta)} = \val \textrm{ after transition}
-
+	\cesktrans{
+		\contconf{\VarSetK{\env}{\varmeta}{\econt}}{\val}}{
+		\contconf{\econt}{\val}},
+		\hspace{5mm} \deref{\env(\varmeta)} = \val
+		\textrm{ after transition}
   \end{array}
 \]
 
@@ -623,90 +645,109 @@ A variable $\varmeta$ is accessed by reading the value stored at location $\env(
 \label{subsubsec:bool-expressions}
 \newcommand{\true}{\tt{true}}
 \newcommand{\false}{\tt{false}}
+% Boolean expression continuations
+\newcommand{\NotK}[1]{\mathrm{NotK}({#1})}
+\newcommand{\AndK}[6]{\mathrm{AndK}({#1},\,{#2},\,{#3},\,{\handler},\,{#4},\,{#5},\,{#6})}
+\newcommand{\OrK}[6]{\mathrm{OrK}({#1},\,{#2},\,{#3},\,{\handler},\,{#4},\,{#5},\,{#6})}
+\newcommand{\ConditionalK}[7]{\mathrm{ConditionalK}({#1},\,{#2},\,{#3},\,{#4},\,{\handler},\,{#5},\,{#6},\,{#7})}
 
+The transition steps for boolean expressions are defined as follows:
+\begin{itemize}
+\item Not expression\\
 \[
   \begin{array}{lll}
-	\evalconf{\Not{\expressionmeta}}{\env}{\strace}{\cstrace}{\cex}{\econt}
-	& \Rightarrow &
-	\evalconf{\expressionmeta}{\env}{\strace}{\cstrace}{\cex}{\notk{\econt}}\\[2mm]
+	\cesktrans{
+		\evalconf{\Not{\expressionmeta}}{\env}{\strace}{\cstrace}{\cex}{\econt}}{
+		\evalconf{\expressionmeta}{\env}{\strace}{\cstrace}{\cex}{\NotK{\econt}}}
+		\\[2mm]
 
-	\contconf{\notk{\econt}}{\true}
-	& \Rightarrow &
-	\contconf{\econt}{\false}\\[2mm]
+	\cesktrans{
+		\contconf{\NotK{\econt}}{\true}}{
+		\contconf{\econt}{\false}}
+		\\[2mm]
 
-	\contconf{\notk{\econt}}{\false}
-	& \Rightarrow &
-	\contconf{\econt}{\true}
+	\cesktrans{
+		\contconf{\NotK{\econt}}{\false}}{
+		\contconf{\econt}{\true}}
   \end{array}
 \]
-
-\noindent
-Let $\econt' = \andk{\expri{2}}{\env}{\strace}{\cstrace}{\cex}{\econt}$ below:
+\item And expression\\
+Let $\econt' = \AndK{\expri{2}}{\env}{\strace}{\cstrace}{\cex}{\econt}$ below:
 \[
   \begin{array}{lcl}
-	\evalconf{\AndExpression{\expressionmeta_0}{\expressionmeta_1}}{\env}{\strace}{\cstrace}{\cex}{\econt}
-	& \Rightarrow &
-	\evalconf{\expressionmeta_0}{\env}{\strace}{\cstrace}{\cex}{\econt'}\\[2mm]
+	\cesktrans{
+		\evalconf{\AndExpression{\expressionmeta_0}{\expressionmeta_1}}{\env}{\strace}{\cstrace}{\cex}{\econt}}{
+		\evalconf{\expressionmeta_0}{\env}{\strace}{\cstrace}{\cex}{\econt'}}
+		\\[2mm]
 
-	\contconf{\andk{\expressionmeta}{\env}{\strace}{\cstrace}{\cex}{\econt}}{\true}
-	& \Rightarrow &
-	\evalconf{\expressionmeta}{\env}{\strace}{\cstrace}{\cex}{\econt}\\[2mm]
+	\cesktrans{
+		\contconf{\AndK{\expressionmeta}{\env}{\strace}{\cstrace}{\cex}{\econt}}{\true}}{
+		\evalconf{\expressionmeta}{\env}{\strace}{\cstrace}{\cex}{\econt}}
+		\\[2mm]
 
-	\contconf{\andk{\expressionmeta}{\env}{\strace}{\cstrace}{\cex}{\econt}}{\false}
-	& \Rightarrow &
-	\contconf{\econt}{\false}\\
+	\\cesktrans{
+		contconf{\AndK{\expressionmeta}{\env}{\strace}{\cstrace}{\cex}{\econt}}{\false}}{
+		\contconf{\econt}{\false}}
   \end{array}
 \]
-\noindent
-Let $\econt' = \ork{\expri{2}}{\env}{\strace}{\cstrace}{\cex}{\econt}$ below:
+\item Or expression\\
+Let $\econt' = \OrK{\expri{2}}{\env}{\strace}{\cstrace}{\cex}{\econt}$ below:
 \[
   \begin{array}{lcl}
-	\evalconf{\OrExpression{\expressionmeta_0}{\expressionmeta_1}}{\env}{\strace}{\cstrace}{\cex}{\econt}
-	& \Rightarrow &
-	\evalconf{\expressionmeta_0}{\env}{\strace}{\cstrace}{\cex}{\econt'}\\[2mm]
+	\cesktrans{
+		\evalconf{\OrExpression{\expressionmeta_0}{\expressionmeta_1}}{\env}{\strace}{\cstrace}{\cex}{\econt}}{
+		\evalconf{\expressionmeta_0}{\env}{\strace}{\cstrace}{\cex}{\econt'}}
+		\\[2mm]
 
-	\contconf{\ork{\expressionmeta}{\env}{\strace}{\cstrace}{\cex}{\econt}}{\false}
-	& \Rightarrow &
-	\evalconf{\expressionmeta}{\env}{\strace}{\cstrace}{\cex}{\econt}\\[2mm]
+	\cesktrans{
+		\contconf{\OrK{\expressionmeta}{\env}{\strace}{\cstrace}{\cex}{\econt}}{\false}}{
+		\evalconf{\expressionmeta}{\env}{\strace}{\cstrace}{\cex}{\econt}}
+		\\[2mm]
 
-	\contconf{\ork{\expressionmeta}{\env}{\strace}{\cstrace}{\cex}{\econt}}{\true}
-	& \Rightarrow &
-	\contconf{\econt}{\true}\\
+	\cesktrans{
+		\contconf{\OrK{\expressionmeta}{\env}{\strace}{\cstrace}{\cex}{\econt}}{\true}}{
+		\contconf{\econt}{\true}}
   \end{array}
 \]
-\noindent
-Let $\econt' = \conditionalk{\expri{1}}{\expri{2}}{\env}{\strace}{\cstrace}{\cex}{\econt}$ below:
+\item Conditional expression\\
+Let $\econt' = \ConditionalK{\expri{1}}{\expri{2}}{\env}{\strace}{\cstrace}{\cex}{\econt}$ below:
 \[
   \begin{array}{lcl}
-	\evalconf{\expr \textbf{ ? } \expri{1} \textbf{ : } \expri{2}}{\env}{\strace}{\cstrace}{\cex}{\econt}
-	& \Rightarrow &
-	\evalconf{\expr}{\env}{\strace}{\cstrace}{\cex}{\econt'}\\[2mm]
+	\cesktrans{
+		\evalconf{\ConditionalExpression{\expr}{\expri{1}}{\expri{2}}}{\env}{\strace}{\cstrace}{\cex}{\econt}}{
+		\evalconf{\expr}{\env}{\strace}{\cstrace}{\cex}{\econt'}}
+		\\[2mm]
 
-	\contconf{\econt'}{\true}
-	& \Rightarrow &
-	\evalconf{\expri{1}}{\env}{\strace}{\cstrace}{\cex}{\econt}\\[2mm]
+	\cesktrans{
+		\contconf{\econt'}{\true}}{
+		\evalconf{\expri{1}}{\env}{\strace}{\cstrace}{\cex}{\econt}}
+		\\[2mm]
 
-	\contconf{\econt'}{\false}
-	& \Rightarrow &
-	\evalconf{\expri{2}}{\env}{\strace}{\cstrace}{\cex}{\econt}\\[2mm]
+	\cesktrans{
+		\contconf{\econt'}{\false}}{
+		\evalconf{\expri{2}}{\env}{\strace}{\cstrace}{\cex}{\econt}}
+		\\[2mm]
   \end{array}
 \]
 
+\end{itemize}
 \subsubsection{Let}
+\newcommand{\letk}[7]{\mathrm{LetK}({#1},\,{#2},\,{#3},\,{#4},\,{\handler},\,{#5},\,{#6},\,{#7})}
 Let $\econt' = \letk{\expri{2}}{\env}{\varmeta}{\strace}{\cstrace}{\cex}{\econt}$ below:
 \[
   \begin{array}{lcl}
-	\evalconf{\textbf{let } \varmeta = \expri{1} \textbf{ in } \expri{2}}{\env}{\strace}{\cstrace}{\cex}{\econt}
-	& \Rightarrow &
-	\evalconf{\expri{1}}{\env}{\strace}{\cstrace}{\cex}{\econt'}\\[2mm]
+	\cesktrans{
+		\evalconf{\Let{\varmeta}{\expri{1}}{\expri{2}}}{\env}{\strace}{\cstrace}{\cex}{\econt}}{
+		\evalconf{\expri{1}}{\env}{\strace}{\cstrace}{\cex}{\econt'}}
+		\\[2mm]
 
-	\contconf{\econt'}{\val}
-	& \Rightarrow &
-	\evalconf{\expri{2}}{\env'}{\strace}{\cstrace}{\cex}{\econt}\\
+	\cesktrans{
+		\contconf{\econt'}{\val}}{
+		\evalconf{\expri{2}}{\env'}{\strace}{\cstrace}{\cex}{\econt}}
+		\\
 	&&\env'=\ext{\env}{\varmeta}{\val}\\[2mm]
   \end{array}
 \]
-
 \subsubsection{String Concatenation}
 \label{subsubsec:string-concatenation}
 Function $stringValue$ concatenates strings from the given meta-list.
@@ -718,170 +759,181 @@ The transition string concatenation expressions are defined as follows:
 \newcommand{\StringConcatenationA}{\mathrm{StringConcatenationA(\econt)}}
 \[
   \begin{array}{lcl}
-	\evalconf{\StringConcatenation{\exprs}}{\env}{\strace}{\cstrace}{\cex}{\econt}
-	& \Rightarrow &
-	\evallistconf{\exprs}{\env}{\strace}{\cstrace}{\cex}{\acont'}\\[2mm]
-	 \textrm{with }\\
+	\cesktrans{
+		\evalconf{\StringConcatenation{\exprs}}{\env}{\strace}{\cstrace}{\cex}{\econt}}{
+		\evallistconf{\exprs}{\env}{\strace}{\cstrace}{\cex}{\acont'}}\\[2mm]
+
+	\textrm{with }\\
 	\hspace{3mm}\acont' = \StringConcatenationA\\[2mm]
-	\contconf{\StringConcatenationA}{\vals}
-	& \Rightarrow &
-	\contconf{\econt}{stringValue(\vals)}
+	\cesktrans{
+		\contconf{\StringConcatenationA}{\vals}}{
+		\contconf{\econt}{stringValue(\vals)}}
   \end{array}
 \]
 
 
 \subsubsection{Static and library fields}
 \label{subsubsec:static-and-library-fields}
-
 \newcommand{\ExitSK}[1]{\mathrm{ExitSK(\econt,\,#1)}}
-
-Let $\env^{M}$ be the global environment that stores bindings for static and library fields to labels for all static and library fields previously accessed or set during the execution of the program.\\
-Static and library variables are accessed with $\StaticGet{\membermeta}$. Let $\membermeta$ be a static or library field and $\expressionmeta_{\membermeta}$ its initializer expression.
 \newcommand{\StaticGetK}{\mathrm{StaticGetK}(\membermeta,\,\econt)}
 
+Let $\env^{M}$ be the global environment that stores bindings for static and library fields to labels for all static and library fields previously accessed or set during the execution of the program.\\
+Static and library variables are accessed with $\StaticGet{\membermeta}$. 
+
+\noindent
+Let $\membermeta$ be a static or library field and $\expressionmeta_{\membermeta}$ its initializer expression.
 \[
   \begin{array}{llcl}
 	\textrm{If }\membermeta \in \env^{M}:
-	&\evalconf{\StaticGet{\membermeta}}{\env}{\strace}{\cstrace}{\cex}{\econt}
-	& \Rightarrow &
-	\contconf{\econt}{\deref{\env^{M}(\membermeta)}}\\[2mm]
+	&\cesktrans{\evalconf{
+		\StaticGet{\membermeta}}{\env}{\strace}{\cstrace}{\cex}{\econt}}{
+		\contconf{\econt}{\deref{\env^{M}(\membermeta)}}}
+		\\[2mm]
 
 	\textrm{If }\idmeta \notin \env^{M}, \expressionmeta_{\idmeta} = \tt{null}:
-	&\evalconf{\StaticGet{\idmeta}}{\env}{\strace}{\cstrace}{\cex}{\econt}
-	& \Rightarrow &
-	\contconf{\econt}{\tt{null}},\\[2mm]
-	&\textrm{with }\env^{M} = \ext{\env^{M}}{\idmeta}{\tt{null}}\\[2mm]
+	&\cesktrans{
+		\evalconf{\StaticGet{\idmeta}}{\env}{\strace}{\cstrace}{\cex}{\econt}}{
+		\contconf{\econt}{\tt{null}}},
+		\\[2mm]
+	&\textrm{with }\env^{M} = \ext{\env^{M}}{\idmeta}{\tt{null}}
+	\\[2mm]
 
 	\textrm{Otherwise }:
-	&\evalconf{\StaticGet{\membermeta}}{\env}{\strace}{\cstrace}{\cex}{\econt}
-	& \Rightarrow &
-	\evalconf{\expressionmeta_{\membermeta}}{\env}{\strace}{\cstrace}{\cex}{\econt'}\\[2mm]
-	&\textrm{with }\econt' = \StaticGetK\\[2mm]
+	&\cesktrans{\evalconf{
+		\StaticGet{\membermeta}}{\env}{\strace}{\cstrace}{\cex}{\econt}}{
+		\evalconf{\expressionmeta_{\membermeta}}{\env}{\strace}{\cstrace}{\cex}{\econt'}}
+		\\[2mm]
+	&\textrm{with }\econt' = \StaticGetK
+	\\[2mm]
 
-	&\contconf{\StaticGetK}{\val}
-	& \Rightarrow &
-	\contconf{\econt}{\val}\\[2mm]
-	&\textrm{with }\env^{M} = \ext{\env^{M}}{\membermeta}{\val}\\[2mm]
+	&\cesktrans{
+		\contconf{\StaticGetK}{\val}}{
+		\contconf{\econt}{\val}}
+		\\[2mm]
+	&\textrm{with }\env^{M} = \ext{\env^{M}}{\membermeta}{\val}
+	\\[2mm]
   \end{array}
 \]
 Otherwise, if $\membermeta$ is a static or library getter with statement body $\stmt$.
 \[
   \begin{array}{lcl}
-	\evalconf{\StaticGet{\membermeta}}{\env}{\strace}{\cstrace}{\cex}{\econt}
-	& \Rightarrow &
-	\execconf{\stmt}{\env_{empty}}{[]}{[]}{\handler}{\cstrace}{\cex}{\econt}{\scont}\\
+	\cesktrans{
+		\evalconf{\StaticGet{\membermeta}}{\env}{\strace}{\cstrace}{\cex}{\econt}}{
+		\execconf{\stmt}{\env_{empty}}{[]}{[]}{\handler}{\cstrace}{\cex}{\econt}{\scont}}
+		\\[2mm]
 	\textrm{where }\scont = \emptyset\\[2mm]
    \end{array}
 \]
 Otherwise, $\membermeta$ is a method tear-off with statement body $\stmt$ and formal parameters $\formals$.
 \[
   \begin{array}{lcl}
-	\evalconf{\StaticGet{\membermeta}}{\env}{\strace}{\cstrace}{\cex}{\econt}
-	& \Rightarrow &
-	\contconf{\econt}{\funval{\formals}{\stmt}{\env_{empty}}}
+	\cesktrans{
+		\evalconf{\StaticGet{\membermeta}}{\env}{\strace}{\cstrace}{\cex}{\econt}}{
+		\contconf{\econt}{\funval{\formals}{\stmt}{\env_{empty}}}}
    \end{array}
 \]
-
 Static and library variables are set with $\StaticSet{\membermeta}{\expressionmeta}$.
 \newcommand{\StaticSetK}{\mathrm{StaticSetK}(\membermeta,\,\econt)}
 \[
   \begin{array}{lcl}
-	\evalconf{\StaticSet{\membermeta}{\expressionmeta}}{\env}{\strace}{\cstrace}{\cex}{\econt}
-	& \Rightarrow &
-	\evalconf{\expressionmeta}{\env}{\strace}{\cstrace}{\cex}{\econt'}\\[2mm]
+	\cesktrans{
+		\evalconf{\StaticSet{\membermeta}{\expressionmeta}}{\env}{\strace}{\cstrace}{\cex}{\econt}}{
+		\evalconf{\expressionmeta}{\env}{\strace}{\cstrace}{\cex}{\econt'}}
+		\\[2mm]
 	\textrm{with }\econt' = \StaticSetK\\[2mm]
   \end{array}
 \]
-\noindent
 Let $\membermeta$ be a static or library field.
 \[
   \begin{array}{lcl}
-	\contconf{\StaticSetK}{\val}
-	& \Rightarrow &
-	\contconf{\econt}{\val}\\[2mm]
-	\textrm{with }\env^{M} = \ext{\env^{M}}{\membermeta}{\val}
-	\textrm{ if }\membermeta \notin \env^M,
-	&&
-	\update{\env^{M}}{\val} \textrm{ otherwise}
-	\\[2mm]
+	\cesktrans{
+		\contconf{\StaticSetK}{\val}}{
+		\contconf{\econt}{\val}}
   \end{array}
 \]
+with $\env^{M} = \ext{\env^{M}}{\membermeta}{\val}$ if $\membermeta \notin \env^M,$ $\update{\env^{M}}{\val}$ otherwise.\\
+
+\noindent
 Otherwise, $\membermeta$ is a static or library setter with body $\stmt$ and formal parameter $\formal$.
 \[
   \begin{array}{lcl}
-	\contconf{\StaticSetK}{\val}
-	& \Rightarrow &
-	\execconf{\stmt}{\env}{[]}{[]}{\handler}{\cstrace}{\cex}{\econt}{\scont}\\
-	\textrm{where }\\[2mm]
-	\scont = \ExitSK{\val}\\[2mm]
-	\env = \ext{\env_{empty}}{\formal}{\val}
+	\cesktrans{
+		\contconf{\StaticSetK}{\val}}{
+		\execconf{\stmt}{\env}{[]}{[]}{\handler}{\cstrace}{\cex}{\econt}{\scont}}
   \end{array}
 \]
-\subsubsection{Static Invocation}
+with $\scont = \ExitSK{\val}$, $\env = \ext{\env_{empty}}{\formal}{\val}$.
 
+\subsubsection{Static Invocation}
 \newcommand{\StaticInvocation}[2]{#1(#2)}
+\newcommand{\StaticInvApp}[6]{\mathrm{StaticInvocationA}({#1},\,{#2},\,{#3},\,\handler,\,{#4},\,{#5},\,{#6})}
 Static invocation is supported with $\StaticInvocation{\{\membermeta\}}{\expressionsmeta}$ where $\membermeta$ is a function with statement body $\stmt$ and formal parameters $\formals$.
 \[
   \begin{array}{lcl}
-	\evalconf{\StaticInvocation{\{\membermeta\}}{\expressionsmeta}}{\env}{\strace}{\cstrace}{\cex}{\econt}
-	& \Rightarrow &
-	\evallistconf{\exprs}{\env}{\strace}{\cstrace}{\cex}{\acont'}\\[2mm]
+	\cesktrans{
+		\evalconf{\StaticInvocation{\{\membermeta\}}{\expressionsmeta}}{\env}{\strace}{\cstrace}{\cex}{\econt}}{
+		\evallistconf{\exprs}{\env}{\strace}{\cstrace}{\cex}{\acont'}}
+		\\[2mm]
 	\textrm{with }\\
-	\hspace{3mm}\acont' = \staticinvocapp{\formals}{\stmt}{\strace'}{\cstrace}{\cex}
+	\hspace{3mm}\acont' = \StaticInvApp{\formals}{\stmt}{\strace'}{\cstrace}{\cex}
 {\econt}\\[2mm]
 	\hspace{3mm}\strace' = \StaticInvocation{\{\membermeta\}}{\expressionsmeta}::\strace\\[2mm]
 
-	\acontconf{ \staticinvocapp{\formals}{\stmt}{\strace}{\cstrace}{\cex}
-{\econt}}{\val{s}}
-	& \Rightarrow &
-	\execconf{\stmt}{\env'}{[]}{[]}{\handler}{\cstrace}{\cex}{\econt}{\scont}
+	\cesktrans{
+		\acontconf{\StaticInvApp{\formals}{\stmt}{\strace}{\cstrace}{\cex}
+{\econt}}{\val{s}}}{
+		\execconf{\stmt}{\env'}{[]}{[]}{\handler}{\cstrace}{\cex}{\econt}{\scont}}
 	\\[2mm]
 	\textrm{with }\\
 	\hspace{3mm}\scont = \ExitSK{\tt{null}},\\
 	\hspace{3mm}\env' = \ext{\env_{empty}}{\formals}{\val{s}}\\[2mm]
   \end{array}
 \]
-
-
 \subsubsection{Property extraction}
 \label{subsubsec:property-extraction}
 Kernel allows access of a member as a property, which can be either getter access, which executes the getter, or method extraction, which converts a method into a closure, also known as tear-off.
 %% PropertyGetK
-\newcommand{\propertygetk}{\mathrm{PropertyGetK}(\idmeta,\,\strace,\,\handler,\,\cstrace,\,\cex,\,\econt)}
+\newcommand{\PropertyGetK}{\mathrm{PropertyGetK}(\idmeta,\,\strace,\,\handler,\,\cstrace,\,\cex,\,\econt)}
 
 \[
   \begin{array}{lcl@{\hspace{30mm}}}
-	\evalconf{\PropertyGet{\expressionmeta}{\idmeta}}{\env}{\strace}{\cstrace}{\cex}{\econt}
-	& \Rightarrow &
-	\evalconf{\expressionmeta}{\env}{\strace}{\cstrace}{\cex}{\econt'}\\
-	\textrm{where:}\\
-	\hspace{5mm}\econt' = \propertygetk\\[2mm]
+	\cesktrans{
+		\evalconf{\PropertyGet{\expressionmeta}{\idmeta}}{\env}{\strace}{\cstrace}{\cex}{\econt}}{
+		\evalconf{\expressionmeta}{\env}{\strace}{\cstrace}{\cex}{\econt'}}
   \end{array}
 \]
+with $\econt' = \PropertyGetK$.\\
 
 \noindent
 After the evaluation of the receiver expression to a value $\val$, the property $\idmeta$ is looked up in methods, getters and implicit getters for the value $\val$. Let $\membermeta$ be the result of such lookup.
 \[
   \begin{array}{lcl@{\hspace{30mm}}}
 	\textrm{if M is a method with body }\stmt\textrm{ and formals }\formals :\\
-	\hspace{2mm}\contconf{\propertygetk}{\val}
-	& \Rightarrow &
-	\contconf{\econt}{\funval{\formals}{\stmt}{\env}}\\
-	\textrm{where:}\\
-	\hspace{5mm}\env = \ext{\env_{empty}}{\mathbf{this}}{\val}\\[2mm]
+	\hspace{2mm}
+	\cesktrans{
+		\contconf{\PropertyGetK}{\val}}{
+		\contconf{\econt}{\funval{\formals}{\stmt}{\env}}}\\
+	\textrm{with}\\
+	\hspace{3mm}
+	\env = \ext{\env_{empty}}{\mathbf{this}}{\val}\\[2mm]
 
 	\textrm{if M is getter with statement body }\stmt :\\
-	\hspace{2mm}\contconf{\propertygetk}{\val}
-	& \Rightarrow &
-	\execconf{\stmt}{\env}{\lbls}{\clbls}{\handler}{\cstrace}{\cex}{\econt}{\scont}\\
-	\textrm{where:}\\
-	\hspace{5mm}\env = \ext{\env_{empty}}{\mathbf{this}}{\val}\\
-	\hspace{5mm}\scont = \emptyset\\[2mm]
+	\hspace{2mm}
+	\cesktrans{
+		\contconf{\PropertyGetK}{\val}}{
+		\execconf{\stmt}{\env}{\lbls}{\clbls}{\handler}{\cstrace}{\cex}{\econt}{\scont}
+		}\\
+	\textrm{with}\\
+	\hspace{3mm}
+	\env = \ext{\env_{empty}}{\mathbf{this}}{\val}\\
+	\hspace{3mm}
+	\scont = \emptyset\\[2mm]
 
 	\textrm{if M is an implicit getter for field }\idmeta :\\
-	\hspace{2mm}\contconf{\propertygetk}{\val}
-	& \Rightarrow &
-	\contconf{\econt}{\textrm{R}(\val)}\\
+	\hspace{2mm}
+	\cesktrans{
+		\contconf{\PropertyGetK}{\val}}{
+		\contconf{\econt}{\textrm{R}(\val)}}
   \end{array}
 \]
 %If the lookup fails, noSuchMethod is created/invoked accordingly (TBD)
@@ -893,258 +945,300 @@ In Kernel a property can be accessed without lookup, by direct reference to the 
 \newcommand{\dpropertygetk}{\mathrm{DPropertyGetK}(\membermeta,\,\strace,\,\handler,\,\cstrace,\,\cex,\,\econt)}
 \[
   \begin{array}{lcl@{\hspace{30mm}}}
-	\evalconf{\DirectPropertyGet{\expressionmeta}{\membermeta}}{\env}{\strace}{\cstrace}{\cex}{\econt}
-	& \Rightarrow &
-	\evalconf{\expressionmeta}{\env}{\strace}{\cstrace}{\cex}{\econt'}\\
-	\textrm{where:}\\
-	\hspace{5mm}\econt' = \dpropertygetk\\[2mm]
+	\cesktrans{
+		\evalconf{\DirectPropertyGet{\expressionmeta}{\membermeta}}{\env}{\strace}{\cstrace}{\cex}{\econt}}{
+		\evalconf{\expressionmeta}{\env}{\strace}{\cstrace}{\cex}{\econt'}}\\
+	\textrm{with}\\
+	\hspace{3mm}
+	\econt' = \dpropertygetk\\[2mm]
 
 	\textrm{if }\membermeta \textrm{ is a method with body }\stmt\textrm{ and formals }\formals :\\
-	\hspace{2mm}\contconf{\dpropertygetk}{\val}
-	& \Rightarrow &
-	\contconf{\econt}{\funval{\formals}{\stmt}{\env}}\\
-	\textrm{where:}\\
-	\hspace{5mm}\env = \ext{\env_{empty}}{\mathbf{this}}{\val}\\[2mm]
+	\hspace{2mm}
+	\cesktrans{
+		\contconf{\dpropertygetk}{\val}}{
+		\contconf{\econt}{\funval{\formals}{\stmt}{\env}}}\\
+	\textrm{with}\\
+	\hspace{3mm}
+	\env = \ext{\env_{empty}}{\mathbf{this}}{\val}\\[2mm]
 
 	\textrm{if }\membermeta \textrm{ is getter with statement body }\stmt :\\
-	\hspace{2mm}\contconf{\dpropertygetk}{\val}
-	& \Rightarrow &
-	\execconf{\stmt}{\env}{\lbls}{\clbls}{\handler}{\cstrace}{\cex}{\econt}{\scont}\\
-	\textrm{where:}\\
-	\hspace{5mm}\env = \ext{\env_{empty}}{\mathbf{this}}{\val}\\
-	\hspace{5mm}\scont = \emptyset\\[2mm]
+	\hspace{2mm}
+	\cesktrans{
+		\contconf{\dpropertygetk}{\val}}{
+		\execconf{\stmt}{\env}{\lbls}{\clbls}{\handler}{\cstrace}{\cex}{\econt}{\scont}}
+		\\
+	\textrm{with}\\
+	\hspace{3mm}
+	\env = \ext{\env_{empty}}{\mathbf{this}}{\val}\\
+	\hspace{3mm}
+	\scont = \emptyset\\[2mm]
 
 	\textrm{if }\membermeta \textrm{ is a field } :\\
-	\hspace{2mm}\contconf{\dpropertygetk}{\val}
-	& \Rightarrow &
-	\contconf{\econt}{\deref{\val[\membermeta]}}\\
+	\hspace{2mm}\cesktrans{
+		\contconf{\dpropertygetk}{\val}}{
+		\contconf{\econt}{\deref{\val[\membermeta]}}}\\
   \end{array}
 \]
 \subsubsection{Property assignment}
 \label{subsubsec:property-assignment}
-% \newcommand{\PropertySet}[3]{#1.#2=#3}
 An assignment changes the value stored at the location of the provided property name.
 A property assignment in Kernel can be done by executing a setter or accessing an instance variable and setting its value.
-\newcommand{\propertysetk}{\mathrm{PropertySetK}(\idmeta,\,\expressionmeta_1,\,\env,\,\strace,\,\handler,\,\cstrace,\,\cex,\,\econt)}
-\newcommand{\propertysetvk}{\mathrm{PropertySetValueK}(\val_0,\,\idmeta,\,\strace,\,\handler,\,\cstrace,\,\cex,\,\econt)}
-
+%
+\newcommand{\PropertySetK}{\mathrm{PropertySetK}(\idmeta,\,\expressionmeta_1,\,\env,\,\strace,\,\handler,\,\cstrace,\,\cex,\,\econt)}
+\newcommand{\PropertySetVK}{\mathrm{PropertySetValueK}(\val_0,\,\idmeta,\,\strace,\,\handler,\,\cstrace,\,\cex,\,\econt)}
 \[
-  \begin{array}{lcl@{\hspace{30mm}}}
-	\evalconf{\PropertySet{\expressionmeta_0}{\idmeta}{\expressionmeta_1}}{\env}{\strace}{\cstrace}{\cex}{\econt}
-	& \Rightarrow &
-	\evalconf{\expressionmeta_0}{\env}{\strace}{\cstrace}{\cex}{\econt'}\\
-	\textrm{where:}\\
-	\hspace{5mm}\econt' = \propertysetk\\[2mm]
+  \begin{array}{lcl}
+	\cesktrans{
+		\evalconf{\PropertySet{\expressionmeta_0}{\idmeta}{\expressionmeta_1}}{\env}{\strace}{\cstrace}{\cex}{\econt}}{
+		\evalconf{\expressionmeta_0}{\env}{\strace}{\cstrace}{\cex}{\econt'}}\\
+	\textrm{with}\\
+	\hspace{3mm}
+	\econt' = \PropertySetK\\[2mm]
 
-	\contconf{\propertysetk}{\val_0}
-	& \Rightarrow &
-	\evalconf{\expressionmeta_1}{\env}{\strace}{\cstrace}{\cex}{\econt'}\\
-	\textrm{where:}\\
-	\hspace{5mm}\econt' = \propertysetvk\\[2mm]
+	\cesktrans{
+		\contconf{\PropertySetK}{\val_0}}{
+		\evalconf{\expressionmeta_1}{\env}{\strace}{\cstrace}{\cex}{\econt'}}\\
+	\textrm{with}\\
+	\hspace{3mm}
+	\econt' = \PropertySetVK
   \end{array}
 \]
-
 \noindent
-After the evaluation of the receiver expression to a value $\val_0$ and the argument to value $\val_1$, the property $\idmeta$ is looked up in setters and implicit setters for the value $\val_0$. Let R be the result of such lookup.
+After the evaluation of the receiver expression to a value $\val_0$ and the argument to value $\val_1$, the property $\idmeta$ is looked up in setters and implicit setters for the value $\val_0$. Let $\membermeta$ be the result of such lookup.
 \[
-  \begin{array}{lcl@{\hspace{30mm}}}
-	\textrm{if R is setter with statement body }\stmt \textrm{ and formal }\formal :\\
-	\hspace{2mm}\contconf{\propertysetvk}{\val_1}
-	& \Rightarrow &
-	\execconf{\stmt}{\env}{\lbls}{\clbls}{\handler}{\cstrace}{\cex}{\econt}{\scont}\\
-	\textrm{where:}\\
-	\hspace{5mm}\env = \ext{\env_{empty}}{\mathbf{this} :: \formal :: []}{\val_0 :: \val_1 :: []}\\
-	\hspace{5mm}\scont = \emptyset\\[2mm]
+  \begin{array}{lcl}
+	\textrm{if \membermeta is setter with statement body }\stmt \textrm{ and formal }\formal :\\
+	\hspace{2mm}
+	\cesktrans{
+		\contconf{\PropertySetVK}{\val_1}}{
+		\execconf{\stmt}{\env}{\lbls}{\clbls}{\handler}{\cstrace}{\cex}{\econt}{\scont}}\\
+	\textrm{with}\\
+	\hspace{3mm}
+	\env = \ext{\env_{empty}}{\mathbf{this} :: \formal :: []}{\val_0 :: \val_1 :: []}\\
+	\hspace{3mm}
+	\scont = \emptyset\\[2mm]
 
-	\textrm{if R is an implicit setter for field }\idmeta :\\
-	\hspace{2mm}\contconf{\propertygetk}{\val}
-	& \Rightarrow &
-	\contconf{\econt}{\textrm{R}(\val_0, \val_1)}\\
+	\textrm{if \membermeta is an implicit setter for field }\idmeta :\\
+	\hspace{2mm}
+	\cesktrans{
+		\contconf{\PropertySetK}{\val}}{
+		\contconf{\econt}{\textrm{R}(\val_0, \val_1)}}
   \end{array}
 \]
 
 \subsubsection{Direct property assignment}
 \label{subsubsec:direct-property-assignment}
-In Kernel a property can be set without lookup, by direct reference to the $AST$ node of said property. This implies that the lookup step above is bypassed.
+In Kernel a property can be set without lookup, by direct reference to the $AST$ node of the property. This implies that the lookup step above is bypassed.
 %% DirectPropertyGetK
-\newcommand{\dpropertysetk}{\mathrm{DPropertySetK}(\membermeta,\,\expressionmeta_1,\,\env,\,\strace,\,\handler,\,\cstrace,\,\cex,\,\econt)}
-\newcommand{\dpropertysetvk}{\mathrm{DPropertySetValueK}(\val_0,\,\membermeta,\,\strace,\,\handler,\,\cstrace,\,\cex,\,\econt)}
+\newcommand{\DirectPropertySetK}{\mathrm{DPropertySetK}(\membermeta,\,\expressionmeta_1,\,\env,\,\strace,\,\handler,\,\cstrace,\,\cex,\,\econt)}
+\newcommand{\DPropertysetVK}{\mathrm{DPropertySetValueK}(\val_0,\,\membermeta,\,\strace,\,\handler,\,\cstrace,\,\cex,\,\econt)}
 \[
   \begin{array}{lcl@{\hspace{30mm}}}
-	\evalconf{\DirectPropertySet{\expressionmeta_0}{\membermeta}{\expressionmeta_1}}{\env}{\strace}{\cstrace}{\cex}{\econt}
-	& \Rightarrow &
-	\evalconf{\expressionmeta}{\env}{\strace}{\cstrace}{\cex}{\econt'}\\
-	\textrm{where:}\\
-	\hspace{5mm}\econt' = \dpropertysetk\\[2mm]
+	\cesktrans{
+		\evalconf{\DirectPropertySet{\expressionmeta_0}{\membermeta}{\expressionmeta_1}}{\env}{\strace}{\cstrace}{\cex}{\econt}}{
+		\evalconf{\expressionmeta}{\env}{\strace}{\cstrace}{\cex}{\econt'}}\\
+	\textrm{with}\\
+	\hspace{3mm}
+	\econt' = \DirectPropertySetK\\[2mm]
 
-	\contconf{\dpropertysetk}{\val_0}
-	& \Rightarrow &
-	\evalconf{\expressionmeta_1}{\env}{\strace}{\cstrace}{\cex}{\econt'}\\
-	\textrm{where:}\\
-	\hspace{5mm}\econt' = \dpropertysetvk\\[2mm]
+	\cesktrans{
+		\contconf{\DirectPropertySetK}{\val_0}}{
+		\evalconf{\expressionmeta_1}{\env}{\strace}{\cstrace}{\cex}{\econt'}}\\
+	\textrm{with}\\
+	\hspace{3mm}
+	\econt' = \DPropertysetVK\\[2mm]
 
 	\textrm{if }\membermeta \textrm{ is setter with statement body }\stmt \textrm{ and formal }\formal :\\
-	\hspace{2mm}\contconf{\dpropertysetvk}{\val_1}
-	& \Rightarrow &
-	\execconf{\stmt}{\env}{\lbls}{\clbls}{\handler}{\cstrace}{\cex}{\econt}{\scont}\\
-	\textrm{where:}\\
-	\hspace{5mm}\env = \ext{\env_{empty}}{\mathbf{this} :: \formal :: []}{\val_0 :: \val_1 :: []}\\
-	\hspace{5mm}\scont = \emptyset\\[2mm]
+	\hspace{2mm}
+	\cesktrans{
+		\contconf{\DPropertysetVK}{\val_1}}{
+		\execconf{\stmt}{\env}{\lbls}{\clbls}{\handler}{\cstrace}{\cex}{\econt}{\scont}}\\
+	\textrm{with}\\
+	\hspace{3mm}
+	\env = \ext{\env_{empty}}{\mathbf{this} :: \formal :: []}{\val_0 :: \val_1 :: []}\\
+	\hspace{3mm}
+	\scont = \emptyset\\[2mm]
 
 	\textrm{if }\membermeta \textrm{ is a field } :\\
-	\hspace{2mm}\contconf{\dpropertysetvk}{\val_1}
-	& \Rightarrow &
-	\contconf{\econt}{\update{\val_0[\membermeta]}{\val_1}}\\
+	\hspace{2mm}
+	\cesktrans{
+		\contconf{\DPropertysetVK}{\val_1}}{
+		\contconf{\econt}{\update{\val_0[\membermeta]}{\val_1}}}
   \end{array}
 \]
 
 \subsubsection{Super property get}
 \label{subsubsec:super-property-get}
 %\newcommand{\SuperPropertyGet}[1]{\tt{super}.#1}
-Kernel allows access of a superclass member as a property, which can be either getter access, which executes the getter, or method extraction, which converts a method into a closure, also known as tear-off.
+Kernel allows access of a superclass member as a property, which can be either getter access, which executes the getter, or method extraction, which converts a method into a closure.
 \newcommand{\this}{\tt{this}}
 \newcommand{\superclass}[1]{superclass({#1})}
 
 \noindent
-Accessing a superclass member is accessed with the expression $\SuperPropertyGet{\idmeta}$ evaluated with the corresponding components: $\env$, $\strace$, $\handler$, $\cstrace$, $\cex$, $\econt$. Let $\val = \deref{(\env(\this))}$, $C = \superclass{\val}$ and $M$ the result of looking up $\idmeta$ in $C$.
+Accessing a superclass member is accessed with the expression $\SuperPropertyGet{\idmeta}$ evaluated with the corresponding components: $\env$, $\strace$, $\handler$, $\cstrace$, $\cex$, $\econt$. Let $\val = \deref{(\env(\this))}$, $C = \superclass{\val}$ and $M$ the result of looking up $\idmeta$ in $C$.\\
+
+\noindent
+If $\membermeta$ is a member method with body $\stmt$ and formal parameters $\formals$:
 \[
-  \begin{array}{l@{\hspace{50mm}}}
-	\textrm{If }\membermeta \textrm{ is a member method with body }\stmt \textrm{ and formals }\formals:\\
-	\hspace{3mm}\evalconf{\SuperPropertyGet{\idmeta}}{\env}{\strace}{\cstrace}{\cex}{\econt}
-	\Rightarrow
-	\contconf{\econt}{\funval{\formals}{\stmt}{\env'}}\\
-	\hspace{5mm}\textrm{with }\env' = \ext{\env_{empty}}{\this}{\deref{(\env(\this))}}\\[2mm]
+  \begin{array}{lcl}
+	\cesktrans{
+		\evalconf{\SuperPropertyGet{\idmeta}}{\env}{\strace}{\cstrace}{\cex}{\econt}}{
+		\contconf{\econt}{\funval{\formals}{\stmt}{\env'}}}\\
+	\textrm{with }\\
+	\hspace{3mm}
+	\env' = \ext{\env_{empty}}{\this}{\deref{(\env(\this))}}\\[2mm]
 
 	\textrm{If }\membermeta \textrm{ is a getter method with body }\stmt :\\
-	\hspace{3mm}\evalconf{\SuperPropertyGet{\idmeta}}{\env}{\strace}{\cstrace}{\cex}{\econt}
-	\Rightarrow
-	\execconf{\stmt}{\env'}{\lbls}{\clbls}{\handler}{\cstrace}{\cex}{\econt}{\scont}\\
-	\hspace{5mm}\textrm{with }\env' =  \ext{\env_{empty}}{\this}{\deref{(\env(\this))}}, \hspace{2mm}\scont = \emptyset\\[2mm]
+	\hspace{2mm}
+	\cesktrans{
+		\evalconf{\SuperPropertyGet{\idmeta}}{\env}{\strace}{\cstrace}{\cex}{\econt}}{
+		\execconf{\stmt}{\env'}{\lbls}{\clbls}{\handler}{\cstrace}{\cex}{\econt}{\scont}}\\
+	\textrm{with}\\
+	\hspace{3mm}
+	\env' =  \ext{\env_{empty}}{\this}{\deref{(\env(\this))}}\\
+	\hspace{3mm}
+	\scont = \emptyset\\[2mm]
 
 	\textrm{If }\membermeta \textrm{ is a implicit field getter} :\\
-	\hspace{3mm}\evalconf{\SuperPropertyGet{\idmeta}}{\env}{\strace}{\cstrace}{\cex}{\econt}
-	\Rightarrow
-	\contconf{\econt}{M(\deref{(\env(\this))})}\\
+	\hspace{2mm}
+	\cesktrans{
+		\evalconf{\SuperPropertyGet{\idmeta}}{\env}{\strace}{\cstrace}{\cex}{\econt}}{
+		\contconf{\econt}{M(\deref{(\env(\this))})}}\\
   \end{array}
 \]
 \subsubsection{Super property set}
 \label{subsubsec:super-property-set}
-%\newcommand{\SuperPropertySet}[2]{\tt{super}.#1=#2}
-\newcommand{\superpropertysetk}{\mathrm{SuperPropertySetK}(\idmeta,\,\env,\,\strace,\,\handler,\,\cstrace,\,\cex,\,\econt)}
+\newcommand{\SuperPropertySetK}{\mathrm{SuperPropertySetK}(\idmeta,\,\env,\,\strace,\,\handler,\,\cstrace,\,\cex,\,\econt)}
 Kernel supports assignment of a super member with the expression $\SuperPropertySet{\idmeta}{\expressionmeta}$. The transition is defined as follows:
 \[
-  \begin{array}{l@{\hspace{30mm}}}
-	\evalconf{\SuperPropertySet{\idmeta}{\expressionmeta}}{\env}{\strace}{\cstrace}{\cex}{\econt}
-	\Rightarrow
-	\evalconf{\expressionmeta}{\env}{\strace}{\cstrace}{\cex}{\econt'}\\
-	\textrm{with }\econt' = \superpropertysetk
+  \begin{array}{lcl}
+	\cesktrans{
+		\evalconf{\SuperPropertySet{\idmeta}{\expressionmeta}}{\env}{\strace}{\cstrace}{\cex}{\econt}}{
+		\evalconf{\expressionmeta}{\env}{\strace}{\cstrace}{\cex}{\econt'}}\\
   \end{array}
 \]
-
-Let $\val = \deref{(\env(\this))}$, $C = \superclass{\val}$ and $M$ the result of looking up $\idmeta$ in $C$.
-
+with $\econt' = \SuperPropertySetK$.\\
+Let $\val = \deref{(\env(\this))}$, $C = \superclass{\val}$ and $M$ the result of looking up $\idmeta$ in $C$.\\
+If is a setter method with body $\stmt$ and formal $\formal$:
 \[
-  \begin{array}{l@{\hspace{50mm}}}
-	\textrm{If }\membermeta \textrm{ is a setter method with body }\stmt\textrm{ and formal }\formal:\\
-	\hspace{3mm}\contconf{\superpropertysetk}{\val}
-	\Rightarrow
-	\execconf{\stmt}{\env'}{\lbls}{\clbls}{\handler}{\cstrace}{\cex}{\econt}{\scont}\\
-	\hspace{5mm}\textrm{with }\env' =  \ext{\env_{empty}}{\this :: \formal :: []}{\deref{(\env(\this))} :: \val :: []}, \hspace{2mm}\scont = \emptyset\\[2mm]
-
-	\textrm{If }\membermeta \textrm{ is a implicit field setter} :\\
-	\hspace{3mm}\contconf{\superpropertysetk}{\val}
-	\Rightarrow
-	\contconf{\econt}{M(\deref{(\env(\this))}, \val)}\\
+  \begin{array}{lcl}
+	\cesktrans{
+		\contconf{\SuperPropertySetK}{\val}}{
+		\execconf{\stmt}{\env'}{\lbls}{\clbls}{\handler}{\cstrace}{\cex}{\econt}{\scont}}\\
+  \end{array}
+\]
+with $\env' =  \ext{\env_{empty}}{\this :: \formal :: []}{\deref{(\env(\this))} :: \val :: []}, \hspace{2mm}\scont = \emptyset$.\\
+If $\membermeta$ is a implicit field setter:
+\[
+  \begin{array}{lcl}
+	\hspace{2mm}
+	\cesktrans{
+		\contconf{\SuperPropertySetK}{\val}}{
+		\contconf{\econt}{M(\deref{(\env(\this))}, \val)}}
   \end{array}
 \]
 \subsubsection{Instance method invocation}
 \label{subsubsec:instance-method-invoc}
 \newcommand{\InstanceMethodInvocation}[3]{#1.#2(#3)}
-\newcommand{\InstanceMethodInvocationK}{\mathrm{InstanceMethodInvocationK(\expressionsmeta,\,\idmeta,\,\env,\,\strace,\,\handler,\,\cstrace,\,\cex,\,\econt)}}
+\newcommand{\InstanceMethodK}{\mathrm{InstanceMethodK(\expressionsmeta,\,\idmeta,\,\env,\,\strace,\,\handler,\,\cstrace,\,\cex,\,\econt)}}
 Method invocation is supported with $\InstanceMethodInvocation{\expressionmeta}{\idmeta}{\expressionsmeta}$.
 \[
-  \begin{array}{l}
-	\evalconf{\InstanceMethodInvocation{\expressionmeta}{\idmeta}{\expressionsmeta}}{\env}{\strace}{\cstrace}{\cex}{\econt}
-	\Rightarrow
-	\evalconf{\expressionmeta}{\env}{\strace}{\cstrace}{\cex}{\econt'}
-	\\[2mm]
-	\hspace{3mm}\textrm{with } \econt' = \InstanceMethodInvocationK
+  \begin{array}{lcl}
+	\cesktrans{
+		\evalconf{\InstanceMethodInvocation{\expressionmeta}{\idmeta}{\expressionsmeta}}{\env}{\strace}{\cstrace}{\cex}{\econt}}{
+		\evalconf{\expressionmeta}{\env}{\strace}{\cstrace}{\cex}{\econt'}}
   \end{array}
 \]
+with $\econt' = \InstanceMethodK$.
 
+\noindent
 The arguments $\expressionsmeta$ are evaluated after the evaluation of the receiver.
-\newcommand{\InstanceMethodInvocationArgsApp}{\mathrm{InstanceMethodInvocationArgsApp(\idmeta,\,\val,\,\strace,\,\handler,\,\cstrace,\,\cex,\,\econt)}}
+\newcommand{\InstanceMethodInvocationArgsApp}{\mathrm{InstanceMethodA(\idmeta,\,\val,\,\strace,\,\handler,\,\cstrace,\,\cex,\,\econt)}}
 \[
-  \begin{array}{l}
-	\contconf{\InstanceMethodInvocationK}{\val}
-	\Rightarrow
-	\evallistconf{\expressionsmeta}{\env}{\strace}{\cstrace}{\cex}{\acont'}
-	\\[2mm]
-	\hspace{3mm}\textrm{with } \acont' = \InstanceMethodInvocationArgsApp
+  \begin{array}{lcl}
+	\cesktrans{
+		\contconf{\InstanceMethodK}{\val}}{
+		\evallistconf{\expressionsmeta}{\env}{\strace}{\cstrace}{\cex}{\acont'}}
+	\\
+	\textrm{with } \acont' = \InstanceMethodInvocationArgsApp
   \end{array}
 \]
 \noindent
-After the evaluation of the receiver expression to a value $\val$ and the argument expressions to $\val{s}$, the instance method $\idmeta$ is looked up in methods for the value $\val$. Let $\membermeta$ be the result of such lookup. Let $\membermeta$ be a method with statement body $\stmt$ and formal parameters $\formals$:
+After the evaluation of the receiver expression to a value $\val$ and the argument expressions to $\vals$, the instance method $\idmeta$ is looked up in methods for the value $\val$. Let $\membermeta$ be the result of such lookup.
+
+\noindent
+Let $\membermeta$ be a method with statement body $\stmt$ and formal parameters $\formals$:
 \[
-  \begin{array}{l}
-	\contconf{\InstanceMethodInvocationArgsApp}{\val{s}}
-	\Rightarrow \\
-	\hspace{5mm}\execconf{\stmt}{\env}{[]}{[]}{\handler}{\cstrace}{\cex}{\econt}{\scont}
+  \begin{array}{lcl}
+	\cesktrans{
+		\contconf{\InstanceMethodInvocationArgsApp}{\val{s}}}{
+		\execconf{\stmt}{\env}{[]}{[]}{\handler}{\cstrace}{\cex}{\econt}{\scont}}
 	\\[2mm]
-	\hspace{3mm}\textrm{with } \scont = \ExitSK{\tt{null}}, \env = \ext{\env_{empty}}{\this :: \formals}{\val :: \val{s}}\\[2mm]
-	\scontconf{\ExitSK{\val}}{\env} \Rightarrow \contconf{\econt}{\val}
+	\cesktrans{
+		\scontconf{\ExitSK{\val}}{\env}}{
+		\contconf{\econt}{\val}}
   \end{array}
 \]
+with $\scont = \ExitSK{\tt{null}}, \env = \ext{\env_{empty}}{\this :: \formals}{\val :: \val{s}}$.\\[2mm]
+
+\noindent
 When a $\tt{return}$ statement is missing in the statement body $\stmt$ of the instance method $\membermeta$, the statement continuation $\ExitSK{\val}$ ensures that the execution will proceed to the corresponding expression continuation, in this case with $\val = \tt{null}$.
 
 \subsubsection{Direct instance method invocation}
 \label{subsubsec:direct-instance-method-invoc}
 Direct method invocation allows invocation of instance method by providing directly the member method to be invoked and bypass the lookup step described above. Let $\membermeta$ be the target method, $\stmt$ the statement body and $\formals$ the corresponding formal parameters.
 \newcommand{\DInstanceMethodInvocation}[3]{#1.\{#2\}(#3)}
-\newcommand{\DInstanceMethodInvocationK}{\mathrm{DInstanceMethodInvocationK}(\expressionsmeta,\,\membermeta,\,\env,\,\strace,\,\handler,\,\cstrace,\,\cex,\,\econt)}
-\newcommand{\DInstanceMethodInvocationArgsApp}{\mathrm{DInstanceMethodInvocationArgsApp}(\membermeta,\,\val,\,\strace,\,\handler,\,\cstrace,\,\cex,\,\econt)}
+\newcommand{\DInstanceMethodK}{\mathrm{DInstanceMethodK}(\expressionsmeta,\,\membermeta,\,\env,\,\strace,\,\handler,\,\cstrace,\,\cex,\,\econt)}
+\newcommand{\DInstanceMethodA}{\mathrm{DInstanceMethodA}(\membermeta,\,\val,\,\strace,\,\handler,\,\cstrace,\,\cex,\,\econt)}
 \[
-  \begin{array}{l}
-  \evalconf{\DInstanceMethodInvocation{\expressionmeta}{\membermeta}{\expressionsmeta}}{\env}{\strace}{\cstrace}{\cex}{\econt}
-	\Rightarrow
-	\evalconf{\expressionmeta}{\env}{\strace}{\cstrace}{\cex}{\econt'}
+  \begin{array}{lcl}
+	\cesktrans{
+		\evalconf{\DInstanceMethodInvocation{\expressionmeta}{\membermeta}{\expressionsmeta}}{\env}{\strace}{\cstrace}{\cex}{\econt}}{
+		\evalconf{\expressionmeta}{\env}{\strace}{\cstrace}{\cex}{\econt'}}
 	\\[2mm]
-	\hspace{3mm}\textrm{with } \econt' = \DInstanceMethodInvocationK\\[2mm]
 
-  \contconf{\DInstanceMethodInvocationK}{\val}
-	\Rightarrow \\
-	\hspace{5mm}\evallistconf{\expressionsmeta}{\env}{\strace}{\cstrace}{\cex}{\acont'}
+	\cesktrans{
+		\contconf{\DInstanceMethodK}{\val}}{
+		\evallistconf{\expressionsmeta}{\env}{\strace}{\cstrace}{\cex}{\acont'}}
 	\\[2mm]
-	\hspace{3mm}\textrm{with } \acont' = \DInstanceMethodInvocationArgsApp\\[2mm]
 
-	\contconf{\DInstanceMethodInvocationArgsApp}{\val{s}}
-	\Rightarrow \\
-	\hspace{5mm}\execconf{\stmt}{\env}{[]}{[]}{\handler}{\cstrace}{\cex}{\econt}{\scont}
-	\\[2mm]
-	\hspace{3mm}\textrm{with } \scont = \ExitSK{\tt{null}}, \env = \ext{\env_{empty}}{\this :: \formals}{\val :: \val{s}}\\[2mm]
+	\cesktrans{
+		\contconf{\DInstanceMethodA}{\val{s}}}{
+		\execconf{\stmt}{\env}{[]}{[]}{\handler}{\cstrace}{\cex}{\econt}{\scont}}
   \end{array}
 \]
+with
+\[
+\begin{array}{l}
+	\econt' = \DInstanceMethodK,\\
+	\acont' = \DInstanceMethodA,\\
+	\scont = \ExitSK{\tt{null}},\\
+	\env = \ext{\env_{empty}}{\this :: \formals}{\val :: \val{s}}
+\end{array}
+\]
+
+\noindent
 Similarly to \ref{subsubsec:instance-method-invoc}, $\ExitSK{\val}$ is added as next statement continuation.
+
 \subsubsection{Super method invocation}
 \label{subsubsec:super-method-invocation}
 \newcommand{\SuperMethodInvocation}[2]{\tt{super}.#1(#2)}
-\newcommand{\SuperMethodInvocationApp}{\mathrm{SuperMethodInvocationApp}(\idmeta,\,\env,\,\strace,\,\handler,\,\cstrace,\,\cex,\,\econt)}
+\newcommand{\SuperMethodA}{\mathrm{SuperMethodA}(\idmeta,\,\env,\,\strace,\,\handler,\,\cstrace,\,\cex,\,\econt)}
 Super method invocation is supported with $\SuperMethodInvocation{\idmeta}{\expressionsmeta}$ and the transition step is as follows:
 \[
-  \begin{array}{l}
-	\evalconf{\SuperMethodInvocation{\idmeta}{\expressionsmeta}}{\env}{\strace}{\cstrace}{\cex}{\econt}
-	\Rightarrow
-	\evallistconf{\expressionsmeta}{\env}{\strace}{\cstrace}{\cex}{\acont}
-	\\[2mm]
-	\hspace{3mm}\textrm{with } \acont = \SuperMethodInvocationApp
+  \begin{array}{lcl}
+	\cesktrans{
+		\evalconf{\SuperMethodInvocation{\idmeta}{\expressionsmeta}}{\env}{\strace}{\cstrace}{\cex}{\econt}}{
+		\evallistconf{\expressionsmeta}{\env}{\strace}{\cstrace}{\cex}{\acont}}
   \end{array}
 \]
+with $\acont = \SuperMethodA$.\\[2mm]
 After the evaluation of the expressions $\expressionsmeta$ to values $\val{s}$ for the super method invocation, the method $\idmeta$ is looked up. Let $\val = \deref{(\env(\this))}$, $C = \superclass{\val}$ and $M$ the result of looking up $\idmeta$ in $C$. Let $\stmt$ be the statement body and $\formals$ the formal parameters for $\membermeta$ below:
 \[
-  \begin{array}{l}
-	\contconf{\SuperMethodInvocationApp}{\val{s}}
-	\Rightarrow \\
-	\hspace{5mm}\execconf{\stmt}{\env'}{[]}{[]}{\handler}{\cstrace}{\cex}{\econt}{\scont}
+  \begin{array}{lcl}
+	\cesktrans{
+		\contconf{\SuperMethodA}{\val{s}}}{
+		\execconf{\stmt}{\env'}{[]}{[]}{\handler}{\cstrace}{\cex}{\econt}{\scont}}
 	\\[2mm]
 	\textrm{with }\\
 	\hspace{3mm}\scont = \ExitSK{\tt{null}},\\
@@ -1158,45 +1252,49 @@ Similarly to \ref{subsubsec:instance-method-invoc}, $\ExitSK{\val}$ is added as 
 \newcommand{\IsExpressionK}{\mathrm{IsExpressionK}(\tt{T},\,\econt)}
 \[
   \begin{array}{lcl}
-	\evalconf{\IsExpression{\expressionmeta}{\tt{T}}}{\env}{\strace}{\cstrace}{\cex}{\econt}
-	& \Rightarrow &
-	\evalconf{\expressionmeta}{\env}{\strace}{\cstrace}{\cex}{\IsExpressionK}\\[2mm]
+	\cesktrans{
+		\evalconf{\IsExpression{\expressionmeta}{\tt{T}}}{\env}{\strace}{\cstrace}{\cex}{\econt}}{
+		\evalconf{\expressionmeta}{\env}{\strace}{\cstrace}{\cex}{\IsExpressionK}}\\[2mm]
 
-	\contconf{\IsExpressionK}{\val}
-	& \Rightarrow &
-	\contconf{\econt}{\true}, \textrm{ if }\val \textrm{ is } \tt{T}\\[2mm]
+	\cesktrans{
+		\contconf{\IsExpressionK}{\val}}{
+		\contconf{\econt}{\true}},
+		\textrm{ if }\val \textrm{ is } \tt{T}\\[2mm]
 
-	\contconf{\IsExpressionK}{\val}
-	& \Rightarrow &
-	\contconf{\econt}{\false}, \textrm{ otherwise}
+	\cesktrans{
+		\contconf{\IsExpressionK}{\val}}{
+		\contconf{\econt}{\false}}, \textrm{ otherwise}
   \end{array}
 \]
 
 \subsubsection{Type cast}
 \label{subsubsec:type-cast}
 %\newcommand{\AsExpression}[2]{#1\,\tt{as}\,#2}
-\newcommand{\AsExpressionK}{\mathrm{AsExpressionK}(\tt{T},\,\econt)}
+\newcommand{\AsExpressionK}{\mathrm{AsExpressionK}(\tt{T},\,\strace,\,\handler,\,\econt)}
 \[
   \begin{array}{lcl}
-	\evalconf{\AsExpression{\expressionmeta}{\tt{T}}}{\env}{\strace}{\cstrace}{\cex}{\econt}
-	& \Rightarrow &
-	\evalconf{\expressionmeta}{\env}{\strace}{\cstrace}{\cex}{\AsExpressionK}\\[2mm]
+	\cesktrans{
+		\evalconf{\AsExpression{\expressionmeta}{\tt{T}}}{\env}{\strace}{\cstrace}{\cex}{\econt}}{
+		\evalconf{\expressionmeta}{\env}{\strace}{\cstrace}{\cex}{\AsExpressionK}}
+		\\[2mm]
 
-	\contconf{\AsExpressionK}{\val}
-	& \Rightarrow &
-	\contconf{\econt}{\val}, \textrm{if }\val \textrm{ is } \tt{T}\\[2mm]
+	\cesktrans{
+		\contconf{\AsExpressionK}{\val}}{
+		\contconf{\econt}{\val}}, \textrm{if }\val \textrm{ is } \tt{T}\\[2mm]
 
-	\contconf{\AsExpressionK}{\val}
-	& \Rightarrow &
-	\dots, \textrm{ otherwise}
+	\cesktrans{
+		\contconf{\AsExpressionK}{\val}}{
+		\throwconf{\handler}{\AsExpression{\expressionmeta}{\tt{T}} :: \strace}{\tt{CastError}}}, \textrm{ otherwise}
     \end{array}
 \]
 
 \subsubsection{This}
 \[
-	\evalconf{\ThisExpression}{\env}{\strace}{\cstrace}{\cex}{\econt}
-	\Rightarrow
-	\contconf{\econt}{\deref{\env(\this)}}
+  \begin{array}{lcl}
+	\cesktrans{
+		\evalconf{\ThisExpression}{\env}{\strace}{\cstrace}{\cex}{\econt}}{
+		\contconf{\econt}{\deref{\env(\this)}}}
+  $  $\end{array}
 \]
 \subsection{Statement execution}
 \label{subsec:stmt-exectution}
@@ -1226,7 +1324,7 @@ Let $\econt' = \vardeclk{\env}{\varmeta}{\scont}$ below:
 
 	\execconf{\lbrace\expr\rbrace}{\env}{\lbls}{\clbls}{\handler}{\cstrace}{\cex}{\econt}{\scont}
 	& \Rightarrow &
-	\evalconf{\expr}{\env}{\strace}{\cstrace}{\cex}{\exprk{\scont}{\env}}\\[2mm]
+	\evalconf{\expr}{\env}{\strace}{\cstrace}{\cex}{\ExpressionK{\scont}{\env}}\\[2mm]
 
 	\execconf{\stmt :: \stmts}{\env}{\lbls}{\clbls}{\handler}{\cstrace}{\cex}{\econt}{\scont}
 	& \Rightarrow &

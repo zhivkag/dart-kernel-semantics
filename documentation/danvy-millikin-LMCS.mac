@@ -309,30 +309,9 @@
 \newcommand{\mlist}[1]{\textrm{List}\langle {#1} \rangle}
 \newcommand{\ext}[3]{\ensuremath{extend({#1},\,{#2},\,{#3})}}
 
-% Named Configuration for CESK transitions
-\newcommand{\breakconf}[1]{\confsingle{#1}_{\mathrm{breakCont}}}
-\newcommand{\switchconf}[1]{\confsingle{#1}_{\mathrm{switchCont}}}
-\newcommand{\contconf}[2]{\confpair{#1}{#2}_{\mathrm{cont}}}
-\newcommand{\scontconf}[2]{\confpair{#1}{#2}_{\mathrm{scont}}}
-\newcommand{\acontconf}[2]{\confpair{#1}{#2}_{\mathrm{acont}}}
-\newcommand{\throwconf}[3]{\conftriple{#1}{#2}{#3}_{\mathrm{throw}}}
-\newcommand{\evallistconf}[6]{\langle{#1},\,{#2},\,{#3},\handler,\,{#4},\,{#5},\,{#6}\rangle_{\mathrm{evalList}}}
-\newcommand{\evalconf}[6]{\langle{#1},\,{#2},\,{#3},\handler,\,{#4},\,{#5},\,{#6}\rangle_{\mathrm{eval}}}
-\newcommand{\execconf}[9]{\langle{#1},\,{#2},\,{#3},\,{#4},\,\strace,\,{#5},\,{#6},\,{#7},\,{#8},\,{#9}\rangle_{\mathrm{exec}}}
-
-%
-\newcommand{\cesktrans}[2]{{#1} \Rightarrow {#2}}
 
 % Continuation
-\newcommand{\varsetk}[3]{\mathrm{VarSetK}({#1},\,{#2},\,{#3})}
-\newcommand{\notk}[1]{\mathrm{NotK}({#1})}
-\newcommand{\andk}[6]{\mathrm{AndK}({#1},\,{#2},\,{#3},\,{\handler},\,{#4},\,{#5},\,{#6})}
-\newcommand{\ork}[6]{\mathrm{OrK}({#1},\,{#2},\,{#3},\,{\handler},\,{#4},\,{#5},\,{#6})}
-\newcommand{\conditionalk}[7]{\mathrm{ConditionalK}({#1},\,{#2},\,{#3},\,{#4},\,{\handler},\,{#5},\,{#6},\,{#7})}
-\newcommand{\letk}[7]{\mathrm{LetK}({#1},\,{#2},\,{#3},\,{#4},\,{\handler},\,{#5},\,{#6},\,{#7})}
-\newcommand{\exprlistk}[6]{\mathrm{ExpressionListK}(({#1},\,{#2},\,{#3},\,{#4},\,{\handler},\,{#5},\,{#6})}
 \newcommand{\vardeclk}[3]{\mathrm{VarDeclarationK}({#1},\,{#2},\,{#3})}
-\newcommand{\exprk}[2]{\mathrm{ExpressionK}({#1},\,{#2})}
 \newcommand{\ifcondk}[2]{\mathrm{IfConditionK}({#1},\,{#2},\,\env,\,\lbls,\,\clbls,\,\handler,\,\cstrace,\,\cex,\,\econt,\,\scont)}
 \newcommand{\switchk}[2]{\mathrm{SwitchK}({#1},\,\env,\,\lbls,\,{#2},\,\strace,\,\handler,\,\cstrace,\,\cex,\,\econt,\,\scont)}
 \newcommand{\finallybreak}[2]{\mathrm{FinallyBreak}({#1},\,\env,\,\lbls,\,\clbls,\,\strace,\,\handler,\,\cstrace,\,\cex,\,\econt,\,{#2})}
@@ -363,8 +342,6 @@
 
 
 % Application continuation
-\newcommand{\staticinvocapp}[6]{\mathrm{StaticInvocationA}({#1},\,{#2},\,{#3},\,\handler,\,{#4},\,{#5},\,{#6})}
-\newcommand{\valueapp}[2]{\mathrm{ValueA}({#1},\,{#2})}
 
 % New instance
 \newcommand{\ctrapp}[2]{\mathrm{ConstructorApp}({#1},\,\strace,\,\handler,\,\cstrace,\,\cex,\,{#2})}
