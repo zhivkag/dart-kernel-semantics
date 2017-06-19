@@ -179,12 +179,12 @@ The small-step operational semantics of Dart Kernel is given by an abstract mach
 
 \subsection{Store}
 \label{subsec:store-definition}
-The store, $s$, is a map that maps a location, $\loc$, to a value, $\val$. The store is a mutable map and should not be confused with a function. A global store is assumed and locations reachable from a given scope are defined by the current environment function.
+The store, $s$, maps a location, $\loc$, to a value, $\val$. The store is a mutable map and should not be confused with a function. A global store is assumed and locations reachable from a given scope are defined by the current environment function.
 \[s : \dlocation \rightarrow \dval \]
 \subsubsection{Dereferencing}
 \label{subsubsection:dereferecing}
 \newcommand{\deref}[1]{!#1}
-Function "$\deref{}$" is used to "dereference" items stored in environments. It has an implicit argument which is the store of CESK machine.
+Function "$\deref{}$" is used to access a value stored in the stored with by the corresponding label, usually stored in the environment, or an object value for instance fields. It has an implicit argument which is the store of CESK machine.
 
 \begin{align*}
   \deref{} \in \dlocation &\rightarrow \dval \\
@@ -208,7 +208,6 @@ When an environment is needed to further execute the program, it is saved by the
 \label{subsubsec:extend-env}
 
 Function "$extend$" creates a new environment by extending the provided environment with new bindings for the variable declarations to fresh labels for each of the provided values.
-% Exact definition on how the store is modified to be added
 \begin{align*}
   extend \in \denv \times \mlist{\dvardecl} \times \mlist{\dval} &\rightarrow  \denv \hspace{100mm} \\
   \ext{\env}{\varmeta{s}}{\vals} &= \env'
@@ -221,14 +220,15 @@ with
 	\end{cases}
 \]
 
-For simpler notation, we allow $extend$ to be called with singleton lists as $\ext{\env}{\varmeta}{\val}$, which is the same as $\ext{\env}{\varmeta :: []}{\val :: []}$.
+For simpler notation, we allow $extend$ to be called with singleton lists as $\ext{\env}{\varmeta}{\val}$, which we consider equivalent to $\ext{\env}{\varmeta :: []}{\val :: []}$.
 \subsubsection{Variable lookup}
 \label{subsubsec:variable-lookup}
 A variable lookup consists of looking up the address of a variable from the environment with $\loc = \env(\varmeta)$ and reading the stored value $v$ with $\deref{\loc} = \deref{\env(\varmeta)}$. For definition of "$\deref{}$" see Section~\ref{subsubsection:dereferecing}.
 
 \subsection{Configurations for the CESK machine}
 \label{subsec:cesk-configs}
-The state space of the CESK machine contains various kinds of configurations, each containing components for applying the appropriate continuation in order to transition to the next configuration.
+The state space of the CESK machine contains various kinds of configurations. Configurations contain different components and the transition step dispatches to the next configuration based on one of the components of the configuration.
+
 \[
   \begin{array}{lcl}
 	\evalconf{\expr}{\env}{st}{cex}{cst}{\econt} & : &
@@ -260,6 +260,59 @@ The state space of the CESK machine contains various kinds of configurations, ea
 
   \end{array}
 \]
+
+\subsubsection{EvalConfiguration}
+\label{subsubsec:evalconfig}
+%\newcommand{\evallistconf}[6]{\langle{#1},\,{#2},\,{#3},\handler,\,{#4},\,{#5},\,{#6}\rangle_{\mathrm{evalList}}}
+For the EvalConfiguration the transition step dispatches on the expression component, $\expr$. The next configuration is:
+\begin{itemize}
+%% Eval configuration can result with:
+\item ValuePassingConfiguration, when the current expression evaluates to a value in one step.
+\item ExecConfiguration, when the current expression results with an invocation, i.e. execution of statement body of a getter. Note that for other invocations, we first evaluate the receiver for instance invocations, or the arguments for a static or constructor invocations.
+\item EvalListConfiguration, when the current expression implies evaluation of a list of expressions.
+\item ThrowConfiguration, when the current expression throws, i.e. is a throw expression.
+\item EvalConfiguration, otherwise.
+\end{itemize}
+
+\subsubsection{EvalListConfigruation}
+\label{subsubsec:evallistconfig}
+%\newcommand{\evallistconf}[6]{\langle{#1},\,{#2},\,{#3},\handler,\,{#4},\,{#5},\,{#6}\rangle_{\mathrm{evalList}}}
+For the EvalList configuration the transition step dispatches on the expression list, $\exprs$. The next configuration is either a EvalConfiguration or ApplicationConfiguration, see Section~\ref{subsubsec:eval-list-expressions}.
+
+\subsubsection{ExecConfiguration}
+\label{subsubsec:execconfig}
+%\newcommand{\execconf}[9]{\langle{#1},\,{#2},\,{#3},\,{#4},\,\strace,\,{#5},\,{#6},\,{#7},\,{#8},\,{#9}\rangle_{\mathrm{exec}}}
+For the ExecConfiguration the transition step dispatches on the statement expression, $\stmt$. The next configuration is either an ExecConfiguration or EvalConfiguration.
+
+\subsubsection{ValuePassingConfiguration}
+\label{suubsubsec:valuepassingconfig}
+%\newcommand{\contconf}[2]{\confpair{#1}{#2}_{\mathrm{cont}}}
+The ValuePassingConfiguration applies the expression continuation component to its value component.
+
+\subsubsection{ApplicationConfiguration}
+\label{subsubsec:applicationconfig}
+% \newcommand{\acontconf}[2]{\confpair{#1}{#2}_{\mathrm{acont}}}
+The ApplicationConfiguration applies the application continuation component to its list of values component.
+
+\subsubsection{ForwardConfiguration}
+\label{subsubsec:forwardconfig}
+% \newcommand{\acontconf}[2]{\confpair{#1}{#2}_{\mathrm{acont}}}
+The ForwardConfiguration applies the statement continuation component to its environment component.
+
+\subsubsection{ThrowCongfiguration}
+\label{subsubsec:throwconfig}
+% \newcommand{\throwconf}[3]{\conftriple{#1}{#2}{#3}_{\mathrm{throw}}}
+For the ThrowConfiguration the transition step dispatches its continuation component.  It results with either a ThrowConfiguration, when  the exception cant be handled in the head of the non empty catch list or a ExecConfiguration, for the statement body of the matching catch or the finally statement.
+
+\subsubsection{BreakConfiguration}
+\label{subsubsec:breakconfig}
+%\newcommand{\breakconf}[1]{\confsingle{#1}_{\mathrm{breakCont}}}
+For the BreakConfiguration the transition step dispatches on the continuation component. It results with a ForwardConfiguration corresponding to the target break label.
+
+\subsubsection{SwitchConfiguration}
+\label{subsubsec:switchconfig}
+% \newcommand{\switchconf}[1]{\confsingle{#1}_{\mathrm{switchCont}}}
+For the SwitchConfiguration the transition step dispatches on the continuation component. It results with a ExecConfiguration.
 
 \subsection{Continuations}
 \label{subsec:continuations-definition}
@@ -419,6 +472,7 @@ There are various types of continuations depending on the next statement to be e
 \label{subsec:expr-evaluation}
 %% todo: add about EvalConfig and EvalListConfig
 \subsubsection{Evaluation of list of expressions}
+\label{subsubsec:eval-list-expressions}
 \[
   \begin{array}{lcl}
 	\evallistconf{\expr :: \exprs}{\env}{\strace}{\cstrace}{\cex}{\acont}
