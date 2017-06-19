@@ -345,6 +345,12 @@ Statement continuations capture the steps after execution of a statement. They a
 \noindent
 We suffix the names of statement continuations with "$SK$".
 
+\subsubsection{Application continuation}
+\label{subsubsec:application-continuation}
+
+Application continuations capture the application of a list of values resulting from the evaluation of list of expressions.\\
+We use ValueA, an application continuation, capturing a value and an application continuation, as application that adds a value to the head of the list.
+
 \subsubsection{Break continuations}
 \label{subsubsec:break-continuations}
 
@@ -453,6 +459,7 @@ FinallyContinue continuations are added when a try/finally statement is encounte
 \newcommand{\ConditionalExpression}[3]{#1\,?\,#2\,:\,#3}
 
 %% StringConcatenation
+\newcommand{\StringConcatenation}[1]{\tt{Concat}\,#1}
 
 \newcommand{\IsExpression}[2]{#1\,\tt{is}\,#2}
 \newcommand{\AsExpression}[2]{#1\,\tt{as}\,#2}
@@ -699,17 +706,39 @@ Let $\econt' = \letk{\expri{2}}{\env}{\varmeta}{\strace}{\cstrace}{\cex}{\econt}
 	&&\env'=\ext{\env}{\varmeta}{\val}\\[2mm]
   \end{array}
 \]
-\newcommand{\ExitSK}[1]{\mathrm{ExitSK(\econt,\,#1)}}
 
 \subsubsection{String Concatenation}
 \label{subsubsec:string-concatenation}
 Function $stringValue$ concatenates strings from the given meta-list.
 
 \[stringValue : \mlist{\dstring} \rightarrow \dstring\]
+
+\noindent
+The transition string concatenation expressions are defined as follows:
+\newcommand{\StringConcatenationA}{\mathrm{StringConcatenationA(\econt)}}
+\[
+  \begin{array}{lcl}
+	\evalconf{\StringConcatenation{\exprs}}{\env}{\strace}{\cstrace}{\cex}{\econt}
+	& \Rightarrow &
+	\evallistconf{\exprs}{\env}{\strace}{\cstrace}{\cex}{\acont'}\\[2mm]
+	 \textrm{with }\\
+	\hspace{3mm}\acont' = \StringConcatenationA\\[2mm]
+	\contconf{\StringConcatenationA}{\vals}
+	& \Rightarrow &
+	\contconf{\econt}{stringValue(\vals)}
+  \end{array}
+\]
+
+
 \subsubsection{Static and library fields}
+\label{subsubsec:static-and-library-fields}
+
+\newcommand{\ExitSK}[1]{\mathrm{ExitSK(\econt,\,#1)}}
+
 Let $\env^{M}$ be the global environment that stores bindings for static and library fields to labels for all static and library fields previously accessed or set during the execution of the program.\\
 Static and library variables are accessed with $\StaticGet{\membermeta}$. Let $\membermeta$ be a static or library field and $\expressionmeta_{\membermeta}$ its initializer expression.
 \newcommand{\StaticGetK}{\mathrm{StaticGetK}(\membermeta,\,\econt)}
+
 \[
   \begin{array}{llcl}
 	\textrm{If }\membermeta \in \env^{M}:
