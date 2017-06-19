@@ -309,11 +309,6 @@
 \newcommand{\mlist}[1]{\textrm{List}\langle {#1} \rangle}
 \newcommand{\ext}[3]{\ensuremath{extend({#1},\,{#2},\,{#3})}}
 
-% Syntactic
-
-
-% Semantic
-
 % Named Configuration for CESK transitions
 \newcommand{\breakconf}[1]{\confsingle{#1}_{\mathrm{breakCont}}}
 \newcommand{\switchconf}[1]{\confsingle{#1}_{\mathrm{switchCont}}}

@@ -317,8 +317,63 @@ For the SwitchConfiguration the transition step dispatches on the continuation c
 \subsection{Continuations}
 \label{subsec:continuations-definition}
 
-Continuation is the function that represents the rest of the program and is has the information needed to resume the execution of the program. 
+Continuations capture the state for execution of statements, or expressions and capture the information needed to resume the execution of the program.
 There are various types of continuations depending on the next statement to be executed or next expression to be evaluated.
+\subsubsection{Expression continuations}
+\label{subsubsec:expression-continuations}
+
+Expression continuations, $\econt$, capture the steps after the evaluation of a given expression. They accept a value and produce the next configuration. We suffix the names of expression continuations with "$K$".
+
+There are various kinds of configurations, two more general types can be distinguished.
+\begin{itemize}
+\item Continuations with holes, i.e. expressions to be evaluated
+
+Expression continuations with expressions will produce EvalConfiguration for evaluation of the next expression. For example, $\conditionalk{\expri{1}}{\expri{2}}{\env}{\strace}{\cstrace}{\cex}{\econt}$, will proceed to the next configuration depending on the input value and produce an EvalConfiguration for the evaluation of the expression $\expri{1}$ or $\expri{2}$ accordingly.
+
+\noindent
+Note that some continuation will not evaluate the captured expression, when this is not necessary (e.g., Section~\ref{subsubsec:bool-expressions}).
+
+\item Continuations without holes
+Continuations without holes dispatch on the provided value and produce the next configuration, a ValuePassingConfiguration.
+\end{itemize}
+
+\subsubsection{Statement continuations}
+\label{subsubsec:statement-continuations}
+
+Statement continuations capture the steps after execution of a statement. They accept an environment and produce the next configuration. Statements in a block expressions can extend the environment function and this is visible to the subsequent expressions in the block. For other types of statement configuration, the environment is ignored.
+
+\noindent
+We suffix the names of statement continuations with "$SK$".
+
+\subsubsection{Break continuations}
+\label{subsubsec:break-continuations}
+
+Break continuations capture the steps to be executed when a break to a given label is encountered.
+
+\noindent
+There are two types of Break continuations:
+\begin{itemize}
+\item Break -
+Break continuations capture the statement continuation and the environment corresponding to the provided label.
+\item FinallyBreak -
+FinallyBreak continuations are added when a try/finally statement is encountered and they capture the statement body and the components necessary for its execution.
+\end{itemize}
+
+\subsubsection{Switch continuations}
+\label{subsubsec:switch-continuations}
+
+Switch continuations capture the steps to be executed when a continue to a preceding switch case is encountered. They capture the components needed for the execution of the case body statement.
+
+\noindent
+There are two types of Switch continuations:
+\begin{itemize}
+\item SwitchContinue -
+SwitchContinue continuations capture the statement body of a preceding switch case, targeted by some continue statement, and the components necessary for its execution.
+\item FinallyContinue -
+FinallyContinue continuations are added when a try/finally statement is encountered and they capture the statement body and the components necessary for its execution.
+\end{itemize}
+\subsubsection{Exception handlers}
+\label{subsubsec:exception-handlers}
 
 \subsection{Values}
 \label{subsec:values}
@@ -558,6 +613,7 @@ A variable $\varmeta$ is accessed by reading the value stored at location $\env(
 \]
 
 \subsubsection{Boolean expressions}
+\label{subsubsec:bool-expressions}
 \newcommand{\true}{\tt{true}}
 \newcommand{\false}{\tt{false}}
 
