@@ -336,8 +336,7 @@ There are various types of continuations depending on the next statement to be e
 \subsubsection{Expression continuations}
 \label{subsubsec:expression-continuations}
 
-Expression continuations, $\econt$, capture the steps after the evaluation of a given expression. They accept a value and produce the next configuration. We suffix the names of expression continuations with "$K$".
-
+Expression continuations, $\econt$, capture the steps after the evaluation of a given expression. They accept a value and produce the next configuration. 
 There are various kinds of configurations, two more general types can be distinguished:
 \begin{itemize}
 \item Continuations with holes, i.e. expressions to be evaluated\\
@@ -347,6 +346,7 @@ Note that some continuation will not evaluate the captured expression, when this
 \item Continuations without holes\\
 Continuations without holes dispatch on the provided value and produce the next configuration, a ValuePassingConfiguration.
 \end{itemize}
+We suffix the names of expression continuations with "$K$".
 
 \subsubsection{Statement continuations}
 \label{subsubsec:statement-continuations}
@@ -360,7 +360,8 @@ We suffix the names of statement continuations with "$SK$".
 \label{subsubsec:application-continuation}
 
 Application continuations capture the application of a list of values resulting from the evaluation of list of expressions.\\
-We use ValueA, an application continuation, capturing a value and an application continuation, as application that adds a value to the head of the list.
+We use ValueA, an application continuation, capturing a value and an application continuation, as application that adds a value to the head of the list.\\
+We suffix the names of application continuations with "$A$".
 
 \subsubsection{Break continuations}
 \label{subsubsec:break-continuations}
@@ -544,7 +545,6 @@ FinallyContinue continuations are added when a try/finally statement is encounte
 \subsection{Expression evaluation}
 \label{subsec:expr-evaluation}
 \newcommand{\ExpressionsK}[6]{\mathrm{ExpressionsK}({#1},\,{#2},\,{#3},\,{#4},\,{\handler},\,{#5},\,{#6})}
-\newcommand{\ExpressionK}[2]{\mathrm{ExpressionK}({#1},\,{#2})}
 \newcommand{\ValueA}[2]{\mathrm{ValueA}({#1},\,{#2})}
 
 Expressions are evaluated by dispatching according to the expression component in EvalConfiguration, Section~\ref{subsubsec:evalconfig}, and EvalListConfiguration, Section~\ref{subsubsec:evallistconfig}.
@@ -1250,6 +1250,7 @@ Similarly to \ref{subsubsec:instance-method-invoc}, $\ExitSK{\val}$ is added as 
 \subsubsection{Type test}
 \label{subsubsec:type-test}
 \newcommand{\IsExpressionK}{\mathrm{IsExpressionK}(\tt{T},\,\econt)}
+Type tests evaluate to a boolean value, as show below: 
 \[
   \begin{array}{lcl}
 	\cesktrans{
@@ -1269,8 +1270,8 @@ Similarly to \ref{subsubsec:instance-method-invoc}, $\ExitSK{\val}$ is added as 
 
 \subsubsection{Type cast}
 \label{subsubsec:type-cast}
-%\newcommand{\AsExpression}[2]{#1\,\tt{as}\,#2}
 \newcommand{\AsExpressionK}{\mathrm{AsExpressionK}(\tt{T},\,\strace,\,\handler,\,\econt)}
+Type casts evaluate the target expression to the corresponding value eventually, when the expression is of the target type. Otherwise, the evaluation of the expression results with an error, as shown below:
 \[
   \begin{array}{lcl}
 	\cesktrans{
@@ -1289,58 +1290,80 @@ Similarly to \ref{subsubsec:instance-method-invoc}, $\ExitSK{\val}$ is added as 
 \]
 
 \subsubsection{This}
+For the evaluation $\this$ expression we add a special variable declaration, $\this$. In the body of instance methods or constructors, there is a binding in the corresponding environment from $\this$ variable declaration to a label that stores the corresponding object. Evaluation of $\this$ expression resolves to the value in one step, as shown below:
 \[
   \begin{array}{lcl}
 	\cesktrans{
 		\evalconf{\ThisExpression}{\env}{\strace}{\cstrace}{\cex}{\econt}}{
 		\contconf{\econt}{\deref{\env(\this)}}}
-  $  $\end{array}
+  \end{array}
 \]
 \subsection{Statement execution}
 \label{subsec:stmt-exectution}
 
 \subsubsection{Variable Declaration}
+Variable declaration extend the corresponding environment with a new binding. The corresponding initializer expression is first evaluated to a value $v$.
 
+\noindent
 Let $\econt' = \vardeclk{\env}{\varmeta}{\scont}$ below:
 \[
   \begin{array}{lcl}
-	\execconf{\textbf{var } \varmeta = \expr}{\env}{\lbls}{\clbls}{\handler}{\cstrace}{\cex}{\econt}{\scont}
-	& \Rightarrow &
-	\evalconf{\expr}{\env}{\strace}{\cstrace}{\cex}{\econt'}\\[2mm]
+	\cesktrans{
+		\execconf{\textbf{var } \varmeta = \expr}{\env}{\lbls}{\clbls}{\handler}{\cstrace}{\cex}{\econt}{\scont}}{
+		\evalconf{\expr}{\env}{\strace}{\cstrace}{\cex}{\econt'}}
+	\\[2mm]
 
-	\contconf{\econt'}{\val}
-	& \Rightarrow &
-	\scontconf{\scont}{\ext{\env}{\varmeta}{\val}}
-
+	\cesktrans{
+		\contconf{\econt'}{\val}}{
+		\scontconf{\scont}{\ext{\env}{\varmeta}{\val}}}
   \end{array}
 \]
-\subsubsection{Block statements}
+
+\subsubsection{Empty statement}
+\label{subsubsec:emtpy-stmt}
 
 \[
   \begin{array}{lcl}
-	\execconf{\lbrace\rbrace}{\env}{\lbls}{\clbls}{\handler}{\cstrace}{\cex}{\econt}{\scont}
-	& \Rightarrow &
-	\scontconf{\scont}{\env}\\[2mm]
-
-	\execconf{\lbrace\expr\rbrace}{\env}{\lbls}{\clbls}{\handler}{\cstrace}{\cex}{\econt}{\scont}
-	& \Rightarrow &
-	\evalconf{\expr}{\env}{\strace}{\cstrace}{\cex}{\ExpressionK{\scont}{\env}}\\[2mm]
-
-	\execconf{\stmt :: \stmts}{\env}{\lbls}{\clbls}{\handler}{\cstrace}{\cex}{\econt}{\scont}
-	& \Rightarrow &
-	\execconf{\stmt}{\env}{\lbls}{\clbls}{\handler}{\cstrace}{\cex}{\econt}{\scont'}\\[2mm]
-
-	\scontconf{\blocksk{\stmt :: \stmts}{\env}}{\env'}
-	& \Rightarrow &
-	\execconf{\stmt}{\env'}{\lbls}{\clbls}{\handler}{\cstrace}{\cex}{\econt}{\scont'}\\[2mm]
-
-	\scontconf{\blocksk{[]}{\env}}{ \_ }
-	& \Rightarrow &
-	\scontconf{\scont}{\env}\\[2mm]
-
+	\cesktrans{
+		\execconf{\lbrace\rbrace}{\env}{\lbls}{\clbls}{\handler}{\cstrace}{\cex}{\econt}{\scont}}{
+		\scontconf{\scont}{\env}}
+		\\[2mm]
   \end{array}
 \]
 
+\subsubsection{Expression statement}
+\label{expression-stmt}
+\newcommand{\ExpressionK}[2]{\mathrm{ExpressionK}({#1},\,{#2})}
+
+\[
+  \begin{array}{lcl}
+	\cesktrans{
+		\execconf{\lbrace\expr\rbrace}{\env}{\lbls}{\clbls}{\handler}{\cstrace}{\cex}{\econt}{\scont}}{
+		\evalconf{\expr}{\env}{\strace}{\cstrace}{\cex}{\ExpressionK{\scont}{\env}}}
+		\\[2mm]
+  \end{array}
+\]
+\subsubsection{Block statements}
+\[
+  \begin{array}{lcl}
+	\cesktrans{
+		\execconf{\stmt :: \stmts}{\env}{\lbls}{\clbls}{\handler}{\cstrace}{\cex}{\econt}{\scont}}{
+		\execconf{\stmt}{\env}{\lbls}{\clbls}{\handler}{\cstrace}{\cex}{\econt}{\scont'}}
+		\\[2mm]
+
+	\cesktrans{
+		\scontconf{\blocksk{\stmt :: \stmts}{\env}}{\env'}}{
+		\execconf{\stmt}{\env'}{\lbls}{\clbls}{\handler}{\cstrace}{\cex}{\econt}{\scont'}}
+		\\[2mm]
+
+	\cesktrans{
+		\scontconf{\blocksk{[]}{\env}}{ \_ }}{
+		\scontconf{\scont}{\env}}
+		\\[2mm]
+  \end{array}
+\]
+
+\noindent
 with $\scont' = \blocksk{\stmts}{\env}$.
 
 \subsubsection{If statement}
