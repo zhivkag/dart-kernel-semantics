@@ -1336,7 +1336,105 @@ Type casts evaluate the target expression to the corresponding value eventually,
 For the evaluation $\this$ expression we add a special variable declaration, $\this$. In the body of instance methods or constructors, there is a binding in the corresponding environment from $\this$ variable declaration to a label that stores the corresponding object. Evaluation of $\this$ expression resolves to the value in one step.
 \subsection{Statement execution}
 \label{subsec:stmt-exectution}
+\newcommand{\execcesktrans}[4]{\labl{#1}\, &\cesktrans{#2}{#3}\,\hspace{2mm}#4\\[2mm]}
+%
+\newcommand{\ExpressionK}[2]{\mathrm{ExpressionK}({#1},\,{#2})}
+%
+\begin{center}
+	$
+	\begin{array}{llcl}
+		\execcesktrans
+			{1}
+			{\execconf{\textbf{var } \varmeta = \expr}{\env}{\lbls}{\clbls}{\handler}{\cstrace}{\cex}{\econt}{\scont}}
+			{\evalconf{\expr}{\env}{\strace}{\cstrace}{\cex}{\econt'}}
+			{\\&\econt' = \vardeclk{\env}{\varmeta}{\scont}}
 
+		\execcesktrans
+			{2}
+			{\execconf{\lbrace\rbrace}{\env}{\lbls}{\clbls}{\handler}{\cstrace}{\cex}{\econt}{\scont}}
+			{\scontconf{\scont}{\env}}
+			{}
+
+		\execcesktrans
+			{3}
+			{\execconf{\lbrace\expr\rbrace}{\env}{\lbls}{\clbls}{\handler}{\cstrace}{\cex}{\econt}{\scont}}
+			{\evalconf{\expr}{\env}{\strace}{\cstrace}{\cex}{\econt'}}
+			{\\&\econt' = \ExpressionK{\scont}{\env}}
+
+		\execcesktrans
+			{4}
+			{\execconf{\stmt :: \stmts}{\env}{\lbls}{\clbls}{\handler}{\cstrace}{\cex}{\econt}{\scont}}
+			{}
+			{\\&\hspace{4mm}\execconf{\stmt}{\env}{\lbls}{\clbls}{\handler}{\cstrace}{\cex}{\econt}{\scont'}
+			\\&\scont' = \blocksk{\stmts}{\env}}
+
+		\execcesktrans
+			{5}
+			{\execconf{\textbf{if } \expr \textbf{ then } \stmti{1} \textbf{ else } \stmti{2} }{\env}{\lbls}{\clbls}{\handler}{\cstrace}{\cex}{\econt}{\scont}}
+			{\evalconf{\expr}{\env}{\strace}{\cstrace}{\cex}{\econt'}}
+			{\\&\econt' = \ifcondk{\stmti{1}}{\stmti{2}}}
+
+		\execcesktrans
+			{6}
+			{\execconf{\textbf{return } \expr}{\env}{\lbls}{\clbls}{\handler}{\cstrace}{\cex}{\econt}{\scont}}
+			{\evalconf{\expr}{\env}{\strace}{\cstrace}{\cex}{\econt}}
+			{}
+
+		\execcesktrans
+			{7}
+			{\execconf{\textbf{return}}{\env}{\lbls}{\clbls}{\handler}{\cstrace}{\cex}{\econt}{\scont}}
+			{\contconf{\econt}{\textbf{null}}}
+			{}
+
+		\execcesktrans
+			{8}
+			{\execconf{\textbf{while } (\expr) \stmt}{\env}{\lbls}{\clbls}{\handler}{\cstrace}{\cex}{\econt}{\scont}}
+			{\evalconf{\expr}{\env}{\strace}{\cstrace}{\cex}{\econt'}}
+			{\\&\econt', \scont' = \whilecondk}
+
+		\execcesktrans
+			{9}
+			{\execconf{\textbf{L: }\stmt_{L}}{\env}{\lbls}{\clbls}{\handler}{\cstrace}{\cex}{\econt}{\scont}}
+			{}
+			{\\&\hspace{4mm}\execconf{\stmt_{L}}{\env}{\lbl :: \lbls}{\clbls}{\handler}{\cstrace}{\cex}{\econt}{\scont}
+			\\&\lbl = \mathrm{Label}(L, \bcont), \bcont = \mathrm{Break}(\env, \scont)}
+
+		\execcesktrans
+			{10}
+			{\execconf{\textbf{switch }(\expr) \scases }{\env}{\lbls}{\clbls}{\handler}{\cstrace}{\cex}{\econt}{\scont}}
+			{\evalconf{\expr}{\env}{\strace}{\cstrace}{\cex}{\econt'}}
+			{\\&\econt' = \switchk{\scases}{\clbls}}
+
+		\execcesktrans
+			{11}
+			{\execconf{\mathrm{TryCatch}(\stmt, cs)}{\env}{\lbls}{\clbls}{\handler}{\cex}{\cstrace}{\econt}{\scont}}
+			{}
+			{\\&\hspace{4mm}\execconf{\stmt}{\env}{\lbls}{\clbls}{\handler'}{\cex}{\cstrace}{\econt}{\scont}
+			\\&\handler' = \catchk{cs}}
+
+		\execcesktrans
+			{12}
+			{\execconf{\textbf{break L}}{\env}{\lbls}{\clbls}{\handler}{\cex}{\cstrace}{\econt}{\scont}}
+			{\breakconf{\bcont}}
+			{\\&\lbl = Label(L', \bcont) \in \lbls \textrm{ with } L' == \mathbf{L}}
+
+		\execcesktrans
+			{13}
+			{\execconf{\textbf{continue L}}{\env}{\lbls}{\clbls}{\handler}{\cex}{\cstrace}{\econt}{\scont}}
+			{\switchconf{\switchcont}}
+			{\\&\clbl = \continuel{L'}{\switchcont} \in \clbls \textrm{ with } L' == \mathbf{L}}
+
+		\execcesktrans
+			{14}
+			{\execconf{fun(\formals) \stmt_{body}}{\env}{\lbls}{\clbls}{\handler}{\cstrace}{\cex}{\econt}{\scont}}
+			{}
+			{\\&\hspace{4mm}\contconf{\econt}{\funval{\stmt_{body}}{\formals}{\env'}}
+			\\&\env' = \ext{\env}{fun}{\funval{\stmt_{body}}{\formals}{\env'}}}
+	\end{array}
+	$
+	\captionof{table}{Evaluation of instance method invocation expressions}
+	\label{table:instance-method-evalconfigs}
+\end{center}
 \subsubsection{Variable Declaration}
 Variable declaration extend the corresponding environment with a new binding. The corresponding initializer expression is first evaluated to a value $v$.
 
@@ -1344,11 +1442,6 @@ Variable declaration extend the corresponding environment with a new binding. Th
 Let $\econt' = \vardeclk{\env}{\varmeta}{\scont}$ below:
 \[
   \begin{array}{lcl}
-	\cesktrans{
-		\execconf{\textbf{var } \varmeta = \expr}{\env}{\lbls}{\clbls}{\handler}{\cstrace}{\cex}{\econt}{\scont}}{
-		\evalconf{\expr}{\env}{\strace}{\cstrace}{\cex}{\econt'}}
-	\\[2mm]
-
 	\cesktrans{
 		\contconf{\econt'}{\val}}{
 		\scontconf{\scont}{\ext{\env}{\varmeta}{\val}}}
@@ -1358,35 +1451,13 @@ Let $\econt' = \vardeclk{\env}{\varmeta}{\scont}$ below:
 \subsubsection{Empty statement}
 \label{subsubsec:emtpy-stmt}
 
-\[
-  \begin{array}{lcl}
-	\cesktrans{
-		\execconf{\lbrace\rbrace}{\env}{\lbls}{\clbls}{\handler}{\cstrace}{\cex}{\econt}{\scont}}{
-		\scontconf{\scont}{\env}}
-		\\[2mm]
-  \end{array}
-\]
 
 \subsubsection{Expression statement}
 \label{expression-stmt}
-\newcommand{\ExpressionK}[2]{\mathrm{ExpressionK}({#1},\,{#2})}
 
-\[
-  \begin{array}{lcl}
-	\cesktrans{
-		\execconf{\lbrace\expr\rbrace}{\env}{\lbls}{\clbls}{\handler}{\cstrace}{\cex}{\econt}{\scont}}{
-		\evalconf{\expr}{\env}{\strace}{\cstrace}{\cex}{\ExpressionK{\scont}{\env}}}
-		\\[2mm]
-  \end{array}
-\]
 \subsubsection{Block statements}
 \[
   \begin{array}{lcl}
-	\cesktrans{
-		\execconf{\stmt :: \stmts}{\env}{\lbls}{\clbls}{\handler}{\cstrace}{\cex}{\econt}{\scont}}{
-		\execconf{\stmt}{\env}{\lbls}{\clbls}{\handler}{\cstrace}{\cex}{\econt}{\scont'}}
-		\\[2mm]
-
 	\cesktrans{
 		\scontconf{\blocksk{\stmt :: \stmts}{\env}}{\env'}}{
 		\execconf{\stmt}{\env'}{\lbls}{\clbls}{\handler}{\cstrace}{\cex}{\econt}{\scont'}}
@@ -1398,21 +1469,12 @@ Let $\econt' = \vardeclk{\env}{\varmeta}{\scont}$ below:
 		\\[2mm]
   \end{array}
 \]
-
 \noindent
 with $\scont' = \blocksk{\stmts}{\env}$.
 
 \subsubsection{If statement}
 
 Let $\econt' = \ifcondk{\stmti{1}}{\stmti{2}}$ below:
-
-\[
-  \begin{array}{lcl}
-	\execconf{\textbf{if } \expr \textbf{ then } \stmti{1} \textbf{ else } \stmti{2} }{\env}{\lbls}{\clbls}{\handler}{\cstrace}{\cex}{\econt}{\scont}
-	& \Rightarrow &
-	\evalconf{\expr}{\env}{\strace}{\cstrace}{\cex}{\econt'}\\[2mm]
-  \end{array}
-\]
 \[
   \begin{array}{lcl}
 	\contconf{\econt'}{\true} 
@@ -1427,27 +1489,8 @@ Let $\econt' = \ifcondk{\stmti{1}}{\stmti{2}}$ below:
 
 \subsubsection{Return statement}
 
-\[
-  \begin{array}{lcl}
-	\execconf{\textbf{return } \expr}{\env}{\lbls}{\clbls}{\handler}{\cstrace}{\cex}{\econt}{\scont}
-	& \Rightarrow &
-	\evalconf{\expr}{\env}{\strace}{\cstrace}{\cex}{\econt}\\[2mm]
-	
-	\execconf{\textbf{return}}{\env}{\lbls}{\clbls}{\handler}{\cstrace}{\cex}{\econt}{\scont}
-	& \Rightarrow &
-	\contconf{\econt}{\textbf{null}}
-  \end{array}
-\]
-
 \subsubsection{Loops}
-\[
-  \begin{array}{lcl}
-	\execconf{\textbf{while } (\expr) \stmt}{\env}{\lbls}{\clbls}{\handler}{\cstrace}{\cex}{\econt}{\scont}
-	& \Rightarrow &
-	\evalconf{\expr}{\env}{\strace}{\cstrace}{\cex}{\econt'}\\[2mm]
-  \end{array}
-\]
-with $\econt', \scont' = \whilecondk$.
+Let $\econt', \scont' = \whilecondk$ below:
 \[
   \begin{array}{lcl}
 	\contconf{\econt'}{\false}
@@ -1470,30 +1513,10 @@ Loops \textbf{do while}, \textbf{for in}, for can be desugared to while loops wi
 Kernel supports labelling statements, \textbf{L: $\stmt_{L}$}, and breaking to L, \textbf{break L}, which completes the execution of the labelled statement and proceeds to executing the rest of the program.
 To support breaking to a label, we add a labels component, $\lbls$, to statement configurations. $\lbls$ represents a list of pairs mapping a labelled statement, \textbf{L: $\stmt_L$}, to a break statement continuation, $\bcont$. Executing a labelled statement inserts a new break label, $\lbl$ in the list of labels $\lbls$.
 
-\[
-  \begin{array}{lcl}
-	\execconf{\textbf{L: }\stmt_{L}}{\env}{\lbls}{\clbls}{\handler}{\cstrace}{\cex}{\econt}{\scont}
-	& \Rightarrow &
-	\execconf{\stmt_{L}}{\env}{\lbl :: \lbls}{\clbls}{\handler}{\cstrace}{\cex}{\econt}{\scont}
-  \end{array}
-\]
-with:
-\[\lbl = \mathrm{Label}(L, \bcont), \bcont = \mathrm{Break}(\env, \scont)\]
 \subsection{Switch}
 Kernel supports dispatching control among a number of cases with \textbf{switch} statements, where the target expression $\expr$ is evaluated and matched against the different case clauses of the switch statement. 
  
 In Kernel, case clauses can have multiple constant expressions and there is no implicit fall-through between cases. Kernel supports continuing to execution of a preceding case clause with continue statements where the target of the continue statement is a preceding case clause, e.g, continue C with C = case $\expri{1..i}$: $\stmt$. To support continue, we add an optional $\clbls$ list, similar to the label list, which is set in a switch statement and unset otherwise.
-
-The execution of a switch statement proceeds as follows: 
-
-\[
-  \begin{array}{lcl}
-	\execconf{\textbf{switch }(\expr) \scases }{\env}{\lbls}{\clbls}{\handler}{\cstrace}{\cex}{\econt}{\scont}
-	& \Rightarrow &
-	\evalconf{\expr}{\env}{\strace}{\cstrace}{\cex}{\econt'}\\
-  \end{array}
-\]
-with $\econt' = \switchk{\scases}{\clbls}$
 
 If there is a matching case clause, its statement is executed with a new statement continuation that will throw when reached. The new statement continuation is necessary because implicit fall-through is not supported and an explicit break of the flow is required (with either of \textbf{continue, break, return, throw}).
 
@@ -1598,18 +1621,7 @@ When a catch handler with no on-catch handlers is reached, the exception is reth
   \end{array}
 \]
 \noindent
-\textbf{try/catch} statements execute their body with a new handler:
-
-\[
-  \begin{array}{lcl}
-	\execconf{\mathrm{TryCatch}(\stmt, cs)}{\env}{\lbls}{\clbls}{\handler}{\cex}{\cstrace}{\econt}{\scont}
-	\Rightarrow\\
-	\hspace{10mm}\execconf{\stmt}{\env}{\lbls}{\clbls}{\handler'}{\cex}{\cstrace}{\econt}
-	{\scont}\hspace{50mm}
-  \end{array}
-\]
-where $\handler' = \catchk{cs}$.
-
+\textbf{try/catch} statements execute their body with a new handler.
 
 \noindent
 \textbf{try/finally} statements execute their body with a new handler and additionally install new break and continue switch labels, a new return continuation, and a new statement continuation:
@@ -1644,10 +1656,6 @@ where:
 Let $\lbl = Label(L', \bcont) \in \lbls \textrm{ with } L' == \mathbf{L}$ below:
 \[
   \begin{array}{lcl}
-	\execconf{\textbf{break L}}{\env}{\lbls}{\clbls}{\handler}{\cex}{\cstrace}{\econt}{\scont}
-	& \Rightarrow &
-	\breakconf{\bcont}\\[2mm]
-
 	\breakconf{\mathrm{Break}(\env, \scont)}
 	& \Rightarrow &
 	\scontconf{\scont}{\env}\\[2mm]
@@ -1669,10 +1677,6 @@ Let $\lbl = Label(L', \bcont) \in \lbls \textrm{ with } L' == \mathbf{L}$ below:
 Let $\clbl = \continuel{L'}{\switchcont} \in \clbls \textrm{ with } L' == \mathbf{L}$ below:
 \[
   \begin{array}{lcl}
-	\execconf{\textbf{continue L}}{\env}{\lbls}{\clbls}{\handler}{\cex}{\cstrace}{\econt}{\scont}
-	& \Rightarrow \\
-	\hspace{10mm}\switchconf{\switchcont}\\[2mm]
-
 	\switchconf{\continuek}
 	& \Rightarrow \\
 	\hspace{10mm}\execconf{\stmt}{\env}{\lbls}{\clbls}{\handler}{\cex}{\cstrace}{\econt}{\scont}\\[2mm]
@@ -1694,14 +1698,6 @@ Kernel supports encapsulating an executable unit of code with function expressio
 \subsubsection{Function declaration}
 Kernel supports local function declaration, where a final variable stores a function value. 
 Let $F$ be a function with a body $\stmt_{body}$ and a list of formal parameters, $\formals$, and let $fun \in \dvardecl$ be the corresponding final variable declaration.
-\[
-  \begin{array}{lcl}
-	\execconf{fun(\formals) \stmt_{body}}{\env}{\lbls}{\clbls}{\handler}{\cstrace}{\cex}{\econt}{\scont}
-	& \Rightarrow &
-	\contconf{\econt}{\funval{\stmt_{body}}{\formals}{\env'}}
-  \end{array}
-\]
-where $\env' = \ext{\env}{fun}{\funval{\stmt_{body}}{\formals}{\env'}}$.
 
 \subsection{New instance creation}
 
