@@ -590,7 +590,7 @@ There are two types of Switch continuations:
 \newcommand{\SuperMethodA}{\mathrm{SuperMethodA}(\idmeta,\,\env,\,\ExceptionHandlers,\,\econt)}
 \begin{center}
 	$
-	\begin{array}{llcl}
+	\begin{array}{lrcl}
 		\evalcesktrans
 			{1}
 			{\evalconf{\IntLiteral{\integermeta}}{\env}{\strace}{\cstrace}{\cex}{\econt}}
@@ -700,13 +700,13 @@ There are two types of Switch continuations:
 			\\&&&\textrm{ and body}\stmt}
 	\end{array}
 	$
-	\captionof{table}{Evaluation of simple expressions}
-	\label{table:simple-evalconfigs}
+	\captionof{table}{Expressions}
+	\label{table:expressions-evalconfigs}
 \end{center}
 
 \begin{center}
 	$
-	\begin{array}{llcl}
+	\begin{array}{lrcl}
 		\evalcesktrans
 			{1}
 			{\evalconf{\StaticGet{\membermeta}}{\env}{\strace}{\cstrace}{\cex}{\econt}}
@@ -754,12 +754,12 @@ There are two types of Switch continuations:
 			\\&&&\strace' = \StaticInvocation{\{\membermeta\}}{\expressionsmeta}::\strace}
 	\end{array}
 	$
-	\captionof{table}{Evaluation of static variable extraction and assignments, and method invocation expressions}
+	\captionof{table}{Static variable extraction and assignment, and static method invocation}
 	\label{table:static-evalconfigs}
 \end{center}
 \begin{center}
 	$
-	\begin{array}{llcl}
+	\begin{array}{lrcl}
 		\evalcesktrans
 			{1}
 			{\evalconf{\PropertyGet{\expressionmeta}{\idmeta}}{\env}{\strace}{\cstrace}{\cex}{\econt}}
@@ -816,13 +816,13 @@ There are two types of Switch continuations:
 			{\\&&&\econt' = \SuperPropertySetK}
 	\end{array}
 	$
-	\captionof{table}{Evaluation of instance property extraction and assignment expressions}
+	\captionof{table}{Instance property extraction and assignment}
 	\label{table:instance-property-evalconfigs}
 \end{center}
 
 \begin{center}
 	$
-	\begin{array}{llcl}
+	\begin{array}{lrcl}
 		\evalcesktrans
 			{1}
 			{\evalconf{\InstanceMethodInvocation{\expressionmeta}{\idmeta}{\expressionsmeta}}{\env}{\strace}{\cstrace}{\cex}{\econt}}
@@ -848,7 +848,7 @@ There are two types of Switch continuations:
 			{\\&&&\acont' = \ctrapp{\textbf{Q}}{\econt}}
 	\end{array}
 	$
-	\captionof{table}{Evaluation of instance method invocation expressions}
+	\captionof{table}{Instance method and constructor invocation}
 	\label{table:instance-method-evalconfigs}
 \end{center}
 
@@ -861,7 +861,7 @@ Expressions are evaluated by dispatching according to the expression component i
 The rules for evaluation of list of expressions, i.e., transition steps from EvalListConfiguration, are the following:
 \label{subsec:eval-list-expressions}
 \[
-  \begin{array}{lcl}
+  \begin{array}{rcl}
 	\cesktrans{
 		\evallistconf{\expr :: \exprs}{\env}{\strace}{\cstrace}{\cex}{\acont}}{
 		\evalconf{\expr}{\env}{\strace}{\cstrace}{\cex}{\econt'}}
@@ -871,7 +871,6 @@ The rules for evaluation of list of expressions, i.e., transition steps from Eva
 		\evallistconf{[]}{\env}{\strace}{\cstrace}{\cex}{\acont}}{
 		\acontconf{\acont}{[]}}
 		\\[2mm]
-	\textrm{with:}\\
 	\hspace{3mm}\econt' = \ExpressionsK{\exprs}{\env}{\acont}
 	\\[2mm]
 
@@ -896,7 +895,7 @@ Kernel literals are evaluated to a value $\val \in \dlitval$. Transitions of the
 \label{subsubsec:variable-assignment-and-lookup}
 A variable $\varmeta$ is accessed by reading the value stored at location $\env(\varmeta)$ in the store $s$. Assigning a value to a variable will modify the store and the value stored at location  $\env(\varmeta)$.
 \[
-  \begin{array}{lcl}
+  \begin{array}{rcl}
 	\cesktrans{
 		\contconf{\VarSetK{\env}{\varmeta}{\econt}}{\val}}{
 		\contconf{\econt}{\val}},
@@ -915,7 +914,7 @@ The transition steps for boolean expressions are defined as follows:
 \begin{itemize}
 \item Not expression\\
 \[
-  \begin{array}{lll}
+  \begin{array}{rll}
 	\cesktrans{
 		\contconf{\NotK{\econt}}{\true}}{
 		\contconf{\econt}{\false}}
@@ -928,7 +927,7 @@ The transition steps for boolean expressions are defined as follows:
 \]
 \item And expression\\
 \[
-  \begin{array}{lcl}
+  \begin{array}{rcl}
 	\cesktrans{
 		\contconf{\AndK{\expressionmeta}{\env}{\econt}}{\true}}{
 		\evalconf{\expressionmeta}{\env}{\strace}{\cstrace}{\cex}{\econt}}
@@ -941,7 +940,7 @@ The transition steps for boolean expressions are defined as follows:
 \]
 \item Or expression\\
 \[
-  \begin{array}{lcl}
+  \begin{array}{rcl}
 	\cesktrans{
 		\contconf{\OrK{\expressionmeta}{\env}{\econt}}{\false}}{
 		\evalconf{\expressionmeta}{\env}{\strace}{\cstrace}{\cex}{\econt}}
@@ -954,7 +953,7 @@ The transition steps for boolean expressions are defined as follows:
 \]
 \item Conditional expression\\
 \[
-  \begin{array}{lcl}
+  \begin{array}{rcl}
 	\cesktrans{
 		\contconf{\econt'}{\true}}{
 		\evalconf{\expri{1}}{\env}{\strace}{\cstrace}{\cex}{\econt}}
@@ -971,7 +970,7 @@ The transition steps for boolean expressions are defined as follows:
 \subsubsection{Let}
 Let $\econt' = \LetK{\expri{2}}{\env}{\varmeta}{\econt}$ below:
 \[
-  \begin{array}{lcl}
+  \begin{array}{rcl}
 	\cesktrans{
 		\contconf{\econt'}{\val}}{
 		\evalconf{\expri{2}}{\env'}{\strace}{\cstrace}{\cex}{\econt}}
@@ -988,7 +987,7 @@ Function $stringValue$ concatenates strings from the given meta-list.
 \noindent
 The transition string concatenation expressions are defined as follows:
 \[
-  \begin{array}{lcl}
+  \begin{array}{rcl}
 	\cesktrans{
 		\contconf{\StringConcatenationA}{\vals}}{
 		\contconf{\econt}{stringValue(\vals)}}
@@ -1005,7 +1004,7 @@ Static and library variables are accessed with $\StaticGet{\membermeta}$.
 \noindent
 Let $\membermeta$ be a static or library field and $\expressionmeta_{\membermeta}$ its initializer expression.
 \[
-  \begin{array}{llcl}
+  \begin{array}{rlcl}
 	&\cesktrans{
 		\contconf{\StaticGetK}{\val}}{
 		\contconf{\econt}{\val}}
@@ -1018,7 +1017,7 @@ Let $\membermeta$ be a static or library field and $\expressionmeta_{\membermeta
 Static and library variables are set with $\StaticSet{\membermeta}{\expressionmeta}$.
 Let $\membermeta$ be a static or library field.
 \[
-  \begin{array}{lcl}
+  \begin{array}{rcl}
 	\cesktrans{
 		\contconf{\StaticSetK}{\val}}{
 		\contconf{\econt}{\val}}
@@ -1040,14 +1039,13 @@ with $\scont = \ExitSK{\val}$, $\env = \ext{\env_{empty}}{\formal}{\val}$.
 \subsubsection{Static Invocation}
 Static invocation is supported with $\StaticInvocation{\{\membermeta\}}{\expressionsmeta}$ where $\membermeta$ is a function with statement body $\stmt$ and formal parameters $\formals$.
 \[
-  \begin{array}{lcl}
+  \begin{array}{rcl}
 	\cesktrans{
 		\acontconf{\StaticInvApp{\formals}{\stmt}{\strace}{\econt}}{\val{s}}}{
 		\execconf{\stmt}{\env'}{[]}{[]}{\handler}{\cstrace}{\cex}{\econt}{\scont}}
 	\\[2mm]
-	\textrm{with }\\
-	\hspace{3mm}\scont = \ExitSK{\tt{null}},\\
-	\hspace{3mm}\env' = \ext{\env_{empty}}{\formals}{\val{s}}\\[2mm]
+	\scont = \ExitSK{\tt{null}},
+	\env' = \ext{\env_{empty}}{\formals}{\val{s}}\\[2mm]
   \end{array}
 \]
 \subsubsection{Property extraction}
@@ -1129,8 +1127,6 @@ A property assignment in Kernel can be done by executing a setter or accessing a
 	\cesktrans{
 		\contconf{\PropertySetK}{\val_0}}{
 		\evalconf{\expressionmeta_1}{\env}{\strace}{\cstrace}{\cex}{\econt'}}\\
-	\textrm{with}\\
-	\hspace{3mm}
 	\econt' = \PropertySetVK
   \end{array}
 \]
@@ -1336,13 +1332,13 @@ Type casts evaluate the target expression to the corresponding value eventually,
 For the evaluation $\this$ expression we add a special variable declaration, $\this$. In the body of instance methods or constructors, there is a binding in the corresponding environment from $\this$ variable declaration to a label that stores the corresponding object. Evaluation of $\this$ expression resolves to the value in one step.
 \subsection{Statement execution}
 \label{subsec:stmt-exectution}
-\newcommand{\execcesktrans}[4]{\labl{#1}\, &\cesktrans{#2}{#3}\,\hspace{2mm}#4\\[2mm]}
+\newcommand{\execcesktrans}[4]{\labl{#1}\, &\cesktrans{#2}{#3}\,\hspace{2mm}#4\hspace{6mm}\\[2mm]}
 %
 \newcommand{\ExpressionK}[2]{\mathrm{ExpressionK}({#1},\,{#2})}
 %
 \begin{center}
 	$
-	\begin{array}{llcl}
+	\begin{array}{lrcl}
 		\execcesktrans
 			{1}
 			{\execconf{\textbf{var } \varmeta = \expr}{\env}{\lbls}{\clbls}{\handler}{\cstrace}{\cex}{\econt}{\scont}}
@@ -1432,7 +1428,7 @@ For the evaluation $\this$ expression we add a special variable declaration, $\t
 			\\&\env' = \ext{\env}{fun}{\funval{\stmt_{body}}{\formals}{\env'}}}
 	\end{array}
 	$
-	\captionof{table}{Evaluation of instance method invocation expressions}
+	\captionof{table}{Instance method invocation}
 	\label{table:instance-method-evalconfigs}
 \end{center}
 \subsubsection{Variable Declaration}
