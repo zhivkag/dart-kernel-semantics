@@ -12,8 +12,10 @@
 %
 \usepackage{caption}
 \definecolor{shade}{gray}{0.75}
-
-
+%
+\usepackage{hyperref}
+\usepackage{chngcntr}
+%
 \newcommand{\shadethis}[1]{\colorbox{shade}
 {\protect\rule[-0.95mm]{0mm}{3.95mm}\hspace{0.3mm}#1\hspace{0.3mm}}}
 
@@ -348,7 +350,44 @@ Note that some continuation will not evaluate the captured expression, when this
 \item Continuations without holes\\
 Continuations without holes dispatch on the provided value and produce the next configuration, a ValuePassingConfiguration.
 \end{itemize}
-We suffix the names of expression continuations with "$K$".
+We suffix the names of expression continuations with "$K$". We differentiate the following continuations: 
+%
+%% Continuations
+%
+\newcommand{\VarSetK}[3]{\mathrm{VarSetK}({#1},\,{#2},\,{#3})}
+\newcommand{\ExpressionsK}[3]{\mathrm{ExpressionsK}({#1},\,{#2},\,\ExceptionHandlers,\,{#3})}
+\newcommand{\ValueA}[2]{\mathrm{ValueA}({#1},\,{#2})}
+%
+\newcommand{\NotK}[1]{\mathrm{NotK}({#1})}
+\newcommand{\AndK}[3]{\mathrm{AndK}({#1},\,{#2},\,\ExceptionHandlers,\,{#3})}
+\newcommand{\OrK}[3]{\mathrm{OrK}({#1},\,{#2},\,\ExceptionHandlers,\,{#3})}
+\newcommand{\ConditionalK}[4]{\mathrm{ConditionalK}({#1},\,{#2},\,{#3},\,\ExceptionHandlers,\,{#4})}
+%
+\newcommand{\LetK}[4]{\mathrm{LetK}({#1},\,{#2},\,{#3},\,\ExceptionHandlers,\,{#4})}
+\newcommand{\StringConcatenationA}{\mathrm{StringConcatenationA(\econt)}}
+%
+\newcommand{\IsExpressionK}{\mathrm{IsExpressionK}(\tt{T},\,\econt)}
+\newcommand{\AsExpressionK}{\mathrm{AsExpressionK}(\tt{T},\,\strace,\,\handler,\,\econt)}
+%
+\newcommand{\ExitSK}[1]{\mathrm{ExitSK(\econt,\,#1)}}
+\newcommand{\StaticInvApp}[4]{\mathrm{StaticInvocationA}({#1},\,{#2},\,{#3},\,\ExceptionHandlersRest,\,{#4})}
+\newcommand{\StaticGetK}{\mathrm{StaticGetK}(\membermeta,\,\econt)}
+\newcommand{\StaticSetK}{\mathrm{StaticSetK}(\membermeta,\,\econt)}
+\newcommand{\PropertyGetK}{\mathrm{PropertyGetK}(\idmeta,\,\ExceptionHandlers,\,\econt)}
+\newcommand{\PropertySetK}{\mathrm{PropertySetK}(\idmeta,\,\expressionmeta_1,\,\env,\,\ExceptionHandlers,\,\econt)}
+\newcommand{\PropertySetVK}{\mathrm{PropertySetValueK}(\val_0,\,\idmeta,\,\ExceptionHandlers\,\econt)}
+\newcommand{\dpropertygetk}{\mathrm{DPropertyGetK}(\membermeta,\,\ExceptionHandlers,\,\econt)}
+\newcommand{\DirectPropertySetK}{\mathrm{DPropertySetK}(\membermeta,\,\expressionmeta_1,\,\env,\,\ExceptionHandlers,\,\econt)}
+\newcommand{\DPropertysetVK}{\mathrm{DPropertySetValueK}(\val_0,\,\membermeta,\,\ExceptionHandlers,\,\econt)}
+\newcommand{\SuperPropertySetK}{\mathrm{SuperPropertySetK}(\idmeta,\,\env,\,\ExceptionHandlers,\,\econt)}
+%
+\newcommand{\InstanceMethodK}{\mathrm{InstanceMethodK(\expressionsmeta,\,\idmeta,\,\env,\,\ExceptionHandlers,\,\econt)}}
+\newcommand{\DInstanceMethodInvocation}[3]{#1.\{#2\}(#3)}
+\newcommand{\DInstanceMethodK}{\mathrm{DInstanceMethodK}(\expressionsmeta,\,\membermeta,\,\env,\,\ExceptionHandlers,\,\econt)}
+\newcommand{\DInstanceMethodA}{\mathrm{DInstanceMethodA}(\membermeta,\,\val,\,\ExceptionHandlers,\,\econt)}
+\newcommand{\SuperMethodInvocation}[2]{\tt{super}.#1(#2)}
+\newcommand{\SuperMethodA}{\mathrm{SuperMethodA}(\idmeta,\,\env,\,\ExceptionHandlers,\,\econt)}
+
 
 \subsubsection{Statement continuations}
 \label{subsubsec:statement-continuations}
@@ -551,149 +590,110 @@ There are two types of Switch continuations:
 \newcommand{\ExceptionHandlersRest}{\handler,\,\cstrace,\,\cex}
 \newcommand{\ExceptionHandlers}{\strace,\,\handler,\,\cstrace,\,\cex}
 %
-\newcommand{\evalcesktrans}[4]{\labl{#1}\, &\cesktrans{#2}{#3}\,\hspace{2mm}#4\\[2mm]}
+\newcommand{\evalcesktrans}[3]{&\cesktrans{#1}{#2}\,\hspace{2mm}#3\\[2mm]}
+% Counter for rows in tables
+\newcounter{rowcount}[table]
+\newcounter{tablecount}
+\setcounter{tablecount}{1}
 %
-%% Continuations
+\makeatletter
+\renewcommand{\p@rowcount}{\thesubsection.}
+\makeatother
 %
-\newcommand{\VarSetK}[3]{\mathrm{VarSetK}({#1},\,{#2},\,{#3})}
-\newcommand{\ExpressionsK}[3]{\mathrm{ExpressionsK}({#1},\,{#2},\,\ExceptionHandlers,\,{#3})}
-\newcommand{\ValueA}[2]{\mathrm{ValueA}({#1},\,{#2})}
+\newcommand{\myrowcount}{\refstepcounter{rowcount}\thesubsection.\thetablecount.\therowcount}
+\newcommand{\labeledrow}[1]{\myrowcount\label{#1}}
 %
-\newcommand{\NotK}[1]{\mathrm{NotK}({#1})}
-\newcommand{\AndK}[3]{\mathrm{AndK}({#1},\,{#2},\,\ExceptionHandlers,\,{#3})}
-\newcommand{\OrK}[3]{\mathrm{OrK}({#1},\,{#2},\,\ExceptionHandlers,\,{#3})}
-\newcommand{\ConditionalK}[4]{\mathrm{ConditionalK}({#1},\,{#2},\,{#3},\,\ExceptionHandlers,\,{#4})}
-%
-\newcommand{\LetK}[4]{\mathrm{LetK}({#1},\,{#2},\,{#3},\,\ExceptionHandlers,\,{#4})}
-\newcommand{\StringConcatenationA}{\mathrm{StringConcatenationA(\econt)}}
-%
-\newcommand{\IsExpressionK}{\mathrm{IsExpressionK}(\tt{T},\,\econt)}
-\newcommand{\AsExpressionK}{\mathrm{AsExpressionK}(\tt{T},\,\strace,\,\handler,\,\econt)}
-%
-\newcommand{\ExitSK}[1]{\mathrm{ExitSK(\econt,\,#1)}}
-\newcommand{\StaticInvApp}[4]{\mathrm{StaticInvocationA}({#1},\,{#2},\,{#3},\,\ExceptionHandlersRest,\,{#4})}
-\newcommand{\StaticGetK}{\mathrm{StaticGetK}(\membermeta,\,\econt)}
-\newcommand{\StaticSetK}{\mathrm{StaticSetK}(\membermeta,\,\econt)}
-\newcommand{\PropertyGetK}{\mathrm{PropertyGetK}(\idmeta,\,\ExceptionHandlers,\,\econt)}
-\newcommand{\PropertySetK}{\mathrm{PropertySetK}(\idmeta,\,\expressionmeta_1,\,\env,\,\ExceptionHandlers,\,\econt)}
-\newcommand{\PropertySetVK}{\mathrm{PropertySetValueK}(\val_0,\,\idmeta,\,\ExceptionHandlers\,\econt)}
-\newcommand{\dpropertygetk}{\mathrm{DPropertyGetK}(\membermeta,\,\ExceptionHandlers,\,\econt)}
-\newcommand{\DirectPropertySetK}{\mathrm{DPropertySetK}(\membermeta,\,\expressionmeta_1,\,\env,\,\ExceptionHandlers,\,\econt)}
-\newcommand{\DPropertysetVK}{\mathrm{DPropertySetValueK}(\val_0,\,\membermeta,\,\ExceptionHandlers,\,\econt)}
-\newcommand{\SuperPropertySetK}{\mathrm{SuperPropertySetK}(\idmeta,\,\env,\,\ExceptionHandlers,\,\econt)}
-%
-\newcommand{\InstanceMethodK}{\mathrm{InstanceMethodK(\expressionsmeta,\,\idmeta,\,\env,\,\ExceptionHandlers,\,\econt)}}
-\newcommand{\DInstanceMethodInvocation}[3]{#1.\{#2\}(#3)}
-\newcommand{\DInstanceMethodK}{\mathrm{DInstanceMethodK}(\expressionsmeta,\,\membermeta,\,\env,\,\ExceptionHandlers,\,\econt)}
-\newcommand{\DInstanceMethodA}{\mathrm{DInstanceMethodA}(\membermeta,\,\val,\,\ExceptionHandlers,\,\econt)}
-\newcommand{\SuperMethodInvocation}[2]{\tt{super}.#1(#2)}
-\newcommand{\SuperMethodA}{\mathrm{SuperMethodA}(\idmeta,\,\env,\,\ExceptionHandlers,\,\econt)}
+% Use counter as: 
+% \labeledrow{eval:$rulename}	
 \begin{center}
 	$
-	\begin{array}{lrcl}
+	\begin{array}{lrclr}
 		\evalcesktrans
-			{1}
 			{\evalconf{\IntLiteral{\integermeta}}{\env}{\strace}{\cstrace}{\cex}{\econt}}
 			{\contconf{\econt}{\val}}
 			{\val = \mathrm{IntLiteral(\integermeta)} \in \mathbf{int}}
-
+		
 		\evalcesktrans
-			{2}
 			{\evalconf{\DoubleLiteral{\doublemeta}}{\env}{\strace}{\cstrace}{\cex}{\econt}}
 			{\contconf{\econt}{\val}}
 			{\val = \mathrm{DoubleLiteral(\doublemeta)} \in \mathbf{double}}
 
 		\evalcesktrans
-			{3}
 			{\evalconf{\BoolLiteral{\tt{true}}}{\env}{\strace}{\cstrace}{\cex}{\econt}}
 			{\contconf{\econt}{\val}}
 			{\val = \mathrm{BoolValue(\tt{true})} = \tt{true}\in \mathbf{bool}}
 
 		\evalcesktrans
-			{4}
 			{\evalconf{\BoolLiteral{\tt{false}}}{\env}{\strace}{\cstrace}{\cex}{\econt}}
 			{\contconf{\econt}{\val}}
 			{\val = \mathrm{BoolValue(\tt{false})} = \tt{false}\in \mathbf{bool}}
 
 		\evalcesktrans
-			{5}
 			{\evalconf{\StringLiteral{\stringmeta}}{\env}{\strace}{\cstrace}{\cex}{\econt}}
 			{\contconf{\econt}{\val}}
 			{\val = \mathrm{StringValue(\stringmeta)} \in \mathbf{String}}
 
 		\evalcesktrans
-			{6}
 			{\evalconf{\varmeta}{\env}{\strace}{\cstrace}{\cex}{\econt}}
 			{\contconf{\econt}{\deref{\env(\varmeta)}}}
 			{}
 
 		\evalcesktrans
-			{7}
 			{\evalconf{\varmeta = \expr}{\env}{\strace}{\cstrace}{\cex}{\econt}}
 			{\evalconf{\expr}{\env}{\strace}{\cstrace}{\cex}{\VarSetK{\env}{\varmeta}{\econt}}}{}
 
 		\evalcesktrans
-			{8}
 			{\evalconf{\Not{\expressionmeta}}{\env}{\strace}{\cstrace}{\cex}{\econt}}
 			{\evalconf{\expressionmeta}{\env}{\strace}{\cstrace}{\cex}{\NotK{\econt}}}
 			{\\&&&\econt' = \AndK{\expri{2}}{\env}{\econt}}
 
 		\evalcesktrans
-			{9}
 			{\evalconf{\OrExpression{\expressionmeta_0}{\expressionmeta_1}}{\env}{\strace}{\cstrace}{\cex}{\econt}}
 			{\evalconf{\expressionmeta_0}{\env}{\strace}{\cstrace}{\cex}{\econt'}}
 			{\\&&&\econt' = \OrK{\expri{2}}{\env}{\econt}}
 
 		\evalcesktrans
-			{10}
 			{\evalconf{\ConditionalExpression{\expr}{\expri{1}}{\expri{2}}}{\env}{\strace}{\cstrace}{\cex}{\econt}}
 			{\evalconf{\expr}{\env}{\strace}{\cstrace}{\cex}{\econt'}}
 			{\\&&&\econt' = \ConditionalK{\expri{1}}{\expri{2}}{\env}{\econt}}
 
 		\evalcesktrans
-			{11}
 			{\evalconf{\Let{\varmeta}{\expri{1}}{\expri{2}}}{\env}{\strace}{\cstrace}{\cex}{\econt}}
 			{\evalconf{\expri{1}}{\env}{\strace}{\cstrace}{\cex}{\econt'}}
 			{\\&&&\econt' = \LetK{\expri{2}}{\env}{\varmeta}{\econt}}
 
 		\evalcesktrans
-			{12}
 			{\evalconf{\StringConcatenation{\exprs}}{\env}{\strace}{\cstrace}{\cex}{\econt}}
 			{\evallistconf{\exprs}{\env}{\strace}{\cstrace}{\cex}{\StringConcatenationA}}
 			{}
 
 		\evalcesktrans
-			{13}
 			{\evalconf{\IsExpression{\expressionmeta}{\tt{T}}}{\env}{\strace}{\cstrace}{\cex}{\econt}}
 			{\evalconf{\expressionmeta}{\env}{\strace}{\cstrace}{\cex}{\IsExpressionK}}
 			{}
 
 		\evalcesktrans
-			{14}
 			{\evalconf{\AsExpression{\expressionmeta}{\tt{T}}}{\env}{\strace}{\cstrace}{\cex}{\econt}}
 			{\evalconf{\expressionmeta}{\env}{\strace}{\cstrace}{\cex}{\AsExpressionK}}
 			{}
 
 		\evalcesktrans
-			{15}
+			{}
 			{\evalconf{\ThisExpression}{\env}{\strace}{\cstrace}{\cex}{\econt}}
 			{\contconf{\econt}{\deref{\env(\this)}}}
 			{}
 
 		\evalcesktrans
-			{16}
 			{\evalconf{\textbf{throw } \expr}{\env}{\strace}{\cstrace}{\cex}{\econt}}
 			{\evalconf{\expr}{\env}{\strace}{\cstrace}{\cex}{\throwk{(\textbf{throw } \expr) :: \strace}{\handler}}}
 			{}
 
 		\evalcesktrans
-			{17}
 			{\evalconf{\textbf{rethrow}}{\env}{\strace}{inr(\val)}{\strace'}{\econt}}
 			{\throwconf{\handler}{\val}{\strace'}}
 			{}
 
 		\evalcesktrans
-			{18}
 			{\evalconf{F}{\env}{st}{cex}{cst}{\econt}}
 			{\contconf{\econt}{\funval{\formals}{\stmt}{\env}}}
 			{\\&&&\textrm{F is function expression with formal parameters }\formals
@@ -703,51 +703,47 @@ There are two types of Switch continuations:
 	\captionof{table}{Expressions}
 	\label{table:expressions-evalconfigs}
 \end{center}
-
+%
+\stepcounter{tablecount}
+% Use counter as: 
+% \labeledrow{eval:$rulename}	
 \begin{center}
 	$
-	\begin{array}{lrcl}
+	\begin{array}{lrcl}	
 		\evalcesktrans
-			{1}
 			{\evalconf{\StaticGet{\membermeta}}{\env}{\strace}{\cstrace}{\cex}{\econt}}
 			{\contconf{\econt}{\deref{\env^{M}(\membermeta)}}}
 			{\\&&&\membermeta\textrm{ is a field and } \membermeta \in \env^{M}}
 
 		\evalcesktrans
-			{14}
 			{\evalconf{\StaticGet{\membermeta}}{\env}{\strace}{\cstrace}{\cex}{\econt}}
 			{\contconf{\econt}{\tt{null}}}
 			{\\&&&\membermeta\textrm{ is a field, } \membermeta \notin \env^{M}, \expressionmeta_{\membermeta} = \tt{null}
 			\\&&&\env^{M} = \ext{\env^{M}}{\membermeta}{\tt{null}}}
 
 		\evalcesktrans
-			{2}
 			{\evalconf{\StaticGet{\membermeta}}{\env}{\strace}{\cstrace}{\cex}{\econt}}
 			{\evalconf{\expressionmeta_{\membermeta}}{\env}{\strace}{\cstrace}{\cex}{\econt'}}
 			{\\&&&\membermeta\textrm{ is a field}
 			\\&&&\econt' = \StaticGetK}
 
 		\evalcesktrans
-			{3}
 			{\evalconf{\StaticGet{\membermeta}}{\env}{\strace}{\cstrace}{\cex}{\econt}}
 			{\execconf{\stmt}{\env_{empty}}{[]}{[]}{\handler}{\cstrace}{\cex}{\econt}{\emptyset}}
 			{\\&&&\membermeta\textrm{ is s getter with body }\stmt}
 
 		\evalcesktrans
-			{4}
 			{\evalconf{\StaticGet{\membermeta}}{\env}{\strace}{\cstrace}{\cex}{\econt}}
 			{\contconf{\econt}{\funval{\formals}{\stmt}{\env_{empty}}}}
 			{\\&&&\membermeta\textrm{ is a method tear-off with formal parameters }\formals
 			\\&&&\textrm{ and body }\stmt}
 
 		\evalcesktrans
-			{5}
 			{\evalconf{\StaticSet{\membermeta}{\expressionmeta}}{\env}{\strace}{\cstrace}{\cex}{\econt}}
 			{\evalconf{\expressionmeta}{\env}{\strace}{\cstrace}{\cex}{\econt'}}
 			{\econt' = \StaticSetK}
 
 		\evalcesktrans
-			{6}
 			{\evalconf{\StaticInvocation{\{\membermeta\}}{\expressionsmeta}}{\env}{\strace}{\cstrace}{\cex}{\econt}}
 			{\evallistconf{\exprs}{\env}{\strace}{\cstrace}{\cex}{\acont'}}
 			{\\&&&\acont' = \StaticInvApp{\formals}{\stmt}{\strace'}{\econt}
@@ -757,35 +753,34 @@ There are two types of Switch continuations:
 	\captionof{table}{Static variable extraction and assignment, and static method invocation}
 	\label{table:static-evalconfigs}
 \end{center}
+%
+\stepcounter{tablecount}
+% Use counter as: 
+% \labeledrow{eval:$rulename}	
 \begin{center}
 	$
 	\begin{array}{lrcl}
 		\evalcesktrans
-			{1}
 			{\evalconf{\PropertyGet{\expressionmeta}{\idmeta}}{\env}{\strace}{\cstrace}{\cex}{\econt}}
 			{\evalconf{\expressionmeta}{\env}{\strace}{\cstrace}{\cex}{\econt'}}
 			{\\&&&\econt' = \PropertyGetK}
 
 		\evalcesktrans
-			{2}
 			{\evalconf{\DirectPropertyGet{\expressionmeta}{\membermeta}}{\env}{\strace}{\cstrace}{\cex}{\econt}}
 			{\evalconf{\expressionmeta}{\env}{\strace}{\cstrace}{\cex}{\econt'}}
 			{\\&&&\econt' = \dpropertygetk}
 
 		\evalcesktrans
-			{3}
 			{\evalconf{\PropertySet{\expressionmeta_0}{\idmeta}{\expressionmeta_1}}{\env}{\strace}{\cstrace}{\cex}{\econt}}
 			{\evalconf{\expressionmeta_0}{\env}{\strace}{\cstrace}{\cex}{\econt'}}
 			{\\&&&\econt' = \PropertySetK}
 
 		\evalcesktrans
-			{4}
 			{\evalconf{\DirectPropertySet{\expressionmeta_0}{\membermeta}{\expressionmeta_1}}{\env}{\strace}{\cstrace}{\cex}{\econt}}
 			{\evalconf{\expressionmeta}{\env}{\strace}{\cstrace}{\cex}{\econt'}}
 			{\\&&&\econt' = \DirectPropertySetK}
 
 		\evalcesktrans
-			{5}
 			{\evalconf{\SuperPropertyGet{\idmeta}}{\env}{\strace}{\cstrace}{\cex}{\econt}}
 			{\contconf{\econt}{\funval{\formals}{\stmt}{\env'}}}
 			{\\&&&\env' = \ext{\env_{empty}}{\this}{\deref{(\env(\this))}}
@@ -794,7 +789,6 @@ There are two types of Switch continuations:
 			\\&&&\textrm{ and body }\stmt}
 
 		\evalcesktrans
-			{6}
 			{\evalconf{\SuperPropertyGet{\idmeta}}{\env}{\strace}{\cstrace}{\cex}{\econt}}
 			{\execconf{\stmt}{\env'}{\lbls}{\clbls}{\handler}{\cstrace}{\cex}{\econt}{\scont}}
 			{\\&&&\env' = \ext{\env_{empty}}{\this}{\deref{(\env(\this))}}
@@ -803,14 +797,12 @@ There are two types of Switch continuations:
 			\\&&&\membermeta \textrm{ is a getter method with body }\stmt}
 
 		\evalcesktrans
-			{7}
 			{\evalconf{\SuperPropertyGet{\idmeta}}{\env}{\strace}{\cstrace}{\cex}{\econt}}
 			{\contconf{\econt}{M(\deref{(\env(\this))})}}
 			{\\&&&\membermeta = \superclass{\deref{\env(\this)}}.lookup(\idmeta)
 			\\&&&\membermeta \textrm{ is a implicit field getter}}
 
 		\evalcesktrans
-			{8}
 			{\evalconf{\SuperPropertySet{\idmeta}{\expressionmeta}}{\env}{\strace}{\cstrace}{\cex}{\econt}}
 			{\evalconf{\expressionmeta}{\env}{\strace}{\cstrace}{\cex}{\econt'}}
 			{\\&&&\econt' = \SuperPropertySetK}
@@ -819,30 +811,29 @@ There are two types of Switch continuations:
 	\captionof{table}{Instance property extraction and assignment}
 	\label{table:instance-property-evalconfigs}
 \end{center}
-
+%
+\stepcounter{tablecount}
+% Use counter as: 
+% \labeledrow{eval:$rulename}	
 \begin{center}
 	$
 	\begin{array}{lrcl}
 		\evalcesktrans
-			{1}
 			{\evalconf{\InstanceMethodInvocation{\expressionmeta}{\idmeta}{\expressionsmeta}}{\env}{\strace}{\cstrace}{\cex}{\econt}}
 			{\evalconf{\expressionmeta}{\env}{\strace}{\cstrace}{\cex}{\econt'}}
 			{\\&&&\econt' = \InstanceMethodK}
 
 		\evalcesktrans
-			{2}
 			{\evalconf{\DInstanceMethodInvocation{\expressionmeta}{\membermeta}{\expressionsmeta}}{\env}{\strace}{\cstrace}{\cex}{\econt}}
 			{\evalconf{\expressionmeta}{\env}{\strace}{\cstrace}{\cex}{\econt'}}
 			{\\&&&\econt' = \DInstanceMethodK}
 
 		\evalcesktrans
-			{3}
 			{\evalconf{\SuperMethodInvocation{\idmeta}{\expressionsmeta}}{\env}{\strace}{\cstrace}{\cex}{\econt}}
 			{\evallistconf{\expressionsmeta}{\env}{\strace}{\cstrace}{\cex}{\acont}}
 			{\\&&&\acont = \SuperMethodA}
 
 		\evalcesktrans
-			{4}
 			{\evalconf{\textbf{new Q}(\exprs)}{\env}{st}{cex}{cst}{\econt}}
 			{\evallistconf{\exprs}{\env}{st}{cex}{cst}{\acont'}}
 			{\\&&&\acont' = \ctrapp{\textbf{Q}}{\econt}}
@@ -1332,96 +1323,85 @@ Type casts evaluate the target expression to the corresponding value eventually,
 For the evaluation $\this$ expression we add a special variable declaration, $\this$. In the body of instance methods or constructors, there is a binding in the corresponding environment from $\this$ variable declaration to a label that stores the corresponding object. Evaluation of $\this$ expression resolves to the value in one step.
 \subsection{Statement execution}
 \label{subsec:stmt-exectution}
-\newcommand{\execcesktrans}[4]{\labl{#1}\, &\cesktrans{#2}{#3}\,\hspace{2mm}#4\hspace{6mm}\\[2mm]}
+\newcommand{\execcesktrans}[3]{&\cesktrans{#1}{#2}\,\hspace{2mm}#3\hspace{6mm}\\[2mm]}
 %
 \newcommand{\ExpressionK}[2]{\mathrm{ExpressionK}({#1},\,{#2})}
 %
+\stepcounter{tablecount}
+% Use counter as: 
+% \labeledrow{exec:$rulename}
 \begin{center}
 	$
 	\begin{array}{lrcl}
 		\execcesktrans
-			{1}
 			{\execconf{\textbf{var } \varmeta = \expr}{\env}{\lbls}{\clbls}{\handler}{\cstrace}{\cex}{\econt}{\scont}}
 			{\evalconf{\expr}{\env}{\strace}{\cstrace}{\cex}{\econt'}}
 			{\\&\econt' = \vardeclk{\env}{\varmeta}{\scont}}
 
 		\execcesktrans
-			{2}
 			{\execconf{\lbrace\rbrace}{\env}{\lbls}{\clbls}{\handler}{\cstrace}{\cex}{\econt}{\scont}}
 			{\scontconf{\scont}{\env}}
 			{}
 
 		\execcesktrans
-			{3}
 			{\execconf{\lbrace\expr\rbrace}{\env}{\lbls}{\clbls}{\handler}{\cstrace}{\cex}{\econt}{\scont}}
 			{\evalconf{\expr}{\env}{\strace}{\cstrace}{\cex}{\econt'}}
 			{\\&\econt' = \ExpressionK{\scont}{\env}}
 
 		\execcesktrans
-			{4}
 			{\execconf{\stmt :: \stmts}{\env}{\lbls}{\clbls}{\handler}{\cstrace}{\cex}{\econt}{\scont}}
 			{}
 			{\\&\hspace{4mm}\execconf{\stmt}{\env}{\lbls}{\clbls}{\handler}{\cstrace}{\cex}{\econt}{\scont'}
 			\\&\scont' = \blocksk{\stmts}{\env}}
 
 		\execcesktrans
-			{5}
 			{\execconf{\textbf{if } \expr \textbf{ then } \stmti{1} \textbf{ else } \stmti{2} }{\env}{\lbls}{\clbls}{\handler}{\cstrace}{\cex}{\econt}{\scont}}
 			{\evalconf{\expr}{\env}{\strace}{\cstrace}{\cex}{\econt'}}
 			{\\&\econt' = \ifcondk{\stmti{1}}{\stmti{2}}}
 
 		\execcesktrans
-			{6}
 			{\execconf{\textbf{return } \expr}{\env}{\lbls}{\clbls}{\handler}{\cstrace}{\cex}{\econt}{\scont}}
 			{\evalconf{\expr}{\env}{\strace}{\cstrace}{\cex}{\econt}}
 			{}
 
 		\execcesktrans
-			{7}
 			{\execconf{\textbf{return}}{\env}{\lbls}{\clbls}{\handler}{\cstrace}{\cex}{\econt}{\scont}}
 			{\contconf{\econt}{\textbf{null}}}
 			{}
 
 		\execcesktrans
-			{8}
 			{\execconf{\textbf{while } (\expr) \stmt}{\env}{\lbls}{\clbls}{\handler}{\cstrace}{\cex}{\econt}{\scont}}
 			{\evalconf{\expr}{\env}{\strace}{\cstrace}{\cex}{\econt'}}
 			{\\&\econt', \scont' = \whilecondk}
 
 		\execcesktrans
-			{9}
 			{\execconf{\textbf{L: }\stmt_{L}}{\env}{\lbls}{\clbls}{\handler}{\cstrace}{\cex}{\econt}{\scont}}
 			{}
 			{\\&\hspace{4mm}\execconf{\stmt_{L}}{\env}{\lbl :: \lbls}{\clbls}{\handler}{\cstrace}{\cex}{\econt}{\scont}
 			\\&\lbl = \mathrm{Label}(L, \bcont), \bcont = \mathrm{Break}(\env, \scont)}
 
 		\execcesktrans
-			{10}
 			{\execconf{\textbf{switch }(\expr) \scases }{\env}{\lbls}{\clbls}{\handler}{\cstrace}{\cex}{\econt}{\scont}}
 			{\evalconf{\expr}{\env}{\strace}{\cstrace}{\cex}{\econt'}}
 			{\\&\econt' = \switchk{\scases}{\clbls}}
 
 		\execcesktrans
-			{11}
 			{\execconf{\mathrm{TryCatch}(\stmt, cs)}{\env}{\lbls}{\clbls}{\handler}{\cex}{\cstrace}{\econt}{\scont}}
 			{}
 			{\\&\hspace{4mm}\execconf{\stmt}{\env}{\lbls}{\clbls}{\handler'}{\cex}{\cstrace}{\econt}{\scont}
 			\\&\handler' = \catchk{cs}}
 
 		\execcesktrans
-			{12}
 			{\execconf{\textbf{break L}}{\env}{\lbls}{\clbls}{\handler}{\cex}{\cstrace}{\econt}{\scont}}
 			{\breakconf{\bcont}}
 			{\\&\lbl = Label(L', \bcont) \in \lbls \textrm{ with } L' == \mathbf{L}}
 
 		\execcesktrans
-			{13}
 			{\execconf{\textbf{continue L}}{\env}{\lbls}{\clbls}{\handler}{\cex}{\cstrace}{\econt}{\scont}}
 			{\switchconf{\switchcont}}
 			{\\&\clbl = \continuel{L'}{\switchcont} \in \clbls \textrm{ with } L' == \mathbf{L}}
 
 		\execcesktrans
-			{14}
 			{\execconf{fun(\formals) \stmt_{body}}{\env}{\lbls}{\clbls}{\handler}{\cstrace}{\cex}{\econt}{\scont}}
 			{}
 			{\\&\hspace{4mm}\contconf{\econt}{\funval{\stmt_{body}}{\formals}{\env'}}
