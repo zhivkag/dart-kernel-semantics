@@ -423,47 +423,68 @@ We suffix the names of expression continuations with "$K$". We differentiate the
 \begin{center}
   $
   \begin{array}{lll@{\hspace{3cm}}}
-	\labeledrow{econt:varset}&
+  	&&\\
+	%\labeledrow{econt:varset}&
 	\VarSetK{\idmeta}{\ExceptionHandlers}{\econt}\\[2mm]
-	\labeledrow{econt:expressions}&
+
+	%\labeledrow{econt:expressions}&
 	\ExpressionsK{\exprs}{\env}{\acont}&\\[2mm]
-	\labeledrow{econt:not}&
+
+	%\labeledrow{econt:not}&
 	\NotK{\econt}&\\[2mm]
-	\labeledrow{econt:and}&
+
+	%\labeledrow{econt:and}&
 	\AndK{\expressionmeta}{\ExceptionHandlers}{\econt}&\\[2mm]
-	\labeledrow{econt:or}&
+
+	%\labeledrow{econt:or}&
 	\OrK{\expressionmeta}{\ExceptionHandlers}{\econt}&\\[2mm]
-	\labeledrow{econt:cond}&
+
+	%\labeledrow{econt:cond}&
 	\ConditionalK{\expressionmeta_1}{\expressionmeta_2}{\ExceptionHandlers}{\econt}&\\[2mm]
-	\labeledrow{econt:let}&
+
+	%\labeledrow{econt:let}&
 	\LetK{\idmeta}{\expressionmeta}{\ExceptionHandlers}{\econt}&\\[2mm]
-	\labeledrow{econt:is}&
+
+	%\labeledrow{econt:is}&
 	\IsExpressionK&\\[2mm]
-	\labeledrow{econt:as}&
+
+	%\labeledrow{econt:as}&
 	\AsExpressionK&\\[2mm]
-	\labeledrow{econt:static-get}&
+
+	%\labeledrow{econt:static-get}&
 	\StaticGetK&\\[2mm]
-	\labeledrow{econt:static-set}&
+
+	%\labeledrow{econt:static-set}&
 	\StaticSetK&\\[2mm]
-	\labeledrow{econt:dproperty-get}&
+
+	%\labeledrow{econt:dproperty-get}&
 	\DPropertyGetK&\\[2mm]
-	\labeledrow{econt:property-set}&
+
+	%\labeledrow{econt:property-set}&
 	\PropertySetK&\\[2mm]
-	\labeledrow{econt:property-set}&
+
+	%\labeledrow{econt:property-set}&
 	\PropertySetVK&\\[2mm]
-	\labeledrow{econt:dproperty-set}&
+
+	%\labeledrow{econt:dproperty-set}&
 	\DPropertyGetK&\\[2mm]
-	\labeledrow{econt:dproperty-set-v}&
+
+	%\labeledrow{econt:dproperty-set-v}&
 	\DPropertySetVK&\\[2mm]
-	\labeledrow{econt:super-property-set}&
+
+	%\labeledrow{econt:super-property-set}&
 	\SuperPropertySetK&\\[2mm]
-	\labeledrow{econt:instance-method}&
+
+	%\labeledrow{econt:instance-method}&
 	\InstanceMethodK&\\[2mm]
-	\labeledrow{econt:dinstance-method}&
+
+	%\labeledrow{econt:dinstance-method}&
 	\DInstanceMethodK&\\[2mm]
-	\labeledrow{econt:var-decl}&
+
+	%\labeledrow{econt:var-decl}&
 	\VarDeclK{\idmeta}{\env}{\scont}&\\[2mm]
-	\labeledrow{econt:if-cond}&
+
+	%\labeledrow{econt:if-cond}&
 	\IfCondK{\expressionmeta_1}{\expressionmeta_2}&\\[2mm]
   \end{array}
   $
@@ -492,25 +513,26 @@ We suffix the names of statement continuations with "$SK$".
 \begin{center}
   $
   \begin{array}{lll@{\hspace{5cm}}}
-	\labeledrow{scont:exit}	&
+  	&&\\
+	%\labeledrow{scont:exit}	&
 	\ExitSK{\val}\\[2mm]
 
-	\labeledrow{scont:block}&
+	%\labeledrow{scont:block}&
 	\BlockSK{\stmts}{\env}&\\[2mm]
 
-	\labeledrow{scont:while}&
+	%\labeledrow{scont:while}&
 	\WhileSK&\\[2mm]
 
-	\labeledrow{scont:body}&
+	%\labeledrow{scont:body}&
 	\BodySK{\stmt}{\env}{\scont}&\\[2mm]
 
-	\labeledrow{scont:new}&
+	%\labeledrow{scont:new}&
 	\NewSK{\econt}{\loc}&\\[2mm]
 
-	\labeledrow{scont:finally}&
+	%\labeledrow{scont:finally}&
 	\FinallySK{\stmt}&\\[2mm]
 
-	\labeledrow{scont:rethrow}&
+	%\labeledrow{scont:rethrow}&
 	\RethrowSK{\val}{\strace}{\handler}&\\[2mm]
   \end{array}
   $
@@ -538,29 +560,30 @@ We suffix the names of application continuations with "$A$".
 % \labeledrow{acont:$rulename}
 \begin{center}
   $
-  \begin{array}{lll@{\hspace{7cm}}}
-	\labeledrow{acont:value}&
+  \begin{array}{lll@{\hspace{5cm}}}
+  	&&\\
+	%\labeledrow{acont:value}&
 	\ValueA{\val}{\acont}&\\[2mm]
 
-	\labeledrow{acont:stringconcat}&
+	%\labeledrow{acont:stringconcat}&
 	\StringConcatenationA&\\[2mm]
 
-	\labeledrow{acont:supermethod}&
+	%\labeledrow{acont:supermethod}&
 	\SuperMethodA&\\[2mm]
 
-	\labeledrow{acont:staticinv}&
+	%\labeledrow{acont:staticinv}&
 	\DInstanceMethodA&\\[2mm]
 
-	\labeledrow{acont:fields}&
+	%\labeledrow{acont:fields}&
 	\FieldsA{\env}{Izs}{\loc}{\scont}\\[2mm]
 
-	\labeledrow{acont:constructor}&
+	%\labeledrow{acont:constructor}&
 	\ConstructorA{Q}{\econt}\\[2mm]
 
-	\labeledrow{acont:super}&
+	%\labeledrow{acont:super}&
 	\SuperA{Q}{\loc}{\scont}\\[2mm]
 
-	\labeledrow{acont:redirecting}&
+	%\labeledrow{acont:redirecting}&
 	\RedirectingA{Q}{\loc}{\scont}
   \end{array}
   $
@@ -570,16 +593,8 @@ We suffix the names of application continuations with "$A$".
 \label{subsubsec:break-continuations}
 
 Break continuations capture the steps to be executed when a break to a given label is encountered.
-\newcommand{\finallybreak}[2]{\mathrm{FinallyBreak}({#1},\,\env,\,\lbls,\,\clbls,\,\strace,\,\handler,\,\cstrace,\,\cex,\,\econt,\,{#2})}
-%
-\noindent
-There are two types of Break continuations:
-\begin{itemize}
-\item Break -
-Break continuations capture the statement continuation and the environment corresponding to the provided label.
-\item FinallyBreak -
-FinallyBreak continuations are added when a try/finally statement is encountered and they capture the statement body and the components necessary for its execution.
-\end{itemize}
+\newcommand{\Break}[2]{\mathrm{Break}(#1,\,#2)}
+\newcommand{\FinallyBreak}[2]{\mathrm{FinallyBreak}({#1},\,\env,\,\lbls,\,\clbls,\,\strace,\,\handler,\,\cstrace,\,\cex,\,\econt,\,{#2})}
 %
 \stepcounter{tablecount}
 %
@@ -588,24 +603,25 @@ FinallyBreak continuations are added when a try/finally statement is encountered
 \begin{center}
   $
   \begin{array}{lll@{\hspace{5cm}}}
+	&&\\
+	\labeledrow{breakcont:break}&
+		\Break{\env}{\scont}&\\[2mm]
+
+	\labeledrow{breakcont:finallybreak}&
+	\FinallyBreak{\stmt}{\scont}&
   \end{array}
   $
   \captionof{table}{Break Continuations}
 \end{center}
+Break continuations, \ref{breakcont:break}, capture the statement continuation and the environment corresponding to the provided label.\\
+FinallyBreak continuations, \ref{breakcont:finallybreak}, are added when a try/finally statement is encountered and they capture the statement body and the components necessary for its execution.
 \subsubsection{Switch continuations}
 \label{subsubsec:switch-continuations}
 
 Switch continuations capture the steps to be executed when a continue to a preceding switch case is encountered. They capture the components needed for the execution of the case body statement.
 %
-\newcommand{\continuek}{\mathrm{SwitchContinueK}(\stmt,\,\env,\,\lbls,\,\clbls,\,\handler,\,\cstrace,\,\cex,\,\econt,\,\scont)}
+\newcommand{\ContinueK}{\mathrm{SwitchContinueK}(\stmt,\,\env,\,\lbls,\,\clbls,\,\handler,\,\cstrace,\,\cex,\,\econt,\,\scont)}
 \newcommand{\FinallyContinue}[2]{\mathrm{FinallyContinue}({#1},\,\env,\,\lbls,\,\clbls,\,\strace,\,\handler,\,\cstrace,\,\cex,\,\econt,\,{#2})}
-%
-\noindent
-There are two types of Switch continuations:
-\begin{itemize}
-\item SwitchContinue - SwitchContinue continuations capture the statement body of a preceding switch case, targeted by some continue statement, and the components necessary for its execution.
-\item FinallyContinue - FinallyContinue continuations are added when a try/finally statement is encountered and they capture the statement body and the components necessary for its execution.
-\end{itemize}
 %
 \stepcounter{tablecount}
 %
@@ -614,10 +630,20 @@ There are two types of Switch continuations:
 \begin{center}
   $
   \begin{array}{lll@{\hspace{5cm}}}
+	&&\\
+	\labeledrow{switchcont:continue}&
+	\ContinueK\\[2mm]
+
+	\labeledrow{switchcont:finallycontinue}&
+	\FinallyContinue{\stmt}{\scont}
   \end{array}
   $
   \captionof{table}{Switch Continuations}
 \end{center}
+%
+\noindent
+SwitchContinue continuations, \ref{switchcont:continue}, capture the statement body of a preceding switch case, targeted by some continue statement, and the components necessary for its execution.
+FinallyContinue continuations, \ref{switchcont:finallycontinue}, are added when a try/finally statement is encountered and they capture the statement body and the components necessary for its execution.
 \subsubsection{Exception handlers}
 \label{subsubsec:exception-handlers}
 \newcommand{\ThrowH}[2]{\mathrm{ThrowK}({#1},\,{#2})}
@@ -630,6 +656,12 @@ There are two types of Switch continuations:
 \begin{center}
   $
   \begin{array}{lll@{\hspace{5cm}}}
+	&&\\
+	%\labeledrow{handle:throw}&
+	\ThrowH{\val}{\strace}\\
+
+	%\labeledrow{handle:catch}&
+	\CatchH{cs}
   \end{array}
   $
   \captionof{table}{Exception handlers}
@@ -1708,7 +1740,7 @@ with:
 \[
   \begin{array}{l}
 	\clbl = \continuel{\scase}{\switchcont},\\
-	\switchcont = \continuek
+	\switchcont = \ContinueK
   \end{array}
 \]
 \noindent
@@ -1805,7 +1837,7 @@ where:
 	\scont' = \FinallySK{\stmti{1}}\\[2mm]
 
 	\lbls' = \lbrace \mathrm{Label}(L, \bcont') \mid \mathrm{Label}(L, \bcont) \in \lbls\rbrace \\
-	\hspace{10mm}\textrm{where } \bcont = \finallybreak{\stmti{1}}{\bcont}\\[2mm]
+	\hspace{10mm}\textrm{where } \bcont = \FinallyBreak{\stmti{1}}{\bcont}\\[2mm]
 	\clbls' =  \lbrace \continuel{C}{\switchcont'} \mid  \continuel{C}{\switchcont} \in \clbls\rbrace\\
 	\hspace{10mm}\textrm{where } \switchcont' = \FinallyContinue{\stmti{1}}{\switchcont}
 
@@ -1817,11 +1849,11 @@ where:
 Let $\lbl = Label(L', \bcont) \in \lbls \textrm{ with } L' == \mathbf{L}$ below:
 \[
   \begin{array}{lcl}
-	\breakconf{\mathrm{Break}(\env, \scont)}
+	\breakconf{\Break{\env}{\scont}}
 	& \Rightarrow &
 	\scontconf{\scont}{\env}\\[2mm]
 
-	\breakconf{\finallybreak{\stmt}{\bcont}}
+	\breakconf{\FinallyBreak{\stmt}{\bcont}}
 	& \Rightarrow \\
 	\hspace{10mm}\execconf{\stmt}{\env}{\lbls}{\clbls}{\handler}{\cex}{\cstrace}{\econt}{\mathrm{BreakSK}(\bcont)}\\[2mm]
 
@@ -1838,7 +1870,7 @@ Let $\lbl = Label(L', \bcont) \in \lbls \textrm{ with } L' == \mathbf{L}$ below:
 Let $\clbl = \continuel{L'}{\switchcont} \in \clbls \textrm{ with } L' == \mathbf{L}$ below:
 \[
   \begin{array}{lcl}
-	\switchconf{\continuek}
+	\switchconf{\ContinueK}
 	& \Rightarrow \\
 	\hspace{10mm}\execconf{\stmt}{\env}{\lbls}{\clbls}{\handler}{\cex}{\cstrace}{\econt}{\scont}\\[2mm]
 
