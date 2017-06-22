@@ -18,7 +18,19 @@
 %
 \newcommand{\shadethis}[1]{\colorbox{shade}
 {\protect\rule[-0.95mm]{0mm}{3.95mm}\hspace{0.3mm}#1\hspace{0.3mm}}}
-
+%
+% Counter for rows in tables
+\newcounter{rowcount}[table]
+\newcounter{tablecount}
+\setcounter{tablecount}{1}
+%
+\makeatletter
+\renewcommand{\p@rowcount}{\thesubsection.}
+\makeatother
+%
+\newcommand{\myrowcount}{\refstepcounter{rowcount}\thesubsection.\thetablecount.\therowcount}
+\newcommand{\labeledrow}[1]{\myrowcount\label{#1}}
+%
 % Macros used below have been contributed in part by Olivier Danvy and Kevin Millikin
 \input{danvy-millikin-LMCS.mac}
 
@@ -335,6 +347,18 @@ For the SwitchConfiguration the transition step dispatches on the continuation c
 \subsection{Continuations}
 \label{subsec:continuations-definition}
 
+% Metavariables
+\newcommand{\expressionmeta}{\ensuremath{\mathit{E}}}
+\newcommand{\expressionsmeta}{\expressionmeta{s}}
+\newcommand{\variablemeta}{\ensuremath{\mathit{X}}}
+\newcommand{\boolmeta}{\ensuremath{\mathit{B}}}
+\newcommand{\integermeta}{\ensuremath{\mathit{I}}}
+\newcommand{\doublemeta}{\ensuremath{\mathit{D}}}
+\newcommand{\stringmeta}{\ensuremath{\mathit{S}}}
+\newcommand{\idmeta}{\ensuremath{\mathit{X}}}
+\newcommand{\membermeta}{\ensuremath{\mathit{M}}}
+\newcommand{\typemeta}{\ensuremath{\mathit{T}}}
+
 Continuations capture the state for execution of statements, or expressions and capture the information needed to resume the execution of the program.
 There are various types of continuations depending on the next statement to be executed or next expression to be evaluated.
 \subsubsection{Expression continuations}
@@ -350,13 +374,13 @@ Note that some continuation will not evaluate the captured expression, when this
 \item Continuations without holes\\
 Continuations without holes dispatch on the provided value and produce the next configuration, a ValuePassingConfiguration.
 \end{itemize}
-We suffix the names of expression continuations with "$K$". We differentiate the following continuations: 
+We suffix the names of expression continuations with "$K$". We differentiate the following continuations:
 %
-%% Continuations
-%
+\newcommand{\ExceptionHandlersRest}{\handler,\,\cstrace,\,\cex}
+\newcommand{\ExceptionHandlers}{\strace,\,\handler,\,\cstrace,\,\cex}
+% Continuations
 \newcommand{\VarSetK}[3]{\mathrm{VarSetK}({#1},\,{#2},\,{#3})}
 \newcommand{\ExpressionsK}[3]{\mathrm{ExpressionsK}({#1},\,{#2},\,\ExceptionHandlers,\,{#3})}
-\newcommand{\ValueA}[2]{\mathrm{ValueA}({#1},\,{#2})}
 %
 \newcommand{\NotK}[1]{\mathrm{NotK}({#1})}
 \newcommand{\AndK}[3]{\mathrm{AndK}({#1},\,{#2},\,\ExceptionHandlers,\,{#3})}
@@ -364,29 +388,47 @@ We suffix the names of expression continuations with "$K$". We differentiate the
 \newcommand{\ConditionalK}[4]{\mathrm{ConditionalK}({#1},\,{#2},\,{#3},\,\ExceptionHandlers,\,{#4})}
 %
 \newcommand{\LetK}[4]{\mathrm{LetK}({#1},\,{#2},\,{#3},\,\ExceptionHandlers,\,{#4})}
-\newcommand{\StringConcatenationA}{\mathrm{StringConcatenationA(\econt)}}
 %
 \newcommand{\IsExpressionK}{\mathrm{IsExpressionK}(\tt{T},\,\econt)}
 \newcommand{\AsExpressionK}{\mathrm{AsExpressionK}(\tt{T},\,\strace,\,\handler,\,\econt)}
 %
-\newcommand{\ExitSK}[1]{\mathrm{ExitSK(\econt,\,#1)}}
-\newcommand{\StaticInvApp}[4]{\mathrm{StaticInvocationA}({#1},\,{#2},\,{#3},\,\ExceptionHandlersRest,\,{#4})}
 \newcommand{\StaticGetK}{\mathrm{StaticGetK}(\membermeta,\,\econt)}
 \newcommand{\StaticSetK}{\mathrm{StaticSetK}(\membermeta,\,\econt)}
 \newcommand{\PropertyGetK}{\mathrm{PropertyGetK}(\idmeta,\,\ExceptionHandlers,\,\econt)}
 \newcommand{\PropertySetK}{\mathrm{PropertySetK}(\idmeta,\,\expressionmeta_1,\,\env,\,\ExceptionHandlers,\,\econt)}
 \newcommand{\PropertySetVK}{\mathrm{PropertySetValueK}(\val_0,\,\idmeta,\,\ExceptionHandlers\,\econt)}
-\newcommand{\dpropertygetk}{\mathrm{DPropertyGetK}(\membermeta,\,\ExceptionHandlers,\,\econt)}
+\newcommand{\DPropertyGetK}{\mathrm{DPropertyGetK}(\membermeta,\,\ExceptionHandlers,\,\econt)}
 \newcommand{\DirectPropertySetK}{\mathrm{DPropertySetK}(\membermeta,\,\expressionmeta_1,\,\env,\,\ExceptionHandlers,\,\econt)}
-\newcommand{\DPropertysetVK}{\mathrm{DPropertySetValueK}(\val_0,\,\membermeta,\,\ExceptionHandlers,\,\econt)}
+\newcommand{\DPropertySetVK}{\mathrm{DPropertySetValueK}(\val_0,\,\membermeta,\,\ExceptionHandlers,\,\econt)}
 \newcommand{\SuperPropertySetK}{\mathrm{SuperPropertySetK}(\idmeta,\,\env,\,\ExceptionHandlers,\,\econt)}
 %
 \newcommand{\InstanceMethodK}{\mathrm{InstanceMethodK(\expressionsmeta,\,\idmeta,\,\env,\,\ExceptionHandlers,\,\econt)}}
-\newcommand{\DInstanceMethodInvocation}[3]{#1.\{#2\}(#3)}
 \newcommand{\DInstanceMethodK}{\mathrm{DInstanceMethodK}(\expressionsmeta,\,\membermeta,\,\env,\,\ExceptionHandlers,\,\econt)}
-\newcommand{\DInstanceMethodA}{\mathrm{DInstanceMethodA}(\membermeta,\,\val,\,\ExceptionHandlers,\,\econt)}
-\newcommand{\SuperMethodInvocation}[2]{\tt{super}.#1(#2)}
-\newcommand{\SuperMethodA}{\mathrm{SuperMethodA}(\idmeta,\,\env,\,\ExceptionHandlers,\,\econt)}
+\[
+\begin{array}{lll}
+
+\VarSetK{}{}{}&\\[2mm]
+\ExpressionsK{}{}{}&\\[2mm]
+\NotK{}&\\[2mm]
+\AndK{}{}{}&\\[2mm]
+\OrK{}{}{}&\\[2mm]
+\ConditionalK{}{}{}{}&\\[2mm]
+\LetK{}{}{}{}&\\[2mm]
+\IsExpressionK&\\[2mm]
+\AsExpressionK&\\[2mm]
+\StaticGetK&\\[2mm]
+\StaticSetK&\\[2mm]
+\DPropertyGetK&\\[2mm]
+\PropertySetK&\\[2mm]
+\PropertySetVK&\\[2mm]
+\DPropertyGetK&\\[2mm]
+\DPropertySetVK&\\[2mm]
+\SuperPropertySetK&\\[2mm]
+\InstanceMethodK&\\[2mm]
+\DInstanceMethodK&\\[2mm]
+
+\end{array}
+\]
 
 
 \subsubsection{Statement continuations}
@@ -396,13 +438,19 @@ Statement continuations capture the steps after execution of a statement. They a
 
 \noindent
 We suffix the names of statement continuations with "$SK$".
-
+\newcommand{\ExitSK}[1]{\mathrm{ExitSK(\econt,\,#1)}}
 \subsubsection{Application continuation}
 \label{subsubsec:application-continuation}
 
 Application continuations capture the application of a list of values resulting from the evaluation of list of expressions.\\
 We use ValueA, an application continuation, capturing a value and an application continuation, as application that adds a value to the head of the list.\\
 We suffix the names of application continuations with "$A$".
+\newcommand{\ValueA}[2]{\mathrm{ValueA}({#1},\,{#2})}
+\newcommand{\StringConcatenationA}{\mathrm{StringConcatenationA(\econt)}}
+\newcommand{\SuperMethodA}{\mathrm{SuperMethodA}(\idmeta,\,\env,\,\ExceptionHandlers,\,\econt)}
+\newcommand{\StaticInvApp}[4]{\mathrm{StaticInvocationA}({#1},\,{#2},\,{#3},\,\ExceptionHandlersRest,\,{#4})}
+\newcommand{\DInstanceMethodA}{\mathrm{DInstanceMethodA}(\membermeta,\,\val,\,\ExceptionHandlers,\,\econt)}
+
 
 \subsubsection{Break continuations}
 \label{subsubsec:break-continuations}
@@ -469,18 +517,6 @@ There are two types of Switch continuations:
 \subsubsection{Expressions}
 \label{sec:expr-syntax}
 
-% Metavariables
-\newcommand{\expressionmeta}{\ensuremath{\mathit{E}}}
-\newcommand{\expressionsmeta}{\expressionmeta{s}}
-\newcommand{\variablemeta}{\ensuremath{\mathit{X}}}
-\newcommand{\boolmeta}{\ensuremath{\mathit{B}}}
-\newcommand{\integermeta}{\ensuremath{\mathit{I}}}
-\newcommand{\doublemeta}{\ensuremath{\mathit{D}}}
-\newcommand{\stringmeta}{\ensuremath{\mathit{S}}}
-\newcommand{\idmeta}{\ensuremath{\mathit{X}}}
-\newcommand{\membermeta}{\ensuremath{\mathit{M}}}
-\newcommand{\typemeta}{\ensuremath{\mathit{T}}}
-
 % Syntax
 \newcommand{\VariableGet}[1]{#1}
 \newcommand{\VariableSet}[2]{#1=#2}
@@ -501,7 +537,9 @@ There are two types of Switch continuations:
 %% MethodInvocation
 \newcommand{\InstanceMethodInvocation}[3]{#1.#2(#3)}
 %% DirectMethodInvocation
+\newcommand{\DInstanceMethodInvocation}[3]{#1.\{#2\}(#3)}
 %% SuperMethodInvocation
+\newcommand{\SuperMethodInvocation}[2]{\tt{super}.#1(#2)}
 %% StaticInvocation
 \newcommand{\StaticInvocation}[2]{#1(#2)}
 %% ConstructorInvocation
@@ -587,21 +625,9 @@ There are two types of Switch continuations:
 \newcommand{\this}{\tt{this}}
 \newcommand{\superclass}[1]{superclass({#1})}
 %
-\newcommand{\ExceptionHandlersRest}{\handler,\,\cstrace,\,\cex}
-\newcommand{\ExceptionHandlers}{\strace,\,\handler,\,\cstrace,\,\cex}
 %
 \newcommand{\evalcesktrans}[3]{&\cesktrans{#1}{#2}\,\hspace{2mm}#3\\[2mm]}
-% Counter for rows in tables
-\newcounter{rowcount}[table]
-\newcounter{tablecount}
-\setcounter{tablecount}{1}
-%
-\makeatletter
-\renewcommand{\p@rowcount}{\thesubsection.}
-\makeatother
-%
-\newcommand{\myrowcount}{\refstepcounter{rowcount}\thesubsection.\thetablecount.\therowcount}
-\newcommand{\labeledrow}[1]{\myrowcount\label{#1}}
+\stepcounter{tablecount}
 %
 % Use counter as: 
 % \labeledrow{eval:$rulename}	
@@ -768,7 +794,7 @@ There are two types of Switch continuations:
 		\evalcesktrans
 			{\evalconf{\DirectPropertyGet{\expressionmeta}{\membermeta}}{\env}{\strace}{\cstrace}{\cex}{\econt}}
 			{\evalconf{\expressionmeta}{\env}{\strace}{\cstrace}{\cex}{\econt'}}
-			{\\&&&\econt' = \dpropertygetk}
+			{\\&&&\econt' = \DPropertyGetK}
 
 		\evalcesktrans
 			{\evalconf{\PropertySet{\expressionmeta_0}{\idmeta}{\expressionmeta_1}}{\env}{\strace}{\cstrace}{\cex}{\econt}}
@@ -1085,7 +1111,7 @@ In Kernel a property can be accessed without lookup, by direct reference to the 
 	\textrm{if }\membermeta \textrm{ is a method with body }\stmt\textrm{ and formals }\formals :\\
 	\hspace{2mm}
 	\cesktrans{
-		\contconf{\dpropertygetk}{\val}}{
+		\contconf{\DPropertyGetK}{\val}}{
 		\contconf{\econt}{\funval{\formals}{\stmt}{\env}}}\\
 	\textrm{with}\\
 	\hspace{3mm}
@@ -1094,7 +1120,7 @@ In Kernel a property can be accessed without lookup, by direct reference to the 
 	\textrm{if }\membermeta \textrm{ is getter with statement body }\stmt :\\
 	\hspace{2mm}
 	\cesktrans{
-		\contconf{\dpropertygetk}{\val}}{
+		\contconf{\DPropertyGetK}{\val}}{
 		\execconf{\stmt}{\env}{\lbls}{\clbls}{\handler}{\cstrace}{\cex}{\econt}{\scont}}
 		\\
 	\textrm{with}\\
@@ -1105,7 +1131,7 @@ In Kernel a property can be accessed without lookup, by direct reference to the 
 
 	\textrm{if }\membermeta \textrm{ is a field } :\\
 	\hspace{2mm}\cesktrans{
-		\contconf{\dpropertygetk}{\val}}{
+		\contconf{\DPropertyGetK}{\val}}{
 		\contconf{\econt}{\deref{\val[\membermeta]}}}\\
   \end{array}
 \]
@@ -1155,12 +1181,12 @@ In Kernel a property can be set without lookup, by direct reference to the $AST$
 		\evalconf{\expressionmeta_1}{\env}{\strace}{\cstrace}{\cex}{\econt'}}\\
 	\textrm{with}\\
 	\hspace{3mm}
-	\econt' = \DPropertysetVK\\[2mm]
+	\econt' = \DPropertySetVK\\[2mm]
 
 	\textrm{if }\membermeta \textrm{ is setter with statement body }\stmt \textrm{ and formal }\formal :\\
 	\hspace{2mm}
 	\cesktrans{
-		\contconf{\DPropertysetVK}{\val_1}}{
+		\contconf{\DPropertySetVK}{\val_1}}{
 		\execconf{\stmt}{\env}{\lbls}{\clbls}{\handler}{\cstrace}{\cex}{\econt}{\scont}}\\
 	\textrm{with}\\
 	\hspace{3mm}
@@ -1171,7 +1197,7 @@ In Kernel a property can be set without lookup, by direct reference to the $AST$
 	\textrm{if }\membermeta \textrm{ is a field } :\\
 	\hspace{2mm}
 	\cesktrans{
-		\contconf{\DPropertysetVK}{\val_1}}{
+		\contconf{\DPropertySetVK}{\val_1}}{
 		\contconf{\econt}{\update{\val_0[\membermeta]}{\val_1}}}
   \end{array}
 \]
