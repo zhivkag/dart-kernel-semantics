@@ -22,7 +22,7 @@
 % Counter for rows in tables
 \newcounter{rowcount}[table]
 \newcounter{tablecount}
-\setcounter{tablecount}{1}
+\setcounter{tablecount}{0}
 %
 \makeatletter
 \renewcommand{\p@rowcount}{\thesubsection.\thetablecount.}
@@ -404,32 +404,67 @@ We suffix the names of expression continuations with "$K$". We differentiate the
 %
 \newcommand{\InstanceMethodK}{\mathrm{InstanceMethodK(\expressionsmeta,\,\idmeta,\,\env,\,\ExceptionHandlers,\,\econt)}}
 \newcommand{\DInstanceMethodK}{\mathrm{DInstanceMethodK}(\expressionsmeta,\,\membermeta,\,\env,\,\ExceptionHandlers,\,\econt)}
+\newcommand{\VarDeclK}[3]{\mathrm{VarDeclarationK}({#1},\,{#2},\,{#3})}
+\newcommand{\IfCondK}[2]{\mathrm{IfConditionK}({#1},\,{#2},\,\env,\,\lbls,\,\clbls,\,\handler,\,\cstrace,\,\cex,\,\econt,\,\scont)}
+\newcommand{\SwitchK}[2]{\mathrm{SwitchK}({#1},\,\env,\,\lbls,\,{#2},\,\strace,\,\handler,\,\cstrace,\,\cex,\,\econt,\,\scont)}
+%
+\newcommand{\whilecondk}{\mathrm{WhileCondK}(\expr,\,\stmt,\,\env,\,\lbls,\,\clbls,\,\handler,\,\cstrace,\,\cex,\,\econt,\,\scont)}
+\newcommand{\InitializerK}[4]{\mathrm{InitializerK}({#1},\,{#2},\,{#3},\,\strace,\,\handler,\,\cstrace,\,\cex,\,{#4})}
+\newcommand{\InitK}[3]{\mathrm{InitiK}({#1},\,{#2},\,\strace,\,\handler,\,\cstrace,\,\cex,\,{#3})}
+\newcommand{\FinallyK}[1]{\mathrm{Finally}({#1},\,\env,\,\lbls,\,\clbls,\,\strace,\,\handler,\,\econt)}
+\newcommand{\FinallyReturnK}[1]{\mathrm{FinallyReturnK}({#1},\,\env,\,\lbls,\,\clbls,\,\strace,\,\handler,\,\econt)}
+%
+
+%
 \stepcounter{tablecount}
 %
-% Use counter as:
-% \labeledrow{eval:$rulename}
+% Label row (if referenced) with:
+% \labeledrow{econt:$rulename}
 \begin{center}
   $
-  \begin{array}{lll}
-	\VarSetK{\idmeta}{\ExceptionHandlers}{\econt}&\\[2mm]
+  \begin{array}{lll@{\hspace{3cm}}}
+	\labeledrow{econt:varset}&
+	\VarSetK{\idmeta}{\ExceptionHandlers}{\econt}\\[2mm]
+	\labeledrow{econt:expressions}&
 	\ExpressionsK{\exprs}{\env}{\acont}&\\[2mm]
+	\labeledrow{econt:not}&
 	\NotK{\econt}&\\[2mm]
+	\labeledrow{econt:and}&
 	\AndK{\expressionmeta}{\ExceptionHandlers}{\econt}&\\[2mm]
+	\labeledrow{econt:or}&
 	\OrK{\expressionmeta}{\ExceptionHandlers}{\econt}&\\[2mm]
+	\labeledrow{econt:cond}&
 	\ConditionalK{\expressionmeta_1}{\expressionmeta_2}{\ExceptionHandlers}{\econt}&\\[2mm]
+	\labeledrow{econt:let}&
 	\LetK{\idmeta}{\expressionmeta}{\ExceptionHandlers}{\econt}&\\[2mm]
+	\labeledrow{econt:is}&
 	\IsExpressionK&\\[2mm]
+	\labeledrow{econt:as}&
 	\AsExpressionK&\\[2mm]
+	\labeledrow{econt:static-get}&
 	\StaticGetK&\\[2mm]
+	\labeledrow{econt:static-set}&
 	\StaticSetK&\\[2mm]
+	\labeledrow{econt:dproperty-get}&
 	\DPropertyGetK&\\[2mm]
+	\labeledrow{econt:property-set}&
 	\PropertySetK&\\[2mm]
+	\labeledrow{econt:property-set}&
 	\PropertySetVK&\\[2mm]
+	\labeledrow{econt:dproperty-set}&
 	\DPropertyGetK&\\[2mm]
+	\labeledrow{econt:dproperty-set-v}&
 	\DPropertySetVK&\\[2mm]
+	\labeledrow{econt:super-property-set}&
 	\SuperPropertySetK&\\[2mm]
+	\labeledrow{econt:instance-method}&
 	\InstanceMethodK&\\[2mm]
+	\labeledrow{econt:dinstance-method}&
 	\DInstanceMethodK&\\[2mm]
+	\labeledrow{econt:var-decl}&
+	\VarDeclK{\idmeta}{\env}{\scont}&\\[2mm]
+	\labeledrow{econt:if-cond}&
+	\IfCondK{\expressionmeta_1}{\expressionmeta_2}&\\[2mm]
   \end{array}
   $
   \captionof{table}{Expression Continuations}
@@ -443,6 +478,44 @@ Statement continuations capture the steps after execution of a statement. They a
 \noindent
 We suffix the names of statement continuations with "$SK$".
 \newcommand{\ExitSK}[1]{\mathrm{ExitSK(\econt,\,#1)}}
+\newcommand{\BlockSK}[2]{\mathrm{BlockSK}({#1},\,{#2},\,\lbls,\,\clbls,\,\handler,\,\cstrace,\,\cex,\,\econt,\,\scont)}
+\newcommand{\WhileSK}{\mathrm{WhileSK}(\expr,\,\stmt,\,\env,\,\lbls,\,\clbls,\,\handler,\,\cstrace,\,\cex,\,\econt,\,\scont)}
+\newcommand{\BodySK}[3]{\mathrm{BodySK}({#1},\,{#2},\,\strace,\,\handler,\,\cstrace,\,\cex,\,{#3})}
+\newcommand{\NewSK}[2]{\mathrm{NewSK}({#1},\,{#2})}
+\newcommand{\FinallySK}[1]{\mathrm{FinallySK}({#1},\,\env,\,\lbls,\,\clbls,\,\strace,\,\handler,\,\econt,\,\scont)}
+\newcommand{\RethrowSK}[3]{\mathrm{RethrowSK}({#1},\,{#2},\,{#3})}
+%
+\stepcounter{tablecount}
+%
+% Label row (if referenced) with:
+% \labeledrow{scont:$rulename}
+\begin{center}
+  $
+  \begin{array}{lll@{\hspace{5cm}}}
+	\labeledrow{scont:exit}	&
+	\ExitSK{\val}\\[2mm]
+
+	\labeledrow{scont:block}&
+	\BlockSK{\stmts}{\env}&\\[2mm]
+
+	\labeledrow{scont:while}&
+	\WhileSK&\\[2mm]
+
+	\labeledrow{scont:body}&
+	\BodySK{\stmt}{\env}{\scont}&\\[2mm]
+
+	\labeledrow{scont:new}&
+	\NewSK{\econt}{\loc}&\\[2mm]
+
+	\labeledrow{scont:finally}&
+	\FinallySK{\stmt}&\\[2mm]
+
+	\labeledrow{scont:rethrow}&
+	\RethrowSK{\val}{\strace}{\handler}&\\[2mm]
+  \end{array}
+  $
+  \captionof{table}{Statement Continuations}
+\end{center}
 \subsubsection{Application continuation}
 \label{subsubsec:application-continuation}
 
@@ -452,15 +525,18 @@ We suffix the names of application continuations with "$A$".
 \newcommand{\ValueA}[2]{\mathrm{ValueA}({#1},\,{#2})}
 \newcommand{\StringConcatenationA}{\mathrm{StringConcatenationA(\econt)}}
 \newcommand{\SuperMethodA}{\mathrm{SuperMethodA}(\idmeta,\,\env,\,\ExceptionHandlers,\,\econt)}
-\newcommand{\StaticInvApp}[4]{\mathrm{StaticInvocationA}({#1},\,{#2},\,{#3},\,\ExceptionHandlersRest,\,{#4})}
+\newcommand{\StaticInvA}[4]{\mathrm{StaticInvocationA}({#1},\,{#2},\,{#3},\,\ExceptionHandlersRest,\,{#4})}
 \newcommand{\DInstanceMethodA}{\mathrm{DInstanceMethodA}(\membermeta,\,\val,\,\ExceptionHandlers,\,\econt)}
-
-
+\newcommand{\FieldsA}[4]{\mathrm{FieldsApp}({#1},\,{#2},\,{#3},\,\strace,\,\handler,\,\cstrace,\,\cex,\,{#4})}
+\newcommand{\SuperA}[3]{\mathrm{SuperA}({#1},\,{#2},\,\strace,\,\handler,\,\cstrace,\,\cex,\,{#3})}
+\newcommand{\ConstructorA}[2]{\mathrm{ConstructorA}({#1},\,\strace,\,\handler,\,\cstrace,\,\cex,\,{#2})}
+\newcommand{\RedirectingA}[3]{\mathrm{RedirectingA}({#1},\,{#2},\,\strace,\,\handler,\,\cstrace,\,\cex,\,{#3})}
 \subsubsection{Break continuations}
 \label{subsubsec:break-continuations}
 
 Break continuations capture the steps to be executed when a break to a given label is encountered.
-
+\newcommand{\finallybreak}[2]{\mathrm{FinallyBreak}({#1},\,\env,\,\lbls,\,\clbls,\,\strace,\,\handler,\,\cstrace,\,\cex,\,\econt,\,{#2})}
+%
 \noindent
 There are two types of Break continuations:
 \begin{itemize}
@@ -474,7 +550,10 @@ FinallyBreak continuations are added when a try/finally statement is encountered
 \label{subsubsec:switch-continuations}
 
 Switch continuations capture the steps to be executed when a continue to a preceding switch case is encountered. They capture the components needed for the execution of the case body statement.
-
+%
+\newcommand{\continuek}{\mathrm{SwitchContinueK}(\stmt,\,\env,\,\lbls,\,\clbls,\,\handler,\,\cstrace,\,\cex,\,\econt,\,\scont)}
+\newcommand{\FinallyContinue}[2]{\mathrm{FinallyContinue}({#1},\,\env,\,\lbls,\,\clbls,\,\strace,\,\handler,\,\cstrace,\,\cex,\,\econt,\,{#2})}
+%
 \noindent
 There are two types of Switch continuations:
 \begin{itemize}
@@ -483,6 +562,8 @@ There are two types of Switch continuations:
 \end{itemize}
 \subsubsection{Exception handlers}
 \label{subsubsec:exception-handlers}
+\newcommand{\ThrowH}[2]{\mathrm{ThrowK}({#1},\,{#2})}
+\newcommand{\CatchH}[1]{\mathrm{Catch}({#1},\,\env,\,\lbls,\,\clbls,\,\strace,\,\handler,\,\econt,\,\scont)}
 
 \subsection{Values}
 \label{subsec:values}
@@ -633,11 +714,11 @@ There are two types of Switch continuations:
 \newcommand{\evalcesktrans}[3]{&\cesktrans{#1}{#2}\,\hspace{2mm}#3\\[2mm]}
 \stepcounter{tablecount}
 %
-% Use counter as:
+% Label row (if referenced) with:
 % \labeledrow{eval:$rulename}
 \begin{center}
 	$
-	\begin{array}{lrclr}
+	\begin{array}{lrclr@{\hspace{3cm}}}
 		\evalcesktrans
 			{\evalconf{\IntLiteral{\integermeta}}{\env}{\strace}{\cstrace}{\cex}{\econt}}
 			{\contconf{\econt}{\val}}
@@ -716,7 +797,7 @@ There are two types of Switch continuations:
 
 		\evalcesktrans
 			{\evalconf{\textbf{throw } \expr}{\env}{\strace}{\cstrace}{\cex}{\econt}}
-			{\evalconf{\expr}{\env}{\strace}{\cstrace}{\cex}{\throwk{(\textbf{throw } \expr) :: \strace}{\handler}}}
+			{\evalconf{\expr}{\env}{\strace}{\cstrace}{\cex}{\ThrowH{(\textbf{throw } \expr) :: \strace}{\handler}}}
 			{}
 
 		\evalcesktrans
@@ -737,7 +818,7 @@ There are two types of Switch continuations:
 %
 \stepcounter{tablecount}
 %
-% Use counter as:
+% Label row (if referenced) with:
 % \labeledrow{eval:$rulename}
 \begin{center}
 	$
@@ -778,7 +859,7 @@ There are two types of Switch continuations:
 		\evalcesktrans
 			{\evalconf{\StaticInvocation{\{\membermeta\}}{\expressionsmeta}}{\env}{\strace}{\cstrace}{\cex}{\econt}}
 			{\evallistconf{\exprs}{\env}{\strace}{\cstrace}{\cex}{\acont'}}
-			{\\&&&\acont' = \StaticInvApp{\formals}{\stmt}{\strace'}{\econt}
+			{\\&&&\acont' = \StaticInvA{\formals}{\stmt}{\strace'}{\econt}
 			\\&&&\strace' = \StaticInvocation{\{\membermeta\}}{\expressionsmeta}::\strace}
 	\end{array}
 	$
@@ -841,13 +922,13 @@ There are two types of Switch continuations:
 			{\\&&&\econt' = \SuperPropertySetK}
 	\end{array}
 	$
-	\captionof{table}{Instance property extraction and assignment}
+	\captionof{table}{The CESK-transition function for instance property extraction and assignment expressions}
 	\label{table:instance-property-evalconfigs}
 \end{center}
 %
 \stepcounter{tablecount}
 %
-% Use counter as:
+% Label row (if referenced) with:
 % \labeledrow{eval:$rulename}
 \begin{center}
 	$
@@ -870,7 +951,7 @@ There are two types of Switch continuations:
 		\evalcesktrans
 			{\evalconf{\textbf{new Q}(\exprs)}{\env}{st}{cex}{cst}{\econt}}
 			{\evallistconf{\exprs}{\env}{st}{cex}{cst}{\acont'}}
-			{\\&&&\acont' = \ctrapp{\textbf{Q}}{\econt}}
+			{\\&&&\acont' = \ConstructorA{\textbf{Q}}{\econt}}
 	\end{array}
 	$
 	\captionof{table}{Instance method and constructor invocation}
@@ -1066,7 +1147,7 @@ Static invocation is supported with $\StaticInvocation{\{\membermeta\}}{\express
 \[
   \begin{array}{rcl}
 	\cesktrans{
-		\acontconf{\StaticInvApp{\formals}{\stmt}{\strace}{\econt}}{\val{s}}}{
+		\acontconf{\StaticInvA{\formals}{\stmt}{\strace}{\econt}}{\val{s}}}{
 		\execconf{\stmt}{\env'}{[]}{[]}{\handler}{\cstrace}{\cex}{\econt}{\scont}}
 	\\[2mm]
 	\scont = \ExitSK{\tt{null}},
@@ -1362,7 +1443,8 @@ For the evaluation $\this$ expression we add a special variable declaration, $\t
 \newcommand{\ExpressionK}[2]{\mathrm{ExpressionK}({#1},\,{#2})}
 %
 \stepcounter{tablecount}
-% Use counter as:
+%
+% Label row (if referenced) with:
 % \labeledrow{exec:$rulename}
 \begin{center}
 	$
@@ -1370,7 +1452,7 @@ For the evaluation $\this$ expression we add a special variable declaration, $\t
 		\execcesktrans
 			{\execconf{\textbf{var } \varmeta = \expr}{\env}{\lbls}{\clbls}{\handler}{\cstrace}{\cex}{\econt}{\scont}}
 			{\evalconf{\expr}{\env}{\strace}{\cstrace}{\cex}{\econt'}}
-			{\\&\econt' = \vardeclk{\env}{\varmeta}{\scont}}
+			{\\&\econt' = \VarDeclK{\env}{\varmeta}{\scont}}
 
 		\execcesktrans
 			{\execconf{\lbrace\rbrace}{\env}{\lbls}{\clbls}{\handler}{\cstrace}{\cex}{\econt}{\scont}}
@@ -1386,12 +1468,12 @@ For the evaluation $\this$ expression we add a special variable declaration, $\t
 			{\execconf{\stmt :: \stmts}{\env}{\lbls}{\clbls}{\handler}{\cstrace}{\cex}{\econt}{\scont}}
 			{}
 			{\\&\hspace{4mm}\execconf{\stmt}{\env}{\lbls}{\clbls}{\handler}{\cstrace}{\cex}{\econt}{\scont'}
-			\\&\scont' = \blocksk{\stmts}{\env}}
+			\\&\scont' = \BlockSK{\stmts}{\env}}
 
 		\execcesktrans
 			{\execconf{\textbf{if } \expr \textbf{ then } \stmti{1} \textbf{ else } \stmti{2} }{\env}{\lbls}{\clbls}{\handler}{\cstrace}{\cex}{\econt}{\scont}}
 			{\evalconf{\expr}{\env}{\strace}{\cstrace}{\cex}{\econt'}}
-			{\\&\econt' = \ifcondk{\stmti{1}}{\stmti{2}}}
+			{\\&\econt' = \IfCondK{\stmti{1}}{\stmti{2}}}
 
 		\execcesktrans
 			{\execconf{\textbf{return } \expr}{\env}{\lbls}{\clbls}{\handler}{\cstrace}{\cex}{\econt}{\scont}}
@@ -1417,13 +1499,13 @@ For the evaluation $\this$ expression we add a special variable declaration, $\t
 		\execcesktrans
 			{\execconf{\textbf{switch }(\expr) \scases }{\env}{\lbls}{\clbls}{\handler}{\cstrace}{\cex}{\econt}{\scont}}
 			{\evalconf{\expr}{\env}{\strace}{\cstrace}{\cex}{\econt'}}
-			{\\&\econt' = \switchk{\scases}{\clbls}}
+			{\\&\econt' = \SwitchK{\scases}{\clbls}}
 
 		\execcesktrans
 			{\execconf{\mathrm{TryCatch}(\stmt, cs)}{\env}{\lbls}{\clbls}{\handler}{\cex}{\cstrace}{\econt}{\scont}}
 			{}
 			{\\&\hspace{4mm}\execconf{\stmt}{\env}{\lbls}{\clbls}{\handler'}{\cex}{\cstrace}{\econt}{\scont}
-			\\&\handler' = \catchk{cs}}
+			\\&\handler' = \CatchH{cs}}
 
 		\execcesktrans
 			{\execconf{\textbf{break L}}{\env}{\lbls}{\clbls}{\handler}{\cex}{\cstrace}{\econt}{\scont}}
@@ -1442,14 +1524,14 @@ For the evaluation $\this$ expression we add a special variable declaration, $\t
 			\\&\env' = \ext{\env}{fun}{\funval{\stmt_{body}}{\formals}{\env'}}}
 	\end{array}
 	$
-	\captionof{table}{Instance method invocation}
+	\captionof{table}{The CESK-transition function for statements}
 	\label{table:instance-method-evalconfigs}
 \end{center}
 \subsubsection{Variable Declaration}
 Variable declaration extend the corresponding environment with a new binding. The corresponding initializer expression is first evaluated to a value $v$.
 
 \noindent
-Let $\econt' = \vardeclk{\env}{\varmeta}{\scont}$ below:
+Let $\econt' = \VarDeclK{\env}{\varmeta}{\scont}$ below:
 \[
   \begin{array}{lcl}
 	\cesktrans{
@@ -1469,22 +1551,22 @@ Let $\econt' = \vardeclk{\env}{\varmeta}{\scont}$ below:
 \[
   \begin{array}{lcl}
 	\cesktrans{
-		\scontconf{\blocksk{\stmt :: \stmts}{\env}}{\env'}}{
+		\scontconf{\BlockSK{\stmt :: \stmts}{\env}}{\env'}}{
 		\execconf{\stmt}{\env'}{\lbls}{\clbls}{\handler}{\cstrace}{\cex}{\econt}{\scont'}}
 		\\[2mm]
 
 	\cesktrans{
-		\scontconf{\blocksk{[]}{\env}}{ \_ }}{
+		\scontconf{\BlockSK{[]}{\env}}{ \_ }}{
 		\scontconf{\scont}{\env}}
 		\\[2mm]
   \end{array}
 \]
 \noindent
-with $\scont' = \blocksk{\stmts}{\env}$.
+with $\scont' = \BlockSK{\stmts}{\env}$.
 
 \subsubsection{If statement}
 
-Let $\econt' = \ifcondk{\stmti{1}}{\stmti{2}}$ below:
+Let $\econt' = \IfCondK{\stmti{1}}{\stmti{2}}$ below:
 \[
   \begin{array}{lcl}
 	\contconf{\econt'}{\true} 
@@ -1532,9 +1614,9 @@ If there is a matching case clause, its statement is executed with a new stateme
 
 \[
   \begin{array}{lcl}
-	\contconf{\switchk{\scase :: \scases}{\clbls}}{\val}
+	\contconf{\SwitchK{\scase :: \scases}{\clbls}}{\val}
 	\Rightarrow \hspace{30mm}\\
-	\hspace{20mm}\execconf{\stmt}{\env}{\lbls}{\clbls}{\handler}{\cstrace}{\cex}{\econt}{\exitssk}
+	\hspace{20mm}\execconf{\stmt}{\env}{\lbls}{\clbls}{\handler}{\cstrace}{\cex}{\econt}{\ExitSK{\tt{null}}}
   \end{array}
 \]
 with:
@@ -1548,9 +1630,9 @@ If a non-matching \textbf{case} clause, $\scase$, is the target of a continue st
 
 \[
   \begin{array}{lcl}
-	\contconf{\switchk{\scase :: \scases}{\clbls}}{\val}
+	\contconf{\SwitchK{\scase :: \scases}{\clbls}}{\val}
 	\Rightarrow \hspace{30mm}\\
-	\hspace{20mm}\contconf{\switchk{\scases}{\clbl :: \clbls}}{\val}
+	\hspace{20mm}\contconf{\SwitchK{\scases}{\clbl :: \clbls}}{\val}
   \end{array}
 \]
 with:
@@ -1564,11 +1646,11 @@ with:
 Otherwise, the execution continues as follows:
 \[
   \begin{array}{lcl}
-    \contconf{\switchk{\scase :: \scases}{\clbls}}{\val}
+    \contconf{\SwitchK{\scase :: \scases}{\clbls}}{\val}
 	\Rightarrow \hspace{30mm}\\
-	\hspace{20mm}\contconf{\switchk{\scases}{\clbls}}{\val}\\[2mm]
+	\hspace{20mm}\contconf{\SwitchK{\scases}{\clbls}}{\val}\\[2mm]
 
-	\contconf{\switchk{[]}{\clbls}}{\val}
+	\contconf{\SwitchK{[]}{\clbls}}{\val}
 	\Rightarrow
 	\scontconf{\scont}{\env}
   \end{array}
@@ -1580,7 +1662,7 @@ Kernel supports structured exception handling with \textbf{try/catch} and \textb
 
 \[
   \begin{array}{lcl}
-	\contconf{\throwk{\strace}{\handler}}{\val}
+	\contconf{\ThrowH{\strace}{\handler}}{\val}
 	& \Rightarrow &
 	\throwconf{\handler}{\val}{\strace}\\[2mm]
 
@@ -1591,7 +1673,7 @@ Kernel supports structured exception handling with \textbf{try/catch} and \textb
 \textbf{try/catch} handlers contain a list of on-catch handlers, environment, break labels, continue switch labels, exception handler, stacktrace, return continuation, and statement continuation. The handlers are tried in order to see if they match against the type of the exception. If none match, the exception is rethrown.
 
 \noindent
-Let $\econt' = \catchk{(\textbf{on T catch (e, s) }\stmt) :: cs}$ be a catch continuation containing a non-empty list of on-catch handlers:
+Let $\econt' = \CatchH{(\textbf{on T catch (e, s) }\stmt) :: cs}$ be a catch continuation containing a non-empty list of on-catch handlers:
 \[
   \begin{array}{lcll}
 	\throwconf{\econt'}{\val}{\strace'}
@@ -1603,7 +1685,7 @@ Let $\econt' = \catchk{(\textbf{on T catch (e, s) }\stmt) :: cs}$ be a catch con
 
 	\throwconf{\econt'}{\val}{\strace'}
 	& \Rightarrow &
-	\throwconf{\catchk{cs}}{\val}{\strace'}	&\textrm{ otherwise}\\[2mm]
+	\throwconf{\CatchH{cs}}{\val}{\strace'}	&\textrm{ otherwise}\\[2mm]
 	&&\textrm{with } \env' = extend(\env, e :: s :: [], \val :: \strace' :: [])
   \end{array}
 \]
@@ -1611,7 +1693,7 @@ Let $\econt' = \catchk{(\textbf{on T catch (e, s) }\stmt) :: cs}$ be a catch con
 When a catch handler with no on-catch handlers is reached, the exception is rethrown.
 \[
   \begin{array}{lcll}
-	\throwconf{\catchk{[]}}{\val}{\strace'}
+	\throwconf{\CatchH{[]}}{\val}{\strace'}
 	& \Rightarrow &
 	\throwconf{\handler}{\val}{\strace'}\hspace{20mm}
   \end{array}
@@ -1621,11 +1703,11 @@ When a catch handler with no on-catch handlers is reached, the exception is reth
 
 \[
   \begin{array}{lcl}
-	\throwconf{\finallyk{\stmt}}{\val}{\strace'}
+	\throwconf{\FinallyK{\stmt}}{\val}{\strace'}
 	\Rightarrow \\
-	\hspace{10mm}\execconf{\stmt}{\env}{\lbls}{\clbls}{\handler}{inl()}{inl()}{\econt}{\rethrowsk{\val}{\strace'}{\handler}}\hspace{20mm}\\[2mm]
+	\hspace{10mm}\execconf{\stmt}{\env}{\lbls}{\clbls}{\handler}{inl()}{inl()}{\econt}{\RethrowSK{\val}{\strace'}{\handler}}\hspace{20mm}\\[2mm]
 
-	\scontconf{\rethrowsk{\val}{\strace}{\handler}}{\_}
+	\scontconf{\RethrowSK{\val}{\strace}{\handler}}{\_}
 	\Rightarrow \throwconf{\handler}{\val}{\strace}
 
   \end{array}
@@ -1647,16 +1729,16 @@ where:
 
 \[
   \begin{array}{lcl}
-	\handler' = \finallyk{\stmti{0}}\hspace{50mm}\\[2mm]
+	\handler' = \FinallyK{\stmti{0}}\hspace{50mm}\\[2mm]
 
-	\econt' = \finallyretk{\stmti{1}}\\[2mm]
+	\econt' = \FinallyReturnK{\stmti{1}}\\[2mm]
 
-	\scont' = \finallysk{\stmti{1}}\\[2mm]
+	\scont' = \FinallySK{\stmti{1}}\\[2mm]
 
 	\lbls' = \lbrace \mathrm{Label}(L, \bcont') \mid \mathrm{Label}(L, \bcont) \in \lbls\rbrace \\
 	\hspace{10mm}\textrm{where } \bcont = \finallybreak{\stmti{1}}{\bcont}\\[2mm]
 	\clbls' =  \lbrace \continuel{C}{\switchcont'} \mid  \continuel{C}{\switchcont} \in \clbls\rbrace\\
-	\hspace{10mm}\textrm{where } \switchcont' = \finallycontinue{\stmti{1}}{\switchcont}
+	\hspace{10mm}\textrm{where } \switchcont' = \FinallyContinue{\stmti{1}}{\switchcont}
 
   \end{array}
 \]
@@ -1691,7 +1773,7 @@ Let $\clbl = \continuel{L'}{\switchcont} \in \clbls \textrm{ with } L' == \mathb
 	& \Rightarrow \\
 	\hspace{10mm}\execconf{\stmt}{\env}{\lbls}{\clbls}{\handler}{\cex}{\cstrace}{\econt}{\scont}\\[2mm]
 
-	\switchconf{\finallycontinue{\stmt}{\switchcont}}
+	\switchconf{\FinallyContinue{\stmt}{\switchcont}}
 	& \Rightarrow \\
 	\hspace{10mm}\execconf{\stmt}{\env}{\lbls}{\clbls}{\handler}{\cex}{\cstrace}{\econt}{\mathrm{SwitchContinueSK}(\switchcont)}\\[2mm]
 
@@ -1714,9 +1796,9 @@ Let $F$ be a function with a body $\stmt_{body}$ and a list of formal parameters
 The expression \textbf{new} invokes a constructor to produce a new instance. The target constructor \textbf{Q} has a list of formal parameters, $\formals$, a list of initializers, $Izs$, and a statement body, $\stmt_{body}$. The invocation of a constructor \textbf{Q} with \textbf{new Q}($\exprs$) proceeds as follows:
 \[
   \begin{array}{lcl}
-	\acontconf{\ctrapp{\textbf{Q}}{\econt}}{\val{s}}
+	\acontconf{\ConstructorA{\textbf{Q}}{\econt}}{\val{s}}
 	& \Rightarrow &
-	\contconf{\initk{Q}{\env}{\scont}}{!\loc}
+	\contconf{\InitK{Q}{\env}{\scont}}{!\loc}
   \end{array}
 \]
 \noindent
@@ -1725,9 +1807,9 @@ where $\loc$ is the location of the newly allocated instance, $\val \in \dobjval
   \begin{array}{l}
 	\deref{\loc} = \objval \in \dobjval, fields \in \mlist{\dlocation}\\
 	\env' = extend(\env_{empty}, \formals, \val{s})\\
-	\scont = \newsk{\econt}{\loc} \\[2mm]
+	\scont = \NewSK{\econt}{\loc} \\[2mm]
 
-	\scontconf{\newsk{\econt}{\loc}}{\env}
+	\scontconf{\NewSK{\econt}{\loc}}{\env}
 	\Rightarrow
 	\contconf{\econt}{\deref{\loc}}
   \end{array}
@@ -1740,17 +1822,17 @@ Let $li = last(Izs)$ be the last initializer in the list of initializers, $Izs$,
 When $li$ is a redirecting initializer to target constructor \textbf{G}, then execution of constructor \textbf{Q} proceeds immediately with execution of its initializer list, $Izs$.
 \[
   \begin{array}{lcl}
-	\contconf{\initk{Q}{\env}{\scont}}{\val}
+	\contconf{\InitK{Q}{\env}{\scont}}{\val}
 	& \Rightarrow &
 	\evallistconf{\exprs}{\env}{\strace}{\cstrace}{\cex}{\acont}\\	
 	&&
 	\textrm{if } Izs = RedirectingI(G, \exprs) :: []\\
 	\textrm{where:}\\
-	\acont = \redapp{G}{\loc}{\scont}\\
+	\acont = \RedirectingA{G}{\loc}{\scont}\\
 	\deref{\loc} = \val
 	\\[2mm]
 
-	\contconf{\initk{Q}{\env}{\scont}}{\val}
+	\contconf{\InitK{Q}{\env}{\scont}}{\val}
 	& \Rightarrow &
 	\evalconf{\expr}{\env}{st}{cex}{cst}{\econt'}\\
 	&&
@@ -1758,12 +1840,12 @@ When $li$ is a redirecting initializer to target constructor \textbf{G}, then ex
 	\textrm{where:}\\
 
 	fi = Initializer(\expr) \textrm{, first initializer in }Izs\\
-	\econt' = \initializerk{Izs}{\loc}{\env}{\scont}\\
+	\econt' = \InitializerK{Izs}{\loc}{\env}{\scont}\\
 	\deref{\loc} = \val\\[2mm]
 
-	\acontconf{\redapp{G}{\loc}{\scont}}{\val{s}}
+	\acontconf{\RedirectingA{G}{\loc}{\scont}}{\val{s}}
 	& \Rightarrow &
-	\contconf{\initk{G}{\env'}{\scont}}{\deref{\loc}}\\[2mm]
+	\contconf{\InitK{G}{\env'}{\scont}}{\deref{\loc}}\\[2mm]
 	\textrm{where:}\\
 	\env' = extend(\env_{empty}, \formals, \val{s})
   \end{array}
@@ -1774,7 +1856,7 @@ Otherwise, \textbf{Q} is a non-redirecting generative constructor, and execution
 Let \textbf{Q} be a constructor with non empty initializer list, $Izs$ and a constructor body $\stmt_{body}$.
 \[
   \begin{array}{lcl}
-	\contconf{\initk{Q}{\env}{\scont}}{\val}
+	\contconf{\InitK{Q}{\env}{\scont}}{\val}
 	& \Rightarrow &
 	\evallistconf{\exprs}{\env}{\strace}{\cstrace}{\cex}{\acont}\\[2mm]
 
@@ -1784,9 +1866,9 @@ Let \textbf{Q} be a constructor with non empty initializer list, $Izs$ and a con
 	\exprs = \textrm{initializer expressions for instance fields}\\
 	\deref{\loc} = \val
 	&&
-	\acont = \fieldsapp{\env}{Izs}{\loc}{\scont'}\\
+	\acont = \FieldsA{\env}{Izs}{\loc}{\scont'}\\
 	&&
-	\scont' = \bodysk{\stmt_{body}}{\env'}{\scont}
+	\scont' = \BodySK{\stmt_{body}}{\env'}{\scont}
   \end{array}
 \]
 \noindent
@@ -1795,7 +1877,7 @@ To further initialize the new instance, the body of the constructor will be exec
 To support this, we add a new statement continuation, $BodySK$, that has the constructor body statement, the environment, the error handlers and stacktraces, and the next statement continuation.
 \[
   \begin{array}{lcl}
-	\scontconf{\bodysk{\stmt}{\env}{\scont}}{\_}
+	\scontconf{\BodySK{\stmt}{\env}{\scont}}{\_}
 	& \Rightarrow &
 	\execconf{\stmt}{\env}{[]}{[]}{\handler}{\cex}{\cstrace}{\econt}{\scont}
   \end{array}
@@ -1810,7 +1892,7 @@ Let $Fs$ be the list of fields for value $\deref{\loc}$ for the class immediatel
 If the initializer list is empty, $Izs = []$, the next statement continuation is executed.
 \[
   \begin{array}{lcl@{\hspace{30mm}}}
-	\acontconf{\fieldsapp{\env}{Izs}{\loc}{\scont}}{\val{s}}
+	\acontconf{\FieldsA{\env}{Izs}{\loc}{\scont}}{\val{s}}
 	& \Rightarrow &
 	\scontconf{\scont}{\env}\\[2mm]
 	&&\textrm{with }\deref{\deref\loc[f_i]} = \val_{i}, \forall f_i \in Fs, \forall \val_i \in \val{s}
@@ -1821,12 +1903,12 @@ In Kernel, a super initializer or a redirecting initializer, when present, will 
 If the initializer list contains at least two initializers, $Izs = Ininitalizer(E) :: Izs', Izs' \neq []$, we can assume that the next initializer to execute is a local or a field initializer.
 \[
   \begin{array}{lcl@{\hspace{30mm}}}
-	\acontconf{\fieldsapp{\env}{Izs}{\loc}{\scont}}{\val{s}}
+	\acontconf{\FieldsA{\env}{Izs}{\loc}{\scont}}{\val{s}}
 	& \Rightarrow &
 	\evalconf{\expr}{\env}{st}{cex}{cst}{\econt'}\\[2mm]
 	&&\textrm{with }\deref{\deref{\loc[f_i]}} = \val_{i}, \forall f_i \in Fs, \forall \val_i \in \val{s}\\
 	\textrm{where:}\\
-	\hspace{5mm}\econt' = \initk{Izs}{\loc}{\env}
+	\hspace{5mm}\econt' = \InitK{Izs}{\loc}{\env}
   \end{array}
 \]
 
@@ -1838,24 +1920,24 @@ Otherwise, there is only one initializer to execute in the initializer list, $li
 \item When the last initializer is a redirecting constructor, i.e. $li = RedirectingI(G, \exprs)$, the transition is as follows:
 \[
   \begin{array}{lcl@{\hspace{30mm}}}
-	\acontconf{\fieldsapp{\env}{li::[]}{\loc}{\scont}}{\val{s}}
+	\acontconf{\FieldsA{\env}{li::[]}{\loc}{\scont}}{\val{s}}
 	& \Rightarrow &
 	\evallistconf{\exprs}{\env}{\strace}{\cstrace}{\cex}{\acont}\\	
 	&&\textrm{with }\deref{\deref{\loc[f_i]}} = \val_{i}, \forall f_i \in Fs, \forall \val_i \in \val{s}\\
 	\textrm{where:}\\
-	\acont = \redapp{G}{\loc}{\scont}\\[2mm]
+	\acont = \RedirectingA{G}{\loc}{\scont}\\[2mm]
   \end{array}
 \]
 
 \item Otherwise, the last initializer is a super initializer, $li = Super(G, \exprs)$:
 \[
   \begin{array}{lcl@{\hspace{30mm}}}
-	\acontconf{\fieldsapp{\env}{li::[]}{\loc}{\scont}}{\val{s}}
+	\acontconf{\FieldsA{\env}{li::[]}{\loc}{\scont}}{\val{s}}
 	& \Rightarrow &
 	\evallistconf{\exprs}{\env}{\strace}{\cstrace}{\cex}{\acont}\\	
 	&&\textrm{with }\deref{\deref{\loc[f_i]}} = \val_{i}, \forall f_i \in Fs, \forall \val_i \in \val{s}\\
 	\textrm{where:}\\
-	\acont = \superapp{G}{\loc}{\scont}\\[2mm]
+	\acont = \SuperA{G}{\loc}{\scont}\\[2mm]
   \end{array}
 \]
 \end{itemize}
@@ -1865,29 +1947,29 @@ Besides redirecting and super initializers, in Kernel we also have field and loc
 Local initializers are special initializers in Kernel and they extend the environment for the execution of the initializer list. The transition steps for initializer continuation are as follows:
 \[
   \begin{array}{lcl@{\hspace{30mm}}}
-	\contconf{\initk{Local(\variablemeta, \expr) :: []}{\loc}{\scont}}{\val}
+	\contconf{\InitK{Local(\variablemeta, \expr) :: []}{\loc}{\scont}}{\val}
 	& \Rightarrow &
 	\scontconf{\scont}{\env'}\\[1mm]
 	\textrm{where:}\\
 	\hspace{5mm}\env' = \ext{\env}{\variablemeta}{\val}\\[2mm]
 
-	\contconf{\initk{Local(\variablemeta, \expr) :: li :: []}{\loc}{\scont}}{\val}
+	\contconf{\InitK{Local(\variablemeta, \expr) :: li :: []}{\loc}{\scont}}{\val}
 	& \Rightarrow &
 	\evallistconf{\exprs}{\env'}{\strace}{\cstrace}{\cex}{\acont}\\[1mm]
 	\textrm{where:}\\
 	\hspace{5mm}\env' = \ext{\env}{\variablemeta}{\val}\\
 	\hspace{5mm}\textrm{if } li = Super(G, \exprs):\\
-	\hspace{8mm}\acont = \superapp{G}{\loc}{\scont}\\
+	\hspace{8mm}\acont = \SuperA{G}{\loc}{\scont}\\
 	\hspace{5mm}\textrm{if } li = Redirecting(G, \exprs):\\
-	\hspace{8mm}\acont = \redapp{G}{\loc}{\scont}\\[2mm]
+	\hspace{8mm}\acont = \RedirectingA{G}{\loc}{\scont}\\[2mm]
 
-	\contconf{\initk{Local(\variablemeta, \expri{0}) :: Izs}{\loc}{\scont}}{\val}
+	\contconf{\InitK{Local(\variablemeta, \expri{0}) :: Izs}{\loc}{\scont}}{\val}
 	& \Rightarrow &
 	\evalconf{\expri{1}}{\env'}{st}{cex}{cst}{\econt'}\\[2mm]
 	\textrm{where:}\\
 	\hspace{5mm}\env' = \ext{\env}{\variablemeta}{\val}\\
 	\hspace{5mm}Izs = Initializer(\expri{1}) :: Izs'\\
-	\hspace{5mm}\econt' = \initk{Izs}{\loc}{\env'}
+	\hspace{5mm}\econt' = \InitK{Izs}{\loc}{\env'}
   \end{array}
 \]
 \noindent
@@ -1898,29 +1980,29 @@ Field initializers further initialize fields of the fresh instance. Let $Field(f
 
 \[
   \begin{array}{lcl@{\hspace{30mm}}}
-	\contconf{\initk{Field(f, \expr) :: []}{\loc}{\scont}}{\val}
+	\contconf{\InitK{Field(f, \expr) :: []}{\loc}{\scont}}{\val}
 	& \Rightarrow &
 	\scontconf{\scont}{\env'}\\[1mm]
 	\textrm{where:}\\
 	\hspace{5mm}\update{(\deref{\loc})[f]}{\val}\\[2mm]
 
-	\contconf{\initk{Field(f, \expr) :: li :: []}{\loc}{\scont}}{\val}
+	\contconf{\InitK{Field(f, \expr) :: li :: []}{\loc}{\scont}}{\val}
 	& \Rightarrow &
 	\evallistconf{\exprs}{\env}{\strace}{\cstrace}{\cex}{\acont}\\[1mm]
 	\textrm{where:}\\
 	\hspace{5mm}\update{(\deref{\loc})[f]}{\val}\\
 	\hspace{5mm}\textrm{if } li = Super(G, \exprs):\\
-	\hspace{8mm}\acont = \superapp{G}{\loc}{\scont}\\
+	\hspace{8mm}\acont = \SuperA{G}{\loc}{\scont}\\
 	\hspace{5mm}\textrm{if } li = Redirecting(G, \exprs):\\
-	\hspace{8mm}\acont = \redapp{G}{\loc}{\scont}\\[2mm]
+	\hspace{8mm}\acont = \RedirectingA{G}{\loc}{\scont}\\[2mm]
 
-	\contconf{\initk{Field(f, \expri{0}) :: Izs}{\loc}{\scont}}{\val}
+	\contconf{\InitK{Field(f, \expri{0}) :: Izs}{\loc}{\scont}}{\val}
 	& \Rightarrow &
 	\evalconf{\expri{1}}{\env}{st}{cex}{cst}{\econt}\\[2mm]
 	\textrm{where:}\\
 	\hspace{5mm}\update{(\deref\loc)[f]}{\val}\\
 	\hspace{5mm}Izs = Initializer(\expri{1}) :: Izs'\\
-	\hspace{5mm}\econt' = \initk{Izs}{\loc}{\env}
+	\hspace{5mm}\econt' = \InitK{Izs}{\loc}{\env}
   \end{array}
 \]
 
