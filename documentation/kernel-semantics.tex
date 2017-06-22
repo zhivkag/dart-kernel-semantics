@@ -10,7 +10,6 @@
 %
 \usepackage{color,alltt}
 %
-\usepackage{caption}
 \definecolor{shade}{gray}{0.75}
 %
 \usepackage{hyperref}
@@ -21,14 +20,14 @@
 %
 % Counter for rows in tables
 \newcounter{rowcount}[table]
-\newcounter{tablecount}
-\setcounter{tablecount}{0}
+\newcounter{figurecount}
+\setcounter{figurecount}{0}
 %
 \makeatletter
-\renewcommand{\p@rowcount}{\thesubsection.\thetablecount.}
+\renewcommand{\p@rowcount}{\thesubsection.\thefigurecount.}
 \makeatother
 %
-\newcommand{\myrowcount}{\refstepcounter{rowcount}\thesubsection.\thetablecount.\therowcount}
+\newcommand{\myrowcount}{\refstepcounter{rowcount}\thesubsection.\thefigurecount.\therowcount}
 \newcommand{\labeledrow}[1]{\myrowcount\label{#1}}
 %
 % Macros used below have been contributed in part by Olivier Danvy and Kevin Millikin
@@ -200,7 +199,7 @@ The store, $s$, maps a location, $\loc$, to a value, $\val$. The store is a muta
 \subsubsection{Dereferencing}
 \label{subsubsection:dereferecing}
 \newcommand{\deref}[1]{!#1}
-Function "$\deref{}$" is used to access a value stored in the stored with by the corresponding label, usually stored in the environment, or an object value for instance fields. It has an implicit argument which is the store of CESK machine.
+Function "$\deref{}$" is used to access a value stored in the store provided the corresponding label. The label is stored in the environment, or the object value for instance fields. "$\deref{}$" has an implicit argument which is the store of CESK machine.
 
 \begin{align*}
   \deref{} \in \dlocation &\rightarrow \dval \\
@@ -241,7 +240,7 @@ For simpler notation, we allow $extend$ to be called with singleton lists as $\e
 \label{subsubsec:variable-lookup}
 A variable lookup consists of looking up the address of a variable from the environment with $\loc = \env(\varmeta)$ and reading the stored value $v$ with $\deref{\loc} = \deref{\env(\varmeta)}$. For definition of "$\deref{}$" see Section~\ref{subsubsection:dereferecing}.
 
-\subsection{Configurations for the CESK machine}
+\subsection{Configurations}
 \label{subsec:cesk-configs}
 The state space of the CESK machine contains various kinds of configurations. Configurations contain different components and the transition step dispatches to the next configuration based on one of the components of the configuration.
 
@@ -258,8 +257,9 @@ The state space of the CESK machine contains various kinds of configurations. Co
 
 % Transition
 \newcommand{\cesktrans}[2]{{#1} & \Rightarrow & {#2}}
-
-\[
+\stepcounter{figurecount}
+\begin{figure}
+  $
   \begin{array}{lcl}
 	\evalconf{\expr}{\env}{st}{cex}{cst}{\econt} & : &
 	\textrm{EvalConfiguration}\\
@@ -289,8 +289,9 @@ The state space of the CESK machine contains various kinds of configurations. Co
 	\textrm{SwitchConfiguration}\\
 
   \end{array}
-\]
-
+  $  
+  \caption{Configurations for the CESK machine}
+\end{figure}
 \subsubsection{EvalConfiguration}
 \label{subsubsec:evalconfig}
 
@@ -374,7 +375,7 @@ Note that some continuation will not evaluate the captured expression, when this
 \item Continuations without holes\\
 Continuations without holes dispatch on the provided value and produce the next configuration, a ValuePassingConfiguration.
 \end{itemize}
-We suffix the names of expression continuations with "$K$". We differentiate the following continuations:
+We suffix the names of expression continuations with "$K$". The different expression continuations are shown in Figure~\ref{figure:econts}.
 %
 \newcommand{\ExceptionHandlersRest}{\handler,\,\cstrace,\,\cex}
 \newcommand{\ExceptionHandlers}{\strace,\,\handler,\,\cstrace,\,\cex}
@@ -416,11 +417,11 @@ We suffix the names of expression continuations with "$K$". We differentiate the
 %
 
 %
-\stepcounter{tablecount}
+\stepcounter{figurecount}
 %
 % Label row (if referenced) with:
 % \labeledrow{econt:$rulename}
-\begin{center}
+\begin{figure}
   $
   \begin{array}{lll@{\hspace{3cm}}}
   	&&\\
@@ -488,8 +489,9 @@ We suffix the names of expression continuations with "$K$". We differentiate the
 	\IfCondK{\expressionmeta_1}{\expressionmeta_2}&\\[2mm]
   \end{array}
   $
-  \captionof{table}{Expression Continuations}
-\end{center}
+  \caption{Expression Continuations}
+  \label{figure:econts}
+\end{figure}
 
 \subsubsection{Statement continuations}
 \label{subsubsec:statement-continuations}
@@ -497,7 +499,7 @@ We suffix the names of expression continuations with "$K$". We differentiate the
 Statement continuations capture the steps after execution of a statement. They accept an environment and produce the next configuration. Statements in a block expressions can extend the environment function and this is visible to the subsequent expressions in the block. For other types of statement configuration, the environment is ignored.
 
 \noindent
-We suffix the names of statement continuations with "$SK$".
+We suffix the names of statement continuations with "$SK$". The different statement continuations are shown in Figure~\ref{figure:sconts}.
 \newcommand{\ExitSK}[1]{\mathrm{ExitSK(\econt,\,#1)}}
 \newcommand{\BlockSK}[2]{\mathrm{BlockSK}({#1},\,{#2},\,\lbls,\,\clbls,\,\handler,\,\cstrace,\,\cex,\,\econt,\,\scont)}
 \newcommand{\WhileSK}{\mathrm{WhileSK}(\expr,\,\stmt,\,\env,\,\lbls,\,\clbls,\,\handler,\,\cstrace,\,\cex,\,\econt,\,\scont)}
@@ -506,11 +508,11 @@ We suffix the names of statement continuations with "$SK$".
 \newcommand{\FinallySK}[1]{\mathrm{FinallySK}({#1},\,\env,\,\lbls,\,\clbls,\,\strace,\,\handler,\,\econt,\,\scont)}
 \newcommand{\RethrowSK}[3]{\mathrm{RethrowSK}({#1},\,{#2},\,{#3})}
 %
-\stepcounter{tablecount}
+\stepcounter{figurecount}
 %
 % Label row (if referenced) with:
 % \labeledrow{scont:$rulename}
-\begin{center}
+\begin{figure}
   $
   \begin{array}{lll@{\hspace{5cm}}}
   	&&\\
@@ -536,14 +538,15 @@ We suffix the names of statement continuations with "$SK$".
 	\RethrowSK{\val}{\strace}{\handler}&\\[2mm]
   \end{array}
   $
-  \captionof{table}{Statement Continuations}
-\end{center}
+  \caption{Statement Continuations}
+  \label{figure:sconts}
+\end{figure}
 \subsubsection{Application continuation}
 \label{subsubsec:application-continuation}
 
 Application continuations capture the application of a list of values resulting from the evaluation of list of expressions.\\
 We use ValueA, an application continuation, capturing a value and an application continuation, as application that adds a value to the head of the list.\\
-We suffix the names of application continuations with "$A$".
+We suffix the names of application continuations with "$A$". The different application continuations are shown in Figure~\ref{figure:acont}.
 \newcommand{\ValueA}[2]{\mathrm{ValueA}({#1},\,{#2})}
 \newcommand{\StringConcatenationA}{\mathrm{StringConcatenationA(\econt)}}
 \newcommand{\SuperMethodA}{\mathrm{SuperMethodA}(\idmeta,\,\env,\,\ExceptionHandlers,\,\econt)}
@@ -554,11 +557,11 @@ We suffix the names of application continuations with "$A$".
 \newcommand{\ConstructorA}[2]{\mathrm{ConstructorA}({#1},\,\strace,\,\handler,\,\cstrace,\,\cex,\,{#2})}
 \newcommand{\RedirectingA}[3]{\mathrm{RedirectingA}({#1},\,{#2},\,\strace,\,\handler,\,\cstrace,\,\cex,\,{#3})}
 %
-\stepcounter{tablecount}
+\stepcounter{figurecount}
 %
 % Label row (if referenced) with:
 % \labeledrow{acont:$rulename}
-\begin{center}
+\begin{figure}
   $
   \begin{array}{lll@{\hspace{5cm}}}
   	&&\\
@@ -587,20 +590,21 @@ We suffix the names of application continuations with "$A$".
 	\RedirectingA{Q}{\loc}{\scont}
   \end{array}
   $
-  \captionof{table}{Application Continuations}
-\end{center}
+  \caption{Application Continuations}
+  \label{figure:acont}
+\end{figure}
 \subsubsection{Break continuations}
 \label{subsubsec:break-continuations}
 
-Break continuations capture the steps to be executed when a break to a given label is encountered.
+Break continuations capture the steps to be executed when a break to a given label is encountered. The different break continuations are shown in Figure~\ref{figure:breakcont}.
 \newcommand{\Break}[2]{\mathrm{Break}(#1,\,#2)}
 \newcommand{\FinallyBreak}[2]{\mathrm{FinallyBreak}({#1},\,\env,\,\lbls,\,\clbls,\,\strace,\,\handler,\,\cstrace,\,\cex,\,\econt,\,{#2})}
 %
-\stepcounter{tablecount}
+\stepcounter{figurecount}
 %
 % Label row (if referenced) with:
 % \labeledrow{breakcont:$rulename}
-\begin{center}
+\begin{figure}
   $
   \begin{array}{lll@{\hspace{5cm}}}
 	&&\\
@@ -611,23 +615,24 @@ Break continuations capture the steps to be executed when a break to a given lab
 	\FinallyBreak{\stmt}{\scont}&
   \end{array}
   $
-  \captionof{table}{Break Continuations}
-\end{center}
+  \label{figure:breakcont}
+  \caption{Break Continuations}
+\end{figure}
 Break continuations, \ref{breakcont:break}, capture the statement continuation and the environment corresponding to the provided label.\\
 FinallyBreak continuations, \ref{breakcont:finallybreak}, are added when a try/finally statement is encountered and they capture the statement body and the components necessary for its execution.
 \subsubsection{Switch continuations}
 \label{subsubsec:switch-continuations}
 
-Switch continuations capture the steps to be executed when a continue to a preceding switch case is encountered. They capture the components needed for the execution of the case body statement.
+Switch continuations capture the steps to be executed when a continue to a preceding switch case is encountered. They capture the components needed for the execution of the case body statement. The different switch continuations are shown in Figure~\ref{figure:switchconts}.
 %
 \newcommand{\ContinueK}{\mathrm{SwitchContinueK}(\stmt,\,\env,\,\lbls,\,\clbls,\,\handler,\,\cstrace,\,\cex,\,\econt,\,\scont)}
 \newcommand{\FinallyContinue}[2]{\mathrm{FinallyContinue}({#1},\,\env,\,\lbls,\,\clbls,\,\strace,\,\handler,\,\cstrace,\,\cex,\,\econt,\,{#2})}
 %
-\stepcounter{tablecount}
+\stepcounter{figurecount}
 %
 % Label row (if referenced) with:
 % \labeledrow{switchcont:$rulename}
-\begin{center}
+\begin{figure}
   $
   \begin{array}{lll@{\hspace{5cm}}}
 	&&\\
@@ -638,22 +643,24 @@ Switch continuations capture the steps to be executed when a continue to a prece
 	\FinallyContinue{\stmt}{\scont}
   \end{array}
   $
-  \captionof{table}{Switch Continuations}
-\end{center}
+  \caption{Switch Continuations}
+  \label{figure:switchconts}
+\end{figure}
 %
 \noindent
 SwitchContinue continuations, \ref{switchcont:continue}, capture the statement body of a preceding switch case, targeted by some continue statement, and the components necessary for its execution.
 FinallyContinue continuations, \ref{switchcont:finallycontinue}, are added when a try/finally statement is encountered and they capture the statement body and the components necessary for its execution.
 \subsubsection{Exception handlers}
 \label{subsubsec:exception-handlers}
+The different exception handlers are shown in Figure~\ref{figure:handlers}.
 \newcommand{\ThrowH}[2]{\mathrm{ThrowK}({#1},\,{#2})}
 \newcommand{\CatchH}[1]{\mathrm{Catch}({#1},\,\env,\,\lbls,\,\clbls,\,\strace,\,\handler,\,\econt,\,\scont)}
 %
-\stepcounter{tablecount}
+\stepcounter{figurecount}
 %
 % Label row (if referenced) with:
 % \labeledrow{handle:$rulename}
-\begin{center}
+\begin{figure}
   $
   \begin{array}{lll@{\hspace{5cm}}}
 	&&\\
@@ -664,8 +671,9 @@ FinallyContinue continuations, \ref{switchcont:finallycontinue}, are added when 
 	\CatchH{cs}
   \end{array}
   $
-  \captionof{table}{Exception handlers}
-\end{center}
+  \caption{Exception handlers}
+  \label{figure:handlers}
+\end{figure}
 \subsection{Values}
 \label{subsec:values}
 \subsection{Literal values}
@@ -813,11 +821,11 @@ FinallyContinue continuations, \ref{switchcont:finallycontinue}, are added when 
 %
 %
 \newcommand{\evalcesktrans}[3]{&\cesktrans{#1}{#2}\,\hspace{2mm}#3\\[2mm]}
-\stepcounter{tablecount}
+\stepcounter{figurecount}
 %
 % Label row (if referenced) with:
 % \labeledrow{eval:$rulename}
-\begin{center}
+\begin{figure}
 	$
 	\begin{array}{lrclr@{\hspace{3cm}}}
 		\evalcesktrans
@@ -913,15 +921,15 @@ FinallyContinue continuations, \ref{switchcont:finallycontinue}, are added when 
 			\\&&&\textrm{ and body}\stmt}
 	\end{array}
 	$
-	\captionof{table}{Expressions}
-	\label{table:expressions-evalconfigs}
-\end{center}
+	\caption{Expressions}
+	\label{figure:expressions-evalconfigs}
+\end{figure}
 %
-\stepcounter{tablecount}
+\stepcounter{figurecount}
 %
 % Label row (if referenced) with:
 % \labeledrow{eval:$rulename}
-\begin{center}
+\begin{figure}
 	$
 	\begin{array}{lrcl}	
 		\evalcesktrans
@@ -964,15 +972,15 @@ FinallyContinue continuations, \ref{switchcont:finallycontinue}, are added when 
 			\\&&&\strace' = \StaticInvocation{\{\membermeta\}}{\expressionsmeta}::\strace}
 	\end{array}
 	$
-	\captionof{table}{Static variable extraction and assignment, and static method invocation}
+	\caption{Static variable extraction and assignment, and static method invocation}
 	\label{table:static-evalconfigs}
-\end{center}
+\end{figure}
 %
-\stepcounter{tablecount}
+\stepcounter{figurecount}
 %
 % Use counter as:
 % \labeledrow{eval:$rulename}
-\begin{center}
+\begin{figure}
 	$
 	\begin{array}{lrcl}
 		\evalcesktrans
@@ -1023,15 +1031,15 @@ FinallyContinue continuations, \ref{switchcont:finallycontinue}, are added when 
 			{\\&&&\econt' = \SuperPropertySetK}
 	\end{array}
 	$
-	\captionof{table}{The CESK-transition function for instance property extraction and assignment expressions}
-	\label{table:instance-property-evalconfigs}
-\end{center}
+	\caption{The CESK-transition function for instance property extraction and assignment expressions}
+	\label{figure:instance-property-evalconfigs}
+\end{figure}
 %
-\stepcounter{tablecount}
+\stepcounter{figurecount}
 %
 % Label row (if referenced) with:
 % \labeledrow{eval:$rulename}
-\begin{center}
+\begin{figure}
 	$
 	\begin{array}{lrcl}
 		\evalcesktrans
@@ -1055,9 +1063,9 @@ FinallyContinue continuations, \ref{switchcont:finallycontinue}, are added when 
 			{\\&&&\acont' = \ConstructorA{Q}{\econt}}
 	\end{array}
 	$
-	\captionof{table}{Instance method and constructor invocation}
-	\label{table:instance-method-evalconfigs}
-\end{center}
+	\caption{Instance method and constructor invocation}
+	\label{figure:instance-method-evalconfigs}
+\end{figure}
 
 \label{subsec:expr-evaluation}
 
@@ -1543,11 +1551,11 @@ For the evaluation $\this$ expression we add a special variable declaration, $\t
 %
 \newcommand{\ExpressionK}[2]{\mathrm{ExpressionK}({#1},\,{#2})}
 %
-\stepcounter{tablecount}
+\stepcounter{figurecount}
 %
 % Label row (if referenced) with:
 % \labeledrow{exec:$rulename}
-\begin{center}
+\begin{figure}
 	$
 	\begin{array}{lrcl}
 		\execcesktrans
@@ -1625,9 +1633,9 @@ For the evaluation $\this$ expression we add a special variable declaration, $\t
 			\\&\env' = \ext{\env}{fun}{\funval{\stmt_{body}}{\formals}{\env'}}}
 	\end{array}
 	$
-	\captionof{table}{The CESK-transition function for statements}
+	\caption{The CESK-transition function for statements}
 	\label{table:instance-method-evalconfigs}
-\end{center}
+\end{figure}
 \subsubsection{Variable Declaration}
 Variable declaration extend the corresponding environment with a new binding. The corresponding initializer expression is first evaluated to a value $v$.
 
