@@ -527,10 +527,45 @@ We suffix the names of application continuations with "$A$".
 \newcommand{\SuperMethodA}{\mathrm{SuperMethodA}(\idmeta,\,\env,\,\ExceptionHandlers,\,\econt)}
 \newcommand{\StaticInvA}[4]{\mathrm{StaticInvocationA}({#1},\,{#2},\,{#3},\,\ExceptionHandlersRest,\,{#4})}
 \newcommand{\DInstanceMethodA}{\mathrm{DInstanceMethodA}(\membermeta,\,\val,\,\ExceptionHandlers,\,\econt)}
-\newcommand{\FieldsA}[4]{\mathrm{FieldsApp}({#1},\,{#2},\,{#3},\,\strace,\,\handler,\,\cstrace,\,\cex,\,{#4})}
+\newcommand{\FieldsA}[4]{\mathrm{FieldsA}({#1},\,{#2},\,{#3},\,\strace,\,\handler,\,\cstrace,\,\cex,\,{#4})}
 \newcommand{\SuperA}[3]{\mathrm{SuperA}({#1},\,{#2},\,\strace,\,\handler,\,\cstrace,\,\cex,\,{#3})}
 \newcommand{\ConstructorA}[2]{\mathrm{ConstructorA}({#1},\,\strace,\,\handler,\,\cstrace,\,\cex,\,{#2})}
 \newcommand{\RedirectingA}[3]{\mathrm{RedirectingA}({#1},\,{#2},\,\strace,\,\handler,\,\cstrace,\,\cex,\,{#3})}
+%
+\stepcounter{tablecount}
+%
+% Label row (if referenced) with:
+% \labeledrow{acont:$rulename}
+\begin{center}
+  $
+  \begin{array}{lll@{\hspace{7cm}}}
+	\labeledrow{acont:value}&
+	\ValueA{\val}{\acont}&\\[2mm]
+
+	\labeledrow{acont:stringconcat}&
+	\StringConcatenationA&\\[2mm]
+
+	\labeledrow{acont:supermethod}&
+	\SuperMethodA&\\[2mm]
+
+	\labeledrow{acont:staticinv}&
+	\DInstanceMethodA&\\[2mm]
+
+	\labeledrow{acont:fields}&
+	\FieldsA{\env}{Izs}{\loc}{\scont}\\[2mm]
+
+	\labeledrow{acont:constructor}&
+	\ConstructorA{Q}{\econt}\\[2mm]
+
+	\labeledrow{acont:super}&
+	\SuperA{Q}{\loc}{\scont}\\[2mm]
+
+	\labeledrow{acont:redirecting}&
+	\RedirectingA{Q}{\loc}{\scont}
+  \end{array}
+  $
+  \captionof{table}{Application Continuations}
+\end{center}
 \subsubsection{Break continuations}
 \label{subsubsec:break-continuations}
 
@@ -545,7 +580,18 @@ Break continuations capture the statement continuation and the environment corre
 \item FinallyBreak -
 FinallyBreak continuations are added when a try/finally statement is encountered and they capture the statement body and the components necessary for its execution.
 \end{itemize}
-
+%
+\stepcounter{tablecount}
+%
+% Label row (if referenced) with:
+% \labeledrow{breakcont:$rulename}
+\begin{center}
+  $
+  \begin{array}{lll@{\hspace{5cm}}}
+  \end{array}
+  $
+  \captionof{table}{Break Continuations}
+\end{center}
 \subsubsection{Switch continuations}
 \label{subsubsec:switch-continuations}
 
@@ -560,11 +606,34 @@ There are two types of Switch continuations:
 \item SwitchContinue - SwitchContinue continuations capture the statement body of a preceding switch case, targeted by some continue statement, and the components necessary for its execution.
 \item FinallyContinue - FinallyContinue continuations are added when a try/finally statement is encountered and they capture the statement body and the components necessary for its execution.
 \end{itemize}
+%
+\stepcounter{tablecount}
+%
+% Label row (if referenced) with:
+% \labeledrow{switchcont:$rulename}
+\begin{center}
+  $
+  \begin{array}{lll@{\hspace{5cm}}}
+  \end{array}
+  $
+  \captionof{table}{Switch Continuations}
+\end{center}
 \subsubsection{Exception handlers}
 \label{subsubsec:exception-handlers}
 \newcommand{\ThrowH}[2]{\mathrm{ThrowK}({#1},\,{#2})}
 \newcommand{\CatchH}[1]{\mathrm{Catch}({#1},\,\env,\,\lbls,\,\clbls,\,\strace,\,\handler,\,\econt,\,\scont)}
-
+%
+\stepcounter{tablecount}
+%
+% Label row (if referenced) with:
+% \labeledrow{handle:$rulename}
+\begin{center}
+  $
+  \begin{array}{lll@{\hspace{5cm}}}
+  \end{array}
+  $
+  \captionof{table}{Exception handlers}
+\end{center}
 \subsection{Values}
 \label{subsec:values}
 \subsection{Literal values}
@@ -951,7 +1020,7 @@ There are two types of Switch continuations:
 		\evalcesktrans
 			{\evalconf{\textbf{new Q}(\exprs)}{\env}{st}{cex}{cst}{\econt}}
 			{\evallistconf{\exprs}{\env}{st}{cex}{cst}{\acont'}}
-			{\\&&&\acont' = \ConstructorA{\textbf{Q}}{\econt}}
+			{\\&&&\acont' = \ConstructorA{Q}{\econt}}
 	\end{array}
 	$
 	\captionof{table}{Instance method and constructor invocation}
