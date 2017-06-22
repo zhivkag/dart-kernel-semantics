@@ -25,7 +25,7 @@
 \setcounter{tablecount}{1}
 %
 \makeatletter
-\renewcommand{\p@rowcount}{\thesubsection.}
+\renewcommand{\p@rowcount}{\thesubsection.\thetablecount.}
 \makeatother
 %
 \newcommand{\myrowcount}{\refstepcounter{rowcount}\thesubsection.\thetablecount.\therowcount}
@@ -369,7 +369,7 @@ There are various kinds of configurations, two more general types can be disting
 \begin{itemize}
 \item Continuations with holes, i.e. expressions to be evaluated\\
 Expression continuations with expressions will produce EvalConfiguration for evaluation of the next expression.
-Note that some continuation will not evaluate the captured expression, when this is not necessary (e.g., Section~\ref{subsubsec:bool-expressions}).
+Note that some continuation will not evaluate the captured expression, when this is not necessary (e.g., \ref{eval:bool-expressions}).
 
 \item Continuations without holes\\
 Continuations without holes dispatch on the provided value and produce the next configuration, a ValuePassingConfiguration.
@@ -404,32 +404,36 @@ We suffix the names of expression continuations with "$K$". We differentiate the
 %
 \newcommand{\InstanceMethodK}{\mathrm{InstanceMethodK(\expressionsmeta,\,\idmeta,\,\env,\,\ExceptionHandlers,\,\econt)}}
 \newcommand{\DInstanceMethodK}{\mathrm{DInstanceMethodK}(\expressionsmeta,\,\membermeta,\,\env,\,\ExceptionHandlers,\,\econt)}
-\[
-\begin{array}{lll}
-
-\VarSetK{}{}{}&\\[2mm]
-\ExpressionsK{}{}{}&\\[2mm]
-\NotK{}&\\[2mm]
-\AndK{}{}{}&\\[2mm]
-\OrK{}{}{}&\\[2mm]
-\ConditionalK{}{}{}{}&\\[2mm]
-\LetK{}{}{}{}&\\[2mm]
-\IsExpressionK&\\[2mm]
-\AsExpressionK&\\[2mm]
-\StaticGetK&\\[2mm]
-\StaticSetK&\\[2mm]
-\DPropertyGetK&\\[2mm]
-\PropertySetK&\\[2mm]
-\PropertySetVK&\\[2mm]
-\DPropertyGetK&\\[2mm]
-\DPropertySetVK&\\[2mm]
-\SuperPropertySetK&\\[2mm]
-\InstanceMethodK&\\[2mm]
-\DInstanceMethodK&\\[2mm]
-
-\end{array}
-\]
-
+\stepcounter{tablecount}
+%
+% Use counter as:
+% \labeledrow{eval:$rulename}
+\begin{center}
+  $
+  \begin{array}{lll}
+	\VarSetK{\idmeta}{\ExceptionHandlers}{\econt}&\\[2mm]
+	\ExpressionsK{\exprs}{\env}{\acont}&\\[2mm]
+	\NotK{\econt}&\\[2mm]
+	\AndK{\expressionmeta}{\ExceptionHandlers}{\econt}&\\[2mm]
+	\OrK{\expressionmeta}{\ExceptionHandlers}{\econt}&\\[2mm]
+	\ConditionalK{\expressionmeta_1}{\expressionmeta_2}{\ExceptionHandlers}{\econt}&\\[2mm]
+	\LetK{\idmeta}{\expressionmeta}{\ExceptionHandlers}{\econt}&\\[2mm]
+	\IsExpressionK&\\[2mm]
+	\AsExpressionK&\\[2mm]
+	\StaticGetK&\\[2mm]
+	\StaticSetK&\\[2mm]
+	\DPropertyGetK&\\[2mm]
+	\PropertySetK&\\[2mm]
+	\PropertySetVK&\\[2mm]
+	\DPropertyGetK&\\[2mm]
+	\DPropertySetVK&\\[2mm]
+	\SuperPropertySetK&\\[2mm]
+	\InstanceMethodK&\\[2mm]
+	\DInstanceMethodK&\\[2mm]
+  \end{array}
+  $
+  \captionof{table}{Expression Continuations}
+\end{center}
 
 \subsubsection{Statement continuations}
 \label{subsubsec:statement-continuations}
@@ -629,8 +633,8 @@ There are two types of Switch continuations:
 \newcommand{\evalcesktrans}[3]{&\cesktrans{#1}{#2}\,\hspace{2mm}#3\\[2mm]}
 \stepcounter{tablecount}
 %
-% Use counter as: 
-% \labeledrow{eval:$rulename}	
+% Use counter as:
+% \labeledrow{eval:$rulename}
 \begin{center}
 	$
 	\begin{array}{lrclr}
@@ -673,6 +677,7 @@ There are two types of Switch continuations:
 			{\evalconf{\expressionmeta}{\env}{\strace}{\cstrace}{\cex}{\NotK{\econt}}}
 			{\\&&&\econt' = \AndK{\expri{2}}{\env}{\econt}}
 
+		\labeledrow{eval:bool-expressions}
 		\evalcesktrans
 			{\evalconf{\OrExpression{\expressionmeta_0}{\expressionmeta_1}}{\env}{\strace}{\cstrace}{\cex}{\econt}}
 			{\evalconf{\expressionmeta_0}{\env}{\strace}{\cstrace}{\cex}{\econt'}}
@@ -731,8 +736,9 @@ There are two types of Switch continuations:
 \end{center}
 %
 \stepcounter{tablecount}
-% Use counter as: 
-% \labeledrow{eval:$rulename}	
+%
+% Use counter as:
+% \labeledrow{eval:$rulename}
 \begin{center}
 	$
 	\begin{array}{lrcl}	
@@ -781,8 +787,9 @@ There are two types of Switch continuations:
 \end{center}
 %
 \stepcounter{tablecount}
-% Use counter as: 
-% \labeledrow{eval:$rulename}	
+%
+% Use counter as:
+% \labeledrow{eval:$rulename}
 \begin{center}
 	$
 	\begin{array}{lrcl}
@@ -839,8 +846,9 @@ There are two types of Switch continuations:
 \end{center}
 %
 \stepcounter{tablecount}
-% Use counter as: 
-% \labeledrow{eval:$rulename}	
+%
+% Use counter as:
+% \labeledrow{eval:$rulename}
 \begin{center}
 	$
 	\begin{array}{lrcl}
@@ -1354,7 +1362,7 @@ For the evaluation $\this$ expression we add a special variable declaration, $\t
 \newcommand{\ExpressionK}[2]{\mathrm{ExpressionK}({#1},\,{#2})}
 %
 \stepcounter{tablecount}
-% Use counter as: 
+% Use counter as:
 % \labeledrow{exec:$rulename}
 \begin{center}
 	$
