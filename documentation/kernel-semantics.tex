@@ -49,7 +49,7 @@ The machine is defined by a single step transition function where each step of t
 \label{subsec:conventions}
 \begin{itemize}
 \setlength{\itemsep}{0pt}
-\item Symbols ``:'' and $\in$ are used interchangeably.
+\item Symbols ``:'' and ``$\in$'' are used interchangeably.
 \item Names of variables are italicized.
 \item Names of variables of syntactic domains start with an upper case letter.
 \item Names of domains are written in bold (e.g. ``$\mathbf{X}$'').
@@ -190,9 +190,9 @@ Note that the word ``List'' here is not in bold, so that it isn't confused with 
 
 \[
   \begin{array}{lcl}
-    [] &:=& \textrm{empty list}\\
-    X :: list &:=& \textrm{a meta-list that is constructed by adding element X to the head}\\
-    && \textrm{of the meta-list list}
+    [] &\text{---}& \text{empty list}\\
+    X :: list &\text{---}& \text{a meta-list that is constructed by adding element $X$ to the head}\\
+    && \text{of the meta-list $list$}
   \end{array}
 \]
 
@@ -244,7 +244,7 @@ with
 	\end{cases}
 \]
 
-For simpler notation, we allow $\extend$ to be called with singleton lists as $\ext{\env}{\varmeta}{\val}$, which we consider equivalent to $\ext{\env}{\varmeta :: []}{\val :: []}$.
+For simpler notation, we allow ``$\extend$'' to be called with singleton lists as $\ext{\env}{\varmeta}{\val}$, which we consider equivalent to $\ext{\env}{\varmeta :: []}{\val :: []}$.
 \subsubsection{Variable lookup}
 \label{subsubsec:variable-lookup}
 A variable lookup consists of looking up the address of a variable from the environment with $\loc = \env(\varmeta)$ and reading the stored value $v$ with $\deref{\loc} = \deref{\env(\varmeta)}$.
@@ -2201,3 +2201,5 @@ Then the value stored at location $\loc' = (\deref{\loc})[f]$ in the store $S$ w
 
 
 \end{document}
+
+% vim: tw=0
