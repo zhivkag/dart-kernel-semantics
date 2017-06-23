@@ -38,7 +38,8 @@
 
 \maketitle
 
-The small-step operational semantics of Dart Kernel is given by an abstract machine in the style of the CESK machine. The machine is defined by a single step transition function where each step of the machine starts in a configuration and deterministically gives the next configuration.
+The small-step operational semantics of Dart Kernel is given by an abstract machine in the style of the CESK machine.
+The machine is defined by a single step transition function where each step of the machine starts in a configuration and deterministically gives the next configuration.
 
 \section{Definitions}
 \label{sec:definitions}
@@ -52,7 +53,8 @@ The small-step operational semantics of Dart Kernel is given by an abstract mach
 \item Names of domains are written in bold (e.g. ``$\mathbf{X}$'').
 \item Names of continuation kinds are written in normal text (e.g. VarSetK).
 \item Names of meta-functions start with lower case letter (e.g. $\mathit{extend}$).
-\item ``$\mlist{\mathbf{X}}$'' denotes the domain of meta-lists of elements from domain ``$\mathbf{X}$''. Note that the word ``List'' here is not in bold, so that it isn't confused with the domain $\mathbf{List}$ of Dart objects.
+\item ``$\mlist{\mathbf{X}}$'' denotes the domain of meta-lists of elements from domain ``$\mathbf{X}$''.
+Note that the word ``List'' here is not in bold, so that it isn't confused with the domain $\mathbf{List}$ of Dart objects.
 \end{itemize}
 \subsection{Domains}
 \label{subsec:domains}
@@ -194,12 +196,16 @@ The small-step operational semantics of Dart Kernel is given by an abstract mach
 
 \subsection{Store}
 \label{subsec:store-definition}
-The store, $s$, maps a location, $\loc$, to a value, $\val$. The store is a mutable map and should not be confused with a function. A global store is assumed and locations reachable from a given scope are defined by the current environment function.
+The store, $s$, maps a location, $\loc$, to a value, $\val$.
+The store is a mutable map and should not be confused with a function.
+A global store is assumed and locations reachable from a given scope are defined by the current environment function.
 \[s : \dlocation \rightarrow \dval \]
 \subsubsection{Dereferencing}
 \label{subsubsection:dereferecing}
 \newcommand{\deref}[1]{!#1}
-Function ``$\deref{}$'' is used to access a value stored in the store provided the corresponding label. The label is stored in the environment, or the object value for instance fields. ``$\deref{}$'' has an implicit argument which is the store of CESK machine.
+Function ``$\deref{}$'' is used to access a value stored in the store provided the corresponding label.
+The label is stored in the environment, or the object value for instance fields.
+``$\deref{}$'' has an implicit argument which is the store of CESK machine.
 
 \begin{align*}
   \deref{} \in \dlocation &\rightarrow \dval \\
@@ -208,7 +214,8 @@ Function ``$\deref{}$'' is used to access a value stored in the store provided t
 \subsubsection{Update}
 \label{subsubsec:store-update}
 \newcommand{\update}[2]{{#1} := {#2}}
-Function ``$\update{\loc}{\val}$'' updates the store at location $\loc \in \dlocation$ with value $\val \in \dval$. It has an implicit argument which is the store of the CESK machine.
+Function ``$\update{\loc}{\val}$'' updates the store at location $\loc \in \dlocation$ with value $\val \in \dval$.
+It has an implicit argument which is the store of the CESK machine.
 \begin{align*}
   \update{}{} \in \dlocation \times \dval &\rightarrow  \dval\\
   \update{\loc}{\val} &= \val, \textrm{ with $\val$ the value in store at location $\loc$}
@@ -227,7 +234,7 @@ Function ``$extend$'' creates a new environment by extending the provided enviro
   extend \in \denv \times \mlist{\dvardecl} \times \mlist{\dval} &\rightarrow  \denv \hspace{100mm} \\
   \ext{\env}{\varmeta{s}}{\vals} &= \env'
 \end{align*}
-with 
+with
 \[
 	\env'(\varmeta) =\begin{cases}
 	\loc_i & \textrm{with }\deref{\loc_i} = \val_i\textrm{ if }\exists\varmeta_i \in \varmeta{s} \textrm{ s.t. } \varmeta_i = \varmeta\\
@@ -238,11 +245,13 @@ with
 For simpler notation, we allow $extend$ to be called with singleton lists as $\ext{\env}{\varmeta}{\val}$, which we consider equivalent to $\ext{\env}{\varmeta :: []}{\val :: []}$.
 \subsubsection{Variable lookup}
 \label{subsubsec:variable-lookup}
-A variable lookup consists of looking up the address of a variable from the environment with $\loc = \env(\varmeta)$ and reading the stored value $v$ with $\deref{\loc} = \deref{\env(\varmeta)}$. For definition of ``$\deref{}$'' see Section~\ref{subsubsection:dereferecing}.
+A variable lookup consists of looking up the address of a variable from the environment with $\loc = \env(\varmeta)$ and reading the stored value $v$ with $\deref{\loc} = \deref{\env(\varmeta)}$.
+For definition of ``$\deref{}$'' see Section~\ref{subsubsection:dereferecing}.
 
 \subsection{Configurations}
 \label{subsec:cesk-configs}
-The state space of the CESK machine contains various kinds of configurations. Configurations contain different components and the transition step dispatches to the next configuration based on one of the components of the configuration.
+The state space of the CESK machine contains various kinds of configurations.
+Configurations contain different components and the transition step dispatches to the next configuration based on one of the components of the configuration.
 
 % Named Configuration for CESK transitions
 \newcommand{\breakconf}[1]{\confsingle{#1}_{\mathrm{breakCont}}}
@@ -289,17 +298,19 @@ The state space of the CESK machine contains various kinds of configurations. Co
 	\textrm{SwitchConfiguration}\\
 
   \end{array}
-  $  
+  $
   \caption{Configurations for the CESK machine}
 \end{figure}
 \subsubsection{EvalConfiguration}
 \label{subsubsec:evalconfig}
 
-For the EvalConfiguration the transition step dispatches on the expression component, $\expr$. The next configuration is:
+For the EvalConfiguration the transition step dispatches on the expression component, $\expr$.
+The next configuration is:
 \begin{itemize}
 %% Eval configuration can result with:
 \item ValuePassingConfiguration, when the current expression evaluates to a value in one step.
-\item ExecConfiguration, when the current expression results with an invocation, i.e. execution of statement body of a getter. Note that for other invocations, we first evaluate the receiver for instance invocations, or the arguments for a static or constructor invocations.
+\item ExecConfiguration, when the current expression results with an invocation, i.e. execution of statement body of a getter.
+Note that for other invocations, we first evaluate the receiver for instance invocations, or the arguments for a static or constructor invocations.
 \item EvalListConfiguration, when the current expression implies evaluation of a list of expressions.
 \item ThrowConfiguration, when the current expression throws, i.e. is a throw expression.
 \item EvalConfiguration, otherwise.
@@ -308,12 +319,14 @@ For the EvalConfiguration the transition step dispatches on the expression compo
 \subsubsection{EvalListConfigruation}
 \label{subsubsec:evallistconfig}
 
-For the EvalList configuration the transition step dispatches on the expression list, $\exprs$. The next configuration is either a EvalConfiguration or ApplicationConfiguration, see Section~\ref{subsec:eval-list-expressions}.
+For the EvalList configuration the transition step dispatches on the expression list, $\exprs$.
+The next configuration is either a EvalConfiguration or ApplicationConfiguration, see Section~\ref{subsec:eval-list-expressions}.
 
 \subsubsection{ExecConfiguration}
 \label{subsubsec:execconfig}
 
-For the ExecConfiguration the transition step dispatches on the statement expression, $\stmt$. The next configuration is either an ExecConfiguration or EvalConfiguration.
+For the ExecConfiguration the transition step dispatches on the statement expression, $\stmt$.
+The next configuration is either an ExecConfiguration or EvalConfiguration.
 
 \subsubsection{ValuePassingConfiguration}
 \label{suubsubsec:valuepassingconfig}
@@ -333,17 +346,20 @@ The ForwardConfiguration applies the statement continuation component to its env
 \subsubsection{ThrowCongfiguration}
 \label{subsubsec:throwconfig}
 
-For the ThrowConfiguration the transition step dispatches its continuation component.  It results with either a ThrowConfiguration, when  the exception cant be handled in the head of the non empty catch list or a ExecConfiguration, for the statement body of the matching catch or the finally statement.
+For the ThrowConfiguration the transition step dispatches its continuation component.
+It results with either a ThrowConfiguration, when  the exception cant be handled in the head of the non empty catch list or a ExecConfiguration, for the statement body of the matching catch or the finally statement.
 
 \subsubsection{BreakConfiguration}
 \label{subsubsec:breakconfig}
 
-For the BreakConfiguration the transition step dispatches on the continuation component. It results with a ForwardConfiguration corresponding to the target break label.
+For the BreakConfiguration the transition step dispatches on the continuation component.
+It results with a ForwardConfiguration corresponding to the target break label.
 
 \subsubsection{SwitchConfiguration}
 \label{subsubsec:switchconfig}
 
-For the SwitchConfiguration the transition step dispatches on the continuation component. It results with a ExecConfiguration.
+For the SwitchConfiguration the transition step dispatches on the continuation component.
+It results with a ExecConfiguration.
 
 \subsection{Continuations}
 \label{subsec:continuations-definition}
@@ -365,7 +381,9 @@ There are various types of continuations depending on the next statement to be e
 \subsubsection{Expression continuations}
 \label{subsubsec:expression-continuations}
 
-Expression continuations, $\econt$, capture the steps after the evaluation of a given expression. They accept a value and produce the next configuration. 
+Expression continuations, $\econt$, capture the steps after the evaluation of a given expression.
+They accept a value and produce the next configuration.
+
 There are various kinds of configurations, two more general types can be distinguished:
 \begin{itemize}
 \item Continuations with holes, i.e. expressions to be evaluated\\
@@ -375,7 +393,8 @@ Note that some continuation will not evaluate the captured expression, when this
 \item Continuations without holes\\
 Continuations without holes dispatch on the provided value and produce the next configuration, a ValuePassingConfiguration.
 \end{itemize}
-We suffix the names of expression continuations with ``$K$''. The different expression continuations are shown in Figure~\ref{figure:econts}.
+We suffix the names of expression continuations with ``$K$''.
+The different expression continuations are shown in Figure~\ref{figure:econts}.
 %
 \newcommand{\ExceptionHandlersRest}{\handler,\,\cstrace,\,\cex}
 \newcommand{\ExceptionHandlers}{\strace,\,\handler,\,\cstrace,\,\cex}
@@ -496,10 +515,14 @@ We suffix the names of expression continuations with ``$K$''. The different expr
 \subsubsection{Statement continuations}
 \label{subsubsec:statement-continuations}
 
-Statement continuations capture the steps after execution of a statement. They accept an environment and produce the next configuration. Statements in a block expressions can extend the environment function and this is visible to the subsequent expressions in the block. For other types of statement configuration, the environment is ignored.
+Statement continuations capture the steps after execution of a statement.
+They accept an environment and produce the next configuration.
+Statements in a block expressions can extend the environment function and this is visible to the subsequent expressions in the block.
+For other types of statement configuration, the environment is ignored.
 
 \noindent
-We suffix the names of statement continuations with ``$SK$''. The different statement continuations are shown in Figure~\ref{figure:sconts}.
+We suffix the names of statement continuations with ``$SK$''.
+The different statement continuations are shown in Figure~\ref{figure:sconts}.
 \newcommand{\ExitSK}[1]{\mathrm{ExitSK(\econt,\,#1)}}
 \newcommand{\BlockSK}[2]{\mathrm{BlockSK}({#1},\,{#2},\,\lbls,\,\clbls,\,\handler,\,\cstrace,\,\cex,\,\econt,\,\scont)}
 \newcommand{\WhileSK}{\mathrm{WhileSK}(\expr,\,\stmt,\,\env,\,\lbls,\,\clbls,\,\handler,\,\cstrace,\,\cex,\,\econt,\,\scont)}
@@ -546,7 +569,8 @@ We suffix the names of statement continuations with ``$SK$''. The different stat
 
 Application continuations capture the application of a list of values resulting from the evaluation of list of expressions.\\
 We use ValueA, an application continuation, capturing a value and an application continuation, as application that adds a value to the head of the list.\\
-We suffix the names of application continuations with ``$A$''. The different application continuations are shown in Figure~\ref{figure:acont}.
+We suffix the names of application continuations with ``$A$''.
+The different application continuations are shown in Figure~\ref{figure:acont}.
 \newcommand{\ValueA}[2]{\mathrm{ValueA}({#1},\,{#2})}
 \newcommand{\StringConcatenationA}{\mathrm{StringConcatenationA(\econt)}}
 \newcommand{\SuperMethodA}{\mathrm{SuperMethodA}(\idmeta,\,\env,\,\ExceptionHandlers,\,\econt)}
@@ -596,7 +620,8 @@ We suffix the names of application continuations with ``$A$''. The different app
 \subsubsection{Break continuations}
 \label{subsubsec:break-continuations}
 
-Break continuations capture the steps to be executed when a break to a given label is encountered. The different break continuations are shown in Figure~\ref{figure:breakcont}.
+Break continuations capture the steps to be executed when a break to a given label is encountered.
+The different break continuations are shown in Figure~\ref{figure:breakcont}.
 \newcommand{\Break}[2]{\mathrm{Break}(#1,\,#2)}
 \newcommand{\FinallyBreak}[2]{\mathrm{FinallyBreak}({#1},\,\env,\,\lbls,\,\clbls,\,\strace,\,\handler,\,\cstrace,\,\cex,\,\econt,\,{#2})}
 %
@@ -623,7 +648,9 @@ FinallyBreak continuations, \ref{breakcont:finallybreak}, are added when a try/f
 \subsubsection{Switch continuations}
 \label{subsubsec:switch-continuations}
 
-Switch continuations capture the steps to be executed when a continue to a preceding switch case is encountered. They capture the components needed for the execution of the case body statement. The different switch continuations are shown in Figure~\ref{figure:switchconts}.
+Switch continuations capture the steps to be executed when a continue to a preceding switch case is encountered.
+They capture the components needed for the execution of the case body statement.
+The different switch continuations are shown in Figure~\ref{figure:switchconts}.
 %
 \newcommand{\ContinueK}{\mathrm{SwitchContinueK}(\stmt,\,\env,\,\lbls,\,\clbls,\,\handler,\,\cstrace,\,\cex,\,\econt,\,\scont)}
 \newcommand{\FinallyContinue}[2]{\mathrm{FinallyContinue}({#1},\,\env,\,\lbls,\,\clbls,\,\strace,\,\handler,\,\cstrace,\,\cex,\,\econt,\,{#2})}
@@ -809,7 +836,7 @@ The different exception handlers are shown in Figure~\ref{figure:handlers}.
   & \BoolLiteral{\tt{false}} \\
   & \NullLiteral \\
   & \Let{\variablemeta}{\expressionmeta_0}{\expressionmeta_1} \\
-\end{array}  
+\end{array}
 \]
 
 
@@ -832,7 +859,7 @@ The different exception handlers are shown in Figure~\ref{figure:handlers}.
 			{\evalconf{\IntLiteral{\integermeta}}{\env}{\strace}{\cstrace}{\cex}{\econt}}
 			{\contconf{\econt}{\val}}
 			{\val = \mathrm{IntLiteral(\integermeta)} \in \mathbf{int}}
-		
+
 		\evalcesktrans
 			{\evalconf{\DoubleLiteral{\doublemeta}}{\env}{\strace}{\cstrace}{\cex}{\econt}}
 			{\contconf{\econt}{\val}}
@@ -931,7 +958,7 @@ The different exception handlers are shown in Figure~\ref{figure:handlers}.
 % \labeledrow{eval:$rulename}
 \begin{figure}
 	$
-	\begin{array}{lrcl}	
+	\begin{array}{lrcl}
 		\evalcesktrans
 			{\evalconf{\StaticGet{\membermeta}}{\env}{\strace}{\cstrace}{\cex}{\econt}}
 			{\contconf{\econt}{\deref{\env^{M}(\membermeta)}}}
@@ -1104,11 +1131,13 @@ The value corresponding to the evaluated expression is captured by the applicati
 \subsubsection{Basic literal evaluation}
 \label{subsubsec:basic-literal-eval}
 
-Kernel literals are evaluated to a value $\val \in \dlitval$. Transitions of the CESK machine for basic literals are presented in rows 1 - 5 in Table~\ref{table:evalconfigs}.
+Kernel literals are evaluated to a value $\val \in \dlitval$.
+Transitions of the CESK machine for basic literals are presented in rows 1 - 5 in Table~\ref{table:evalconfigs}.
 
 \subsubsection{Variable assignment and lookup}
 \label{subsubsec:variable-assignment-and-lookup}
-A variable $\varmeta$ is accessed by reading the value stored at location $\env(\varmeta)$ in the store $s$. Assigning a value to a variable will modify the store and the value stored at location  $\env(\varmeta)$.
+A variable $\varmeta$ is accessed by reading the value stored at location $\env(\varmeta)$ in the store $s$.
+Assigning a value to a variable will modify the store and the value stored at location  $\env(\varmeta)$.
 \[
   \begin{array}{rcl}
 	\cesktrans{
@@ -1214,7 +1243,7 @@ The transition string concatenation expressions are defined as follows:
 \label{subsubsec:static-and-library-fields}
 
 Let $\env^{M}$ be the global environment that stores bindings for static and library fields to labels for all static and library fields previously accessed or set during the execution of the program.\\
-Static and library variables are accessed with $\StaticGet{\membermeta}$. 
+Static and library variables are accessed with $\StaticGet{\membermeta}$.
 
 \noindent
 Let $\membermeta$ be a static or library field and $\expressionmeta_{\membermeta}$ its initializer expression.
@@ -1267,7 +1296,8 @@ Static invocation is supported with $\StaticInvocation{\{\membermeta\}}{\express
 \label{subsubsec:property-extraction}
 Kernel allows access of a member as a property, which can be either getter access, which executes the getter, or method extraction, which converts a method into a closure, also known as tear-off.
 \noindent
-After the evaluation of the receiver expression to a value $\val$, the property $\idmeta$ is looked up in methods, getters and implicit getters for the value $\val$. Let $\membermeta$ be the result of such lookup.
+After the evaluation of the receiver expression to a value $\val$, the property $\idmeta$ is looked up in methods, getters and implicit getters for the value $\val$.
+Let $\membermeta$ be the result of such lookup.
 \[
   \begin{array}{lcl@{\hspace{30mm}}}
 	\textrm{if M is a method with body }\stmt\textrm{ and formals }\formals :\\
@@ -1302,7 +1332,8 @@ After the evaluation of the receiver expression to a value $\val$, the property 
 
 \subsubsection{Direct property extraction}
 \label{subsubsec:direct-property-extraction}
-In Kernel a property can be accessed without lookup, by direct reference to the $AST$ node of said property. This implies that the lookup step above is bypassed.
+In Kernel a property can be accessed without lookup, by direct reference to the $AST$ node of said property.
+This implies that the lookup step above is bypassed.
 
 \[
   \begin{array}{lcl@{\hspace{30mm}}}
@@ -1346,7 +1377,8 @@ A property assignment in Kernel can be done by executing a setter or accessing a
   \end{array}
 \]
 \noindent
-After the evaluation of the receiver expression to a value $\val_0$ and the argument to value $\val_1$, the property $\idmeta$ is looked up in setters and implicit setters for the value $\val_0$. Let $\membermeta$ be the result of such lookup.
+After the evaluation of the receiver expression to a value $\val_0$ and the argument to value $\val_1$, the property $\idmeta$ is looked up in setters and implicit setters for the value $\val_0$.
+Let $\membermeta$ be the result of such lookup.
 \[
   \begin{array}{lcl}
 	\textrm{if \membermeta is setter with statement body }\stmt \textrm{ and formal }\formal :\\
@@ -1370,7 +1402,8 @@ After the evaluation of the receiver expression to a value $\val_0$ and the argu
 
 \subsubsection{Direct property assignment}
 \label{subsubsec:direct-property-assignment}
-In Kernel a property can be set without lookup, by direct reference to the $AST$ node of the property. This implies that the lookup step above is bypassed.
+In Kernel a property can be set without lookup, by direct reference to the $AST$ node of the property.
+This implies that the lookup step above is bypassed.
 
 \[
   \begin{array}{lcl@{\hspace{30mm}}}
@@ -1405,11 +1438,12 @@ In Kernel a property can be set without lookup, by direct reference to the $AST$
 %\newcommand{\SuperPropertyGet}[1]{\tt{super}.#1}
 Kernel allows access of a superclass member as a property, which can be either getter access, which executes the getter, or method extraction, which converts a method into a closure.
 \noindent
-Accessing a superclass member is accessed with the expression $\SuperPropertyGet{\idmeta}$ evaluated with the corresponding components: $\env$, $\strace$, $\handler$, $\cstrace$, $\cex$, $\econt$. Let $\val = \deref{(\env(\this))}$, $C = \superclass{\val}$ and $M$ the result of looking up $\idmeta$ in $C$.\\
+Accessing a superclass member is accessed with the expression $\SuperPropertyGet{\idmeta}$ evaluated with the corresponding components: $\env$, $\strace$, $\handler$, $\cstrace$, $\cex$, $\econt$.
+Let $\val = \deref{(\env(\this))}$, $C = \superclass{\val}$ and $M$ the result of looking up $\idmeta$ in $C$.\\
 
 \subsubsection{Super property assignment}
 \label{subsubsec:super-property-assignemnt}
-Kernel supports assignment of a super member with the expression $\SuperPropertySet{\idmeta}{\expressionmeta}$. 
+Kernel supports assignment of a super member with the expression $\SuperPropertySet{\idmeta}{\expressionmeta}$.
 Let $\val = \deref{(\env(\this))}$, $C = \superclass{\val}$ and $M$ the result of looking up $\idmeta$ in $C$.\\
 If is a setter method with body $\stmt$ and formal $\formal$:
 \[
@@ -1446,7 +1480,8 @@ The arguments $\expressionsmeta$ are evaluated after the evaluation of the recei
   \end{array}
 \]
 \noindent
-After the evaluation of the receiver expression to a value $\val$ and the argument expressions to $\vals$, the instance method $\idmeta$ is looked up in methods for the value $\val$. Let $\membermeta$ be the result of such lookup.
+After the evaluation of the receiver expression to a value $\val$ and the argument expressions to $\vals$, the instance method $\idmeta$ is looked up in methods for the value $\val$.
+Let $\membermeta$ be the result of such lookup.
 
 \noindent
 Let $\membermeta$ be a method with statement body $\stmt$ and formal parameters $\formals$:
@@ -1468,7 +1503,8 @@ When a $\tt{return}$ statement is missing in the statement body $\stmt$ of the i
 
 \subsubsection{Direct instance method invocation}
 \label{subsubsec:direct-instance-method-invoc}
-Direct method invocation allows invocation of instance method by providing directly the member method to be invoked and bypass the lookup step described above. Let $\membermeta$ be the target method, $\stmt$ the statement body and $\formals$ the corresponding formal parameters.
+Direct method invocation allows invocation of instance method by providing directly the member method to be invoked and bypass the lookup step described above.
+Let $\membermeta$ be the target method, $\stmt$ the statement body and $\formals$ the corresponding formal parameters.
 
 \[
   \begin{array}{lcl}
@@ -1497,8 +1533,10 @@ Similarly to \ref{subsubsec:instance-method-invoc}, $\ExitSK{\val}$ is added as 
 \subsubsection{Super method invocation}
 \label{subsubsec:super-method-invocation}
 Super method invocation is supported with $\SuperMethodInvocation{\idmeta}{\expressionsmeta}$ and the transition step is as follows:
-	
-After the evaluation of the expressions $\expressionsmeta$ to values $\val{s}$ for the super method invocation, the method $\idmeta$ is looked up. Let $\val = \deref{(\env(\this))}$, $C = \superclass{\val}$ and $M$ the result of looking up $\idmeta$ in $C$. Let $\stmt$ be the statement body and $\formals$ the formal parameters for $\membermeta$ below:
+
+After the evaluation of the expressions $\expressionsmeta$ to values $\val{s}$ for the super method invocation, the method $\idmeta$ is looked up.
+Let $\val = \deref{(\env(\this))}$, $C = \superclass{\val}$ and $M$ the result of looking up $\idmeta$ in $C$.
+Let $\stmt$ be the statement body and $\formals$ the formal parameters for $\membermeta$ below:
 \[
   \begin{array}{lcl}
 	\cesktrans{
@@ -1514,7 +1552,7 @@ Similarly to \ref{subsubsec:instance-method-invoc}, $\ExitSK{\val}$ is added as 
 
 \subsubsection{Type test}
 \label{subsubsec:type-test}
-Type tests evaluate to a boolean value, as show below: 
+Type tests evaluate to a boolean value, as show below:
 \[
   \begin{array}{lcl}
 	\cesktrans{
@@ -1530,7 +1568,8 @@ Type tests evaluate to a boolean value, as show below:
 
 \subsubsection{Type cast}
 \label{subsubsec:type-cast}
-Type casts evaluate the target expression to the corresponding value eventually, when the expression is of the target type. Otherwise, the evaluation of the expression results with an error, as shown below:
+Type casts evaluate the target expression to the corresponding value eventually, when the expression is of the target type.
+Otherwise, the evaluation of the expression results with an error, as shown below:
 \[
   \begin{array}{lcl}
 	\cesktrans{
@@ -1544,7 +1583,9 @@ Type casts evaluate the target expression to the corresponding value eventually,
 \]
 
 \subsubsection{This}
-For the evaluation $\this$ expression we add a special variable declaration, $\this$. In the body of instance methods or constructors, there is a binding in the corresponding environment from $\this$ variable declaration to a label that stores the corresponding object. Evaluation of $\this$ expression resolves to the value in one step.
+For the evaluation $\this$ expression we add a special variable declaration, $\this$.
+In the body of instance methods or constructors, there is a binding in the corresponding environment from $\this$ variable declaration to a label that stores the corresponding object.
+Evaluation of $\this$ expression resolves to the value in one step.
 \subsection{Statement execution}
 \label{subsec:stmt-exectution}
 \newcommand{\execcesktrans}[3]{&\cesktrans{#1}{#2}\,\hspace{2mm}#3\hspace{6mm}\\[2mm]}
@@ -1637,7 +1678,8 @@ For the evaluation $\this$ expression we add a special variable declaration, $\t
 	\label{table:instance-method-evalconfigs}
 \end{figure}
 \subsubsection{Variable Declaration}
-Variable declaration extend the corresponding environment with a new binding. The corresponding initializer expression is first evaluated to a value $v$.
+Variable declaration extend the corresponding environment with a new binding.
+The corresponding initializer expression is first evaluated to a value $v$.
 
 \noindent
 Let $\econt' = \VarDeclK{\env}{\varmeta}{\scont}$ below:
@@ -1678,11 +1720,11 @@ with $\scont' = \BlockSK{\stmts}{\env}$.
 Let $\econt' = \IfCondK{\stmti{1}}{\stmti{2}}$ below:
 \[
   \begin{array}{lcl}
-	\contconf{\econt'}{\true} 
+	\contconf{\econt'}{\true}
 	& \Rightarrow &
 	\execconf{\stmti{1}}{\env}{\lbls}{\clbls}{\handler}{\cstrace}{\cex}{\econt}{\scont}\\[2mm]
 
-	\contconf{\econt'}{\false} 
+	\contconf{\econt'}{\false}
 	& \Rightarrow &
 	\execconf{\stmti{2}}{\env}{\lbls}{\clbls}{\handler}{\cstrace}{\cex}{\econt}{\scont}\\
   \end{array}
@@ -1712,14 +1754,19 @@ Loops \textbf{do while}, \textbf{for in}, for can be desugared to while loops wi
 \subsection{Labels}
 
 Kernel supports labelling statements, \textbf{L: $\stmt_{L}$}, and breaking to L, \textbf{break L}, which completes the execution of the labelled statement and proceeds to executing the rest of the program.
-To support breaking to a label, we add a labels component, $\lbls$, to statement configurations. $\lbls$ represents a list of pairs mapping a labelled statement, \textbf{L: $\stmt_L$}, to a break statement continuation, $\bcont$. Executing a labelled statement inserts a new break label, $\lbl$ in the list of labels $\lbls$.
+To support breaking to a label, we add a labels component, $\lbls$, to statement configurations.
+$\lbls$ represents a list of pairs mapping a labelled statement, \textbf{L: $\stmt_L$}, to a break statement continuation, $\bcont$.
+Executing a labelled statement inserts a new break label, $\lbl$ in the list of labels $\lbls$.
 
 \subsection{Switch}
-Kernel supports dispatching control among a number of cases with \textbf{switch} statements, where the target expression $\expr$ is evaluated and matched against the different case clauses of the switch statement. 
- 
-In Kernel, case clauses can have multiple constant expressions and there is no implicit fall-through between cases. Kernel supports continuing to execution of a preceding case clause with continue statements where the target of the continue statement is a preceding case clause, e.g, continue C with C = case $\expri{1..i}$: $\stmt$. To support continue, we add an optional $\clbls$ list, similar to the label list, which is set in a switch statement and unset otherwise.
+Kernel supports dispatching control among a number of cases with \textbf{switch} statements, where the target expression $\expr$ is evaluated and matched against the different case clauses of the switch statement.
 
-If there is a matching case clause, its statement is executed with a new statement continuation that will throw when reached. The new statement continuation is necessary because implicit fall-through is not supported and an explicit break of the flow is required (with either of \textbf{continue, break, return, throw}).
+In Kernel, case clauses can have multiple constant expressions and there is no implicit fall-through between cases.
+Kernel supports continuing to execution of a preceding case clause with continue statements where the target of the continue statement is a preceding case clause, e.g, continue C with C = case $\expri{1..i}$: $\stmt$.
+To support continue, we add an optional $\clbls$ list, similar to the label list, which is set in a switch statement and unset otherwise.
+
+If there is a matching case clause, its statement is executed with a new statement continuation that will throw when reached.
+The new statement continuation is necessary because implicit fall-through is not supported and an explicit break of the flow is required (with either of \textbf{continue, break, return, throw}).
 
 \[
   \begin{array}{lcl}
@@ -1767,7 +1814,10 @@ Otherwise, the execution continues as follows:
 
 \subsection{Exceptions}
 
-Kernel supports structured exception handling with \textbf{try/catch} and \textbf{try/finally} statements. Exceptions are thrown with \textbf{throw} and \textbf{rethrow} expressions. To support throwing exceptions, we add a handler, $\handler$, and a stacktrace, $\strace$, component to expression configurations (and correspondingly, to statement configurations). To support \textbf{rethrow}, we add an optional current error, $\cex$, and current stack trace, $\cstrace$, which are set when inside a catch block and unset otherwise.
+Kernel supports structured exception handling with \textbf{try/catch} and \textbf{try/finally} statements.
+Exceptions are thrown with \textbf{throw} and \textbf{rethrow} expressions.
+To support throwing exceptions, we add a handler, $\handler$, and a stacktrace, $\strace$, component to expression configurations (and correspondingly, to statement configurations).
+To support \textbf{rethrow}, we add an optional current error, $\cex$, and current stack trace, $\cstrace$, which are set when inside a catch block and unset otherwise.
 
 \[
   \begin{array}{lcl}
@@ -1779,7 +1829,9 @@ Kernel supports structured exception handling with \textbf{try/catch} and \textb
 \]
 
 \noindent
-\textbf{try/catch} handlers contain a list of on-catch handlers, environment, break labels, continue switch labels, exception handler, stacktrace, return continuation, and statement continuation. The handlers are tried in order to see if they match against the type of the exception. If none match, the exception is rethrown.
+\textbf{try/catch} handlers contain a list of on-catch handlers, environment, break labels, continue switch labels, exception handler, stacktrace, return continuation, and statement continuation.
+The handlers are tried in order to see if they match against the type of the exception.
+If none match, the exception is rethrown.
 
 \noindent
 Let $\econt' = \CatchH{(\textbf{on T catch (e, s) }\stmt) :: cs}$ be a catch continuation containing a non-empty list of on-catch handlers:
@@ -1808,7 +1860,9 @@ When a catch handler with no on-catch handlers is reached, the exception is reth
   \end{array}
 \]
 \noindent
-\textbf{try/finally} handlers contain a statement, environment, break labels, continue switch labels, exception handler, stacktrace, and return continuation. Note that they do not contain a statement continuation because when control falls off the end of the finally statement the exception is rethrown. The statement is unconditionally executed:
+\textbf{try/finally} handlers contain a statement, environment, break labels, continue switch labels, exception handler, stacktrace, and return continuation.
+Note that they do not contain a statement continuation because when control falls off the end of the finally statement the exception is rethrown.
+The statement is unconditionally executed:
 
 \[
   \begin{array}{lcl}
@@ -1894,15 +1948,20 @@ Let $\clbl = \continuel{L'}{\switchcont} \in \clbls \textrm{ with } L' == \mathb
 \subsection{Closures}
 \subsubsection{Function expressions}
 
-Kernel supports encapsulating an executable unit of code with function expressions. To support function expressions we introduce $fv = \funval{\stmt_{body}}{\formals}{\env} \in \dfunval$ as a value that has the function statement body, $\stmt_{body} \in \dstmt$, its list of formal parameters, $\formals \in \dformals$, and the environment, $\env \in \denv$ in scope of the function expression. This ensures that there are no free variables in the body of $fv$. $fv \in \dfunval$ has only one method, $call$.
+Kernel supports encapsulating an executable unit of code with function expressions.
+To support function expressions we introduce $fv = \funval{\stmt_{body}}{\formals}{\env} \in \dfunval$ as a value that has the function statement body, $\stmt_{body} \in \dstmt$, its list of formal parameters, $\formals \in \dformals$, and the environment, $\env \in \denv$ in scope of the function expression.
+This ensures that there are no free variables in the body of $fv$.
+$fv \in \dfunval$ has only one method, $call$.
 
 \subsubsection{Function declaration}
-Kernel supports local function declaration, where a final variable stores a function value. 
+Kernel supports local function declaration, where a final variable stores a function value.
 Let $F$ be a function with a body $\stmt_{body}$ and a list of formal parameters, $\formals$, and let $fun \in \dvardecl$ be the corresponding final variable declaration.
 
 \subsection{New instance creation}
 
-The expression \textbf{new} invokes a constructor to produce a new instance. The target constructor \textbf{Q} has a list of formal parameters, $\formals$, a list of initializers, $Izs$, and a statement body, $\stmt_{body}$. The invocation of a constructor \textbf{Q} with \textbf{new Q}($\exprs$) proceeds as follows:
+The expression \textbf{new} invokes a constructor to produce a new instance.
+The target constructor \textbf{Q} has a list of formal parameters, $\formals$, a list of initializers, $Izs$, and a statement body, $\stmt_{body}$.
+The invocation of a constructor \textbf{Q} with \textbf{new Q}($\exprs$) proceeds as follows:
 \[
   \begin{array}{lcl}
 	\acontconf{\ConstructorA{\textbf{Q}}{\econt}}{\val{s}}
@@ -1911,7 +1970,8 @@ The expression \textbf{new} invokes a constructor to produce a new instance. The
   \end{array}
 \]
 \noindent
-where $\loc$ is the location of the newly allocated instance, $\val \in \dobjval$, in the store. The value $\val$ stores the class of the object and the fields, as a list of freshly allocated labels for each field of the new instance.
+where $\loc$ is the location of the newly allocated instance, $\val \in \dobjval$, in the store.
+The value $\val$ stores the class of the object and the fields, as a list of freshly allocated labels for each field of the new instance.
 \[
   \begin{array}{l}
 	\deref{\loc} = \objval \in \dobjval, fields \in \mlist{\dlocation}\\
@@ -1933,7 +1993,7 @@ When $li$ is a redirecting initializer to target constructor \textbf{G}, then ex
   \begin{array}{lcl}
 	\contconf{\InitK{Q}{\env}{\scont}}{\val}
 	& \Rightarrow &
-	\evallistconf{\exprs}{\env}{\strace}{\cstrace}{\cex}{\acont}\\	
+	\evallistconf{\exprs}{\env}{\strace}{\cstrace}{\cex}{\acont}\\
 	&&
 	\textrm{if } Izs = RedirectingI(G, \exprs) :: []\\
 	\textrm{where:}\\
@@ -1981,7 +2041,8 @@ Let \textbf{Q} be a constructor with non empty initializer list, $Izs$ and a con
   \end{array}
 \]
 \noindent
-To further initialize the new instance, the body of the constructor will be executed. In Kernel the body of a constructor is executed after the execution of the initializer list and its super constructor.
+To further initialize the new instance, the body of the constructor will be executed.
+In Kernel the body of a constructor is executed after the execution of the initializer list and its super constructor.
 \noindent
 To support this, we add a new statement continuation, $BodySK$, that has the constructor body statement, the environment, the error handlers and stacktraces, and the next statement continuation.
 \[
@@ -1993,7 +2054,8 @@ To support this, we add a new statement continuation, $BodySK$, that has the con
 \]
 
 \noindent
-After the evaluation of the initializer expressions, the labels for each field in the object value are updated accordingly. An update of field $f_i$, stored at location $\loc' = (\deref{\loc})[f_i]$ with value $\val_i$ is expressed as $\update{(\deref{\loc})[f_i]}{\val_{i}}$, so the following holds $\deref{\loc'} = \deref{\deref{\loc[f_i]}} = \val_{i}$ after the update.
+After the evaluation of the initializer expressions, the labels for each field in the object value are updated accordingly.
+An update of field $f_i$, stored at location $\loc' = (\deref{\loc})[f_i]$ with value $\val_i$ is expressed as $\update{(\deref{\loc})[f_i]}{\val_{i}}$, so the following holds $\deref{\loc'} = \deref{\deref{\loc[f_i]}} = \val_{i}$ after the update.
 
 \noindent
 Let $Fs$ be the list of fields for value $\deref{\loc}$ for the class immediately enclosing the current constructor below.
@@ -2031,7 +2093,7 @@ Otherwise, there is only one initializer to execute in the initializer list, $li
   \begin{array}{lcl@{\hspace{30mm}}}
 	\acontconf{\FieldsA{\env}{li::[]}{\loc}{\scont}}{\val{s}}
 	& \Rightarrow &
-	\evallistconf{\exprs}{\env}{\strace}{\cstrace}{\cex}{\acont}\\	
+	\evallistconf{\exprs}{\env}{\strace}{\cstrace}{\cex}{\acont}\\
 	&&\textrm{with }\deref{\deref{\loc[f_i]}} = \val_{i}, \forall f_i \in Fs, \forall \val_i \in \val{s}\\
 	\textrm{where:}\\
 	\acont = \RedirectingA{G}{\loc}{\scont}\\[2mm]
@@ -2043,7 +2105,7 @@ Otherwise, there is only one initializer to execute in the initializer list, $li
   \begin{array}{lcl@{\hspace{30mm}}}
 	\acontconf{\FieldsA{\env}{li::[]}{\loc}{\scont}}{\val{s}}
 	& \Rightarrow &
-	\evallistconf{\exprs}{\env}{\strace}{\cstrace}{\cex}{\acont}\\	
+	\evallistconf{\exprs}{\env}{\strace}{\cstrace}{\cex}{\acont}\\
 	&&\textrm{with }\deref{\deref{\loc[f_i]}} = \val_{i}, \forall f_i \in Fs, \forall \val_i \in \val{s}\\
 	\textrm{where:}\\
 	\acont = \SuperA{G}{\loc}{\scont}\\[2mm]
@@ -2053,7 +2115,8 @@ Otherwise, there is only one initializer to execute in the initializer list, $li
 The transitions for the initializer continuation are described below.\\[2mm]
 \noindent
 Besides redirecting and super initializers, in Kernel we also have field and local initializers, both containing an expression to evaluate, denoted as $Initializer(\expr) : LocalI(\variablemeta, \expr) + FieldI(f, \expr)$.\\[2mm]
-Local initializers are special initializers in Kernel and they extend the environment for the execution of the initializer list. The transition steps for initializer continuation are as follows:
+Local initializers are special initializers in Kernel and they extend the environment for the execution of the initializer list.
+The transition steps for initializer continuation are as follows:
 \[
   \begin{array}{lcl@{\hspace{30mm}}}
 	\contconf{\InitK{Local(\variablemeta, \expr) :: []}{\loc}{\scont}}{\val}
@@ -2082,10 +2145,13 @@ Local initializers are special initializers in Kernel and they extend the enviro
   \end{array}
 \]
 \noindent
-Note that when a local initializer is last in the initializer list, the environment resulted after the transition is discarded. However, the corresponding expression has to be executed, because of side effects.
+Note that when a local initializer is last in the initializer list, the environment resulted after the transition is discarded.
+However, the corresponding expression has to be executed, because of side effects.
 \\[2mm]
 \noindent
-Field initializers further initialize fields of the fresh instance. Let $Field(f, \expr)$ be a field initializer. Then the value stored at location $\loc' = (\deref{\loc})[f]$ in the store $S$ will be modified, where $\loc$ is the location of the previously allocated fresh instance for the object currently being initialized.
+Field initializers further initialize fields of the fresh instance.
+Let $Field(f, \expr)$ be a field initializer.
+Then the value stored at location $\loc' = (\deref{\loc})[f]$ in the store $S$ will be modified, where $\loc$ is the location of the previously allocated fresh instance for the object currently being initialized.
 
 \[
   \begin{array}{lcl@{\hspace{30mm}}}
