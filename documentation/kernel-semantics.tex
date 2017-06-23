@@ -18,8 +18,8 @@
 \newcommand{\shadethis}[1]{\colorbox{shade}
 {\protect\rule[-0.95mm]{0mm}{3.95mm}\hspace{0.3mm}#1\hspace{0.3mm}}}
 %
-% Counter for rows in tables
-\newcounter{rowcount}[table]
+% Counter for rows in figures
+\newcounter{rowcount}[figure]
 \newcounter{figurecount}
 \setcounter{figurecount}{0}
 %
@@ -271,34 +271,42 @@ Configurations contain different components and the transition step dispatches t
 \stepcounter{figurecount}
 \begin{figure}
   $
-  \begin{array}{lcl}
-	\evalconf{\expr}{\env}{st}{cex}{cst}{\econt} & : &
+  \begin{array}{llcl}
+	\labeledrow{config:eval}
+	&\evalconf{\expr}{\env}{st}{cex}{cst}{\econt} & : &
 	\textrm{EvalConfiguration}\\
 
-	\evallistconf{\exprs}{\env}{st}{cex}{cst}{\acont} & : &
+	\labeledrow{config:evallist}
+	&\evallistconf{\exprs}{\env}{st}{cex}{cst}{\acont} & : &
 	\textrm{EvalListConfiguration}\\
 
-	\execconf{\stmt}{\env}{\lbls}{\clbls}{\handler}{\cex}{\cstrace}{\econt}{\scont}  & : &
+	\labeledrow{config:exec}
+	&\execconf{\stmt}{\env}{\lbls}{\clbls}{\handler}{\cex}{\cstrace}{\econt}{\scont}  & : &
 	\textrm{ExecConfiguration}\\[3mm]
 
-	\contconf{\econt}{\val} & : &
+	\labeledrow{config:econt}
+	&\contconf{\econt}{\val} & : &
 	\textrm{ValuePassingConfiguration}\\
 
-	\acontconf{\acont}{\vals} & : &
+	\labeledrow{config:acont}
+	&\acontconf{\acont}{\vals} & : &
 	\textrm{ApplicationConfiguration}\\
 
-	\scontconf{\scont}{\env} & : &
+	\labeledrow{config:scont}
+	&\scontconf{\scont}{\env} & : &
 	\textrm{ForwardConfiguration}\\[3mm]
 
-	\throwconf{\handler}{\val}{\strace} & : &
+	\labeledrow{config:throw}
+	&\throwconf{\handler}{\val}{\strace} & : &
 	\textrm{ThrowConfiguration}\\
 
-	\breakconf{\bcont} & : &
+	\labeledrow{config:bcont}
+	&\breakconf{\bcont} & : &
 	\textrm{BreakConfiguration}\\
 
-	\switchconf{\switchcont} & : &
+	\labeledrow{config:switchcont}
+	&\switchconf{\switchcont} & : &
 	\textrm{SwitchConfiguration}\\
-
   \end{array}
   $
   \caption{Configurations for the CESK machine}
@@ -306,7 +314,7 @@ Configurations contain different components and the transition step dispatches t
 \subsubsection{EvalConfiguration}
 \label{subsubsec:evalconfig}
 
-For the EvalConfiguration the transition step dispatches on the expression component, $\expr$.
+For the EvalConfiguration, shown in \ref{config:eval}, the transition step dispatches on the expression component, $\expr$.
 The next configuration is:
 \begin{itemize}
 %% Eval configuration can result with:
@@ -321,46 +329,46 @@ Note that for other invocations, we first evaluate the receiver for instance inv
 \subsubsection{EvalListConfigruation}
 \label{subsubsec:evallistconfig}
 
-For the EvalList configuration the transition step dispatches on the expression list, $\exprs$.
+For the EvalList configuration, shown in \ref{config:evallist}, the transition step dispatches on the expression list, $\exprs$.
 The next configuration is either a EvalConfiguration or ApplicationConfiguration, see Section~\ref{subsec:eval-list-expressions}.
 
 \subsubsection{ExecConfiguration}
 \label{subsubsec:execconfig}
 
-For the ExecConfiguration the transition step dispatches on the statement expression, $\stmt$.
+For the ExecConfiguration, shown in \ref{config:evallist}, the transition step dispatches on the statement expression, $\stmt$.
 The next configuration is either an ExecConfiguration or EvalConfiguration.
 
 \subsubsection{ValuePassingConfiguration}
 \label{suubsubsec:valuepassingconfig}
 
-The ValuePassingConfiguration applies the expression continuation component to its value component.
+The ValuePassingConfiguration, shown in \ref{config:econt}, applies the expression continuation component to its value component.
 
 \subsubsection{ApplicationConfiguration}
 \label{subsubsec:applicationconfig}
 
-The ApplicationConfiguration applies the application continuation component to its list of values component.
+The ApplicationConfiguration, shown in \ref{config:acont}, applies the application continuation component to its list of values component.
 
 \subsubsection{ForwardConfiguration}
 \label{subsubsec:forwardconfig}
 
-The ForwardConfiguration applies the statement continuation component to its environment component.
+The ForwardConfiguration, shown in \ref{config:scont}, applies the statement continuation component to its environment component.
 
 \subsubsection{ThrowCongfiguration}
 \label{subsubsec:throwconfig}
 
-For the ThrowConfiguration the transition step dispatches its continuation component.
+For the ThrowConfiguration, shown in \ref{config:throw}, the transition step dispatches its continuation component.
 It results with either a ThrowConfiguration, when  the exception cant be handled in the head of the non empty catch list or a ExecConfiguration, for the statement body of the matching catch or the finally statement.
 
 \subsubsection{BreakConfiguration}
 \label{subsubsec:breakconfig}
 
-For the BreakConfiguration the transition step dispatches on the continuation component.
+For the BreakConfiguration, shown in \ref{config:bcont}, the transition step dispatches on the continuation component.
 It results with a ForwardConfiguration corresponding to the target break label.
 
 \subsubsection{SwitchConfiguration}
 \label{subsubsec:switchconfig}
 
-For the SwitchConfiguration the transition step dispatches on the continuation component.
+For the SwitchConfiguration, shown in \ref{config:switchcont}, the transition step dispatches on the continuation component.
 It results with a ExecConfiguration.
 
 \subsection{Continuations}
@@ -845,8 +853,48 @@ The different exception handlers are shown in Figure~\ref{figure:handlers}.
 \section{Semantics}
 \label{sec:semantics}
 \subsection{Expression evaluation}
+\label{subsec:expr-evaluation}
 \newcommand{\this}{\tt{this}}
 \newcommand{\superclass}[1]{superclass({#1})}
+
+Expressions are evaluated by dispatching according to the expression component in EvalConfiguration, Section~\ref{subsubsec:evalconfig}, and EvalListConfiguration, Section~\ref{subsubsec:evallistconfig}.
+
+\noindent
+The rules for evaluation of list of expressions, i.e., transition steps from EvalListConfiguration, are shown in Figure~\ref{figure:evallist}.
+The value corresponding to the evaluated expression is captured by the application continuation ValueA and eventually added to the list of values corresponding to the expressions.
+%
+\stepcounter{figurecount}
+%
+% Label row (if referenced) with:
+% \labeledrow{evallist:$rulename}
+\label{subsec:eval-list-expressions}
+\begin{figure}
+  $
+  \begin{array}{rcl}
+	\cesktrans{
+		\evallistconf{\expr :: \exprs}{\env}{\strace}{\cstrace}{\cex}{\acont}}{
+		\evalconf{\expr}{\env}{\strace}{\cstrace}{\cex}{\econt'}}
+		\\[2mm]
+
+	\cesktrans{
+		\evallistconf{[]}{\env}{\strace}{\cstrace}{\cex}{\acont}}{
+		\acontconf{\acont}{[]}}
+		\\[2mm]
+	\hspace{3mm}\econt' = \ExpressionsK{\exprs}{\env}{\acont}
+	\\[2mm]
+
+	\cesktrans{
+		\contconf{\ExpressionsK{\exprs}{\env}{\acont}}{\val}}{
+		\evallistconf{\exprs}{\env}{\strace}{\cstrace}{\cex}{\ValueA{\val}{\acont}}}
+		\\[2mm]
+
+	\cesktrans{
+		\acontconf{\ValueA{\val}{\acont}}{\val s}}{
+		\acontconf{\acont}{\val :: \val s}}
+  \end{array}
+  $
+  \caption{The CESK-transition function for expression lists}\label{figure:evallist}
+\end{figure}
 %
 %
 \newcommand{\evalcesktrans}[3]{&\cesktrans{#1}{#2}\,\hspace{2mm}#3\\[2mm]}
@@ -950,7 +998,7 @@ The different exception handlers are shown in Figure~\ref{figure:handlers}.
 			\\&&&\textrm{ and body}\stmt}
 	\end{array}
 	$
-	\caption{Expressions}
+	\caption{The CESK-transition function for expressions}
 	\label{figure:expressions-evalconfigs}
 \end{figure}
 %
@@ -1001,7 +1049,7 @@ The different exception handlers are shown in Figure~\ref{figure:handlers}.
 			\\&&&\strace' = \StaticInvocation{\{\membermeta\}}{\expressionsmeta}::\strace}
 	\end{array}
 	$
-	\caption{Static variable extraction and assignment, and static method invocation}
+	\caption{The CESK-transition function for static variable extraction and assignment, and static method invocation}
 	\label{table:static-evalconfigs}
 \end{figure}
 %
@@ -1095,46 +1143,11 @@ The different exception handlers are shown in Figure~\ref{figure:handlers}.
 	\caption{Instance method and constructor invocation}
 	\label{figure:instance-method-evalconfigs}
 \end{figure}
-
-\label{subsec:expr-evaluation}
-
-
-Expressions are evaluated by dispatching according to the expression component in EvalConfiguration, Section~\ref{subsubsec:evalconfig}, and EvalListConfiguration, Section~\ref{subsubsec:evallistconfig}.
-
-\noindent
-The rules for evaluation of list of expressions, i.e., transition steps from EvalListConfiguration, are the following:
-\label{subsec:eval-list-expressions}
-\[
-  \begin{array}{rcl}
-	\cesktrans{
-		\evallistconf{\expr :: \exprs}{\env}{\strace}{\cstrace}{\cex}{\acont}}{
-		\evalconf{\expr}{\env}{\strace}{\cstrace}{\cex}{\econt'}}
-		\\[2mm]
-
-	\cesktrans{
-		\evallistconf{[]}{\env}{\strace}{\cstrace}{\cex}{\acont}}{
-		\acontconf{\acont}{[]}}
-		\\[2mm]
-	\hspace{3mm}\econt' = \ExpressionsK{\exprs}{\env}{\acont}
-	\\[2mm]
-
-	\cesktrans{
-		\contconf{\ExpressionsK{\exprs}{\env}{\acont}}{\val}}{
-		\evallistconf{\exprs}{\env}{\strace}{\cstrace}{\cex}{\ValueA{\val}{\acont}}}
-		\\[2mm]
-
-	\cesktrans{
-		\acontconf{\ValueA{\val}{\acont}}{\val s}}{
-		\acontconf{\acont}{\val :: \val s}}
-
-  \end{array}
-\]
-The value corresponding to the evaluated expression is captured by the application continuation ValueA and eventually added to the list of values corresponding to the expressions.
 \subsubsection{Basic literal evaluation}
 \label{subsubsec:basic-literal-eval}
 
 Kernel literals are evaluated to a value $\val \in \dlitval$.
-Transitions of the CESK machine for basic literals are presented in rows 1 - 5 in Table~\ref{table:evalconfigs}.
+Transitions of the CESK machine for basic literals are presented in Figure~\ref{figure:expressions-evalconfigs}.
 
 \subsubsection{Variable assignment and lookup}
 \label{subsubsec:variable-assignment-and-lookup}
