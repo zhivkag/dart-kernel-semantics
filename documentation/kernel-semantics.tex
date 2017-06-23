@@ -18,8 +18,8 @@
 \newcommand{\shadethis}[1]{\colorbox{shade}
 {\protect\rule[-0.95mm]{0mm}{3.95mm}\hspace{0.3mm}#1\hspace{0.3mm}}}
 %
-% Counter for rows in tables
-\newcounter{rowcount}[table]
+% Counter for rows in figures
+\newcounter{rowcount}[figure]
 \newcounter{figurecount}
 \setcounter{figurecount}{0}
 %
@@ -269,34 +269,42 @@ Configurations contain different components and the transition step dispatches t
 \stepcounter{figurecount}
 \begin{figure}
   $
-  \begin{array}{lcl}
-	\evalconf{\expr}{\env}{st}{cex}{cst}{\econt} & : &
+  \begin{array}{llcl}
+	\labeledrow{config:eval}
+	&\evalconf{\expr}{\env}{st}{cex}{cst}{\econt} & : &
 	\textrm{EvalConfiguration}\\
 
-	\evallistconf{\exprs}{\env}{st}{cex}{cst}{\acont} & : &
+	\labeledrow{config:evallist}
+	&\evallistconf{\exprs}{\env}{st}{cex}{cst}{\acont} & : &
 	\textrm{EvalListConfiguration}\\
 
-	\execconf{\stmt}{\env}{\lbls}{\clbls}{\handler}{\cex}{\cstrace}{\econt}{\scont}  & : &
+	\labeledrow{config:exec}
+	&\execconf{\stmt}{\env}{\lbls}{\clbls}{\handler}{\cex}{\cstrace}{\econt}{\scont}  & : &
 	\textrm{ExecConfiguration}\\[3mm]
 
-	\contconf{\econt}{\val} & : &
+	\labeledrow{config:econt}
+	&\contconf{\econt}{\val} & : &
 	\textrm{ValuePassingConfiguration}\\
 
-	\acontconf{\acont}{\vals} & : &
+	\labeledrow{config:acont}
+	&\acontconf{\acont}{\vals} & : &
 	\textrm{ApplicationConfiguration}\\
 
-	\scontconf{\scont}{\env} & : &
+	\labeledrow{config:scont}
+	&\scontconf{\scont}{\env} & : &
 	\textrm{ForwardConfiguration}\\[3mm]
 
-	\throwconf{\handler}{\val}{\strace} & : &
+	\labeledrow{config:throw}
+	&\throwconf{\handler}{\val}{\strace} & : &
 	\textrm{ThrowConfiguration}\\
 
-	\breakconf{\bcont} & : &
+	\labeledrow{config:bcont}
+	&\breakconf{\bcont} & : &
 	\textrm{BreakConfiguration}\\
 
-	\switchconf{\switchcont} & : &
+	\labeledrow{config:switchcont}
+	&\switchconf{\switchcont} & : &
 	\textrm{SwitchConfiguration}\\
-
   \end{array}
   $
   \caption{Configurations for the CESK machine}
@@ -304,7 +312,7 @@ Configurations contain different components and the transition step dispatches t
 \subsubsection{EvalConfiguration}
 \label{subsubsec:evalconfig}
 
-For the EvalConfiguration the transition step dispatches on the expression component, $\expr$.
+For the EvalConfiguration, shown in \ref{config:eval}, the transition step dispatches on the expression component, $\expr$.
 The next configuration is:
 \begin{itemize}
 %% Eval configuration can result with:
@@ -319,46 +327,46 @@ Note that for other invocations, we first evaluate the receiver for instance inv
 \subsubsection{EvalListConfigruation}
 \label{subsubsec:evallistconfig}
 
-For the EvalList configuration the transition step dispatches on the expression list, $\exprs$.
+For the EvalList configuration, shown in \ref{config:evallist}, the transition step dispatches on the expression list, $\exprs$.
 The next configuration is either a EvalConfiguration or ApplicationConfiguration, see Section~\ref{subsec:eval-list-expressions}.
 
 \subsubsection{ExecConfiguration}
 \label{subsubsec:execconfig}
 
-For the ExecConfiguration the transition step dispatches on the statement expression, $\stmt$.
+For the ExecConfiguration, shown in \ref{config:evallist}, the transition step dispatches on the statement expression, $\stmt$.
 The next configuration is either an ExecConfiguration or EvalConfiguration.
 
 \subsubsection{ValuePassingConfiguration}
 \label{suubsubsec:valuepassingconfig}
 
-The ValuePassingConfiguration applies the expression continuation component to its value component.
+The ValuePassingConfiguration, shown in \ref{config:econt}, applies the expression continuation component to its value component.
 
 \subsubsection{ApplicationConfiguration}
 \label{subsubsec:applicationconfig}
 
-The ApplicationConfiguration applies the application continuation component to its list of values component.
+The ApplicationConfiguration, shown in \ref{config:acont}, applies the application continuation component to its list of values component.
 
 \subsubsection{ForwardConfiguration}
 \label{subsubsec:forwardconfig}
 
-The ForwardConfiguration applies the statement continuation component to its environment component.
+The ForwardConfiguration, shown in \ref{config:scont}, applies the statement continuation component to its environment component.
 
 \subsubsection{ThrowCongfiguration}
 \label{subsubsec:throwconfig}
 
-For the ThrowConfiguration the transition step dispatches its continuation component.
+For the ThrowConfiguration, shown in \ref{config:throw}, the transition step dispatches its continuation component.
 It results with either a ThrowConfiguration, when  the exception cant be handled in the head of the non empty catch list or a ExecConfiguration, for the statement body of the matching catch or the finally statement.
 
 \subsubsection{BreakConfiguration}
 \label{subsubsec:breakconfig}
 
-For the BreakConfiguration the transition step dispatches on the continuation component.
+For the BreakConfiguration, shown in \ref{config:bcont}, the transition step dispatches on the continuation component.
 It results with a ForwardConfiguration corresponding to the target break label.
 
 \subsubsection{SwitchConfiguration}
 \label{subsubsec:switchconfig}
 
-For the SwitchConfiguration the transition step dispatches on the continuation component.
+For the SwitchConfiguration, shown in \ref{config:switchcont}, the transition step dispatches on the continuation component.
 It results with a ExecConfiguration.
 
 \subsection{Continuations}
