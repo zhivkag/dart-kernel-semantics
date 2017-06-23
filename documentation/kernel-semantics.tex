@@ -46,13 +46,13 @@ The small-step operational semantics of Dart Kernel is given by an abstract mach
 \label{subsec:conventions}
 \begin{itemize}
 \setlength{\itemsep}{0pt}
-\item Symbols ":" and $\in$ are used interchangeably.
+\item Symbols ``:'' and $\in$ are used interchangeably.
 \item Names of variables are italicized.
 \item Names of variables of syntactic domains start with an upper case letter.
-\item Names of domains are written in bold (e.g. "$\mathbf{X}$").
+\item Names of domains are written in bold (e.g. ``$\mathbf{X}$'').
 \item Names of continuation kinds are written in normal text (e.g. VarSetK).
 \item Names of meta-functions start with lower case letter (e.g. $\mathit{extend}$).
-\item "$\mlist{\mathbf{X}}$" denotes the domain of meta-lists of elements from domain "$\mathbf{X}$". Note that the word "List" here is not in bold, so that it isn't confused with the domain $\mathbf{List}$ of Dart objects.
+\item ``$\mlist{\mathbf{X}}$'' denotes the domain of meta-lists of elements from domain ``$\mathbf{X}$''. Note that the word ``List'' here is not in bold, so that it isn't confused with the domain $\mathbf{List}$ of Dart objects.
 \end{itemize}
 \subsection{Domains}
 \label{subsec:domains}
@@ -199,7 +199,7 @@ The store, $s$, maps a location, $\loc$, to a value, $\val$. The store is a muta
 \subsubsection{Dereferencing}
 \label{subsubsection:dereferecing}
 \newcommand{\deref}[1]{!#1}
-Function "$\deref{}$" is used to access a value stored in the store provided the corresponding label. The label is stored in the environment, or the object value for instance fields. "$\deref{}$" has an implicit argument which is the store of CESK machine.
+Function ``$\deref{}$'' is used to access a value stored in the store provided the corresponding label. The label is stored in the environment, or the object value for instance fields. ``$\deref{}$'' has an implicit argument which is the store of CESK machine.
 
 \begin{align*}
   \deref{} \in \dlocation &\rightarrow \dval \\
@@ -208,7 +208,7 @@ Function "$\deref{}$" is used to access a value stored in the store provided the
 \subsubsection{Update}
 \label{subsubsec:store-update}
 \newcommand{\update}[2]{{#1} := {#2}}
-Function "$\update{\loc}{\val}$" updates the store at location $\loc \in \dlocation$ with value $\val \in \dval$. It has an implicit argument which is the store of the CESK machine.
+Function ``$\update{\loc}{\val}$'' updates the store at location $\loc \in \dlocation$ with value $\val \in \dval$. It has an implicit argument which is the store of the CESK machine.
 \begin{align*}
   \update{}{} \in \dlocation \times \dval &\rightarrow  \dval\\
   \update{\loc}{\val} &= \val, \textrm{ with $\val$ the value in store at location $\loc$}
@@ -222,7 +222,7 @@ When an environment is needed to further execute the program, it is saved by the
 \subsubsection{Extend}
 \label{subsubsec:extend-env}
 
-Function "$extend$" creates a new environment by extending the provided environment with new bindings for the variable declarations to fresh labels for each of the provided values.
+Function ``$extend$'' creates a new environment by extending the provided environment with new bindings for the variable declarations to fresh labels for each of the provided values.
 \begin{align*}
   extend \in \denv \times \mlist{\dvardecl} \times \mlist{\dval} &\rightarrow  \denv \hspace{100mm} \\
   \ext{\env}{\varmeta{s}}{\vals} &= \env'
@@ -238,7 +238,7 @@ with
 For simpler notation, we allow $extend$ to be called with singleton lists as $\ext{\env}{\varmeta}{\val}$, which we consider equivalent to $\ext{\env}{\varmeta :: []}{\val :: []}$.
 \subsubsection{Variable lookup}
 \label{subsubsec:variable-lookup}
-A variable lookup consists of looking up the address of a variable from the environment with $\loc = \env(\varmeta)$ and reading the stored value $v$ with $\deref{\loc} = \deref{\env(\varmeta)}$. For definition of "$\deref{}$" see Section~\ref{subsubsection:dereferecing}.
+A variable lookup consists of looking up the address of a variable from the environment with $\loc = \env(\varmeta)$ and reading the stored value $v$ with $\deref{\loc} = \deref{\env(\varmeta)}$. For definition of ``$\deref{}$'' see Section~\ref{subsubsection:dereferecing}.
 
 \subsection{Configurations}
 \label{subsec:cesk-configs}
@@ -375,7 +375,7 @@ Note that some continuation will not evaluate the captured expression, when this
 \item Continuations without holes\\
 Continuations without holes dispatch on the provided value and produce the next configuration, a ValuePassingConfiguration.
 \end{itemize}
-We suffix the names of expression continuations with "$K$". The different expression continuations are shown in Figure~\ref{figure:econts}.
+We suffix the names of expression continuations with ``$K$''. The different expression continuations are shown in Figure~\ref{figure:econts}.
 %
 \newcommand{\ExceptionHandlersRest}{\handler,\,\cstrace,\,\cex}
 \newcommand{\ExceptionHandlers}{\strace,\,\handler,\,\cstrace,\,\cex}
@@ -499,7 +499,7 @@ We suffix the names of expression continuations with "$K$". The different expres
 Statement continuations capture the steps after execution of a statement. They accept an environment and produce the next configuration. Statements in a block expressions can extend the environment function and this is visible to the subsequent expressions in the block. For other types of statement configuration, the environment is ignored.
 
 \noindent
-We suffix the names of statement continuations with "$SK$". The different statement continuations are shown in Figure~\ref{figure:sconts}.
+We suffix the names of statement continuations with ``$SK$''. The different statement continuations are shown in Figure~\ref{figure:sconts}.
 \newcommand{\ExitSK}[1]{\mathrm{ExitSK(\econt,\,#1)}}
 \newcommand{\BlockSK}[2]{\mathrm{BlockSK}({#1},\,{#2},\,\lbls,\,\clbls,\,\handler,\,\cstrace,\,\cex,\,\econt,\,\scont)}
 \newcommand{\WhileSK}{\mathrm{WhileSK}(\expr,\,\stmt,\,\env,\,\lbls,\,\clbls,\,\handler,\,\cstrace,\,\cex,\,\econt,\,\scont)}
@@ -546,7 +546,7 @@ We suffix the names of statement continuations with "$SK$". The different statem
 
 Application continuations capture the application of a list of values resulting from the evaluation of list of expressions.\\
 We use ValueA, an application continuation, capturing a value and an application continuation, as application that adds a value to the head of the list.\\
-We suffix the names of application continuations with "$A$". The different application continuations are shown in Figure~\ref{figure:acont}.
+We suffix the names of application continuations with ``$A$''. The different application continuations are shown in Figure~\ref{figure:acont}.
 \newcommand{\ValueA}[2]{\mathrm{ValueA}({#1},\,{#2})}
 \newcommand{\StringConcatenationA}{\mathrm{StringConcatenationA(\econt)}}
 \newcommand{\SuperMethodA}{\mathrm{SuperMethodA}(\idmeta,\,\env,\,\ExceptionHandlers,\,\econt)}
