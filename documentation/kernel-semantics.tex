@@ -268,7 +268,7 @@ Configurations contain different components and the transition step dispatches t
 % Transition
 \newcommand{\cesktrans}[2]{{#1} & \Rightarrow & {#2}}
 \stepcounter{figurecount}
-\begin{figure}
+\begin{figure}[Htp]
   $
   \begin{array}{llcl}
 	\labeledrow{config:eval}
@@ -310,6 +310,7 @@ Configurations contain different components and the transition step dispatches t
   $
   \caption{Configurations for the CESK machine}
 \end{figure}
+
 \subsubsection{EvalConfiguration}
 \label{subsubsec:evalconfig}
 
@@ -449,7 +450,7 @@ The different expression continuations are shown in Figure~\ref{figure:econts}.
 %
 % Label row (if referenced) with:
 % \labeledrow{econt:$rulename}
-\begin{figure}
+\begin{figure}[Htp]
   $
   \begin{array}{lll@{\hspace{3cm}}}
   	&&\\
@@ -544,7 +545,7 @@ The different statement continuations are shown in Figure~\ref{figure:sconts}.
 %
 % Label row (if referenced) with:
 % \labeledrow{scont:$rulename}
-\begin{figure}
+\begin{figure}[Htp]
   $
   \begin{array}{lll@{\hspace{5cm}}}
   	&&\\
@@ -573,6 +574,7 @@ The different statement continuations are shown in Figure~\ref{figure:sconts}.
   \caption{Statement Continuations}
   \label{figure:sconts}
 \end{figure}
+
 \subsubsection{Application continuation}
 \label{subsubsec:application-continuation}
 
@@ -594,7 +596,7 @@ The different application continuations are shown in Figure~\ref{figure:acont}.
 %
 % Label row (if referenced) with:
 % \labeledrow{acont:$rulename}
-\begin{figure}
+\begin{figure}[Htp]
   $
   \begin{array}{lll@{\hspace{5cm}}}
   	&&\\
@@ -626,6 +628,7 @@ The different application continuations are shown in Figure~\ref{figure:acont}.
   \caption{Application Continuations}
   \label{figure:acont}
 \end{figure}
+
 \subsubsection{Break continuations}
 \label{subsubsec:break-continuations}
 
@@ -638,7 +641,7 @@ The different break continuations are shown in Figure~\ref{figure:breakcont}.
 %
 % Label row (if referenced) with:
 % \labeledrow{breakcont:$rulename}
-\begin{figure}
+\begin{figure}[Htp]
   $
   \begin{array}{lll@{\hspace{5cm}}}
 	&&\\
@@ -652,6 +655,7 @@ The different break continuations are shown in Figure~\ref{figure:breakcont}.
   \label{figure:breakcont}
   \caption{Break Continuations}
 \end{figure}
+
 Break continuations, \ref{breakcont:break}, capture the statement continuation and the environment corresponding to the provided label.\\
 FinallyBreak continuations, \ref{breakcont:finallybreak}, are added when a try/finally statement is encountered and they capture the statement body and the components necessary for its execution.
 \subsubsection{Switch continuations}
@@ -668,7 +672,7 @@ The different switch continuations are shown in Figure~\ref{figure:switchconts}.
 %
 % Label row (if referenced) with:
 % \labeledrow{switchcont:$rulename}
-\begin{figure}
+\begin{figure}[Htp]
   $
   \begin{array}{lll@{\hspace{5cm}}}
 	&&\\
@@ -682,8 +686,7 @@ The different switch continuations are shown in Figure~\ref{figure:switchconts}.
   \caption{Switch Continuations}
   \label{figure:switchconts}
 \end{figure}
-%
-\noindent
+
 SwitchContinue continuations, \ref{switchcont:continue}, capture the statement body of a preceding switch case, targeted by some continue statement, and the components necessary for its execution.
 FinallyContinue continuations, \ref{switchcont:finallycontinue}, are added when a try/finally statement is encountered and they capture the statement body and the components necessary for its execution.
 \subsubsection{Exception handlers}
@@ -696,7 +699,7 @@ The different exception handlers are shown in Figure~\ref{figure:handlers}.
 %
 % Label row (if referenced) with:
 % \labeledrow{handle:$rulename}
-\begin{figure}
+\begin{figure}[Htp]
   $
   \begin{array}{lll@{\hspace{5cm}}}
 	&&\\
@@ -710,6 +713,7 @@ The different exception handlers are shown in Figure~\ref{figure:handlers}.
   \caption{Exception handlers}
   \label{figure:handlers}
 \end{figure}
+
 \subsection{Values}
 \label{subsec:values}
 \subsection{Literal values}
@@ -867,7 +871,7 @@ The value corresponding to the evaluated expression is captured by the applicati
 % Label row (if referenced) with:
 % \labeledrow{evallist:$rulename}
 \label{subsec:eval-list-expressions}
-\begin{figure}
+\begin{figure}[Htp]
   $
   \begin{array}{rcl}
 	\cesktrans{
@@ -894,14 +898,13 @@ The value corresponding to the evaluated expression is captured by the applicati
   $
   \caption{The CESK-transition function for expression lists}\label{figure:evallist}
 \end{figure}
-%
-%
+
 \newcommand{\evalcesktrans}[3]{&\cesktrans{#1}{#2}\,\hspace{2mm}#3\\[2mm]}
 \stepcounter{figurecount}
 %
 % Label row (if referenced) with:
 % \labeledrow{eval:$rulename}
-\begin{figure}
+\begin{figure}[Htp]
 	$
 	\begin{array}{lrclr@{\hspace{3cm}}}
 		\evalcesktrans
@@ -1000,12 +1003,12 @@ The value corresponding to the evaluated expression is captured by the applicati
 	\caption{The CESK-transition function for expressions}
 	\label{figure:expressions-evalconfigs}
 \end{figure}
-%
+
 \stepcounter{figurecount}
 %
 % Label row (if referenced) with:
 % \labeledrow{eval:$rulename}
-\begin{figure}
+\begin{figure}[Htp]
 	$
 	\begin{array}{lrcl}
 		\evalcesktrans
@@ -1051,12 +1054,12 @@ The value corresponding to the evaluated expression is captured by the applicati
 	\caption{The CESK-transition function for static variable extraction and assignment, and static method invocation}
 	\label{table:static-evalconfigs}
 \end{figure}
-%
+
 \stepcounter{figurecount}
 %
 % Use counter as:
 % \labeledrow{eval:$rulename}
-\begin{figure}
+\begin{figure}[Htp]
 	$
 	\begin{array}{lrcl}
 		\evalcesktrans
@@ -1110,12 +1113,12 @@ The value corresponding to the evaluated expression is captured by the applicati
 	\caption{The CESK-transition function for instance property extraction and assignment expressions}
 	\label{figure:instance-property-evalconfigs}
 \end{figure}
-%
+
 \stepcounter{figurecount}
 %
 % Label row (if referenced) with:
 % \labeledrow{eval:$rulename}
-\begin{figure}
+\begin{figure}[Htp]
 	$
 	\begin{array}{lrcl}
 		\evalcesktrans
@@ -1142,6 +1145,7 @@ The value corresponding to the evaluated expression is captured by the applicati
 	\caption{Instance method and constructor invocation}
 	\label{figure:instance-method-evalconfigs}
 \end{figure}
+
 \subsubsection{Basic literal evaluation}
 \label{subsubsec:basic-literal-eval}
 
@@ -1610,7 +1614,7 @@ Evaluation of $\this$ expression resolves to the value in one step.
 %
 % Label row (if referenced) with:
 % \labeledrow{exec:$rulename}
-\begin{figure}
+\begin{figure}[Htp]
 	$
 	\begin{array}{lrcl}
 		\execcesktrans
@@ -1691,6 +1695,7 @@ Evaluation of $\this$ expression resolves to the value in one step.
 	\caption{The CESK-transition function for statements}
 	\label{table:instance-method-evalconfigs}
 \end{figure}
+
 \subsubsection{Variable Declaration}
 Variable declaration extend the corresponding environment with a new binding.
 The corresponding initializer expression is first evaluated to a value $v$.
