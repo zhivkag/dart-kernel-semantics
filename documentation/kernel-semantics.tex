@@ -33,6 +33,8 @@
 % Macros used below have been contributed in part by Olivier Danvy and Kevin Millikin
 \input{danvy-millikin-LMCS.mac}
 
+\DeclareMathOperator{\extend}{extend}
+
 \begin{document}
 \title{Dart Kernel Semantics \\ (draft)}
 
@@ -52,7 +54,7 @@ The machine is defined by a single step transition function where each step of t
 \item Names of variables of syntactic domains start with an upper case letter.
 \item Names of domains are written in bold (e.g. ``$\mathbf{X}$'').
 \item Names of continuation kinds are written in normal text (e.g. VarSetK).
-\item Names of meta-functions start with lower case letter (e.g. $\mathit{extend}$).
+\item Names of meta-functions start with lower case letter (e.g. $\extend$).
 \item ``$\mlist{\mathbf{X}}$'' denotes the domain of meta-lists of elements from domain ``$\mathbf{X}$''.
 Note that the word ``List'' here is not in bold, so that it isn't confused with the domain $\mathbf{List}$ of Dart objects.
 \end{itemize}
@@ -229,9 +231,9 @@ When an environment is needed to further execute the program, it is saved by the
 \subsubsection{Extend}
 \label{subsubsec:extend-env}
 
-Function ``$extend$'' creates a new environment by extending the provided environment with new bindings for the variable declarations to fresh labels for each of the provided values.
+Function ``$\extend$'' creates a new environment by extending the provided environment with new bindings for the variable declarations to fresh labels for each of the provided values.
 \begin{align*}
-  extend \in \denv \times \mlist{\dvardecl} \times \mlist{\dval} &\rightarrow  \denv \hspace{100mm} \\
+  \extend \in \denv \times \mlist{\dvardecl} \times \mlist{\dval} &\rightarrow  \denv \hspace{100mm} \\
   \ext{\env}{\varmeta{s}}{\vals} &= \env'
 \end{align*}
 with
@@ -242,7 +244,7 @@ with
 	\end{cases}
 \]
 
-For simpler notation, we allow $extend$ to be called with singleton lists as $\ext{\env}{\varmeta}{\val}$, which we consider equivalent to $\ext{\env}{\varmeta :: []}{\val :: []}$.
+For simpler notation, we allow $\extend$ to be called with singleton lists as $\ext{\env}{\varmeta}{\val}$, which we consider equivalent to $\ext{\env}{\varmeta :: []}{\val :: []}$.
 \subsubsection{Variable lookup}
 \label{subsubsec:variable-lookup}
 A variable lookup consists of looking up the address of a variable from the environment with $\loc = \env(\varmeta)$ and reading the stored value $v$ with $\deref{\loc} = \deref{\env(\varmeta)}$.
@@ -1842,12 +1844,12 @@ Let $\econt' = \CatchH{(\textbf{on T catch (e, s) }\stmt) :: cs}$ be a catch con
 	\execconf{\stmt}{\env'}{\lbls}{\clbls}{\handler}{inr(\val)}{inr(\strace')}{\econt}{\scont}
 	&\textrm{ if V is T}\\[1mm]
 
-	&&\textrm{with } \env' = extend(\env, e :: s :: [], \val :: \strace' :: [])\\[2mm]
+	&&\textrm{with } \env' = \extend(\env, e :: s :: [], \val :: \strace' :: [])\\[2mm]
 
 	\throwconf{\econt'}{\val}{\strace'}
 	& \Rightarrow &
 	\throwconf{\CatchH{cs}}{\val}{\strace'}	&\textrm{ otherwise}\\[2mm]
-	&&\textrm{with } \env' = extend(\env, e :: s :: [], \val :: \strace' :: [])
+	&&\textrm{with } \env' = \extend(\env, e :: s :: [], \val :: \strace' :: [])
   \end{array}
 \]
 \noindent
@@ -1975,7 +1977,7 @@ The value $\val$ stores the class of the object and the fields, as a list of fre
 \[
   \begin{array}{l}
 	\deref{\loc} = \objval \in \dobjval, fields \in \mlist{\dlocation}\\
-	\env' = extend(\env_{empty}, \formals, \val{s})\\
+	\env' = \extend(\env_{empty}, \formals, \val{s})\\
 	\scont = \NewSK{\econt}{\loc} \\[2mm]
 
 	\scontconf{\NewSK{\econt}{\loc}}{\env}
@@ -2016,7 +2018,7 @@ When $li$ is a redirecting initializer to target constructor \textbf{G}, then ex
 	& \Rightarrow &
 	\contconf{\InitK{G}{\env'}{\scont}}{\deref{\loc}}\\[2mm]
 	\textrm{where:}\\
-	\env' = extend(\env_{empty}, \formals, \val{s})
+	\env' = \extend(\env_{empty}, \formals, \val{s})
   \end{array}
 \]
 \noindent
