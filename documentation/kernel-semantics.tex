@@ -385,6 +385,9 @@ It results with a ExecConfiguration.
 \newcommand{\idmeta}{\ensuremath{\mathit{X}}}
 \newcommand{\membermeta}{\ensuremath{\mathit{M}}}
 \newcommand{\typemeta}{\ensuremath{\mathit{T}}}
+% Metavariables for statements
+\newcommand{\statementmeta}{\ensuremath{\mathit{\stmt}}}
+\newcommand{\labelmeta}{\ensuremath{\mathit{\tt{L}}}}
 
 Continuations capture the state for execution of statements, or expressions and capture the information needed to resume the execution of the program.
 There are various types of continuations depending on the next statement to be executed or next expression to be evaluated.
@@ -851,7 +854,62 @@ The different exception handlers are shown in Figure~\ref{figure:handlers}.
   & \Let{\variablemeta}{\expressionmeta_0}{\expressionmeta_1} \\
 \end{array}
 \]
+\subsection{Statements}
+\label{subsec:stmt-syntax}
+% InvalidStatement
+%
+\newcommand{\ExpressionStatement}[1]{\{\, #1\, \}}
+\newcommand{\Block}[1]{#1\, \statementmeta*}
+\newcommand{\EmptyStatement}{\{\}}
+%
+% AssertStatement
+%
+\newcommand{\LabeledStatement}[2]{#1:\, #2}
+\newcommand{\BreakStatement}[1]{\tt{break}\, #1}
+\newcommand{\WhileStatement}[2]{\tt{while}\, (#1)\, #2}
+\newcommand{\DoStatement}[2]{\tt{do}\, #1\, \tt{while}\, (#2)}
+\newcommand{\ForStatement}[4]{\tt{for}\, (\,#1;\, #2;\, #3\,)\, #4}
+\newcommand{\ForInStatement}[3]{\tt{for}\,(#1\,\tt{in}\,#2)\,#3}
+%
+\newcommand{\SwitchStatement}[1]{\tt{switch}\,(#1)\,\tt{cases}}
+\newcommand{\ContinueSwitchStatement}[1]{\tt{continue}\,#1}
+\newcommand{\IfStatement}[3]{\tt{if}\,(#1)\,#2\,\tt{else}\,#3}
+\newcommand{\ReturnStatement}[1]{\tt{return}\,#1}
+%
+\newcommand{\TryCatch}[2]{\tt{try}\,#1\,\tt{catch}\,#2}
+\newcommand{\TryFinally}[2]{\tt{try}\,#1\,\tt{catch}\,#2}
+%
+\newcommand{\Yield}[1]{\tt{yield}\,#1}
+%
+\newcommand{\VarDeclaration}[2]{\tt{var}\,#1=#2}
+%
+% FunctionDeclaration
+%
+\[
+\begin{array}{rl}
 
+  \statementmeta \in \mathit{Statements} ::=
+  & \ExpressionStatement{\expressionmeta} \\
+  & \Block{\statementmeta} \\
+  & \EmptyStatement \\
+  & \LabeledStatement{\labelmeta}{\statementmeta} \\
+  & \BreakStatement{\labelmeta} \\
+  & \WhileStatement{\expressionmeta}{\statementmeta} \\
+  & \DoStatement{\statementmeta}{\expressionmeta} \\
+  & \ForStatement{??}{\expressionmeta}{??}{\statementmeta} \\
+  & \ForInStatement{\idmeta}{\expressionmeta}{\statementmeta} \\
+  & \SwitchStatement{\expressionmeta} \\
+  & \ContinueSwitchStatement{\statementmeta} \\
+  & \IfStatement{\expressionmeta}{\statementmeta_1}{\statementmeta_2} \\
+  & \ReturnStatement{\expressionmeta} \\
+  & \ReturnStatement{} \\
+  & \TryCatch{\statementmeta}{??} \\
+  & \TryFinally{\statementmeta_1}{\statementmeta_2} \\
+  & \Yield{\expressionmeta} \\
+  & \VarDeclaration{\idmeta}{\expressionmeta} \\
+
+\end{array}
+\]
 
 \section{Semantics}
 \label{sec:semantics}
