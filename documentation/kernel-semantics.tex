@@ -1,6 +1,6 @@
 \documentclass{article}
 
-\usepackage{amsmath}
+\usepackage[fleqn]{amsmath}
 %
 \usepackage{a4wide}
 %
@@ -12,27 +12,99 @@
 %
 \usepackage{hyperref}
 \usepackage{chngcntr}
+\usepackage{ifthen}
+\usepackage[fleqn]{mathtools}
 %
 \newcommand{\shadethis}[1]{\colorbox{shade}
 {\protect\rule[-0.95mm]{0mm}{3.95mm}\hspace{0.3mm}#1\hspace{0.3mm}}}
-%
-% Counter for rows in figures
-\newcounter{rowcount}[figure]
-\newcounter{figurecount}
-\setcounter{figurecount}{0}
-%
-\makeatletter
-\renewcommand{\p@rowcount}{\thesubsection.\thefigurecount.}
-\makeatother
-%
-\newcommand{\myrowcount}{\refstepcounter{rowcount}\thesubsection.\thefigurecount.\therowcount}
-\newcommand{\labeledrow}[1]{\myrowcount\label{#1}}
 %
 % Macros used below have been contributed in part by Olivier Danvy and Kevin Millikin
 \input{danvy-millikin-LMCS.mac}
 
 \renewcommand{\emptyset}{\varnothing}
 \DeclareMathOperator{\extend}{extend}
+
+
+%%
+% Commands to typeset transitions of CESK machine.
+%
+% \cesktrans{FROM}{TO}
+% \cesktransalign{FROM}{TO}
+% \cesktranssplit{FROM}{TO}
+%
+% Typesets a transiton from configuration FROM to configuration TO. Like this:
+%
+%     FROM => TO
+%
+% "Align" variant has an embedded "&" inside, immideately before the transition
+% sign "=>".  It means that the command should be put into an environment that
+% aligns its multi-line content using "&" signs, for example "align".
+%
+% "Split" variant has an embedded "\\" inside, immediately after the transition
+% sign "=>".  It is useful for putting long equations in an environment such as
+% "split".
+%%
+\newcommand{\cesktrans}[2]{\ensuremath{{#1} \Rightarrow {#2}}}
+\newcommand{\cesktransalign}[2]{\ensuremath{{#1} &\Rightarrow {#2}}}
+\newcommand{\cesktranssplit}[2]{\ensuremath{{#1} \Rightarrow\\ {#2}}}
+
+
+%%
+% Commands to typeset transitions of CESK machine with clarifying clause.
+%
+% \cesktranswhere{FROM}{TO}{WHERE}
+% \cesktranswherealign{FROM}{TO}{WHERE}
+% \cesktranswherealign*{FROM}{TO}{WHERE}
+% \cesktranswheresplit{FROM}{TO}{WHERE}
+% \cesktranswheresplit*{FROM}{TO}{WHERE}
+%
+% Typesets a transition from configuration FROM to configuration TO.  These
+% commands have a clarifying clause that explains the meaning of some new
+% symbols introduced by the transition.
+%
+% The "align" versions have an embedded "&" inside, immideately before the
+% transition sign "=>".  It means that the command sould be put into an
+% environment hat aligns its multi-line content using "&" signs, for example
+% "align".  The non-starred "align" variant puts the additional clause to the
+% same line as the transition itself, separating it with a comma.  The starred
+% version puts the additional clause on the next line.
+%
+% Here is how non-starred version looks like:
+%
+%     FROM => TO, WHERE
+%
+% Here is how starred version looks like:
+%
+%     FROM => TO,
+%          WHERE
+%
+% "Split" variants has embedded "\\" inside.  Starred "split" variant have one
+% after the comma.  Non-starred "split" variant have one additional "\\" after
+% the transition sign "=>".  It is useful for putting long equations in an
+% environment such as "split", "gather", or "multline".  Note that if an
+% environment generates a new equation number for each line, it can be disabled
+% by putting "\notag" inside the arguments where the number is undesirable.
+%%
+\newcommand{\cesktranswhere}[3]{\ensuremath{{#1} \Rightarrow {#2}, {#3}}}
+\newcommand{\cesktranswherealignNoStar}[3]{\ensuremath{{#1} &\Rightarrow {#2}, {#3}}}
+\newcommand{\cesktranswherealignStar}[3]{\ensuremath{{#1} &\Rightarrow \begin{aligned}[t]&{#2},\\&{#3}\end{aligned}}}
+\makeatletter
+\newcommand{\cesktranswherealign}{%
+    \@ifstar
+        \cesktranswherealignStar%
+        \cesktranswherealignNoStar%
+}
+\makeatother
+\newcommand{\cesktranswheresplitNoStar}[3]{\ensuremath{{#1} \Rightarrow {#2},\\{#3}}}
+\newcommand{\cesktranswheresplitStar}[3]{\ensuremath{{#1} \Rightarrow\\ {#2},\\{#3}}}
+\makeatletter
+\newcommand{\cesktranswheresplit}{%
+    \@ifstar
+        \cesktranswheresplitStar%
+        \cesktranswheresplitNoStar%
+}
+\makeatother
+
 
 \begin{document}
 \title{Dart Kernel Semantics \\ (draft)}
@@ -266,48 +338,20 @@ Configurations contain different components and the transition step dispatches t
 \newcommand{\execconf}[9]{\langle{#1},\,{#2},\,{#3},\,{#4},\,\strace,\,{#5},\,{#6},\,{#7},\,{#8},\,{#9}\rangle_{\mathrm{exec}}}
 
 % Transition
-\newcommand{\cesktrans}[2]{{#1} & \Rightarrow & {#2}}
-\stepcounter{figurecount}
 \begin{figure}[Htp]
-  $
-  \begin{array}{llcl}
-	\labeledrow{config:eval}
-	&\evalconf{\expr}{\env}{st}{cex}{cst}{\econt} & : &
-	\textrm{EvalConfiguration}\\
-
-	\labeledrow{config:evallist}
-	&\evallistconf{\exprs}{\env}{st}{cex}{cst}{\acont} & : &
-	\textrm{EvalListConfiguration}\\
-
-	\labeledrow{config:exec}
-	&\execconf{\stmt}{\env}{\lbls}{\clbls}{\handler}{\cex}{\cstrace}{\econt}{\scont}  & : &
-	\textrm{ExecConfiguration}\\[3mm]
-
-	\labeledrow{config:econt}
-	&\contconf{\econt}{\val} & : &
-	\textrm{ValuePassingConfiguration}\\
-
-	\labeledrow{config:acont}
-	&\acontconf{\acont}{\vals} & : &
-	\textrm{ApplicationConfiguration}\\
-
-	\labeledrow{config:scont}
-	&\scontconf{\scont}{\env} & : &
-	\textrm{ForwardConfiguration}\\[3mm]
-
-	\labeledrow{config:throw}
-	&\throwconf{\handler}{\val}{\strace} & : &
-	\textrm{ThrowConfiguration}\\
-
-	\labeledrow{config:bcont}
-	&\breakconf{\bcont} & : &
-	\textrm{BreakConfiguration}\\
-
-	\labeledrow{config:switchcont}
-	&\switchconf{\switchcont} & : &
-	\textrm{SwitchConfiguration}\\
-  \end{array}
-  $
+  \begin{align}
+	&\evalconf{\expr}{\env}{st}{cex}{cst}{\econt} & :\quad & \text{EvalConfiguration} \label{config:eval}\\
+	&\evallistconf{\exprs}{\env}{st}{cex}{cst}{\acont} & :\quad & \text{EvalListConfiguration} \label{config:evallist}\\
+	&\execconf{\stmt}{\env}{\lbls}{\clbls}{\handler}{\cex}{\cstrace}{\econt}{\scont}  & :\quad & \text{ExecConfiguration} \label{config:exec}\\
+	&\contconf{\econt}{\val} & :\quad & \text{ValuePassingConfiguration} \label{config:econt}\\
+	&\acontconf{\acont}{\vals} & :\quad & \text{ApplicationConfiguration} \label{config:acont}\\
+	&\scontconf{\scont}{\env} & :\quad & \text{ForwardConfiguration} \label{config:scont}\\
+	&\throwconf{\handler}{\val}{\strace} & :\quad & \text{ThrowConfiguration} \label{config:throw}\\
+	&\breakconf{\bcont} & :\quad & \text{BreakConfiguration} \label{config:bcont}\\
+	&\switchconf{\switchcont} & :\quad &
+	\text{SwitchConfiguration}
+	\label{config:switchcont}
+  \end{align}
   \caption{Configurations for the CESK machine}
 \end{figure}
 
@@ -445,79 +489,30 @@ The different expression continuations are shown in Figure~\ref{figure:econts}.
 \newcommand{\FinallyReturnK}[1]{\mathrm{FinallyReturnK}({#1},\,\env,\,\lbls,\,\clbls,\,\strace,\,\handler,\,\econt)}
 %
 
-%
-\stepcounter{figurecount}
-%
-% Label row (if referenced) with:
-% \labeledrow{econt:$rulename}
 \begin{figure}[Htp]
-  $
-  \begin{array}{lll@{\hspace{3cm}}}
-  	&&\\
-	%\labeledrow{econt:varset}&
-	\VarSetK{\idmeta}{\ExceptionHandlers}{\econt}\\[2mm]
-
-	%\labeledrow{econt:expressions}&
-	\ExpressionsK{\exprs}{\env}{\acont}&\\[2mm]
-
-	%\labeledrow{econt:not}&
-	\NotK{\econt}&\\[2mm]
-
-	%\labeledrow{econt:and}&
-	\AndK{\expressionmeta}{\ExceptionHandlers}{\econt}&\\[2mm]
-
-	%\labeledrow{econt:or}&
-	\OrK{\expressionmeta}{\ExceptionHandlers}{\econt}&\\[2mm]
-
-	%\labeledrow{econt:cond}&
-	\ConditionalK{\expressionmeta_1}{\expressionmeta_2}{\ExceptionHandlers}{\econt}&\\[2mm]
-
-	%\labeledrow{econt:let}&
-	\LetK{\idmeta}{\expressionmeta}{\ExceptionHandlers}{\econt}&\\[2mm]
-
-	%\labeledrow{econt:is}&
-	\IsExpressionK&\\[2mm]
-
-	%\labeledrow{econt:as}&
-	\AsExpressionK&\\[2mm]
-
-	%\labeledrow{econt:static-get}&
-	\StaticGetK&\\[2mm]
-
-	%\labeledrow{econt:static-set}&
-	\StaticSetK&\\[2mm]
-
-	%\labeledrow{econt:dproperty-get}&
-	\DPropertyGetK&\\[2mm]
-
-	%\labeledrow{econt:property-set}&
-	\PropertySetK&\\[2mm]
-
-	%\labeledrow{econt:property-set}&
-	\PropertySetVK&\\[2mm]
-
-	%\labeledrow{econt:dproperty-set}&
-	\DPropertyGetK&\\[2mm]
-
-	%\labeledrow{econt:dproperty-set-v}&
-	\DPropertySetVK&\\[2mm]
-
-	%\labeledrow{econt:super-property-set}&
-	\SuperPropertySetK&\\[2mm]
-
-	%\labeledrow{econt:instance-method}&
-	\InstanceMethodK&\\[2mm]
-
-	%\labeledrow{econt:dinstance-method}&
-	\DInstanceMethodK&\\[2mm]
-
-	%\labeledrow{econt:var-decl}&
-	\VarDeclK{\idmeta}{\env}{\scont}&\\[2mm]
-
-	%\labeledrow{econt:if-cond}&
-	\IfCondK{\expressionmeta_1}{\expressionmeta_2}&\\[2mm]
-  \end{array}
-  $
+  \begin{align}
+	&\VarSetK{\idmeta}{\ExceptionHandlers}{\econt} \label{econt:varset}\\
+	&\ExpressionsK{\exprs}{\env}{\acont} \label{econt:expressions}\\
+	&\NotK{\econt} \label{econt:not}\\
+	&\AndK{\expressionmeta}{\ExceptionHandlers}{\econt} \label{econt:and}\\
+	&\OrK{\expressionmeta}{\ExceptionHandlers}{\econt} \label{econt:or}\\
+	&\ConditionalK{\expressionmeta_1}{\expressionmeta_2}{\ExceptionHandlers}{\econt} \label{econt:cond}\\
+	&\LetK{\idmeta}{\expressionmeta}{\ExceptionHandlers}{\econt} \label{econt:let}\\
+	&\IsExpressionK \label{econt:is}\\
+	&\AsExpressionK \label{econt:as}\\
+	&\StaticGetK \label{econt:static-get}\\
+	&\StaticSetK \label{econt:static-set}\\
+	&\DPropertyGetK \label{econt:dproperty-get}\\
+	&\PropertySetK \label{econt:property-set}\\
+	&\PropertySetVK \label{econt:property-set}\\
+	&\DPropertyGetK \label{econt:dproperty-set}\\
+	&\DPropertySetVK \label{econt:dproperty-set-v}\\
+	&\SuperPropertySetK \label{econt:super-property-set}\\
+	&\InstanceMethodK \label{econt:instance-method}\\
+	&\DInstanceMethodK \label{econt:dinstance-method}\\
+	&\VarDeclK{\idmeta}{\env}{\scont} \label{econt:var-decl}\\
+	&\IfCondK{\expressionmeta_1}{\expressionmeta_2} \label{econt:if-cond}
+  \end{align}
   \caption{Expression Continuations}
   \label{figure:econts}
 \end{figure}
@@ -540,37 +535,17 @@ The different statement continuations are shown in Figure~\ref{figure:sconts}.
 \newcommand{\NewSK}[2]{\mathrm{NewSK}({#1},\,{#2})}
 \newcommand{\FinallySK}[1]{\mathrm{FinallySK}({#1},\,\env,\,\lbls,\,\clbls,\,\strace,\,\handler,\,\econt,\,\scont)}
 \newcommand{\RethrowSK}[3]{\mathrm{RethrowSK}({#1},\,{#2},\,{#3})}
-%
-\stepcounter{figurecount}
-%
-% Label row (if referenced) with:
-% \labeledrow{scont:$rulename}
+
 \begin{figure}[Htp]
-  $
-  \begin{array}{lll@{\hspace{5cm}}}
-  	&&\\
-	%\labeledrow{scont:exit}	&
-	\ExitSK{\val}\\[2mm]
-
-	%\labeledrow{scont:block}&
-	\BlockSK{\stmts}{\env}&\\[2mm]
-
-	%\labeledrow{scont:while}&
-	\WhileSK&\\[2mm]
-
-	%\labeledrow{scont:body}&
-	\BodySK{\stmt}{\env}{\scont}&\\[2mm]
-
-	%\labeledrow{scont:new}&
-	\NewSK{\econt}{\loc}&\\[2mm]
-
-	%\labeledrow{scont:finally}&
-	\FinallySK{\stmt}&\\[2mm]
-
-	%\labeledrow{scont:rethrow}&
-	\RethrowSK{\val}{\strace}{\handler}&\\[2mm]
-  \end{array}
-  $
+  \begin{align}
+	&\ExitSK{\val} \label{scont:exit}\\
+	&\BlockSK{\stmts}{\env} \label{scont:block}\\
+	&\WhileSK \label{scont:while}\\
+	&\BodySK{\stmt}{\env}{\scont} \label{scont:body}\\
+	&\NewSK{\econt}{\loc} \label{scont:new}\\
+	&\FinallySK{\stmt} \label{scont:finally}\\
+	&\RethrowSK{\val}{\strace}{\handler} \label{scont:rethrow}
+  \end{align}
   \caption{Statement Continuations}
   \label{figure:sconts}
 \end{figure}
@@ -591,40 +566,18 @@ The different application continuations are shown in Figure~\ref{figure:acont}.
 \newcommand{\SuperA}[3]{\mathrm{SuperA}({#1},\,{#2},\,\strace,\,\handler,\,\cstrace,\,\cex,\,{#3})}
 \newcommand{\ConstructorA}[2]{\mathrm{ConstructorA}({#1},\,\strace,\,\handler,\,\cstrace,\,\cex,\,{#2})}
 \newcommand{\RedirectingA}[3]{\mathrm{RedirectingA}({#1},\,{#2},\,\strace,\,\handler,\,\cstrace,\,\cex,\,{#3})}
-%
-\stepcounter{figurecount}
-%
-% Label row (if referenced) with:
-% \labeledrow{acont:$rulename}
+
 \begin{figure}[Htp]
-  $
-  \begin{array}{lll@{\hspace{5cm}}}
-  	&&\\
-	%\labeledrow{acont:value}&
-	\ValueA{\val}{\acont}&\\[2mm]
-
-	%\labeledrow{acont:stringconcat}&
-	\StringConcatenationA&\\[2mm]
-
-	%\labeledrow{acont:supermethod}&
-	\SuperMethodA&\\[2mm]
-
-	%\labeledrow{acont:staticinv}&
-	\DInstanceMethodA&\\[2mm]
-
-	%\labeledrow{acont:fields}&
-	\FieldsA{\env}{Izs}{\loc}{\scont}\\[2mm]
-
-	%\labeledrow{acont:constructor}&
-	\ConstructorA{Q}{\econt}\\[2mm]
-
-	%\labeledrow{acont:super}&
-	\SuperA{Q}{\loc}{\scont}\\[2mm]
-
-	%\labeledrow{acont:redirecting}&
-	\RedirectingA{Q}{\loc}{\scont}
-  \end{array}
-  $
+  \begin{align}
+	&\ValueA{\val}{\acont} \label{acont:value}\\
+	&\StringConcatenationA \label{acont:stringconcat}\\
+	&\SuperMethodA \label{acont:supermethod}\\
+	&\DInstanceMethodA \label{acont:staticinv}\\
+	&\FieldsA{\env}{Izs}{\loc}{\scont} \label{acont:fields}\\
+	&\ConstructorA{Q}{\econt} \label{acont:constructor}\\
+	&\SuperA{Q}{\loc}{\scont} \label{acont:super}\\
+	&\RedirectingA{Q}{\loc}{\scont} \label{acont:redirecting}
+  \end{align}
   \caption{Application Continuations}
   \label{figure:acont}
 \end{figure}
@@ -636,24 +589,14 @@ Break continuations capture the steps to be executed when a break to a given lab
 The different break continuations are shown in Figure~\ref{figure:breakcont}.
 \newcommand{\Break}[2]{\mathrm{Break}(#1,\,#2)}
 \newcommand{\FinallyBreak}[2]{\mathrm{FinallyBreak}({#1},\,\env,\,\lbls,\,\clbls,\,\strace,\,\handler,\,\cstrace,\,\cex,\,\econt,\,{#2})}
-%
-\stepcounter{figurecount}
-%
-% Label row (if referenced) with:
-% \labeledrow{breakcont:$rulename}
-\begin{figure}[Htp]
-  $
-  \begin{array}{lll@{\hspace{5cm}}}
-	&&\\
-	\labeledrow{breakcont:break}&
-		\Break{\env}{\scont}&\\[2mm]
 
-	\labeledrow{breakcont:finallybreak}&
-	\FinallyBreak{\stmt}{\scont}&
-  \end{array}
-  $
-  \label{figure:breakcont}
+\begin{figure}[Htp]
+  \begin{align}
+    &\Break{\env}{\scont} \label{breakcont:break} \\
+    &\FinallyBreak{\stmt}{\scont} \label{breakcont:finallybreak}
+  \end{align}
   \caption{Break Continuations}
+  \label{figure:breakcont}
 \end{figure}
 
 Break continuations, \ref{breakcont:break}, capture the statement continuation and the environment corresponding to the provided label.\\
@@ -667,22 +610,12 @@ The different switch continuations are shown in Figure~\ref{figure:switchconts}.
 %
 \newcommand{\ContinueK}{\mathrm{SwitchContinueK}(\stmt,\,\env,\,\lbls,\,\clbls,\,\handler,\,\cstrace,\,\cex,\,\econt,\,\scont)}
 \newcommand{\FinallyContinue}[2]{\mathrm{FinallyContinue}({#1},\,\env,\,\lbls,\,\clbls,\,\strace,\,\handler,\,\cstrace,\,\cex,\,\econt,\,{#2})}
-%
-\stepcounter{figurecount}
-%
-% Label row (if referenced) with:
-% \labeledrow{switchcont:$rulename}
-\begin{figure}[Htp]
-  $
-  \begin{array}{lll@{\hspace{5cm}}}
-	&&\\
-	\labeledrow{switchcont:continue}&
-	\ContinueK\\[2mm]
 
-	\labeledrow{switchcont:finallycontinue}&
-	\FinallyContinue{\stmt}{\scont}
-  \end{array}
-  $
+\begin{figure}[Htp]
+  \begin{align}
+    &\ContinueK \label{switchcont:continue} \\
+    &\FinallyContinue{\stmt}{\scont} \label{switchcont:finallycontinue}
+  \end{align}
   \caption{Switch Continuations}
   \label{figure:switchconts}
 \end{figure}
@@ -694,22 +627,12 @@ FinallyContinue continuations, \ref{switchcont:finallycontinue}, are added when 
 The different exception handlers are shown in Figure~\ref{figure:handlers}.
 \newcommand{\ThrowH}[2]{\mathrm{ThrowK}({#1},\,{#2})}
 \newcommand{\CatchH}[1]{\mathrm{Catch}({#1},\,\env,\,\lbls,\,\clbls,\,\strace,\,\handler,\,\econt,\,\scont)}
-%
-\stepcounter{figurecount}
-%
-% Label row (if referenced) with:
-% \labeledrow{handle:$rulename}
-\begin{figure}[Htp]
-  $
-  \begin{array}{lll@{\hspace{5cm}}}
-	&&\\
-	%\labeledrow{handle:throw}&
-	\ThrowH{\val}{\strace}\\
 
-	%\labeledrow{handle:catch}&
-	\CatchH{cs}
-  \end{array}
-  $
+\begin{figure}[Htp]
+  \begin{align}
+    &\ThrowH{\val}{\strace} \label{handle:throw} \\
+    &\CatchH{cs} \label{handle:catch}
+  \end{align}
   \caption{Exception handlers}
   \label{figure:handlers}
 \end{figure}
@@ -865,283 +788,249 @@ Expressions are evaluated by dispatching according to the expression component i
 \noindent
 The rules for evaluation of list of expressions, i.e., transition steps from EvalListConfiguration, are shown in Figure~\ref{figure:evallist}.
 The value corresponding to the evaluated expression is captured by the application continuation ValueA and eventually added to the list of values corresponding to the expressions.
-%
-\stepcounter{figurecount}
-%
-% Label row (if referenced) with:
-% \labeledrow{evallist:$rulename}
-\label{subsec:eval-list-expressions}
+
 \begin{figure}[Htp]
-  $
-  \begin{array}{rcl}
-	\cesktrans{
-		\evallistconf{\expr :: \exprs}{\env}{\strace}{\cstrace}{\cex}{\acont}}{
-		\evalconf{\expr}{\env}{\strace}{\cstrace}{\cex}{\econt'}}
-		\\[2mm]
-
-	\cesktrans{
-		\evallistconf{[]}{\env}{\strace}{\cstrace}{\cex}{\acont}}{
-		\acontconf{\acont}{[]}}
-		\\[2mm]
-	\hspace{3mm}\econt' = \ExpressionsK{\exprs}{\env}{\acont}
-	\\[2mm]
-
-	\cesktrans{
-		\contconf{\ExpressionsK{\exprs}{\env}{\acont}}{\val}}{
-		\evallistconf{\exprs}{\env}{\strace}{\cstrace}{\cex}{\ValueA{\val}{\acont}}}
-		\\[2mm]
-
-	\cesktrans{
-		\acontconf{\ValueA{\val}{\acont}}{\val s}}{
-		\acontconf{\acont}{\val :: \val s}}
-  \end{array}
-  $
+    \begin{align}
+    &\begin{multlined}
+        \cesktranswheresplit%
+            {\evallistconf{\expr :: \exprs}{\env}{\strace}{\cstrace}{\cex}{\acont}}%
+            {\evalconf{\expr}{\env}{\strace}{\cstrace}{\cex}{\econt'}}%
+            {\text{where $\econt' = \ExpressionsK{\exprs}{\env}{\acont}$}}
+    \end{multlined}\\
+    &\cesktrans%
+        {\evallistconf{[]}{\env}{\strace}{\cstrace}{\cex}{\acont}}%
+        {\acontconf{\acont}{[]}}\\
+    &\begin{multlined}
+        \cesktranssplit%
+            {\contconf{\ExpressionsK{\exprs}{\env}{\acont}}{\val}}%
+            {\evallistconf{\exprs}{\env}{\strace}{\cstrace}{\cex}{\ValueA{\val}{\acont}}}
+    \end{multlined}\\
+    &\cesktrans%
+        {\acontconf{\ValueA{\val}{\acont}}{\val s}}%
+        {\acontconf{\acont}{\val :: \val s}}
+    \end{align}
   \caption{The CESK-transition function for expression lists}\label{figure:evallist}
+  \label{subsec:eval-list-expressions}
 \end{figure}
 
-\newcommand{\evalcesktrans}[3]{&\cesktrans{#1}{#2}\,\hspace{2mm}#3\\[2mm]}
-\stepcounter{figurecount}
-%
-% Label row (if referenced) with:
-% \labeledrow{eval:$rulename}
 \begin{figure}[Htp]
-	$
-	\begin{array}{lrclr@{\hspace{3cm}}}
-		\evalcesktrans
-			{\evalconf{\IntLiteral{\integermeta}}{\env}{\strace}{\cstrace}{\cex}{\econt}}
-			{\contconf{\econt}{\val}}
-			{\val = \mathrm{IntLiteral(\integermeta)} \in \mathbf{int}}
-
-		\evalcesktrans
-			{\evalconf{\DoubleLiteral{\doublemeta}}{\env}{\strace}{\cstrace}{\cex}{\econt}}
-			{\contconf{\econt}{\val}}
-			{\val = \mathrm{DoubleLiteral(\doublemeta)} \in \mathbf{double}}
-
-		\evalcesktrans
-			{\evalconf{\BoolLiteral{\tt{true}}}{\env}{\strace}{\cstrace}{\cex}{\econt}}
-			{\contconf{\econt}{\val}}
-			{\val = \mathrm{BoolValue(\tt{true})} = \tt{true}\in \mathbf{bool}}
-
-		\evalcesktrans
-			{\evalconf{\BoolLiteral{\tt{false}}}{\env}{\strace}{\cstrace}{\cex}{\econt}}
-			{\contconf{\econt}{\val}}
-			{\val = \mathrm{BoolValue(\tt{false})} = \tt{false}\in \mathbf{bool}}
-
-		\evalcesktrans
-			{\evalconf{\StringLiteral{\stringmeta}}{\env}{\strace}{\cstrace}{\cex}{\econt}}
-			{\contconf{\econt}{\val}}
-			{\val = \mathrm{StringValue(\stringmeta)} \in \mathbf{String}}
-
-		\evalcesktrans
-			{\evalconf{\varmeta}{\env}{\strace}{\cstrace}{\cex}{\econt}}
-			{\contconf{\econt}{\deref{\env(\varmeta)}}}
-			{}
-
-		\evalcesktrans
-			{\evalconf{\varmeta = \expr}{\env}{\strace}{\cstrace}{\cex}{\econt}}
-			{\evalconf{\expr}{\env}{\strace}{\cstrace}{\cex}{\VarSetK{\env}{\varmeta}{\econt}}}{}
-
-		\evalcesktrans
-			{\evalconf{\Not{\expressionmeta}}{\env}{\strace}{\cstrace}{\cex}{\econt}}
-			{\evalconf{\expressionmeta}{\env}{\strace}{\cstrace}{\cex}{\NotK{\econt}}}
-			{\\&&&\econt' = \AndK{\expri{2}}{\env}{\econt}}
-
-		\labeledrow{eval:bool-expressions}
-		\evalcesktrans
-			{\evalconf{\OrExpression{\expressionmeta_0}{\expressionmeta_1}}{\env}{\strace}{\cstrace}{\cex}{\econt}}
-			{\evalconf{\expressionmeta_0}{\env}{\strace}{\cstrace}{\cex}{\econt'}}
-			{\\&&&\econt' = \OrK{\expri{2}}{\env}{\econt}}
-
-		\evalcesktrans
-			{\evalconf{\ConditionalExpression{\expr}{\expri{1}}{\expri{2}}}{\env}{\strace}{\cstrace}{\cex}{\econt}}
-			{\evalconf{\expr}{\env}{\strace}{\cstrace}{\cex}{\econt'}}
-			{\\&&&\econt' = \ConditionalK{\expri{1}}{\expri{2}}{\env}{\econt}}
-
-		\evalcesktrans
-			{\evalconf{\Let{\varmeta}{\expri{1}}{\expri{2}}}{\env}{\strace}{\cstrace}{\cex}{\econt}}
-			{\evalconf{\expri{1}}{\env}{\strace}{\cstrace}{\cex}{\econt'}}
-			{\\&&&\econt' = \LetK{\expri{2}}{\env}{\varmeta}{\econt}}
-
-		\evalcesktrans
-			{\evalconf{\StringConcatenation{\exprs}}{\env}{\strace}{\cstrace}{\cex}{\econt}}
-			{\evallistconf{\exprs}{\env}{\strace}{\cstrace}{\cex}{\StringConcatenationA}}
-			{}
-
-		\evalcesktrans
-			{\evalconf{\IsExpression{\expressionmeta}{\tt{T}}}{\env}{\strace}{\cstrace}{\cex}{\econt}}
-			{\evalconf{\expressionmeta}{\env}{\strace}{\cstrace}{\cex}{\IsExpressionK}}
-			{}
-
-		\evalcesktrans
-			{\evalconf{\AsExpression{\expressionmeta}{\tt{T}}}{\env}{\strace}{\cstrace}{\cex}{\econt}}
-			{\evalconf{\expressionmeta}{\env}{\strace}{\cstrace}{\cex}{\AsExpressionK}}
-			{}
-
-		\evalcesktrans
-			{}
-			{\evalconf{\ThisExpression}{\env}{\strace}{\cstrace}{\cex}{\econt}}
-			{\contconf{\econt}{\deref{\env(\this)}}}
-			{}
-
-		\evalcesktrans
-			{\evalconf{\textbf{throw } \expr}{\env}{\strace}{\cstrace}{\cex}{\econt}}
-			{\evalconf{\expr}{\env}{\strace}{\cstrace}{\cex}{\ThrowH{(\textbf{throw } \expr) :: \strace}{\handler}}}
-			{}
-
-		\evalcesktrans
-			{\evalconf{\textbf{rethrow}}{\env}{\strace}{inr(\val)}{\strace'}{\econt}}
-			{\throwconf{\handler}{\val}{\strace'}}
-			{}
-
-		\evalcesktrans
-			{\evalconf{F}{\env}{st}{cex}{cst}{\econt}}
-			{\contconf{\econt}{\funval{\formals}{\stmt}{\env}}}
-			{\\&&&\textrm{F is function expression with formal parameters }\formals
-			\\&&&\textrm{ and body}\stmt}
-	\end{array}
-	$
+	\begin{align}
+        &\cesktranswhere%
+			{\evalconf{\IntLiteral{\integermeta}}{\env}{\strace}{\cstrace}{\cex}{\econt}}%
+			{\contconf{\econt}{\val}}%
+            {\text{where $\val = \mathrm{IntLiteral(\integermeta)} \in \mathbf{int}$}}\\
+        &\cesktranswhere%
+			{\evalconf{\DoubleLiteral{\doublemeta}}{\env}{\strace}{\cstrace}{\cex}{\econt}}%
+			{\contconf{\econt}{\val}}%
+            {\text{where $\val = \mathrm{DoubleLiteral(\doublemeta)} \in \mathbf{double}$}}\\
+        &\begin{multlined}
+            \cesktranswheresplit%
+                {\evalconf{\BoolLiteral{\tt{true}}}{\env}{\strace}{\cstrace}{\cex}{\econt}}%
+                {\contconf{\econt}{\val}}%
+                {\text{where $\val = \mathrm{BoolValue(\tt{true})} = \tt{true}\in \mathbf{bool}$}}
+        \end{multlined}\\
+        &\begin{multlined}
+            \cesktranswheresplit%
+                {\evalconf{\BoolLiteral{\tt{false}}}{\env}{\strace}{\cstrace}{\cex}{\econt}}%
+                {\contconf{\econt}{\val}}%
+                {\text{where $\val = \mathrm{BoolValue(\tt{false})} = \tt{false}\in \mathbf{bool}$}}
+        \end{multlined}\\
+        &\cesktranswhere%
+            {\evalconf{\StringLiteral{\stringmeta}}{\env}{\strace}{\cstrace}{\cex}{\econt}}%
+            {\contconf{\econt}{\val}}%
+            {\text{where $\val = \mathrm{StringValue(\stringmeta)} \in \mathbf{String}$}}\\
+        &\cesktrans%
+            {\evalconf{\varmeta}{\env}{\strace}{\cstrace}{\cex}{\econt}}%
+            {\contconf{\econt}{\deref{\env(\varmeta)}}}\\
+        &\cesktrans%
+            {\evalconf{\varmeta = \expr}{\env}{\strace}{\cstrace}{\cex}{\econt}}%
+            {\evalconf{\expr}{\env}{\strace}{\cstrace}{\cex}{\VarSetK{\env}{\varmeta}{\econt}}}\\
+        &\cesktrans%
+            {\evalconf{\Not{\expressionmeta}}{\env}{\strace}{\cstrace}{\cex}{\econt}}%
+            {\evalconf{\expressionmeta}{\env}{\strace}{\cstrace}{\cex}{\NotK{\econt}}}\\
+        &\begin{multlined}
+            \cesktranswheresplit%
+                {\evalconf{\OrExpression{\expressionmeta_0}{\expressionmeta_1}}{\env}{\strace}{\cstrace}{\cex}{\econt}}%
+                {\evalconf{\expressionmeta_0}{\env}{\strace}{\cstrace}{\cex}{\econt'}}%
+                {\text{where $\econt' = \OrK{\expri{2}}{\env}{\econt}$}}%
+                \label{eval:bool-expressions}
+        \end{multlined}\\
+        &\begin{multlined}
+            \cesktranswheresplit%
+                {\evalconf{\ConditionalExpression{\expr}{\expri{1}}{\expri{2}}}{\env}{\strace}{\cstrace}{\cex}{\econt}}%
+                {\evalconf{\expr}{\env}{\strace}{\cstrace}{\cex}{\econt'}}%
+                {\text{where }\econt' = \ConditionalK{\expri{1}}{\expri{2}}{\env}{\econt}}
+        \end{multlined}\\
+        &\begin{multlined}
+            \cesktranswheresplit%
+                {\evalconf{\Let{\varmeta}{\expri{1}}{\expri{2}}}{\env}{\strace}{\cstrace}{\cex}{\econt}}%
+                {\evalconf{\expri{1}}{\env}{\strace}{\cstrace}{\cex}{\econt'}}%
+                {\text{where }\econt' = \LetK{\expri{2}}{\env}{\varmeta}{\econt}}
+        \end{multlined}\\
+        &\begin{multlined}
+            \cesktranssplit%
+                {\evalconf{\StringConcatenation{\exprs}}{\env}{\strace}{\cstrace}{\cex}{\econt}}%
+                {\evallistconf{\exprs}{\env}{\strace}{\cstrace}{\cex}{\StringConcatenationA}}
+        \end{multlined}\\
+        &\cesktrans%
+            {\evalconf{\IsExpression{\expressionmeta}{\tt{T}}}{\env}{\strace}{\cstrace}{\cex}{\econt}}%
+            {\evalconf{\expressionmeta}{\env}{\strace}{\cstrace}{\cex}{\IsExpressionK}}\\
+        &\begin{multlined}
+            \cesktranssplit%
+                {\evalconf{\AsExpression{\expressionmeta}{\tt{T}}}{\env}{\strace}{\cstrace}{\cex}{\econt}}%
+                {\evalconf{\expressionmeta}{\env}{\strace}{\cstrace}{\cex}{\AsExpressionK}}
+        \end{multlined}\\
+        &\cesktrans%
+            {\evalconf{\ThisExpression}{\env}{\strace}{\cstrace}{\cex}{\econt}}%
+            {\contconf{\econt}{\deref{\env(\this)}}}\\
+        &\begin{multlined}
+            \cesktranssplit%
+                {\evalconf{\textbf{throw } \expr}{\env}{\strace}{\cstrace}{\cex}{\econt}}%
+                {\evalconf{\expr}{\env}{\strace}{\cstrace}{\cex}{\ThrowH{(\textbf{throw } \expr) :: \strace}{\handler}}}
+        \end{multlined}\\
+        &\cesktrans%
+            {\evalconf{\textbf{rethrow}}{\env}{\strace}{inr(\val)}{\strace'}{\econt}}%
+            {\throwconf{\handler}{\val}{\strace'}}\\
+        &\begin{multlined}
+            \cesktranswheresplit%
+                {\evalconf{F}{\env}{st}{cex}{cst}{\econt}}%
+                {\contconf{\econt}{\funval{\formals}{\stmt}{\env}}}%
+                {\text{where $F$ is a function expression with formal parameters $\formals$ and body $\stmt$}}
+        \end{multlined}
+	\end{align}
 	\caption{The CESK-transition function for expressions}
 	\label{figure:expressions-evalconfigs}
 \end{figure}
 
-\stepcounter{figurecount}
-%
-% Label row (if referenced) with:
-% \labeledrow{eval:$rulename}
 \begin{figure}[Htp]
-	$
-	\begin{array}{lrcl}
-		\evalcesktrans
-			{\evalconf{\StaticGet{\membermeta}}{\env}{\strace}{\cstrace}{\cex}{\econt}}
-			{\contconf{\econt}{\deref{\env^{M}(\membermeta)}}}
-			{\\&&&\membermeta\textrm{ is a field and } \membermeta \in \env^{M}}
-
-		\evalcesktrans
-			{\evalconf{\StaticGet{\membermeta}}{\env}{\strace}{\cstrace}{\cex}{\econt}}
-			{\contconf{\econt}{\tt{null}}}
-			{\\&&&\membermeta\textrm{ is a field, } \membermeta \notin \env^{M}, \expressionmeta_{\membermeta} = \tt{null}
-			\\&&&\env^{M} = \ext{\env^{M}}{\membermeta}{\tt{null}}}
-
-		\evalcesktrans
-			{\evalconf{\StaticGet{\membermeta}}{\env}{\strace}{\cstrace}{\cex}{\econt}}
-			{\evalconf{\expressionmeta_{\membermeta}}{\env}{\strace}{\cstrace}{\cex}{\econt'}}
-			{\\&&&\membermeta\textrm{ is a field}
-			\\&&&\econt' = \StaticGetK}
-
-		\evalcesktrans
-			{\evalconf{\StaticGet{\membermeta}}{\env}{\strace}{\cstrace}{\cex}{\econt}}
-			{\execconf{\stmt}{\env_{empty}}{[]}{[]}{\handler}{\cstrace}{\cex}{\econt}{\emptyset}}
-			{\\&&&\membermeta\textrm{ is s getter with body }\stmt}
-
-		\evalcesktrans
-			{\evalconf{\StaticGet{\membermeta}}{\env}{\strace}{\cstrace}{\cex}{\econt}}
-			{\contconf{\econt}{\funval{\formals}{\stmt}{\env_{empty}}}}
-			{\\&&&\membermeta\textrm{ is a method tear-off with formal parameters }\formals
-			\\&&&\textrm{ and body }\stmt}
-
-		\evalcesktrans
-			{\evalconf{\StaticSet{\membermeta}{\expressionmeta}}{\env}{\strace}{\cstrace}{\cex}{\econt}}
-			{\evalconf{\expressionmeta}{\env}{\strace}{\cstrace}{\cex}{\econt'}}
-			{\econt' = \StaticSetK}
-
-		\evalcesktrans
-			{\evalconf{\StaticInvocation{\{\membermeta\}}{\expressionsmeta}}{\env}{\strace}{\cstrace}{\cex}{\econt}}
-			{\evallistconf{\exprs}{\env}{\strace}{\cstrace}{\cex}{\acont'}}
-			{\\&&&\acont' = \StaticInvA{\formals}{\stmt}{\strace'}{\econt}
-			\\&&&\strace' = \StaticInvocation{\{\membermeta\}}{\expressionsmeta}::\strace}
-	\end{array}
-	$
+    \begin{align}
+        &\cesktranswhere%
+            {\evalconf{\StaticGet{\membermeta}}{\env}{\strace}{\cstrace}{\cex}{\econt}}%
+            {\contconf{\econt}{\deref{\env^{M}(\membermeta)}}}%
+            {\text{where $\membermeta$ is a field and $\membermeta \in \env^{M}$}}\\
+        &\begin{multlined}
+            \cesktranswheresplit%
+                {\evalconf{\StaticGet{\membermeta}}{\env}{\strace}{\cstrace}{\cex}{\econt}}%
+                {\contconf{\econt}{\tt{null}}}%
+                {\text{where $\membermeta$ is a field, $\membermeta \notin \env^{M}$, $\expressionmeta_{\membermeta} = \tt{null}$, $\env^{M} = \ext{\env^{M}}{\membermeta}{\tt{null}}$}}
+        \end{multlined}\\
+        &\begin{multlined}
+            \cesktranswheresplit%
+                {\evalconf{\StaticGet{\membermeta}}{\env}{\strace}{\cstrace}{\cex}{\econt}}%
+                {\evalconf{\expressionmeta_{\membermeta}}{\env}{\strace}{\cstrace}{\cex}{\econt'}}%
+                {\text{where $\membermeta$ is a field, $\econt' = \StaticGetK$}}
+        \end{multlined}\\
+        &\begin{multlined}
+            \cesktranswheresplit%
+                {\evalconf{\StaticGet{\membermeta}}{\env}{\strace}{\cstrace}{\cex}{\econt}}%
+                {\execconf{\stmt}{\env_{empty}}{[]}{[]}{\handler}{\cstrace}{\cex}{\econt}{\emptyset}}%
+                {\text{where $\membermeta$ is a getter with body $\stmt$}}
+        \end{multlined}\\
+        &\begin{multlined}
+            \cesktranswheresplit%
+                {\evalconf{\StaticGet{\membermeta}}{\env}{\strace}{\cstrace}{\cex}{\econt}}%
+                {\contconf{\econt}{\funval{\formals}{\stmt}{\env_{empty}}}}%
+                {\text{where $\membermeta$ is a method tear-off with formal parameters $\formals$ and body $\stmt$}}
+        \end{multlined}\\
+        &\begin{multlined}
+            \cesktranswheresplit%
+                {\evalconf{\StaticSet{\membermeta}{\expressionmeta}}{\env}{\strace}{\cstrace}{\cex}{\econt}}%
+                {\evalconf{\expressionmeta}{\env}{\strace}{\cstrace}{\cex}{\econt'}}%
+                {\text{where $\econt' = \StaticSetK$}}
+        \end{multlined}\\
+        &\begin{multlined}
+            \cesktranswheresplit%
+                {\evalconf{\StaticInvocation{\{\membermeta\}}{\expressionsmeta}}{\env}{\strace}{\cstrace}{\cex}{\econt}}%
+                {\evallistconf{\exprs}{\env}{\strace}{\cstrace}{\cex}{\acont'}}%
+                {\text{where $\acont' = \StaticInvA{\formals}{\stmt}{\strace'}{\econt}$, $\strace' = \StaticInvocation{\{\membermeta\}}{\expressionsmeta}::\strace$}}
+        \end{multlined}
+    \end{align}
 	\caption{The CESK-transition function for static variable extraction and assignment, and static method invocation}
 	\label{table:static-evalconfigs}
 \end{figure}
 
-\stepcounter{figurecount}
-%
-% Use counter as:
-% \labeledrow{eval:$rulename}
 \begin{figure}[Htp]
-	$
-	\begin{array}{lrcl}
-		\evalcesktrans
-			{\evalconf{\PropertyGet{\expressionmeta}{\idmeta}}{\env}{\strace}{\cstrace}{\cex}{\econt}}
-			{\evalconf{\expressionmeta}{\env}{\strace}{\cstrace}{\cex}{\econt'}}
-			{\\&&&\econt' = \PropertyGetK}
-
-		\evalcesktrans
-			{\evalconf{\DirectPropertyGet{\expressionmeta}{\membermeta}}{\env}{\strace}{\cstrace}{\cex}{\econt}}
-			{\evalconf{\expressionmeta}{\env}{\strace}{\cstrace}{\cex}{\econt'}}
-			{\\&&&\econt' = \DPropertyGetK}
-
-		\evalcesktrans
-			{\evalconf{\PropertySet{\expressionmeta_0}{\idmeta}{\expressionmeta_1}}{\env}{\strace}{\cstrace}{\cex}{\econt}}
-			{\evalconf{\expressionmeta_0}{\env}{\strace}{\cstrace}{\cex}{\econt'}}
-			{\\&&&\econt' = \PropertySetK}
-
-		\evalcesktrans
-			{\evalconf{\DirectPropertySet{\expressionmeta_0}{\membermeta}{\expressionmeta_1}}{\env}{\strace}{\cstrace}{\cex}{\econt}}
-			{\evalconf{\expressionmeta}{\env}{\strace}{\cstrace}{\cex}{\econt'}}
-			{\\&&&\econt' = \DirectPropertySetK}
-
-		\evalcesktrans
-			{\evalconf{\SuperPropertyGet{\idmeta}}{\env}{\strace}{\cstrace}{\cex}{\econt}}
-			{\contconf{\econt}{\funval{\formals}{\stmt}{\env'}}}
-			{\\&&&\env' = \ext{\env_{empty}}{\this}{\deref{(\env(\this))}}
-			\\&&&\membermeta = \superclass{\deref{\env(\this)}}.lookup(\idmeta)
-			\\&&&\membermeta\textrm{ is a method tear-off with formal parameters } \formals
-			\\&&&\textrm{ and body }\stmt}
-
-		\evalcesktrans
-			{\evalconf{\SuperPropertyGet{\idmeta}}{\env}{\strace}{\cstrace}{\cex}{\econt}}
-			{\execconf{\stmt}{\env'}{\lbls}{\clbls}{\handler}{\cstrace}{\cex}{\econt}{\scont}}
-			{\\&&&\env' = \ext{\env_{empty}}{\this}{\deref{(\env(\this))}}
-			\\&&&\scont = \emptyset
-			\\&&&\membermeta = \superclass{\deref{\env(\this)}}.lookup(\idmeta)
-			\\&&&\membermeta \textrm{ is a getter method with body }\stmt}
-
-		\evalcesktrans
-			{\evalconf{\SuperPropertyGet{\idmeta}}{\env}{\strace}{\cstrace}{\cex}{\econt}}
-			{\contconf{\econt}{M(\deref{(\env(\this))})}}
-			{\\&&&\membermeta = \superclass{\deref{\env(\this)}}.lookup(\idmeta)
-			\\&&&\membermeta \textrm{ is a implicit field getter}}
-
-		\evalcesktrans
-			{\evalconf{\SuperPropertySet{\idmeta}{\expressionmeta}}{\env}{\strace}{\cstrace}{\cex}{\econt}}
-			{\evalconf{\expressionmeta}{\env}{\strace}{\cstrace}{\cex}{\econt'}}
-			{\\&&&\econt' = \SuperPropertySetK}
-	\end{array}
-	$
+    \begin{align}
+        &\begin{multlined}
+		\cesktranswheresplit%
+			{\evalconf{\PropertyGet{\expressionmeta}{\idmeta}}{\env}{\strace}{\cstrace}{\cex}{\econt}}%
+			{\evalconf{\expressionmeta}{\env}{\strace}{\cstrace}{\cex}{\econt'}}%
+            {\text{where $\econt' = \PropertyGetK$}}
+        \end{multlined}\\
+        &\begin{multlined}
+		\cesktranswheresplit%
+			{\evalconf{\DirectPropertyGet{\expressionmeta}{\membermeta}}{\env}{\strace}{\cstrace}{\cex}{\econt}}%
+			{\evalconf{\expressionmeta}{\env}{\strace}{\cstrace}{\cex}{\econt'}}%
+            {\text{where $\econt' = \DPropertyGetK$}}
+        \end{multlined}\\
+        &\begin{multlined}
+		\cesktranswheresplit%
+			{\evalconf{\PropertySet{\expressionmeta_0}{\idmeta}{\expressionmeta_1}}{\env}{\strace}{\cstrace}{\cex}{\econt}}%
+			{\evalconf{\expressionmeta_0}{\env}{\strace}{\cstrace}{\cex}{\econt'}}%
+            {\text{where $\econt' = \PropertySetK$}}
+        \end{multlined}\\
+        &\begin{multlined}
+		\cesktranswheresplit%
+			{\evalconf{\DirectPropertySet{\expressionmeta_0}{\membermeta}{\expressionmeta_1}}{\env}{\strace}{\cstrace}{\cex}{\econt}}%
+			{\evalconf{\expressionmeta}{\env}{\strace}{\cstrace}{\cex}{\econt'}}%
+            {\text{where $\econt' = \DirectPropertySetK$}}
+        \end{multlined}\\
+        &\begin{multlined}
+		\cesktranswheresplit%
+			{\evalconf{\SuperPropertyGet{\idmeta}}{\env}{\strace}{\cstrace}{\cex}{\econt}}%
+			{\contconf{\econt}{\funval{\formals}{\stmt}{\env'}}}%
+            {\parbox{10cm}{where $\env' = \ext{\env_{empty}}{\this}{\deref{(\env(\this))}}$,\\ $\membermeta = \superclass{\deref{\env(\this)}}.lookup(\idmeta)$,\\ $\membermeta$ is a method tear-off with formal parameters $\formals$, and body $\stmt$}}
+        \end{multlined}\\
+        &\begin{multlined}
+		\cesktranswheresplit%
+			{\evalconf{\SuperPropertyGet{\idmeta}}{\env}{\strace}{\cstrace}{\cex}{\econt}}%
+			{\execconf{\stmt}{\env'}{\lbls}{\clbls}{\handler}{\cstrace}{\cex}{\econt}{\scont}}%
+            {\parbox{10cm}{where $\env' = \ext{\env_{empty}}{\this}{\deref{(\env(\this))}}$,\\ $\scont = \emptyset$, $\membermeta = \superclass{\deref{\env(\this)}}.lookup(\idmeta)$,\\ $\membermeta$ is a getter method with body $\stmt$}}
+        \end{multlined}\\
+        &\begin{multlined}
+		\cesktranswheresplit%
+			{\evalconf{\SuperPropertyGet{\idmeta}}{\env}{\strace}{\cstrace}{\cex}{\econt}}%
+			{\contconf{\econt}{M(\deref{(\env(\this))})}}%
+            {\text{where $\membermeta = \superclass{\deref{\env(\this)}}.lookup(\idmeta)$, $\membermeta$ is a implicit field getter}}
+        \end{multlined}\\
+        &\begin{multlined}
+		\cesktranswheresplit%
+			{\evalconf{\SuperPropertySet{\idmeta}{\expressionmeta}}{\env}{\strace}{\cstrace}{\cex}{\econt}}%
+			{\evalconf{\expressionmeta}{\env}{\strace}{\cstrace}{\cex}{\econt'}}%
+            {\text{where $\econt' = \SuperPropertySetK$}}
+        \end{multlined}
+    \end{align}
 	\caption{The CESK-transition function for instance property extraction and assignment expressions}
 	\label{figure:instance-property-evalconfigs}
 \end{figure}
 
-\stepcounter{figurecount}
-%
-% Label row (if referenced) with:
-% \labeledrow{eval:$rulename}
 \begin{figure}[Htp]
-	$
-	\begin{array}{lrcl}
-		\evalcesktrans
-			{\evalconf{\InstanceMethodInvocation{\expressionmeta}{\idmeta}{\expressionsmeta}}{\env}{\strace}{\cstrace}{\cex}{\econt}}
-			{\evalconf{\expressionmeta}{\env}{\strace}{\cstrace}{\cex}{\econt'}}
-			{\\&&&\econt' = \InstanceMethodK}
-
-		\evalcesktrans
-			{\evalconf{\DInstanceMethodInvocation{\expressionmeta}{\membermeta}{\expressionsmeta}}{\env}{\strace}{\cstrace}{\cex}{\econt}}
-			{\evalconf{\expressionmeta}{\env}{\strace}{\cstrace}{\cex}{\econt'}}
-			{\\&&&\econt' = \DInstanceMethodK}
-
-		\evalcesktrans
-			{\evalconf{\SuperMethodInvocation{\idmeta}{\expressionsmeta}}{\env}{\strace}{\cstrace}{\cex}{\econt}}
-			{\evallistconf{\expressionsmeta}{\env}{\strace}{\cstrace}{\cex}{\acont}}
-			{\\&&&\acont = \SuperMethodA}
-
-		\evalcesktrans
-			{\evalconf{\textbf{new Q}(\exprs)}{\env}{st}{cex}{cst}{\econt}}
-			{\evallistconf{\exprs}{\env}{st}{cex}{cst}{\acont'}}
-			{\\&&&\acont' = \ConstructorA{Q}{\econt}}
-	\end{array}
-	$
+    \begin{align}
+        &\begin{multlined}
+		\cesktranswheresplit%
+			{\evalconf{\InstanceMethodInvocation{\expressionmeta}{\idmeta}{\expressionsmeta}}{\env}{\strace}{\cstrace}{\cex}{\econt}}%
+			{\evalconf{\expressionmeta}{\env}{\strace}{\cstrace}{\cex}{\econt'}}%
+			{\econt' = \InstanceMethodK}
+        \end{multlined}\\
+        &\begin{multlined}
+		\cesktranswheresplit%
+			{\evalconf{\DInstanceMethodInvocation{\expressionmeta}{\membermeta}{\expressionsmeta}}{\env}{\strace}{\cstrace}{\cex}{\econt}}%
+			{\evalconf{\expressionmeta}{\env}{\strace}{\cstrace}{\cex}{\econt'}}%
+			{\econt' = \DInstanceMethodK}
+        \end{multlined}\\
+        &\begin{multlined}
+		\cesktranswheresplit%
+			{\evalconf{\SuperMethodInvocation{\idmeta}{\expressionsmeta}}{\env}{\strace}{\cstrace}{\cex}{\econt}}%
+			{\evallistconf{\expressionsmeta}{\env}{\strace}{\cstrace}{\cex}{\acont}}%
+			{\acont = \SuperMethodA}
+        \end{multlined}\\
+        &\begin{multlined}
+		\cesktranswheresplit%
+			{\evalconf{\textbf{new Q}(\exprs)}{\env}{st}{cex}{cst}{\econt}}%
+			{\evallistconf{\exprs}{\env}{st}{cex}{cst}{\acont'}}%
+			{\acont' = \ConstructorA{Q}{\econt}}
+        \end{multlined}
+    \end{align}
 	\caption{Instance method and constructor invocation}
 	\label{figure:instance-method-evalconfigs}
 \end{figure}
@@ -1610,10 +1499,6 @@ Evaluation of $\this$ expression resolves to the value in one step.
 %
 \newcommand{\ExpressionK}[2]{\mathrm{ExpressionK}({#1},\,{#2})}
 %
-\stepcounter{figurecount}
-%
-% Label row (if referenced) with:
-% \labeledrow{exec:$rulename}
 \begin{figure}[Htp]
 	$
 	\begin{array}{lrcl}
