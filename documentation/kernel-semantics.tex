@@ -794,7 +794,7 @@ The different exception handlers are shown in Figure~\ref{figure:handlers}.
 \newcommand{\ForStatement}[4]{\tt{for}\, (\,#1;\, #2;\, #3\,)\, #4}
 \newcommand{\ForInStatement}[3]{\tt{for}\,(#1\,\tt{in}\,#2)\,#3}
 %
-\newcommand{\SwitchStatement}[1]{\tt{switch}\,(#1)\,\tt{cases}}
+\newcommand{\SwitchStatement}[2]{\tt{switch}\,(#1)\,#2}
 \newcommand{\ContinueSwitchStatement}[1]{\tt{continue}\,#1}
 \newcommand{\IfStatement}[3]{\tt{if}\,(#1)\,#2\,\tt{else}\,#3}
 \newcommand{\ReturnStatement}[1]{\tt{return}\,#1}
@@ -821,12 +821,12 @@ The different exception handlers are shown in Figure~\ref{figure:handlers}.
   & \DoStatement{\statementmeta}{\expressionmeta} \\
   & \ForStatement{??}{\expressionmeta}{??}{\statementmeta} \\
   & \ForInStatement{\idmeta}{\expressionmeta}{\statementmeta} \\
-  & \SwitchStatement{\expressionmeta} \\
+  & \SwitchStatement{\expressionmeta}{\tt{SCs}} \\
   & \ContinueSwitchStatement{\statementmeta} \\
   & \IfStatement{\expressionmeta}{\statementmeta_1}{\statementmeta_2} \\
   & \ReturnStatement{\expressionmeta} \\
   & \ReturnStatement{} \\
-  & \TryCatch{\statementmeta}{??} \\
+  & \TryCatch{\statementmeta}{\tt{CCs}} \\
   & \TryFinally{\statementmeta_1}{\statementmeta_2} \\
   & \Yield{\expressionmeta} \\
   & \VarDeclaration{\idmeta}{\expressionmeta} \\
@@ -1559,7 +1559,7 @@ Evaluation of $\this$ expression resolves to the value in one step.
 %
 \begin{figure}[Htp]
 	$
-	\begin{array}{lrcl}
+	\begin{array}{cl}
 		\execcesktrans
 			{\execconf{\textbf{var } \varmeta = \expr}{\env}{\lbls}{\clbls}{\handler}{\cstrace}{\cex}{\econt}{\scont}}
 			{\evalconf{\expr}{\env}{\strace}{\cstrace}{\cex}{\econt'}}
@@ -1596,6 +1596,10 @@ Evaluation of $\this$ expression resolves to the value in one step.
 			{\contconf{\econt}{\textbf{null}}}
 			{}
 
+		\execcesktrans
+			{\execconf{\DoStatement{\statementmeta}{\expressionmeta}}{\env}{\lbls}{\clbls}{\handler}{\cstrace}{\cex}{\econt}{\scont}}
+			{\execconf{\statementmeta}{\env}{\lbls}{\clbls}{\handler}{\cstrace}{\cex}{\econt}{\scont'}}
+			{\\&\scont' = \whilecondk\hspace{2cm}}
 		\execcesktrans
 			{\execconf{\textbf{while } (\expr) \stmt}{\env}{\lbls}{\clbls}{\handler}{\cstrace}{\cex}{\econt}{\scont}}
 			{\evalconf{\expr}{\env}{\strace}{\cstrace}{\cex}{\econt'}}
@@ -1712,6 +1716,8 @@ Let $\econt', \scont' = \whilecondk$ below:
   \end{array}
 \]
 Loops \textbf{do while}, \textbf{for in}, for can be desugared to while loops with transformations performed before interpreting the program.
+
+The execution of \textbf{do while} loops proceeds is shown in %equation~\eqref{eq:dowhile-stmt}.
 
 \subsection{Labels}
 
