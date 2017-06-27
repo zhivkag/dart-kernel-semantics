@@ -302,7 +302,7 @@ When an environment is needed to further execute the program, it is saved by the
 \subsubsection{Extend}
 \label{subsubsec:extend-env}
 
-Function ``$\extend$'' creates a new environment by extending the provided environment with new bindings for the variable declarations to fresh labels for each of the provided values.
+Function ``$\extend$'' creates a new environment by extending the provided environment with new bindings for the variable declarations to fresh locations for each of the provided values.
 \begin{align*}
   \extend \in \denv \times \mlist{\dvardecl} \times \mlist{\dval} &\rightarrow  \denv \hspace{100mm} \\
   \ext{\env}{\varmeta{s}}{\vals} &= \env'
