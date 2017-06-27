@@ -318,8 +318,8 @@ with
 For simpler notation, we allow ``$\extend$'' to be called with singleton lists as $\ext{\env}{\varmeta}{\val}$, which we consider equivalent to $\ext{\env}{\varmeta :: []}{\val :: []}$.
 \subsubsection{Variable lookup}
 \label{subsubsec:variable-lookup}
-A variable lookup consists of looking up the address of a variable from the environment with $\loc = \env(\varmeta)$ and reading the stored value $v$ with $\deref{\loc} = \deref{\env(\varmeta)}$.
-For definition of ``$\deref{}$'' see Section~\ref{subsubsection:dereferecing}.
+A variable lookup consists of looking up the location of a variable from the environment with $\loc = \env(\varmeta)$ and reading the stored value $v$ with $\deref{\loc} = \deref{\env(\varmeta)}$ from the store.
+For definition of ``$\deref$'' see Section~\ref{subsubsection:dereferecing}.
 
 \subsection{Configurations}
 \label{subsec:cesk-configs}
@@ -352,19 +352,19 @@ Configurations contain different components and the transition step dispatches t
 	\text{SwitchConfiguration}
 	\label{config:switchcont}
   \end{align}
-  \caption{Configurations for the CESK machine}
+  \caption{States for the CESK machine}
 \end{figure}
 
 \subsubsection{EvalConfiguration}
 \label{subsubsec:evalconfig}
 
-For the EvalConfiguration, shown in \ref{config:eval}, the transition step dispatches on the expression component, $\expr$.
-The next configuration is:
+The configuration EvalConfiguration is shown in \ref{config:eval}. 
+The transition step for this configuration dispatches on the expression component, $\expr$.
+With one transition step of the CESK-transition function, from the EvalConfiguration the next configuration can be one of the following:
 \begin{itemize}
-%% Eval configuration can result with:
 \item ValuePassingConfiguration, when the current expression evaluates to a value in one step.
 \item ExecConfiguration, when the current expression results with an invocation, i.e. execution of statement body of a getter.
-Note that for other invocations, we first evaluate the receiver for instance invocations, or the arguments for a static or constructor invocations.
+Note that for other invocations, we first evaluate the receiver for instance invocations, or the arguments for static or constructor invocations.
 \item EvalListConfiguration, when the current expression implies evaluation of a list of expressions.
 \item ThrowConfiguration, when the current expression throws, i.e. is a throw expression.
 \item EvalConfiguration, otherwise.
@@ -372,48 +372,57 @@ Note that for other invocations, we first evaluate the receiver for instance inv
 
 \subsubsection{EvalListConfigruation}
 \label{subsubsec:evallistconfig}
-
-For the EvalList configuration, shown in \ref{config:evallist}, the transition step dispatches on the expression list, $\exprs$.
-The next configuration is either a EvalConfiguration or ApplicationConfiguration, see Section~\ref{subsec:eval-list-expressions}.
+The configuration EvalListConfiguration is shown in \ref{config:evallist}.
+The transition step for this configuration dispatches on the expression list, $\exprs$.
+With one step of the CESK-transition function, from EvalListConfifuration the next configuration is either EvalConfiguration, when $\exprs \neq []$, or ApplicationConfiguration, otherwise.
 
 \subsubsection{ExecConfiguration}
 \label{subsubsec:execconfig}
 
-For the ExecConfiguration, shown in \ref{config:evallist}, the transition step dispatches on the statement expression, $\stmt$.
-The next configuration is either an ExecConfiguration or EvalConfiguration.
+The configuration ExecConfiguration is shown in \ref{config:exec}.
+The transition step dispatches on the statement, $\stmt$.
+The next configuration is either EvalConfiguration or ExecConfiguration.
 
 \subsubsection{ValuePassingConfiguration}
 \label{suubsubsec:valuepassingconfig}
 
-The ValuePassingConfiguration, shown in \ref{config:econt}, applies the expression continuation component to its value component.
+The configuration ValuePassingConfiguration is shown in \ref{config:econt}.
+The transition step applies the expression continuation component to its value component.
+The expression continuation produces the next configuration.
 
 \subsubsection{ApplicationConfiguration}
 \label{subsubsec:applicationconfig}
 
-The ApplicationConfiguration, shown in \ref{config:acont}, applies the application continuation component to its list of values component.
-
+The configuration ApplicationConfiguration is shown in \ref{config:acont}.
+The transition step applies the application continuation component to its list of values component.
+The application continuation produces the next configuration.
 \subsubsection{ForwardConfiguration}
 \label{subsubsec:forwardconfig}
 
-The ForwardConfiguration, shown in \ref{config:scont}, applies the statement continuation component to its environment component.
+The configuration ForwardConfiguration is shown in \ref{config:scont}.
+The transition step applies the statement continuation component to its environment component.
+The statement continuation produces the next configuration.
 
 \subsubsection{ThrowCongfiguration}
 \label{subsubsec:throwconfig}
-
-For the ThrowConfiguration, shown in \ref{config:throw}, the transition step dispatches its continuation component.
-It results with either a ThrowConfiguration, when  the exception cant be handled in the head of the non empty catch list or a ExecConfiguration, for the statement body of the matching catch or the finally statement.
-
+The configuration ThrowConfiguration is shown in \ref{config:throw}.
+The transition step applies the exception handler.
+The next configuration is:
+\begin{itemize}
+\item ThrowConfiguration, when the exception is not handled by the first catch clause of a catch handler.
+\item ExecConfiguration, for the statement body of the matching catch or the finally statement, when no catch clauses are present.
+\end{itemize}
 \subsubsection{BreakConfiguration}
 \label{subsubsec:breakconfig}
-
-For the BreakConfiguration, shown in \ref{config:bcont}, the transition step dispatches on the continuation component.
-It results with a ForwardConfiguration corresponding to the target break label.
-
+The configuration BreakConfiguration is shown in \ref{config:bcont}.
+The transition step applies the break continuation component.
+The next configuration is ForwardConfiguration.
 \subsubsection{SwitchConfiguration}
 \label{subsubsec:switchconfig}
 
-For the SwitchConfiguration, shown in \ref{config:switchcont}, the transition step dispatches on the continuation component.
-It results with a ExecConfiguration.
+The configuration SwitchConfiguration is shown in \ref{config:switchcont}.
+The transition step applies the switch continuation component.
+The next configuration is ExecConfiguration.
 
 \subsection{Continuations}
 \label{subsec:continuations-definition}
