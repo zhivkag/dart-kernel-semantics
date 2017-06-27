@@ -442,15 +442,16 @@ The next configuration is ExecConfiguration.
 \newcommand{\statementmeta}{\ensuremath{\mathit{\stmt}}}
 \newcommand{\labelmeta}{\ensuremath{\mathit{\tt{L}}}}
 
-Continuations capture the state for execution of statements, or expressions and capture the information needed to resume the execution of the program.
-There are various types of continuations depending on the next statement to be executed or next expression to be evaluated.
+Continuations represent the instructions for execution of statements or evaluation of expressions.
+They capture the information needed to resume the execution of the program.
+There are various types of continuations depending on the state for evaluation of an expression or execution of a statement.
 \subsubsection{Expression continuations}
 \label{subsubsec:expression-continuations}
 
 Expression continuations, $\econt$, capture the steps after the evaluation of a given expression.
 They accept a value and produce the next configuration.
 
-There are various kinds of configurations, two more general types can be distinguished:
+There are various kinds of configurations, but two more general types can be distinguished:
 \begin{itemize}
 \item Continuations with holes, i.e. expressions to be evaluated\\
 Expression continuations with expressions will produce EvalConfiguration for evaluation of the next expression.
@@ -535,9 +536,9 @@ The different expression continuations are shown in Figure~\ref{figure:econts}.
 \subsubsection{Statement continuations}
 \label{subsubsec:statement-continuations}
 
-Statement continuations capture the steps after execution of a statement.
+Statement continuations, $\scont$, capture the steps after execution of a statement.
 They accept an environment and produce the next configuration.
-Statements in a block expressions can extend the environment function and this is visible to the subsequent expressions in the block.
+Statements in a block expressions can extend the environment function and this is visible to the subsequent statements in the same block.
 For other types of statement configuration, the environment is ignored.
 
 \noindent
@@ -570,10 +571,8 @@ The different statement continuations are shown in Figure~\ref{figure:sconts}.
 \subsubsection{Application continuation}
 \label{subsubsec:application-continuation}
 
-Application continuations capture the application of a list of values resulting from the evaluation of list of expressions.\\
-We use ValueA, an application continuation, capturing a value and an application continuation, as application that adds a value to the head of the list.\\
-We suffix the names of application continuations with ``$A$''.
-The different application continuations are shown in Figure~\ref{figure:acont}.
+Application continuations, $\acont$, capture the application of a list of values resulting from the evaluation of list of expressions.
+
 \newcommand{\ValueA}[2]{\mathrm{ValueA}({#1},\,{#2})}
 \newcommand{\StringConcatenationA}{\mathrm{StringConcatenationA(\econt)}}
 \newcommand{\SuperMethodA}{\mathrm{SuperMethodA}(\idmeta,\,\env,\,\ExceptionHandlers,\,\econt)}
@@ -586,6 +585,11 @@ The different application continuations are shown in Figure~\ref{figure:acont}.
 \newcommand{\ForInitA}{\mathrm{ForInitA}(\mathrm{\varmeta{s}},\, \expressionmeta,\, \exprs,\, \statementmeta,\, \env,\, \lbls,\, \clbls,\, \handler,\, \cstrace,\, \cex,\, \econt,\, \scont)}
 %
 \newcommand{\ForUpdatesA}[1]{\mathrm{ForUpdatesA}(\mathrm{\varmeta{s}},\, \expressionmeta,\, \exprs,\, \statementmeta,\, \env,\, #1,\, \lbls,\, \clbls,\, \handler,\, \cstrace,\, \cex,\, \econt,\, \scont)}
+\noindent
+We use the application continuation $\ValueA{\acont}{\val}$, capturing a value and an application continuation, as application that adds a value to the list of values to eventually used by an application continuation that produces a configuration other than ApplicationConfiguration.\\
+\noindent
+We suffix the names of application continuations with ``$A$''.
+The different application continuations are shown in Figure~\ref{figure:acont}.
 \begin{figure}[Htp]
   \begin{align}
 	&\ValueA{\val}{\acont} \label{acont:value}\\
@@ -606,7 +610,7 @@ The different application continuations are shown in Figure~\ref{figure:acont}.
 \subsubsection{Break continuations}
 \label{subsubsec:break-continuations}
 
-Break continuations capture the steps to be executed when a break to a given label is encountered.
+Break continuations, $\bcont$, capture the steps to be executed when a break to a given label is encountered.
 The different break continuations are shown in Figure~\ref{figure:breakcont}.
 \newcommand{\Break}[2]{\mathrm{Break}(#1,\,#2)}
 \newcommand{\FinallyBreak}[2]{\mathrm{FinallyBreak}({#1},\,\env,\,\lbls,\,\clbls,\,\strace,\,\handler,\,\cstrace,\,\cex,\,\econt,\,{#2})}
@@ -619,13 +623,14 @@ The different break continuations are shown in Figure~\ref{figure:breakcont}.
   \caption{Break Continuations}
   \label{figure:breakcont}
 \end{figure}
-
-Break continuations, \ref{breakcont:break}, capture the statement continuation and the environment corresponding to the provided label.\\
-FinallyBreak continuations, \ref{breakcont:finallybreak}, are added when a try/finally statement is encountered and they capture the statement body and the components necessary for its execution.
+\noindent
+The break continuation Break, \ref{breakcont:break}, captures a statement continuation and the environment corresponding to a target label or a break statement.\\
+The break continuation FinallyBreak, \ref{breakcont:finallybreak}, captures the statement body and the components necessary for the execution of an enclosing Finally statement. 
+They are added when a try/finally statement is executed.
 \subsubsection{Switch continuations}
 \label{subsubsec:switch-continuations}
 
-Switch continuations capture the steps to be executed when a continue to a preceding switch case is encountered.
+Switch continuations, $\switchcont$, capture the steps to be executed when a continue to a preceding switch case statement is executed.
 They capture the components needed for the execution of the case body statement.
 The different switch continuations are shown in Figure~\ref{figure:switchconts}.
 %
@@ -640,9 +645,10 @@ The different switch continuations are shown in Figure~\ref{figure:switchconts}.
   \caption{Switch Continuations}
   \label{figure:switchconts}
 \end{figure}
-
-SwitchContinue continuations, \ref{switchcont:continue}, capture the statement body of a preceding switch case, targeted by some continue statement, and the components necessary for its execution.
-FinallyContinue continuations, \ref{switchcont:finallycontinue}, are added when a try/finally statement is encountered and they capture the statement body and the components necessary for its execution.
+\noindent
+The switch continuation SwitchContinue, \ref{switchcont:continue}, captures the statement body of a preceding switch case, targeted by some continue statement, and the components necessary for its execution.
+The switch continuation FinallyContinue, \ref{switchcont:finallycontinue}, captures the statement body and the components necessary for the execution of an enclosing Finally statement.
+They are added when a try/finally statement is executed.
 \subsubsection{Exception handlers}
 \label{subsubsec:exception-handlers}
 The different exception handlers are shown in Figure~\ref{figure:handlers}.
@@ -894,27 +900,32 @@ The value corresponding to the evaluated expression is captured by the applicati
         &\cesktranswhere%
 			{\evalconf{\IntLiteral{\integermeta}}{\env}{\strace}{\cstrace}{\cex}{\econt}}%
 			{\contconf{\econt}{\val}}%
-            {\text{where $\val = \mathrm{IntLiteral(\integermeta)} \in \mathbf{int}$}}\\
+            {\text{where $\val = \mathrm{IntLiteral(\integermeta)} \in \mathbf{int}$}}
+            \label{eval:int}\\
         &\cesktranswhere%
 			{\evalconf{\DoubleLiteral{\doublemeta}}{\env}{\strace}{\cstrace}{\cex}{\econt}}%
 			{\contconf{\econt}{\val}}%
-            {\text{where $\val = \mathrm{DoubleLiteral(\doublemeta)} \in \mathbf{double}$}}\\
+            {\text{where $\val = \mathrm{DoubleLiteral(\doublemeta)} \in \mathbf{double}$}}
+            \label{eval:double}\\
         &\begin{multlined}
             \cesktranswheresplit%
                 {\evalconf{\BoolLiteral{\tt{true}}}{\env}{\strace}{\cstrace}{\cex}{\econt}}%
                 {\contconf{\econt}{\val}}%
                 {\text{where $\val = \mathrm{BoolValue(\tt{true})} = \tt{true}\in \mathbf{bool}$}}
-        \end{multlined}\\
+        \end{multlined}
+        \label{eval:true}\\
         &\begin{multlined}
             \cesktranswheresplit%
                 {\evalconf{\BoolLiteral{\tt{false}}}{\env}{\strace}{\cstrace}{\cex}{\econt}}%
                 {\contconf{\econt}{\val}}%
                 {\text{where $\val = \mathrm{BoolValue(\tt{false})} = \tt{false}\in \mathbf{bool}$}}
-        \end{multlined}\\
+        \end{multlined}
+        \label{eval:false}\\
         &\cesktranswhere%
             {\evalconf{\StringLiteral{\stringmeta}}{\env}{\strace}{\cstrace}{\cex}{\econt}}%
             {\contconf{\econt}{\val}}%
-            {\text{where $\val = \mathrm{StringValue(\stringmeta)} \in \mathbf{String}$}}\\
+            {\text{where $\val = \mathrm{StringValue(\stringmeta)} \in \mathbf{String}$}}
+            \label{eval:string}\\
         &\cesktrans%
             {\evalconf{\varmeta}{\env}{\strace}{\cstrace}{\cex}{\econt}}%
             {\contconf{\econt}{\deref{\env(\varmeta)}}}\\
@@ -1115,7 +1126,7 @@ The value corresponding to the evaluated expression is captured by the applicati
 \label{subsubsec:basic-literal-eval}
 
 Kernel literals are evaluated to a value $\val \in \dlitval$.
-Transitions of the CESK machine for basic literals are presented in Figure~\ref{figure:expressions-evalconfigs}.
+Transitions of the CESK machine for basic literals are presented in Figure~\ref{figure:expressions-evalconfigs}, rules (\ref{eval:int} - \ref{eval:string}).
 
 \subsubsection{Variable assignment and lookup}
 \label{subsubsec:variable-assignment-and-lookup}
@@ -1207,15 +1218,13 @@ Let $\econt' = \LetK{\expri{2}}{\env}{\varmeta}{\econt}$ below:
 \subsubsection{String Concatenation}
 \label{subsubsec:string-concatenation}
 Function $stringValue$ concatenates strings from the given meta-list.
-
 \[stringValue : \mlist{\dstring} \rightarrow \dstring\]
-
 \noindent
 The transition string concatenation expressions are defined as follows:
 \[
   \begin{array}{rcl}
 	\cesktrans{
-		\contconf{\StringConcatenationA}{\vals}}{
+		\acontconf{\StringConcatenationA}{\vals}}{
 		\contconf{\econt}{stringValue(\vals)}}
   \end{array}
 \]
@@ -1578,38 +1587,38 @@ Evaluation of $\this$ expression resolves to the value in one step.
 	$
 	\begin{array}{cl}
 		\execcesktrans
-			{\execconf{\textbf{var } \varmeta = \expr}{\env}{\lbls}{\clbls}{\handler}{\cstrace}{\cex}{\econt}{\scont}}
+			{\execconf{\VarDeclaration{\varmeta}{\expr}}{\env}{\lbls}{\clbls}{\handler}{\cstrace}{\cex}{\econt}{\scont}}
 			{\evalconf{\expr}{\env}{\strace}{\cstrace}{\cex}{\econt'}}
 			{\\&\econt' = \VarDeclK{\env}{\varmeta}{\scont}}
 
 		\execcesktrans
-			{\execconf{\lbrace\rbrace}{\env}{\lbls}{\clbls}{\handler}{\cstrace}{\cex}{\econt}{\scont}}
+			{\execconf{\EmptyStatement}{\env}{\lbls}{\clbls}{\handler}{\cstrace}{\cex}{\econt}{\scont}}
 			{\scontconf{\scont}{\env}}
 			{}
 
 		\execcesktrans
-			{\execconf{\lbrace\expr\rbrace}{\env}{\lbls}{\clbls}{\handler}{\cstrace}{\cex}{\econt}{\scont}}
+			{\execconf{\ExpressionStatement{\expressionmeta}}{\env}{\lbls}{\clbls}{\handler}{\cstrace}{\cex}{\econt}{\scont}}
 			{\evalconf{\expr}{\env}{\strace}{\cstrace}{\cex}{\econt'}}
 			{\\&\econt' = \ExpressionK{\scont}{\env}}
 
 		\execcesktrans
-			{\execconf{\stmt :: \stmts}{\env}{\lbls}{\clbls}{\handler}{\cstrace}{\cex}{\econt}{\scont}}
+			{\execconf{\Block{\stmt_1}}{\env}{\lbls}{\clbls}{\handler}{\cstrace}{\cex}{\econt}{\scont}}
 			{}
-			{\\&\hspace{4mm}\execconf{\stmt}{\env}{\lbls}{\clbls}{\handler}{\cstrace}{\cex}{\econt}{\scont'}
-			\\&\scont' = \BlockSK{\stmts}{\env}}
+			{\\&\hspace{4mm}\execconf{\stmt_1}{\env}{\lbls}{\clbls}{\handler}{\cstrace}{\cex}{\econt}{\scont'}
+			\\&\scont' = \BlockSK{\stmt*}{\env}}
 
 		\execcesktrans
-			{\execconf{\textbf{if } \expr \textbf{ then } \stmti{1} \textbf{ else } \stmti{2} }{\env}{\lbls}{\clbls}{\handler}{\cstrace}{\cex}{\econt}{\scont}}
+			{\execconf{\IfStatement{\expr}{\stmti{1}}{\stmti{2}}}{\env}{\lbls}{\clbls}{\handler}{\cstrace}{\cex}{\econt}{\scont}}
 			{\evalconf{\expr}{\env}{\strace}{\cstrace}{\cex}{\econt'}}
 			{\\&\econt' = \IfCondK{\stmti{1}}{\stmti{2}}}
 
 		\execcesktrans
-			{\execconf{\textbf{return } \expr}{\env}{\lbls}{\clbls}{\handler}{\cstrace}{\cex}{\econt}{\scont}}
+			{\execconf{\ReturnStatement{\expr}}{\env}{\lbls}{\clbls}{\handler}{\cstrace}{\cex}{\econt}{\scont}}
 			{\evalconf{\expr}{\env}{\strace}{\cstrace}{\cex}{\econt}}
 			{}
 
 		\execcesktrans
-			{\execconf{\textbf{return}}{\env}{\lbls}{\clbls}{\handler}{\cstrace}{\cex}{\econt}{\scont}}
+			{\execconf{\ReturnStatement{}}{\env}{\lbls}{\clbls}{\handler}{\cstrace}{\cex}{\econt}{\scont}}
 			{\contconf{\econt}{\textbf{null}}}
 			{}
 
@@ -1619,7 +1628,7 @@ Evaluation of $\this$ expression resolves to the value in one step.
 			{\\&\scont' = \whilecondk\hspace{2cm}}
 
 		\execcesktrans
-			{\execconf{\textbf{while } (\expr) \stmt}{\env}{\lbls}{\clbls}{\handler}{\cstrace}{\cex}{\econt}{\scont}}
+			{\execconf{\WhileStatement{\expr}{\stmt}}{\env}{\lbls}{\clbls}{\handler}{\cstrace}{\cex}{\econt}{\scont}}
 			{\evalconf{\expr}{\env}{\strace}{\cstrace}{\cex}{\econt'}}
 			{\\&\econt', \scont' = \whilecondk}
 
@@ -1628,34 +1637,33 @@ Evaluation of $\this$ expression resolves to the value in one step.
 			{\evallistconf{\exprs'}{\env}{\strace}{\cex}{\cstrace}{\acont}}
 			{\\&\acont = \ForInitA
 			\\&\exprs' = \text{initializer expressions for the list of variable declarations }\varmeta{s}}
-	\\[2mm]
 
 		\execcesktrans
-			{\execconf{\textbf{L: }\stmt_{L}}{\env}{\lbls}{\clbls}{\handler}{\cstrace}{\cex}{\econt}{\scont}}
+			{\execconf{\LabeledStatement{L}{\stmt_{L}}}{\env}{\lbls}{\clbls}{\handler}{\cstrace}{\cex}{\econt}{\scont}}
 			{}
 			{\\&\hspace{4mm}\execconf{\stmt_{L}}{\env}{\lbl :: \lbls}{\clbls}{\handler}{\cstrace}{\cex}{\econt}{\scont}
 			\\&\lbl = \mathrm{Label}(L, \bcont), \bcont = \mathrm{Break}(\env, \scont)}
 
 		\execcesktrans
-			{\execconf{\textbf{switch }(\expr) \scases }{\env}{\lbls}{\clbls}{\handler}{\cstrace}{\cex}{\econt}{\scont}}
+			{\execconf{\SwitchStatement{\expr}{\scases}}{\env}{\lbls}{\clbls}{\handler}{\cstrace}{\cex}{\econt}{\scont}}
 			{\evalconf{\expr}{\env}{\strace}{\cstrace}{\cex}{\econt'}}
 			{\\&\econt' = \SwitchK{\scases}{\clbls}}
 
 		\execcesktrans
-			{\execconf{\mathrm{TryCatch}(\stmt, cs)}{\env}{\lbls}{\clbls}{\handler}{\cex}{\cstrace}{\econt}{\scont}}
+			{\execconf{\TryCatch{\stmt}{cs}}{\env}{\lbls}{\clbls}{\handler}{\cex}{\cstrace}{\econt}{\scont}}
 			{}
 			{\\&\hspace{4mm}\execconf{\stmt}{\env}{\lbls}{\clbls}{\handler'}{\cex}{\cstrace}{\econt}{\scont}
 			\\&\handler' = \CatchH{cs}}
 
 		\execcesktrans
-			{\execconf{\textbf{break L}}{\env}{\lbls}{\clbls}{\handler}{\cex}{\cstrace}{\econt}{\scont}}
+			{\execconf{\BreakStatement{L}}{\env}{\lbls}{\clbls}{\handler}{\cex}{\cstrace}{\econt}{\scont}}
 			{\breakconf{\bcont}}
 			{\\&\lbl = Label(L', \bcont) \in \lbls \textrm{ with } L' == \mathbf{L}}
 
 		\execcesktrans
-			{\execconf{\textbf{continue L}}{\env}{\lbls}{\clbls}{\handler}{\cex}{\cstrace}{\econt}{\scont}}
+			{\execconf{\ContinueSwitchStatement{\stmt}}{\env}{\lbls}{\clbls}{\handler}{\cex}{\cstrace}{\econt}{\scont}}
 			{\switchconf{\switchcont}}
-			{\\&\clbl = \continuel{L'}{\switchcont} \in \clbls \textrm{ with } L' == \mathbf{L}}
+			{\\&\clbl = \continuel{\stmt'}{\switchcont} \in \clbls \textrm{ with } \stmt' == \stmt}
 
 		\execcesktrans
 			{\execconf{fun(\formals) \stmt_{body}}{\env}{\lbls}{\clbls}{\handler}{\cstrace}{\cex}{\econt}{\scont}}
@@ -1746,13 +1754,6 @@ The execution of \textbf{do while} loops proceeds as shown in Figure~\ref{figure
 The execution of \textbf{for} loops proceeds as shown in Figure~\ref{figure:exec}.
 \[
  \begin{array}{l}
-	\execconf{\ForStatement{\varmeta{s}}{\expressionmeta}{\exprs}{\statementmeta}}{\env}{\lbls}{\clbls}{\handler}{\cstrace}{\cex}{\econt}{\scont}
-	\Rightarrow
-	\evallistconf{\exprs'}{\env}{\strace}{\cex}{\cstrace}{\acont} \\
-	\acont = \ForInitA \\
-	\exprs' = \text{initializer expressions for the list of variable declarations }\varmeta{s}
-	\\[2mm]
-
 	\acontconf{\ForInitA}{\vals}
 	\Rightarrow
 	\evalconf{\expressionmeta}{\env'}{\strace}{\cstrace}{\cex}{\econt'} \\
@@ -1918,7 +1919,7 @@ The statement is unconditionally executed:
 
 \[
   \begin{array}{lcl}
-	\execconf{\mathrm{TryFinally}(\stmti{0}, \stmti{1})}{\env}{\lbls}{\clbls}{\handler}{\cex}{\cstrace}{\econt}{\scont}
+	\execconf{\TryFinally{\stmti{0}}{\stmti{1}}}{\env}{\lbls}{\clbls}{\handler}{\cex}{\cstrace}{\econt}{\scont}
 	\Rightarrow\\
 	\execconf{\stmti{0}}{\env}{\lbls'}{\clbls'}{\handler'}{\cex}{\cstrace}{\econt'}{\scont'}
 	  \end{array}
