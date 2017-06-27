@@ -491,6 +491,8 @@ The different expression continuations are shown in Figure~\ref{figure:econts}.
 \newcommand{\FinallyK}[1]{\mathrm{Finally}({#1},\,\env,\,\lbls,\,\clbls,\,\strace,\,\handler,\,\econt)}
 \newcommand{\FinallyReturnK}[1]{\mathrm{FinallyReturnK}({#1},\,\env,\,\lbls,\,\clbls,\,\strace,\,\handler,\,\econt)}
 %
+%
+\newcommand{\ForCondK}{\mathrm{ForCondK}(\mathrm{\varmeta{s}},\, \expressionmeta,\, \exprs,\, \statementmeta,\, \env,\, \env',\, \lbls,\, \clbls,\, \handler,\, \cstrace,\, \cex,\, \econt,\, \scont)}
 
 \begin{figure}[Htp]
   \begin{align}
@@ -538,7 +540,8 @@ The different statement continuations are shown in Figure~\ref{figure:sconts}.
 \newcommand{\NewSK}[2]{\mathrm{NewSK}({#1},\,{#2})}
 \newcommand{\FinallySK}[1]{\mathrm{FinallySK}({#1},\,\env,\,\lbls,\,\clbls,\,\strace,\,\handler,\,\econt,\,\scont)}
 \newcommand{\RethrowSK}[3]{\mathrm{RethrowSK}({#1},\,{#2},\,{#3})}
-
+%
+\newcommand{\ForSK}{\mathrm{ForSK}(\mathrm{\varmeta{s}},\, \expressionmeta,\, \exprs,\, \statementmeta,\, \env,\, \env',\, \lbls,\, \clbls,\, \handler,\, \cstrace,\, \cex,\, \econt,\, \scont)}
 \begin{figure}[Htp]
   \begin{align}
 	&\ExitSK{\val} \label{scont:exit}\\
@@ -569,7 +572,9 @@ The different application continuations are shown in Figure~\ref{figure:acont}.
 \newcommand{\SuperA}[3]{\mathrm{SuperA}({#1},\,{#2},\,\strace,\,\handler,\,\cstrace,\,\cex,\,{#3})}
 \newcommand{\ConstructorA}[2]{\mathrm{ConstructorA}({#1},\,\strace,\,\handler,\,\cstrace,\,\cex,\,{#2})}
 \newcommand{\RedirectingA}[3]{\mathrm{RedirectingA}({#1},\,{#2},\,\strace,\,\handler,\,\cstrace,\,\cex,\,{#3})}
-
+\newcommand{\ForInitA}{\mathrm{ForInitA}(\mathrm{\varmeta{s}},\, \expressionmeta,\, \exprs,\, \statementmeta,\, \env,\, \lbls,\, \clbls,\, \handler,\, \cstrace,\, \cex,\, \econt,\, \scont)}
+%
+\newcommand{\ForUpdatesA}[1]{\mathrm{ForUpdatesA}(\mathrm{\varmeta{s}},\, \expressionmeta,\, \exprs,\, \statementmeta,\, \env,\, #1,\, \lbls,\, \clbls,\, \handler,\, \cstrace,\, \cex,\, \econt,\, \scont)}
 \begin{figure}[Htp]
   \begin{align}
 	&\ValueA{\val}{\acont} \label{acont:value}\\
@@ -1600,10 +1605,18 @@ Evaluation of $\this$ expression resolves to the value in one step.
 			{\execconf{\DoStatement{\statementmeta}{\expressionmeta}}{\env}{\lbls}{\clbls}{\handler}{\cstrace}{\cex}{\econt}{\scont}}
 			{\execconf{\statementmeta}{\env}{\lbls}{\clbls}{\handler}{\cstrace}{\cex}{\econt}{\scont'}}
 			{\\&\scont' = \whilecondk\hspace{2cm}}
+
 		\execcesktrans
 			{\execconf{\textbf{while } (\expr) \stmt}{\env}{\lbls}{\clbls}{\handler}{\cstrace}{\cex}{\econt}{\scont}}
 			{\evalconf{\expr}{\env}{\strace}{\cstrace}{\cex}{\econt'}}
 			{\\&\econt', \scont' = \whilecondk}
+
+		\execcesktrans
+			{\execconf{\ForStatement{\varmeta{s}}{\expressionmeta}{\exprs}{\statementmeta}}{\env}{\lbls}{\clbls}{\handler}{\cstrace}{\cex}{\econt}{\scont}}
+			{\evallistconf{\exprs'}{\env}{\strace}{\cex}{\cstrace}{\acont}}
+			{\\&\acont = \ForInitA
+			\\&\exprs' = \text{initializer expressions for the list of variable declarations }\varmeta{s}}
+	\\[2mm]
 
 		\execcesktrans
 			{\execconf{\textbf{L: }\stmt_{L}}{\env}{\lbls}{\clbls}{\handler}{\cstrace}{\cex}{\econt}{\scont}}
@@ -1640,8 +1653,8 @@ Evaluation of $\this$ expression resolves to the value in one step.
 	\end{array}
 	$
 	\caption{The CESK-transition function for statements}
-	\label{table:instance-method-evalconfigs}
-\end{figure}
+	\label{figure:exec}
+	\end{figure}
 
 \subsubsection{Variable Declaration}
 Variable declaration extend the corresponding environment with a new binding.
@@ -1717,8 +1730,50 @@ Let $\econt', \scont' = \whilecondk$ below:
 \]
 Loops \textbf{do while}, \textbf{for in}, for can be desugared to while loops with transformations performed before interpreting the program.
 
-The execution of \textbf{do while} loops proceeds is shown in %equation~\eqref{eq:dowhile-stmt}.
+The execution of \textbf{do while} loops proceeds as shown in Figure~\ref{figure:exec}.
+The execution of \textbf{for} loops proceeds as shown in Figure~\ref{figure:exec}.
+\[
+ \begin{array}{l}
+	\execconf{\ForStatement{\varmeta{s}}{\expressionmeta}{\exprs}{\statementmeta}}{\env}{\lbls}{\clbls}{\handler}{\cstrace}{\cex}{\econt}{\scont}
+	\Rightarrow
+	\evallistconf{\exprs'}{\env}{\strace}{\cex}{\cstrace}{\acont} \\
+	\acont = \ForInitA \\
+	\exprs' = \text{initializer expressions for the list of variable declarations }\varmeta{s}
+	\\[2mm]
 
+	\acontconf{\ForInitA}{\vals}
+	\Rightarrow
+	\evalconf{\expressionmeta}{\env'}{\strace}{\cstrace}{\cex}{\econt'} \\
+	\env' = \extend(\env, \varmeta{s}, \vals) \\
+	\econt' = \ForCondK
+	\\[2mm]
+
+	\contconf{\ForCondK}{\tt{false}}
+	\Rightarrow
+	\scontconf{\scont}{\env}
+	\\[2mm]
+
+	\contconf{\ForCondK}{\tt{true}}
+	\Rightarrow \\
+	\execconf{\scont}{\env'}{\lbls}{\clbls}{\handler}{\cstrace}{\cex}{\econt}{\scont'} \\
+	\scont' = \ForSK
+	\\[2mm]
+
+	\scontconf{\ForSK}{\_}
+	\Rightarrow
+	\evallistconf{\exprs}{\env_{new}}{st}{cex}{cst}{\acont} \\
+	\acont = \ForUpdatesA{\env_{new}} \\
+	\env_{new} = \extend(\env, \varmeta{s}, \vals), \vals = \{\val_i \mid \deref(\env'(\varmeta_i))\}
+	\\[2mm]
+
+	\acontconf{\ForUpdatesA{\env'}}{\_}
+	\Rightarrow
+	\evalconf{\expressionmeta}{\env'}{\strace}{\cstrace}{\cex}{\econt'}\\
+	\econt' = \ForCondK
+ \end{array}
+\]
+% This will be desugared as in Dart doc.
+The execution of \textbf{for in} loops proceeds as shown in Figure~\ref{figure:exec}.
 \subsection{Labels}
 
 Kernel supports labelling statements, \textbf{L: $\stmt_{L}$}, and breaking to L, \textbf{break L}, which completes the execution of the labelled statement and proceeds to executing the rest of the program.
