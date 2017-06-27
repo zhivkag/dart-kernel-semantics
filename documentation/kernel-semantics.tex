@@ -895,19 +895,18 @@ The value corresponding to the evaluated expression is captured by the applicati
     &\cesktrans%
         {\evallistconf{[]}{\env}{\strace}{\cstrace}{\cex}{\acont}}%
         {\acontconf{\acont}{[]}}\\
-    &\begin{multlined}
-        \cesktranssplit%
-            {\contconf{\ExpressionsK{\exprs}{\env}{\acont}}{\val}}%
-            {\evallistconf{\exprs}{\env}{\strace}{\cstrace}{\cex}{\ValueA{\val}{\acont}}}
-    \end{multlined}\\
     &\cesktrans%
         {\acontconf{\ValueA{\val}{\acont}}{\val s}}%
         {\acontconf{\acont}{\val :: \val s}}
     \end{align}
-  \caption{The CESK-transition function for expression lists}\label{figure:evallist}
+  \caption{The CESK-transition function for EvalListConfiguration}\label{figure:evallist}
   \label{subsec:eval-list-expressions}
 \end{figure}
 
+%%
+% Figure showing the CEK-transition function starting from EvalConfiguration for simple 
+% expressions.
+%%
 \begin{figure}[Htp]
 	\begin{align}
         &\cesktranswhere%
@@ -1016,10 +1015,170 @@ The value corresponding to the evaluated expression is captured by the applicati
                 {\text{where $F$ is a function expression with formal parameters $\formals$ and body $\stmt$}}
         \end{multlined}
 	\end{align}
-	\caption{The CESK-transition function for EvalConfiguration: expressions}
+	\caption{The CESK-transition function for EvalConfiguration: simple expressions}
 	\label{figure:expressions-evalconfigs}
 \end{figure}
+%
+\newcommand{\true}{\tt{true}}
+\newcommand{\false}{\tt{false}}
+%%
+% Figure showing the CESK-transition function strating from ValuePassingConfiguration
+% for simple expressions
+%%
+\begin{figure}[Htp]
+	\begin{align}
+		&\begin{multlined}
+        \cesktranssplit%
+            {\contconf{\ExpressionsK{\exprs}{\env}{\acont}}{\val}}%
+            {\evallistconf{\exprs}{\env}{\strace}{\cstrace}{\cex}{\ValueA{\val}{\acont}}}
+        \end{multlined}
+        \label{econtconf:exprs}\\
+		&\cesktranswhere%
+			{\contconf{\VarSetK{\env}{\varmeta}{\econt}}{\val}}%
+			{\contconf{\econt}{\val}}%
+			{\deref{\env(\varmeta)} = \val \text{ after transition}}
+			\label{econtconf:varset}\\
+		&\cesktrans%
+			{\contconf{\NotK{\econt}}{\true}}%
+			{\contconf{\econt}{\false}}
+        \label{econtconf:not-true}\\
+		&\cesktrans%
+			{\contconf{\NotK{\econt}}{\false}}%
+			{\contconf{\econt}{\true}}
+        \label{econtconf:not-false}\\
+		&\cesktrans%
+			{\contconf{\AndK{\expressionmeta}{\env}{\econt}}{\true}}%
+			{\evalconf{\expressionmeta}{\env}{\strace}{\cstrace}{\cex}{\econt}}
+        \label{econtconf:and-true}\\
+		&\cesktrans%
+			{\contconf{\AndK{\expressionmeta}{\env}{\econt}}{\false}}%
+			{\contconf{\econt}{\false}}
+        \label{econtconf:and-false}\\
+		&\cesktrans%
+			{\contconf{\OrK{\expressionmeta}{\env}{\econt}}{\false}}%
+			{\evalconf{\expressionmeta}{\env}{\strace}{\cstrace}{\cex}{\econt}}
+        \label{econtconf:or-false}\\
+		&\cesktrans%
+			{\contconf{\OrK{\expressionmeta}{\env}{\econt}}{\true}}%
+			{\contconf{\econt}{\true}}
+        \label{econtconf:or-true}\\
+		&\cesktranswhere%
+			{\contconf{\StaticGetK}{\val}}%
+			{\contconf{\econt}{\val}}%
+			{\env^{M} = \ext{\env^{M}}{\membermeta}{\val}}
+        \label{econtconf:staticget}\\
+		&\begin{multlined}
+		\cesktranssplit%
+			{\contconf{\ConditionalK{\expri{1}}{\expri{2}}{\env}{\econt}}{\true}}%
+			{\evalconf{\expri{1}}{\env}{\strace}{\cstrace}{\cex}{\econt}}
+        \end{multlined}
+        \label{econtconf:cond-true}\\
+		&\begin{multlined}
+		\cesktranssplit%
+			{\contconf{\ConditionalK{\expri{1}}{\expri{2}}{\env}{\econt}}{\false}}%
+			{\evalconf{\expri{2}}{\env}{\strace}{\cstrace}{\cex}{\econt}}
+        \end{multlined}
+        \label{econtconf:cond-false}\\
+		&\begin{multlined}
+		\cesktranswheresplit%
+			{\contconf{\LetK{\expri{2}}{\env}{\varmeta}{\econt}}{\val}}%
+			{\evalconf{\expri{2}}{\env'}{\strace}{\cstrace}{\cex}{\econt}}%
+			{\env'=\ext{\env}{\varmeta}{\val}}
+        \end{multlined}
+        \label{econtconf:let}\\
+        &\cesktranswhere%
+			{\contconf{\IsExpressionK}{\val}}%
+			{\contconf{\econt}{\true}}%
+			{\text{if $\val \textrm{ is } \tt{T}$}}
+		\label{econtconf:is-true}\\
+		&\cesktranswhere%
+			{\contconf{\IsExpressionK}{\val}}%
+			{\contconf{\econt}{\false}}%
+			{\text{otherwise}}
+		\label{econtconf:is-false}\\
+		&\cesktranswhere%
+			{\contconf{\AsExpressionK}{\val}}%
+			{\contconf{\econt}{\val}}%
+			{\text{if $\val \textrm{ is } \tt{T}$}}
+		\label{econtconf:as-true}\\
+		&\cesktranswhere%
+			{\contconf{\AsExpressionK}{\val}}%
+			{\throwconf{\handler}{\AsExpression{\expressionmeta}{\tt{T}} :: \strace}{\tt{CastError}}}%
+			{\text{if $\val \textrm{ is not } \tt{T}$}}
+		\label{econtconf:as-false}
+	\end{align}
+	\caption{The CESK-transition function for ValuePassingConfiguration: expressions}
+	\label{figure:cont-config}
+\end{figure}
+\subsubsection{Basic literal evaluation}
+\label{subsubsec:basic-literal-eval}
 
+Kernel literals are evaluated to a value $\val \in \dlitval$ in one step.
+Transitions of the CESK machine for basic literals are presented in Figure~\ref{figure:expressions-evalconfigs}, rules \eqref{eval:int} - \eqref{eval:string}.
+
+\subsubsection{Variable assignment and lookup}
+\label{subsubsec:variable-assignment-and-lookup}
+A variable $\varmeta$ is accessed by reading the value stored at location $\env(\varmeta)$ in the store, \eqref{eval:varget}.\\[2mm]
+Assigning a value to a variable $\varmeta$ will modify the store, more specifically the value stored at location  $\env(\varmeta)$. The evaluation of this expression proceeds by evaluating the right-hand side expression, \eqref{eval:varset} and setting the location $\env(\varmeta)$ in the store to the value this expression evaluates to, \eqref{econtconf:varset}.
+
+\subsubsection{Boolean expressions}
+\label{subsubsec:bool-expressions}
+The CESK-transition function for boolean expressions is show in Figure~\ref{figure:expressions-evalconfigs}, rules \eqref{eval:not} - \eqref{eval:cond}.
+\begin{itemize}
+\item Not expression\\
+The target expression is evaluated, as shown in \eqref{eval:not} and proceed by dispatching on the value the expression evaluates to according to \eqref{econtconf:not-true} and \eqref{econtconf:not-false}.
+\item And expression\\
+The left-hand side expression is evaluated, according to \eqref{eval:and}.
+We dispatch on the value the expression evaluates to.
+If the expression evaluate to $\false$, according to \eqref{econtconf:and-false}, the value is immediately applied to the current expression continuation.
+Otherwise, we proceed with the CESK-transition \eqref{econtconf:and-true}, by also evaluating the right-hand side.
+\item Or expression\\
+The left-hand side expression is evaluated, as shown in the CESK-transition \eqref{eval:or}.
+We dispatch on the value the expression evaluates to.
+If the expression evaluates to $\true$, according to \eqref{econtconf:or-true}, the value is immediately applied to the current expression continuation.
+Otherwise, we proceed with the CESK-transition \eqref{econtconf:or-false}, by also evaluating the right-hand side.
+\item Conditional expression\\
+The condition expression is evaluated, as shown in the CESK-transition \eqref{eval:cond}.
+We dispatch on the value the expression evaluates to.
+If the expression evaluates to $\true$, the next configuration evaluates the first expression and is produced with the CESK-transition \eqref{econtconf:cond-true}.
+Otherwise, the next configuration evaluates the second expression and is produced with the transition \eqref{econtconf:cond-false}.
+\end{itemize}
+\subsubsection{Let}
+Let expressions in Kernel introduce a new variable, initialized to some value with an initializer expression, for the evaluation of the right-hand side let expression.
+Let expressions are evaluated by first evaluating the initializer expression for the fresh variable as shown in the CESK-transition \eqref{eval:let}.
+It proceeds by extending the environment for the evaluation of the right-hand side let expression and producing the next configuration for evaluation of the later with the CESK-transition \eqref{econtconf:let}.
+\subsubsection{String Concatenation}
+\label{subsubsec:string-concatenation}
+The function $\concat$ concatenates the strings from the given meta-list into a single value.
+\begin{align*}
+  \concat : \mlist{\dstring} &\rightarrow \dstring \hspace{100mm} \\
+  \concat( s_1 :: \dots :: s_n :: []) &= s_1 \dots s_n
+\end{align*}
+The evaluation of concatenation expression proceeds by evaluating the target expressions in the specified order, as shown with the CESK-transition \eqref{eval:concat}.
+\[
+  \begin{array}{rcl}
+	    &\begin{multlined}
+		\cesktrans%
+			{\acontconf{\StringConcatenationA}{\vals}}%
+			{\contconf{\econt}{\concat(\vals)}}
+        \end{multlined}\\
+  \end{array}
+\]
+\subsubsection{Type test}
+\label{subsubsec:type-test}
+Type test expressions evaluate to a boolean literal value, in more than one step.
+The evaluation of this kind of expression proceeds by evaluating the target expression, as in CESK-transition \eqref{eval:is}.
+When the target expression evaluates to a value $\val$ such that ``$\val $ is $\tt{T}$" holds, the value $true$ is applied to the expression continuation, $\econt$, as shown in \eqref{econtconf:is-true}, otherwise $\false$ is applied to $\econt$, as in \eqref{econtconf:is-false}. 
+\subsubsection{Type cast}
+\label{subsubsec:type-cast}
+Evaluation of type cast expression proceed to evaluation of the target expression to the corresponding value, as shown in \eqref{eval:as}.
+When the target expression evaluates to a value $\val$ such that ``$\val $ is $\tt{T}$" holds, the value $\val$ is applied to the expression continuation as shown in \eqref{econtconf:as-true}.
+Otherwise, the evaluation of the expression results with an error, as shown in \eqref{econtconf:as-false}.
+
+%%
+% Figure showing the CESK-transition function fstrating from EvalConfgiration for
+% static property extraction and assignment, and static invocation
+%%
 \begin{figure}[Htp]
     \begin{align}
         &\cesktranswhere%
@@ -1152,152 +1311,6 @@ The value corresponding to the evaluated expression is captured by the applicati
 	\caption{The CESK-transition function for EvalConfiguration: instance method and constructor invocation}
 	\label{figure:instance-method-evalconfigs}
 \end{figure}
-\newcommand{\true}{\tt{true}}
-\newcommand{\false}{\tt{false}}
-\begin{figure}[Htp]
-	\begin{align}
-		&\cesktranswhere%
-			{\contconf{\VarSetK{\env}{\varmeta}{\econt}}{\val}}%
-			{\contconf{\econt}{\val}}%
-			{\deref{\env(\varmeta)} = \val \text{ after transition}}
-			\label{econtconf:varset}\\
-		&\cesktrans%
-			{\contconf{\NotK{\econt}}{\true}}%
-			{\contconf{\econt}{\false}}
-        \label{econtconf:not-true}\\
-		&\cesktrans%
-			{\contconf{\NotK{\econt}}{\false}}%
-			{\contconf{\econt}{\true}}
-        \label{econtconf:not-false}\\
-		&\cesktrans%
-			{\contconf{\AndK{\expressionmeta}{\env}{\econt}}{\true}}%
-			{\evalconf{\expressionmeta}{\env}{\strace}{\cstrace}{\cex}{\econt}}
-        \label{econtconf:and-true}\\
-		&\cesktrans%
-			{\contconf{\AndK{\expressionmeta}{\env}{\econt}}{\false}}%
-			{\contconf{\econt}{\false}}
-        \label{econtconf:and-false}\\
-		&\cesktrans%
-			{\contconf{\OrK{\expressionmeta}{\env}{\econt}}{\false}}%
-			{\evalconf{\expressionmeta}{\env}{\strace}{\cstrace}{\cex}{\econt}}
-        \label{econtconf:or-false}\\
-		&\cesktrans%
-			{\contconf{\OrK{\expressionmeta}{\env}{\econt}}{\true}}%
-			{\contconf{\econt}{\true}}
-        \label{econtconf:or-true}\\
-		&\cesktranswhere%
-			{\contconf{\StaticGetK}{\val}}%
-			{\contconf{\econt}{\val}}%
-			{\env^{M} = \ext{\env^{M}}{\membermeta}{\val}}
-        \label{econtconf:staticget}\\
-		&\begin{multlined}
-		\cesktranssplit%
-			{\contconf{\ConditionalK{\expri{1}}{\expri{2}}{\env}{\econt}}{\true}}%
-			{\evalconf{\expri{1}}{\env}{\strace}{\cstrace}{\cex}{\econt}}
-        \end{multlined}
-        \label{econtconf:cond-true}\\
-		&\begin{multlined}
-		\cesktranssplit%
-			{\contconf{\ConditionalK{\expri{1}}{\expri{2}}{\env}{\econt}}{\false}}%
-			{\evalconf{\expri{2}}{\env}{\strace}{\cstrace}{\cex}{\econt}}
-        \end{multlined}
-        \label{econtconf:cond-false}\\
-		&\begin{multlined}
-		\cesktranswheresplit%
-			{\contconf{\LetK{\expri{2}}{\env}{\varmeta}{\econt}}{\val}}%
-			{\evalconf{\expri{2}}{\env'}{\strace}{\cstrace}{\cex}{\econt}}%
-			{\env'=\ext{\env}{\varmeta}{\val}}
-        \end{multlined}
-        \label{econtconf:let}\\
-        &\cesktranswhere%
-			{\contconf{\IsExpressionK}{\val}}%
-			{\contconf{\econt}{\true}}%
-			{\text{if $\val \textrm{ is } \tt{T}$}}
-		\label{econtconf:is-true}\\
-		&\cesktranswhere%
-			{\contconf{\IsExpressionK}{\val}}%
-			{\contconf{\econt}{\false}}%
-			{\text{otherwise}}
-		\label{econtconf:is-false}\\
-		&\cesktranswhere%
-			{\contconf{\AsExpressionK}{\val}}%
-			{\contconf{\econt}{\val}}%
-			{\text{if $\val \textrm{ is } \tt{T}$}}
-		\label{econtconf:as-true}\\
-		&\cesktranswhere%
-			{\contconf{\AsExpressionK}{\val}}%
-			{\throwconf{\handler}{\AsExpression{\expressionmeta}{\tt{T}} :: \strace}{\tt{CastError}}}%
-			{\text{if $\val \textrm{ is not } \tt{T}$}}
-		\label{econtconf:as-false}
-	\end{align}
-	\caption{The CESK-transition function for ValuePassingConfiguration: expressions}
-	\label{figure:cont-config}
-\end{figure}
-
-\subsubsection{Basic literal evaluation}
-\label{subsubsec:basic-literal-eval}
-
-Kernel literals are evaluated to a value $\val \in \dlitval$ in one step.
-Transitions of the CESK machine for basic literals are presented in Figure~\ref{figure:expressions-evalconfigs}, rules \eqref{eval:int} - \eqref{eval:string}.
-
-\subsubsection{Variable assignment and lookup}
-\label{subsubsec:variable-assignment-and-lookup}
-A variable $\varmeta$ is accessed by reading the value stored at location $\env(\varmeta)$ in the store, \eqref{eval:varget}.\\[2mm]
-Assigning a value to a variable $\varmeta$ will modify the store, more specifically the value stored at location  $\env(\varmeta)$. The evaluation of this expression proceeds by evaluating the right-hand side expression, \eqref{eval:varset} and setting the location $\env(\varmeta)$ in the store to the value this expression evaluates to, \eqref{econtconf:varset}.
-
-\subsubsection{Boolean expressions}
-\label{subsubsec:bool-expressions}
-The CESK-transition function for boolean expressions is show in Figure~\ref{figure:expressions-evalconfigs}, rules \eqref{eval:not} - \eqref{eval:cond}.
-\begin{itemize}
-\item Not expression\\
-The target expression is evaluated, as shown in \eqref{eval:not} and proceed by dispatching on the value the expression evaluates to according to \eqref{econtconf:not-true} and \eqref{econtconf:not-false}.
-\item And expression\\
-The left-hand side expression is evaluated, according to \eqref{eval:and}.
-We dispatch on the value the expression evaluates to.
-If the expression evaluate to $\false$, according to \eqref{econtconf:and-false}, the value is immediately applied to the current expression continuation.
-Otherwise, we proceed with the CESK-transition \eqref{econtconf:and-true}, by also evaluating the right-hand side.
-\item Or expression\\
-The left-hand side expression is evaluated, as shown in the CESK-transition \eqref{eval:or}.
-We dispatch on the value the expression evaluates to.
-If the expression evaluates to $\true$, according to \eqref{econtconf:or-true}, the value is immediately applied to the current expression continuation.
-Otherwise, we proceed with the CESK-transition \eqref{econtconf:or-false}, by also evaluating the right-hand side.
-\item Conditional expression\\
-The condition expression is evaluated, as shown in the CESK-transition \eqref{eval:cond}.
-We dispatch on the value the expression evaluates to.
-If the expression evaluates to $\true$, the next configuration evaluates the first expression and is produced with the CESK-transition \eqref{econtconf:cond-true}.
-Otherwise, the next configuration evaluates the second expression and is produced with the transition \eqref{econtconf:cond-false}.
-\end{itemize}
-\subsubsection{Let}
-Let expressions in Kernel introduce a new variable, initialized to some value with an initializer expression, for the evaluation of the right-hand side let expression.
-Let expressions are evaluated by first evaluating the initializer expression for the fresh variable as shown in the CESK-transition \eqref{eval:let}.
-It proceeds by extending the environment for the evaluation of the right-hand side let expression and producing the next configuration for evaluation of the later with the CESK-transition \eqref{econtconf:let}.
-\subsubsection{String Concatenation}
-\label{subsubsec:string-concatenation}
-The function $\concat$ concatenates the strings from the given meta-list into a single value.
-\begin{align*}
-  \concat : \mlist{\dstring} &\rightarrow \dstring \hspace{100mm} \\
-  \concat( s_1 :: \dots :: s_n :: []) &= s_1 \dots s_n
-\end{align*}
-The evaluation of concatenation expression proceeds by evaluating the target expressions in the specified order, as shown with the CESK-transition \eqref{eval:concat}.
-\[
-  \begin{array}{rcl}
-	    &\begin{multlined}
-		\cesktrans%
-			{\acontconf{\StringConcatenationA}{\vals}}%
-			{\contconf{\econt}{\concat(\vals)}}
-        \end{multlined}\\
-  \end{array}
-\]
-\subsubsection{Type test}
-\label{subsubsec:type-test}
-Type test expressions evaluate to a boolean literal value, in more than one step.
-The evaluation of this kind of expression proceeds by evaluating the target expression, as in CESK-transition \eqref{eval:is}.
-When the target expression evaluates to a value $\val$ such that ``$\val $ is $\tt{T}$" holds, the value $true$ is applied to the expression continuation, $\econt$, as shown in \eqref{econtconf:is-true}, otherwise $\false$ is applied to $\econt$, as in \eqref{econtconf:is-false}. 
-\subsubsection{Type cast}
-\label{subsubsec:type-cast}
-Evaluation of type cast expression proceed to evaluation of the target expression to the corresponding value, as shown in \eqref{eval:as}.
-When the target expression evaluates to a value $\val$ such that ``$\val $ is $\tt{T}$" holds, the value $\val$ is applied to the expression continuation as shown in \eqref{econtconf:as-true}.
-Otherwise, the evaluation of the expression results with an error, as shown in \eqref{econtconf:as-false}.
 \subsubsection{Static and library fields}
 \label{subsubsec:static-and-library-fields}
 
