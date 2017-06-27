@@ -276,8 +276,8 @@ A global store is assumed and locations reachable from a given scope are defined
 \subsubsection{Dereferencing}
 \label{subsubsection:dereferecing}
 \newcommand{\deref}[1]{!#1}
-Function ``$\deref{}$'' is used to access a value stored in the store provided the corresponding label.
-The label is stored in the environment, or the object value for instance fields.
+Function ``$\deref{}$'' is used to access a value stored in the store provided the corresponding location.
+The location is stored in the environment, or in the list of field locations for object values.
 ``$\deref{}$'' has an implicit argument which is the store of CESK machine.
 
 \begin{align*}
@@ -1126,7 +1126,6 @@ Assigning a value to a variable will modify the store and the value stored at lo
 \label{subsubsec:bool-expressions}
 \newcommand{\true}{\tt{true}}
 \newcommand{\false}{\tt{false}}
-
 
 The transition steps for boolean expressions are defined as follows:
 \begin{itemize}
