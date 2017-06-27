@@ -516,7 +516,8 @@ The different expression continuations are shown in Figure~\ref{figure:econts}.
 	&\InstanceMethodK \label{econt:instance-method}\\
 	&\DInstanceMethodK \label{econt:dinstance-method}\\
 	&\VarDeclK{\idmeta}{\env}{\scont} \label{econt:var-decl}\\
-	&\IfCondK{\expressionmeta_1}{\expressionmeta_2} \label{econt:if-cond}
+	&\IfCondK{\expressionmeta_1}{\expressionmeta_2} \label{econt:if-cond}\\
+	&\ForCondK \label{econt:for-cond}
   \end{align}
   \caption{Expression Continuations}
   \label{figure:econts}
@@ -550,7 +551,8 @@ The different statement continuations are shown in Figure~\ref{figure:sconts}.
 	&\BodySK{\stmt}{\env}{\scont} \label{scont:body}\\
 	&\NewSK{\econt}{\loc} \label{scont:new}\\
 	&\FinallySK{\stmt} \label{scont:finally}\\
-	&\RethrowSK{\val}{\strace}{\handler} \label{scont:rethrow}
+	&\RethrowSK{\val}{\strace}{\handler} \label{scont:rethrow}\\
+	&\ForSK \label{scont:for}
   \end{align}
   \caption{Statement Continuations}
   \label{figure:sconts}
@@ -579,6 +581,8 @@ The different application continuations are shown in Figure~\ref{figure:acont}.
   \begin{align}
 	&\ValueA{\val}{\acont} \label{acont:value}\\
 	&\StringConcatenationA \label{acont:stringconcat}\\
+	&\ForInitA \label{acont:forinit}\\
+	&\ForUpdatesA{\env'} \label{acont:forupdates}\\
 	&\SuperMethodA \label{acont:supermethod}\\
 	&\DInstanceMethodA \label{acont:staticinv}\\
 	&\FieldsA{\env}{Izs}{\loc}{\scont} \label{acont:fields}\\
@@ -846,10 +850,10 @@ The different exception handlers are shown in Figure~\ref{figure:handlers}.
 \newcommand{\this}{\tt{this}}
 \newcommand{\superclass}[1]{superclass({#1})}
 
-Expressions are evaluated by dispatching according to the expression component in EvalConfiguration, Section~\ref{subsubsec:evalconfig}, and EvalListConfiguration, Section~\ref{subsubsec:evallistconfig}.
+Expressions are evaluated by dispatching according to the expression component, $\expressionmeta$, in EvalConfiguration, Section~\ref{subsubsec:evalconfig}, and the list of expression component, $\exprs$, in EvalListConfiguration, Section~\ref{subsubsec:evallistconfig}.
 
 \noindent
-The rules for evaluation of list of expressions, i.e., transition steps from EvalListConfiguration, are shown in Figure~\ref{figure:evallist}.
+The CESK-transition function for EvalListConfiguration is shown in Figure~\ref{figure:evallist}.
 The value corresponding to the evaluated expression is captured by the application continuation ValueA and eventually added to the list of values corresponding to the expressions.
 
 \begin{figure}[Htp]
@@ -1772,8 +1776,8 @@ The execution of \textbf{for} loops proceeds as shown in Figure~\ref{figure:exec
 	\econt' = \ForCondK
  \end{array}
 \]
-% This will be desugared as in Dart doc.
-The execution of \textbf{for in} loops proceeds as shown in Figure~\ref{figure:exec}.
+
+In Kernel, \textbf{for in} loops, will be desugared into while loops and their execution proceeds as the \textbf{while} loop rule shown in Figure~\ref{figure:exec}.
 \subsection{Labels}
 
 Kernel supports labelling statements, \textbf{L: $\stmt_{L}$}, and breaking to L, \textbf{break L}, which completes the execution of the labelled statement and proceeds to executing the rest of the program.
