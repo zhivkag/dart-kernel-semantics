@@ -78,8 +78,8 @@
 %     FROM => TO,
 %          WHERE
 %
-% "Split" variants has embedded "\\" inside.  Starred "split" variant have one
-% after the comma.  Non-starred "split" variant have one additional "\\" after
+% "Split" variants has embedded "\\" inside.  Non-starred "split" variant have one
+% after the comma.  Starred "split" variant have one additional "\\" after
 % the transition sign "=>".  It is useful for putting long equations in an
 % environment such as "split", "gather", or "multline".  Note that if an
 % environment generates a new equation number for each line, it can be disabled
@@ -1256,7 +1256,13 @@ Otherwise, the evaluation of the expression results with an error, as shown in \
 			{\execconf{\stmt}{\env}{[]}{[]}{\handler}{\cstrace}{\cex}{\econt}{\scont}}%
 			{\text{$\scont = \ExitSK{\val}$, $\env = \ext{\env_{empty}}{\formal}{\val}$}}
 		\end{multlined}
-		\label{econtconf:staticset-setter}
+		\label{econtconf:staticset-setter}\\
+		&\begin{multlined}
+		\cesktranswheresplit*%
+			{\acontconf{\StaticInvA{\formals}{\stmt}{\strace}{\econt}}{\val{s}}}%
+			{\execconf{\stmt}{\env'}{[]}{[]}{\handler}{\cstrace}{\cex}{\econt}{\scont}}%
+			{\parbox{10cm}{where $\scont = \ExitSK{\tt{null}}$,\\ $\env' = \ext{\env_{empty}}{\formals}{\val{s}}$}}
+		\end{multlined}
     \end{align}
 	\caption{The CESK-transition function for ValuePassingConfiguration: static variable extraction and assignment, and static method invocation}
 	\label{table:static-evalconfigs}
@@ -1305,16 +1311,6 @@ Otherwise, $\membermeta$ is a static or library setter with body $\stmt$ and for
 
 \subsubsection{Static Invocation}
 Static invocation is supported with $\StaticInvocation{\{\membermeta\}}{\expressionsmeta}$ where $\membermeta$ is a function with statement body $\stmt$ and formal parameters $\formals$.
-\[
-  \begin{array}{rcl}
-	\cesktrans{
-		\acontconf{\StaticInvA{\formals}{\stmt}{\strace}{\econt}}{\val{s}}}{
-		\execconf{\stmt}{\env'}{[]}{[]}{\handler}{\cstrace}{\cex}{\econt}{\scont}}
-	\\[2mm]
-	\scont = \ExitSK{\tt{null}},
-	\env' = \ext{\env_{empty}}{\formals}{\val{s}}\\[2mm]
-  \end{array}
-\]
 
 \begin{figure}[Htp]
     \begin{align}
