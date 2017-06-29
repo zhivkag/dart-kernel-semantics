@@ -1062,11 +1062,6 @@ The value corresponding to the evaluated expression is captured by the applicati
 			{\contconf{\OrK{\expressionmeta}{\env}{\econt}}{\true}}%
 			{\contconf{\econt}{\true}}
         \label{econtconf:or-true}\\
-		&\cesktranswhere%
-			{\contconf{\StaticGetK}{\val}}%
-			{\contconf{\econt}{\val}}%
-			{\env^{M} = \ext{\env^{M}}{\membermeta}{\val}}
-        \label{econtconf:staticget}\\
 		&\begin{multlined}
 		\cesktranssplit%
 			{\contconf{\ConditionalK{\expri{1}}{\expri{2}}{\env}{\econt}}{\true}}%
@@ -1107,7 +1102,7 @@ The value corresponding to the evaluated expression is captured by the applicati
 			{\text{if $\val \textrm{ is not } \tt{T}$}}
 		\label{econtconf:as-false}
 	\end{align}
-	\caption{The CESK-transition function for ValuePassingConfiguration: expressions}
+	\caption{The CESK-transition function for ValuePassingConfiguration: simple expressions}
 	\label{figure:cont-config}
 \end{figure}
 \subsubsection{Basic literal evaluation}
@@ -1119,7 +1114,8 @@ Transitions of the CESK machine for basic literals are presented in Figure~\ref{
 \subsubsection{Variable assignment and lookup}
 \label{subsubsec:variable-assignment-and-lookup}
 A variable $\varmeta$ is accessed by reading the value stored at location $\env(\varmeta)$ in the store, \eqref{eval:varget}.\\[2mm]
-Assigning a value to a variable $\varmeta$ will modify the store, more specifically the value stored at location  $\env(\varmeta)$. The evaluation of this expression proceeds by evaluating the right-hand side expression, \eqref{eval:varset} and setting the location $\env(\varmeta)$ in the store to the value this expression evaluates to, \eqref{econtconf:varset}.
+Assigning a value to a variable $\varmeta$ will modify the store, more specifically the value stored at location  $\env(\varmeta)$.
+The evaluation of this expression proceeds by evaluating the right-hand side expression, as shown in \eqref{eval:varset} and setting the location $\env(\varmeta)$ in the store to the value this expression evaluates to, as shown in \eqref{econtconf:varset}.
 
 \subsubsection{Boolean expressions}
 \label{subsubsec:bool-expressions}
@@ -1176,7 +1172,7 @@ When the target expression evaluates to a value $\val$ such that ``$\val $ is $\
 Otherwise, the evaluation of the expression results with an error, as shown in \eqref{econtconf:as-false}.
 
 %%
-% Figure showing the CESK-transition function fstrating from EvalConfgiration for
+% Figure showing the CESK-transition function strating from EvalConfgiration for
 % static property extraction and assignment, and static invocation
 %%
 \begin{figure}[Htp]
@@ -1184,73 +1180,160 @@ Otherwise, the evaluation of the expression results with an error, as shown in \
         &\cesktranswhere%
             {\evalconf{\StaticGet{\membermeta}}{\env}{\strace}{\cstrace}{\cex}{\econt}}%
             {\contconf{\econt}{\deref{\env^{M}(\membermeta)}}}%
-            {\text{where $\membermeta$ is a field and $\membermeta \in \env^{M}$}}\\
+            {\text{where $\membermeta$ is a field and $\membermeta \in \env^{M}$}}
+        \label{eval:staticget-var}\\
         &\begin{multlined}
             \cesktranswheresplit%
                 {\evalconf{\StaticGet{\membermeta}}{\env}{\strace}{\cstrace}{\cex}{\econt}}%
                 {\contconf{\econt}{\tt{null}}}%
                 {\text{where $\membermeta$ is a field, $\membermeta \notin \env^{M}$, $\expressionmeta_{\membermeta} = \tt{null}$, $\env^{M} = \ext{\env^{M}}{\membermeta}{\tt{null}}$}}
-        \end{multlined}\\
+        \end{multlined}
+        \label{eval:staticget-varnew-null}\\
         &\begin{multlined}
             \cesktranswheresplit%
                 {\evalconf{\StaticGet{\membermeta}}{\env}{\strace}{\cstrace}{\cex}{\econt}}%
                 {\evalconf{\expressionmeta_{\membermeta}}{\env}{\strace}{\cstrace}{\cex}{\econt'}}%
                 {\text{where $\membermeta$ is a field, $\econt' = \StaticGetK$}}
-        \end{multlined}\\
+        \end{multlined}
+        \label{eval:staticget-varnew}\\
         &\begin{multlined}
             \cesktranswheresplit%
                 {\evalconf{\StaticGet{\membermeta}}{\env}{\strace}{\cstrace}{\cex}{\econt}}%
                 {\execconf{\stmt}{\env_{empty}}{[]}{[]}{\handler}{\cstrace}{\cex}{\econt}{\emptyset}}%
                 {\text{where $\membermeta$ is a getter with body $\stmt$}}
-        \end{multlined}\\
+        \end{multlined}
+        \label{eval:staticget-getter}\\
         &\begin{multlined}
             \cesktranswheresplit%
                 {\evalconf{\StaticGet{\membermeta}}{\env}{\strace}{\cstrace}{\cex}{\econt}}%
                 {\contconf{\econt}{\funval{\formals}{\stmt}{\env_{empty}}}}%
                 {\text{where $\membermeta$ is a method tear-off with formal parameters $\formals$ and body $\stmt$}}
-        \end{multlined}\\
+        \end{multlined}
+        \label{eval:staticget-tearoff}\\
         &\begin{multlined}
             \cesktranswheresplit%
                 {\evalconf{\StaticSet{\membermeta}{\expressionmeta}}{\env}{\strace}{\cstrace}{\cex}{\econt}}%
                 {\evalconf{\expressionmeta}{\env}{\strace}{\cstrace}{\cex}{\econt'}}%
                 {\text{where $\econt' = \StaticSetK$}}
-        \end{multlined}\\
+        \end{multlined}
+        \label{eval:staticset}\\
         &\begin{multlined}
             \cesktranswheresplit%
                 {\evalconf{\StaticInvocation{\{\membermeta\}}{\expressionsmeta}}{\env}{\strace}{\cstrace}{\cex}{\econt}}%
                 {\evallistconf{\exprs}{\env}{\strace}{\cstrace}{\cex}{\acont'}}%
                 {\text{where $\acont' = \StaticInvA{\formals}{\stmt}{\strace'}{\econt}$, $\strace' = \StaticInvocation{\{\membermeta\}}{\expressionsmeta}::\strace$}}
         \end{multlined}
+        \label{eval:staticinvoc}
     \end{align}
 	\caption{The CESK-transition function for EvalConfiguration: static variable extraction and assignment, and static method invocation}
 	\label{table:static-evalconfigs}
 \end{figure}
 
+%%
+% Figure showing the CESK-transition function strating from ValuePassingConfiguration for
+% static property extraction and assignment, and static invocation
+%%
 \begin{figure}[Htp]
     \begin{align}
-        &\begin{multlined}
+		&\cesktranswhere%
+			{\contconf{\StaticGetK}{\val}}%
+			{\contconf{\econt}{\val}}%
+			{\env^{M} = \ext{\env^{M}}{\membermeta}{\val}}
+		\label{econtconf:staticget}\\
+		&\cesktranswhere%
+			{\contconf{\StaticSetK}{\val}}%
+			{\contconf{\econt}{\val}}
+			{\text{$\env^{M} = \ext{\env^{M}}{\membermeta}{\val}$ if $\membermeta \notin \env^M$}}
+		\label{econtconf:staticsetnew}\\
+		&\cesktranswhere%
+			{\contconf{\StaticSetK}{\val}}%
+			{\contconf{\econt}{\val}}
+			{\text{$\update{\env^{M}(\membermeta)}{\val}$ if $\membermeta \in \env^M$}}
+        \label{econtconf:staticset}
+    \end{align}
+	\caption{The CESK-transition function for ValuePassingConfiguration: static variable extraction and assignment, and static method invocation}
+	\label{table:static-evalconfigs}
+\end{figure}
+
+\subsubsection{Static and library fields}
+\label{subsubsec:static-and-library-fields}
+
+In order to remember initialization and assignment of library variables and static variables, we introduce a global environment $\env^{M}$. 
+The environment $\env^{M}$ stores bindings for static and library fields to locations for all static and library fields previously accessed or set during the execution of the program.\\
+Static and library variables are accessed with $\StaticGet{\membermeta}$. 
+The member $\membermeta$ can be a static or library field, a getter or a method tear-off.
+\begin{itemize}
+\item $\membermeta$ is a static or library field\\
+Let $\expressionmeta_{\membermeta}$ be $\membermeta$'s initializer expression. 
+When $\membermeta$ is accessed for the first time during the program's execution, the evaluation of $\StaticGet{\membermeta}$ proceeds with evaluation of the initializer expression $\expressionmeta_{\membermeta}$.\\
+\noindent
+When $\expressionmeta$ is $\tt{null}$, the environment is extended with a binding to a fresh location that stores a $\tt{null}$ value for the field $\membermeta$, as shown in \eqref{eval:staticget-varnew-null}.\\
+\noindent
+When $\expressionmeta$ is an expression, this expression is evaluated as shown in \eqref{eval:staticget-varnew}.
+The expression will evaluate to some value $\val$ that will be applied to the corresponding continuations, as shown in \eqref{econtconf:staticget}: the environment is extended with a binding to a fresh location that stores the value $\val$ and the continuation $\econt$ is applied to the value $\val$.\\
+\noindent
+When there is already a binding for the member $\membermeta$ in the global environment $\env_{M}$, the continuation $\econt$ is applied to the stored value, as shown in \eqref{eval:staticget-var}.
+\item $\membermeta$ is a static getter\\
+\noindent
+When $\membermeta$ is a static getter, the body of the getter is executed, as shown in \eqref{eval:staticget-getter}.
+\item $\membermeta$ is a static method tear-off\\
+\noindent
+When $\membermeta$ is a method with formal parameters $\formals$ and body $\stmt$, a new $\funval{\formals}{\stmt}{\env_{empty}}$ is created and bound to the member in the global environment $\env^{M}$, as shown in \eqref{eval:staticget-tearoff}.
+The continuation $\econt$ is applied to this value.
+\end{itemize}
+\noindent
+Static and library variables are set with $\StaticSet{\membermeta}{\expressionmeta}$.
+The target
+\noindent
+Otherwise, $\membermeta$ is a static or library setter with body $\stmt$ and formal parameter $\formal$.
+\[
+  \begin{array}{lcl}
+	\cesktrans{
+		\contconf{\StaticSetK}{\val}}{
+		\execconf{\stmt}{\env}{[]}{[]}{\handler}{\cstrace}{\cex}{\econt}{\scont}}
+  \end{array}
+\]
+with $\scont = \ExitSK{\val}$, $\env = \ext{\env_{empty}}{\formal}{\val}$.
+
+\subsubsection{Static Invocation}
+Static invocation is supported with $\StaticInvocation{\{\membermeta\}}{\expressionsmeta}$ where $\membermeta$ is a function with statement body $\stmt$ and formal parameters $\formals$.
+\[
+  \begin{array}{rcl}
+	\cesktrans{
+		\acontconf{\StaticInvA{\formals}{\stmt}{\strace}{\econt}}{\val{s}}}{
+		\execconf{\stmt}{\env'}{[]}{[]}{\handler}{\cstrace}{\cex}{\econt}{\scont}}
+	\\[2mm]
+	\scont = \ExitSK{\tt{null}},
+	\env' = \ext{\env_{empty}}{\formals}{\val{s}}\\[2mm]
+  \end{array}
+\]
+
+
+\begin{figure}[Htp]
+    \begin{align}
+		&\begin{multlined}
 		\cesktranswheresplit%
 			{\evalconf{\PropertyGet{\expressionmeta}{\idmeta}}{\env}{\strace}{\cstrace}{\cex}{\econt}}%
 			{\evalconf{\expressionmeta}{\env}{\strace}{\cstrace}{\cex}{\econt'}}%
-            {\text{where $\econt' = \PropertyGetK$}}
-        \end{multlined}\\
-        &\begin{multlined}
+			{\text{where $\econt' = \PropertyGetK$}}
+		\end{multlined}\\
+		&\begin{multlined}
 		\cesktranswheresplit%
 			{\evalconf{\DirectPropertyGet{\expressionmeta}{\membermeta}}{\env}{\strace}{\cstrace}{\cex}{\econt}}%
 			{\evalconf{\expressionmeta}{\env}{\strace}{\cstrace}{\cex}{\econt'}}%
-            {\text{where $\econt' = \DPropertyGetK$}}
+			{\text{where $\econt' = \DPropertyGetK$}}
         \end{multlined}\\
         &\begin{multlined}
 		\cesktranswheresplit%
 			{\evalconf{\PropertySet{\expressionmeta_0}{\idmeta}{\expressionmeta_1}}{\env}{\strace}{\cstrace}{\cex}{\econt}}%
 			{\evalconf{\expressionmeta_0}{\env}{\strace}{\cstrace}{\cex}{\econt'}}%
-            {\text{where $\econt' = \PropertySetK$}}
+			{\text{where $\econt' = \PropertySetK$}}
         \end{multlined}\\
         &\begin{multlined}
 		\cesktranswheresplit%
 			{\evalconf{\DirectPropertySet{\expressionmeta_0}{\membermeta}{\expressionmeta_1}}{\env}{\strace}{\cstrace}{\cex}{\econt}}%
 			{\evalconf{\expressionmeta}{\env}{\strace}{\cstrace}{\cex}{\econt'}}%
-            {\text{where $\econt' = \DirectPropertySetK$}}
+			{\text{where $\econt' = \DirectPropertySetK$}}
         \end{multlined}\\
         &\begin{multlined}
 		\cesktranswheresplit%
@@ -1277,7 +1360,7 @@ Otherwise, the evaluation of the expression results with an error, as shown in \
             {\text{where $\econt' = \SuperPropertySetK$}}
         \end{multlined}
     \end{align}
-	\caption{The CESK-transition function for EvalConfiguration: instance property extraction and assignment expressions}
+	\caption{The CESK-transition function for EvalConfiguration: instance property extraction and assignment}
 	\label{figure:instance-property-evalconfigs}
 \end{figure}
 
@@ -1311,59 +1394,6 @@ Otherwise, the evaluation of the expression results with an error, as shown in \
 	\caption{The CESK-transition function for EvalConfiguration: instance method and constructor invocation}
 	\label{figure:instance-method-evalconfigs}
 \end{figure}
-\subsubsection{Static and library fields}
-\label{subsubsec:static-and-library-fields}
-
-Let $\env^{M}$ be the global environment that stores bindings for static and library fields to locations for all static and library fields previously accessed or set during the execution of the program.\\
-Static and library variables are accessed with $\StaticGet{\membermeta}$.
-
-\noindent
-Let $\membermeta$ be a static or library field and $\expressionmeta_{\membermeta}$ its initializer expression.
-\[
-  \begin{array}{rlcl}
-	&\cesktrans{
-		\contconf{\StaticGetK}{\val}}{
-		\contconf{\econt}{\val}}
-		\\[2mm]
-	&\textrm{with }\env^{M} = \ext{\env^{M}}{\membermeta}{\val}
-	\\[2mm]
-  \end{array}
-\]
-
-Static and library variables are set with $\StaticSet{\membermeta}{\expressionmeta}$.
-Let $\membermeta$ be a static or library field.
-\[
-  \begin{array}{rcl}
-	\cesktrans{
-		\contconf{\StaticSetK}{\val}}{
-		\contconf{\econt}{\val}}
-  \end{array}
-\]
-with $\env^{M} = \ext{\env^{M}}{\membermeta}{\val}$ if $\membermeta \notin \env^M,$ $\update{\env^{M}}{\val}$ otherwise.\\
-
-\noindent
-Otherwise, $\membermeta$ is a static or library setter with body $\stmt$ and formal parameter $\formal$.
-\[
-  \begin{array}{lcl}
-	\cesktrans{
-		\contconf{\StaticSetK}{\val}}{
-		\execconf{\stmt}{\env}{[]}{[]}{\handler}{\cstrace}{\cex}{\econt}{\scont}}
-  \end{array}
-\]
-with $\scont = \ExitSK{\val}$, $\env = \ext{\env_{empty}}{\formal}{\val}$.
-
-\subsubsection{Static Invocation}
-Static invocation is supported with $\StaticInvocation{\{\membermeta\}}{\expressionsmeta}$ where $\membermeta$ is a function with statement body $\stmt$ and formal parameters $\formals$.
-\[
-  \begin{array}{rcl}
-	\cesktrans{
-		\acontconf{\StaticInvA{\formals}{\stmt}{\strace}{\econt}}{\val{s}}}{
-		\execconf{\stmt}{\env'}{[]}{[]}{\handler}{\cstrace}{\cex}{\econt}{\scont}}
-	\\[2mm]
-	\scont = \ExitSK{\tt{null}},
-	\env' = \ext{\env_{empty}}{\formals}{\val{s}}\\[2mm]
-  \end{array}
-\]
 \subsubsection{Property extraction}
 \label{subsubsec:property-extraction}
 Kernel allows access of a member as a property, which can be either getter access, which executes the getter, or method extraction, which converts a method into a closure, also known as tear-off.
