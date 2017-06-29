@@ -1244,12 +1244,19 @@ Otherwise, the evaluation of the expression results with an error, as shown in \
 			{\contconf{\StaticSetK}{\val}}%
 			{\contconf{\econt}{\val}}
 			{\text{$\env^{M} = \ext{\env^{M}}{\membermeta}{\val}$ if $\membermeta \notin \env^M$}}
-		\label{econtconf:staticsetnew}\\
+		\label{econtconf:staticset-var-new}\\
 		&\cesktranswhere%
 			{\contconf{\StaticSetK}{\val}}%
 			{\contconf{\econt}{\val}}
 			{\text{$\update{\env^{M}(\membermeta)}{\val}$ if $\membermeta \in \env^M$}}
-        \label{econtconf:staticset}
+        \label{econtconf:staticset-var}\\
+        &\begin{multlined}
+		\cesktranswheresplit%
+			{\contconf{\StaticSetK}{\val}}%
+			{\execconf{\stmt}{\env}{[]}{[]}{\handler}{\cstrace}{\cex}{\econt}{\scont}}%
+			{\text{$\scont = \ExitSK{\val}$, $\env = \ext{\env_{empty}}{\formal}{\val}$}}
+		\end{multlined}
+		\label{econtconf:staticset-setter}
     \end{align}
 	\caption{The CESK-transition function for ValuePassingConfiguration: static variable extraction and assignment, and static method invocation}
 	\label{table:static-evalconfigs}
@@ -1283,17 +1290,18 @@ The continuation $\econt$ is applied to this value.
 \end{itemize}
 \noindent
 Static and library variables are set with $\StaticSet{\membermeta}{\expressionmeta}$.
-The target
+The target member can either be a static or library field, or it can be a static setter. For both cases, the right-hand side expression is evaluated first, as shown in \eqref{eval:staticset}.
+\begin{itemize}
+\item $\membermeta$ is a static or library field\\
+The evaluation proceeds by extending the environment $\env^{M}$, when $\membermeta \notin \env^{M}$, as shown in \eqref{econtconf:staticset-var-new}.\\
+\noindent
+Otherwise, when $\membermeta \in \env^{M}$, the value stored at location $\env^{M}(\membermeta)$ is modified accordingly, as shown in \eqref{econtconf:staticset-var}.
+\item $\membermeta$ is a static setter\\
+The evaluation proceeds by executing the statement body of the setter. A statement continuation $\ExitSK{\econt}{\val}$ is added that applies the given expression continuation $\econt$ to the value of the right-hand side expression.
+The statement body is executed in an environment that has only the binding from the formal parameter of the static setter to the value of the right-hand side expression, as shown in \eqref{econtconf:staticset-setter}.
+\end{itemize}
 \noindent
 Otherwise, $\membermeta$ is a static or library setter with body $\stmt$ and formal parameter $\formal$.
-\[
-  \begin{array}{lcl}
-	\cesktrans{
-		\contconf{\StaticSetK}{\val}}{
-		\execconf{\stmt}{\env}{[]}{[]}{\handler}{\cstrace}{\cex}{\econt}{\scont}}
-  \end{array}
-\]
-with $\scont = \ExitSK{\val}$, $\env = \ext{\env_{empty}}{\formal}{\val}$.
 
 \subsubsection{Static Invocation}
 Static invocation is supported with $\StaticInvocation{\{\membermeta\}}{\expressionsmeta}$ where $\membermeta$ is a function with statement body $\stmt$ and formal parameters $\formals$.
@@ -1307,7 +1315,6 @@ Static invocation is supported with $\StaticInvocation{\{\membermeta\}}{\express
 	\env' = \ext{\env_{empty}}{\formals}{\val{s}}\\[2mm]
   \end{array}
 \]
-
 
 \begin{figure}[Htp]
     \begin{align}
