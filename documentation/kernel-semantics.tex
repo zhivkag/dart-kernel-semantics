@@ -1410,7 +1410,38 @@ A statement continuation, $\ExitSK{\econt}{\tt{null}}$ is added as next statemen
 		where $\env = \ext{\env_{empty}}{\mathbf{this}}{\val}$\\
 		$\scont = \emptyset$}}
 	\end{multlined}
-	\label{econtconf:propertyget-field}
+	\label{econtconf:propertyget-field}\\
+	&\begin{multlined}
+		\cesktranswheresplit*%
+		{\contconf{\PropertyGetK}{\val}}%
+		{\throwconf{\handler}{(\tt{throw}\text{ NoSuchMethod}) :: \strace}{\textrm{NoSuchMethod}}}%
+		{\parbox{10cm}{if lookup of name $\idmeta$ was unsuccessful in class of value $\val$}}
+	\end{multlined}
+	\label{econtconf:propertyget-nosuchmethod}\\
+	&\begin{multlined}
+		\cesktranswheresplit*%
+		{\contconf{\DPropertyGetK}{\val}}%
+		{\contconf{\econt}{\funval{\formals}{\stmt}{\env}}}%
+		{\parbox{10cm}{if $\membermeta$ is a method with body $\stmt$ and formals $\formals$\\
+		where $\env = \ext{\env_{empty}}{\mathbf{this}}{\val}$}}
+	\end{multlined}
+	\label{econtconf:dpropertyget-tearoff}\\
+	&\begin{multlined}
+		\cesktranswheresplit*%
+			{\contconf{\DPropertyGetK}{\val}}%
+			{\execconf{\stmt}{\env}{[]}{[]}{\handler}{\cstrace}{\cex}{\econt}{\scont}}%
+			{\parbox{10cm}{if $\membermeta$ is getter with statement body $\stmt$ \\
+			where $\env = \ext{\env_{empty}}{\mathbf{this}}{\val}$ \\
+			$\scont = \emptyset$}}
+	\end{multlined}
+	\label{econtconf:dpropertyget-getter}\\
+	&\begin{multlined}
+		\cesktranswhere%
+		{\contconf{\DPropertyGetK}{\val}}%
+		{\contconf{\econt}{\deref{\val[\membermeta]}}}%
+		{\text{if $\membermeta$ is a field }}
+	\end{multlined}
+	\label{econtconf:dpropertyget-field}
 	\end{align}
 	\caption{The CESK-transition function for ValuePassingConfiguration: instance property extraction and assignment}
 	\label{figure:instance-property-evalconfigs}
@@ -1439,42 +1470,23 @@ Application of implicit getter on some instance value returns the value stored i
 Afterwards the continuation expression is applied to the value, as shown in \eqref{econtconf:propertyget-field}.
 \end{itemize}
 
-%If the lookup fails, noSuchMethod is created/invoked accordingly (TBD)
+If the lookup fails, a "NoSuchMethod" will be thrown, as shown in \eqref{econtconf:propertyget-nosuchmethod}.
 
 \subsubsection{Direct property extraction}
 \label{subsubsec:direct-property-extraction}
-In Kernel a property can be accessed without lookup, by direct reference to the $AST$ node of said property.
+In Kernel a property can be accessed without lookup, by direct reference to the member $\membermeta$.
 This implies that the lookup step above is bypassed.
-
-\[
-  \begin{array}{lcl@{\hspace{30mm}}}
-	\textrm{if }\membermeta \textrm{ is a method with body }\stmt\textrm{ and formals }\formals :\\
-	\hspace{2mm}
-	\cesktrans{
-		\contconf{\DPropertyGetK}{\val}}{
-		\contconf{\econt}{\funval{\formals}{\stmt}{\env}}}\\
-	\textrm{with}\\
-	\hspace{3mm}
-	\env = \ext{\env_{empty}}{\mathbf{this}}{\val}\\[2mm]
-
-	\textrm{if }\membermeta \textrm{ is getter with statement body }\stmt :\\
-	\hspace{2mm}
-	\cesktrans{
-		\contconf{\DPropertyGetK}{\val}}{
-		\execconf{\stmt}{\env}{\lbls}{\clbls}{\handler}{\cstrace}{\cex}{\econt}{\scont}}
-		\\
-	\textrm{with}\\
-	\hspace{3mm}
-	\env = \ext{\env_{empty}}{\mathbf{this}}{\val}\\
-	\hspace{3mm}
-	\scont = \emptyset\\[2mm]
-
-	\textrm{if }\membermeta \textrm{ is a field } :\\
-	\hspace{2mm}\cesktrans{
-		\contconf{\DPropertyGetK}{\val}}{
-		\contconf{\econt}{\deref{\val[\membermeta]}}}\\
-  \end{array}
-\]
+Similar to Section~\ref{subsubsec:property-extraction}, this expression can be either getter access, which executes the getter, or method extraction, which converts a method into a closure, also known as tear-off.
+The evaluation proceeds as follows:
+\begin{itemize}
+\item $\membermeta$ is an instance method\\
+When $\membermeta$ is an instance method the evaluation of the direct property extraction expression proceeds in the same way as in Section~\ref{subsubsec:property-extraction}.
+The exact CESK-transition function for this case is shown in \eqref{econtconf:dpropertyget-tearoff}.
+\item $\membermeta$ is an instance getter\\
+When $\membermeta$ is an instance getter, the statement body of the getter is executed, as described in the previous section with the CESK-transition function shown in \eqref{econtconf:dpropertyget-getter}.
+\item $\membermeta$ is an instance field\\
+When $\membermeta$ is an instance field, the evaluation proceeds as shown in \eqref{econtconf:dpropertyget-field}.
+\end{itemize}
 \subsubsection{Property assignment}
 \label{subsubsec:property-assignment}
 An assignment changes the value stored at the location of the provided property name.
