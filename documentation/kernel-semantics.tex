@@ -1328,90 +1328,117 @@ A statement continuation, $\ExitSK{\econt}{\tt{null}}$ is added as next statemen
 			{\evalconf{\PropertyGet{\expressionmeta}{\idmeta}}{\env}{\strace}{\cstrace}{\cex}{\econt}}%
 			{\evalconf{\expressionmeta}{\env}{\strace}{\cstrace}{\cex}{\econt'}}%
 			{\text{where $\econt' = \PropertyGetK$}}
-		\end{multlined}\\
+		\end{multlined}
+		\label{eval:propertyget}\\
 		&\begin{multlined}
 		\cesktranswheresplit%
 			{\evalconf{\DirectPropertyGet{\expressionmeta}{\membermeta}}{\env}{\strace}{\cstrace}{\cex}{\econt}}%
 			{\evalconf{\expressionmeta}{\env}{\strace}{\cstrace}{\cex}{\econt'}}%
 			{\text{where $\econt' = \DPropertyGetK$}}
-        \end{multlined}\\
+        \end{multlined}
+        \label{eval:dpropertyget}\\
         &\begin{multlined}
 		\cesktranswheresplit%
 			{\evalconf{\PropertySet{\expressionmeta_0}{\idmeta}{\expressionmeta_1}}{\env}{\strace}{\cstrace}{\cex}{\econt}}%
 			{\evalconf{\expressionmeta_0}{\env}{\strace}{\cstrace}{\cex}{\econt'}}%
 			{\text{where $\econt' = \PropertySetK$}}
-        \end{multlined}\\
+        \end{multlined}
+        \label{eval:propertyset}\\
         &\begin{multlined}
 		\cesktranswheresplit%
 			{\evalconf{\DirectPropertySet{\expressionmeta_0}{\membermeta}{\expressionmeta_1}}{\env}{\strace}{\cstrace}{\cex}{\econt}}%
 			{\evalconf{\expressionmeta}{\env}{\strace}{\cstrace}{\cex}{\econt'}}%
 			{\text{where $\econt' = \DirectPropertySetK$}}
-        \end{multlined}\\
+        \end{multlined}
+        \label{eval:dpropertyset}\\
         &\begin{multlined}
 		\cesktranswheresplit%
 			{\evalconf{\SuperPropertyGet{\idmeta}}{\env}{\strace}{\cstrace}{\cex}{\econt}}%
 			{\contconf{\econt}{\funval{\formals}{\stmt}{\env'}}}%
             {\parbox{10cm}{where $\env' = \ext{\env_{empty}}{\this}{\deref{(\env(\this))}}$,\\ $\membermeta = \superclass{\deref{\env(\this)}}.lookup(\idmeta)$,\\ $\membermeta$ is a method tear-off with formal parameters $\formals$, and body $\stmt$}}
-        \end{multlined}\\
+        \end{multlined}
+        \label{eval:superpropertyget-tearoff}\\
         &\begin{multlined}
 		\cesktranswheresplit%
 			{\evalconf{\SuperPropertyGet{\idmeta}}{\env}{\strace}{\cstrace}{\cex}{\econt}}%
 			{\execconf{\stmt}{\env'}{\lbls}{\clbls}{\handler}{\cstrace}{\cex}{\econt}{\scont}}%
             {\parbox{10cm}{where $\env' = \ext{\env_{empty}}{\this}{\deref{(\env(\this))}}$,\\ $\scont = \emptyset$, $\membermeta = \superclass{\deref{\env(\this)}}.lookup(\idmeta)$,\\ $\membermeta$ is a getter method with body $\stmt$}}
-        \end{multlined}\\
+        \end{multlined}
+        \label{eval:superpropertyget-getter}\\
         &\begin{multlined}
 		\cesktranswheresplit%
 			{\evalconf{\SuperPropertyGet{\idmeta}}{\env}{\strace}{\cstrace}{\cex}{\econt}}%
 			{\contconf{\econt}{M(\deref{(\env(\this))})}}%
             {\text{where $\membermeta = \superclass{\deref{\env(\this)}}.lookup(\idmeta)$, $\membermeta$ is a implicit field getter}}
-        \end{multlined}\\
+        \end{multlined}
+        \label{eval:superpropertyget-field}\\
         &\begin{multlined}
 		\cesktranswheresplit%
 			{\evalconf{\SuperPropertySet{\idmeta}{\expressionmeta}}{\env}{\strace}{\cstrace}{\cex}{\econt}}%
 			{\evalconf{\expressionmeta}{\env}{\strace}{\cstrace}{\cex}{\econt'}}%
             {\text{where $\econt' = \SuperPropertySetK$}}
         \end{multlined}
+        \label{eval:superpropertyset}
     \end{align}
 	\caption{The CESK-transition function for EvalConfiguration: instance property extraction and assignment}
+	\label{figure:instance-property-evalconfigs}
+\end{figure}
+\begin{figure}[Htp]
+    \begin{align}
+	&\begin{multlined}
+	\cesktranswheresplit*%
+		{\contconf{\PropertyGetK}{\val}}%
+		{\contconf{\econt}{\funval{\formals}{\stmt}{\env}}}
+		{\parbox{10cm}{if $\membermeta$ is a method with body $\stmt$ and formals $\formals$ \\
+		where $\env = \ext{\env_{empty}}{\mathbf{this}}{\val}$}}
+	\end{multlined}
+	\label{econtconf:propertyget-tearoff}\\
+	&\begin{multlined}
+		\cesktranswheresplit*%
+		{\contconf{\PropertyGetK}{\val}}%
+		{\execconf{\stmt}{\env}{[]}{[]}{\handler}{\cstrace}{\cex}{\econt}{\scont}}%
+		{\parbox{10cm}{if $\membermeta$ is a getter with body $\stmt$\\
+		where $\env = \ext{\env_{empty}}{\mathbf{this}}{\val}$\\
+		$\scont = \emptyset$}}
+	\end{multlined}
+	\label{econtconf:propertyget-getter}\\
+	&\begin{multlined}
+		\cesktranswheresplit%
+		{\contconf{\PropertyGetK}{\val}}%
+		{\contconf{\econt}{\textrm{\membermeta}(\val)}}%
+		{\parbox{10cm}{if $\membermeta$ is an implicit getter for field $\idmeta$\\
+		where $\env = \ext{\env_{empty}}{\mathbf{this}}{\val}$\\
+		$\scont = \emptyset$}}
+	\end{multlined}
+	\label{econtconf:propertyget-field}
+	\end{align}
+	\caption{The CESK-transition function for ValuePassingConfiguration: instance property extraction and assignment}
 	\label{figure:instance-property-evalconfigs}
 \end{figure}
 
 \subsubsection{Property extraction}
 \label{subsubsec:property-extraction}
 Kernel allows access of a member as a property, which can be either getter access, which executes the getter, or method extraction, which converts a method into a closure, also known as tear-off.
+Property extraction is supported with $\PropertyGet{\expr}{\idmeta}$.
+The evaluation of this expression is shown in \eqref{eval:propertyget}.\\
 \noindent
 After the evaluation of the receiver expression to a value $\val$, the property $\idmeta$ is looked up in methods, getters and implicit getters for the value $\val$.
-Let $\membermeta$ be the result of such lookup.
-\[
-  \begin{array}{lcl@{\hspace{30mm}}}
-	\textrm{if M is a method with body }\stmt\textrm{ and formals }\formals :\\
-	\hspace{2mm}
-	\cesktrans{
-		\contconf{\PropertyGetK}{\val}}{
-		\contconf{\econt}{\funval{\formals}{\stmt}{\env}}}\\
-	\textrm{with}\\
-	\hspace{3mm}
-	\env = \ext{\env_{empty}}{\mathbf{this}}{\val}\\[2mm]
+Let $\membermeta$ be the instance member result of such successful lookup below and in \eqref{econtconf:propertyget-field}, \eqref{econtconf:propertyget-getter} and \eqref{econtconf:propertyget-tearoff}.
+The evaluation of the expression proceeds as follow: 
+\begin{itemize}
+\item $\membermeta$ is a method tear-off\\
+When $\membermeta$ is a method tear-off, the evaluation of the property extraction expression proceeds as shown in \eqref{econtconf:propertyget-tearoff}.
+The member is converted to a value $\val \in \dfunval$, capturing the method body, its formal parameters and an environment with a $\tt{this}$ binding to a location that stores the current instance value and the expression continuation $\econt$ is applied to it.
+\item $\membermeta$ is a getter\\
+When $\membermeta$ is a getter, the body of the getter is executed as shown in the CESK-transition function step \eqref{econtconf:propertyget-getter}.
+The statement body is executed with an environment with a $\tt{this}$ binding to a location that stores the current instance value and no statement continuation.
+A getter should always contain a reachable return statement.
+\item $\membermeta$ is an implicit getter for a field $\idmeta$\\
+When $\membermeta$ is an implicit getter for field $\idmeta$ it is immediately applied on the receiver expression.
+Application of implicit getter on some instance value returns the value stored in the location this getter contains.
+Afterwards the continuation expression is applied to the value, as shown in \eqref{econtconf:propertyget-field}.
+\end{itemize}
 
-	\textrm{if M is getter with statement body }\stmt :\\
-	\hspace{2mm}
-	\cesktrans{
-		\contconf{\PropertyGetK}{\val}}{
-		\execconf{\stmt}{\env}{\lbls}{\clbls}{\handler}{\cstrace}{\cex}{\econt}{\scont}
-		}\\
-	\textrm{with}\\
-	\hspace{3mm}
-	\env = \ext{\env_{empty}}{\mathbf{this}}{\val}\\
-	\hspace{3mm}
-	\scont = \emptyset\\[2mm]
-
-	\textrm{if M is an implicit getter for field }\idmeta :\\
-	\hspace{2mm}
-	\cesktrans{
-		\contconf{\PropertyGetK}{\val}}{
-		\contconf{\econt}{\textrm{R}(\val)}}
-  \end{array}
-\]
 %If the lookup fails, noSuchMethod is created/invoked accordingly (TBD)
 
 \subsubsection{Direct property extraction}
