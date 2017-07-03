@@ -1536,7 +1536,24 @@ When $\membermeta$ is an instance field, the evaluation proceeds as shown in \eq
 		{\contconf{\econt}{\update{\val_0[\membermeta]}{\val_1}}}%
 		{\text{if $\membermeta$ is a field}}
 	\end{multlined}
-	\label{econtconf:dpropertyset-field}
+	\label{econtconf:propertyset-setter}\\
+	&\begin{multlined}
+		\cesktranswheresplit*%
+		{\contconf{\SuperPropertySetK}{\val}}
+		{\execconf{\stmt}{\env'}{\lbls}{\clbls}{\handler}{\cstrace}{\cex}{\econt}{\scont}}
+		{\parbox{10cm}{if $\membermeta$ is a setter method with body $\stmt$ and formal $\formal$\\
+		where $\env' =  \ext{\env_{empty}}{\this :: \formal :: []}{\deref{(\env(\this))} :: \val :: []}$,\\
+		$\scont = \emptyset$}}
+	\end{multlined}
+	\label{econtconf:superpropertyset-setter}\\
+	&\begin{multlined}
+		\cesktranswheresplit%
+		{\contconf{\SuperPropertySetK}{\val}}%
+		{\contconf{\econt}{\val}}%
+		{\parbox{10cm}{if $\membermeta$ is a field\\
+		where $\update{\deref{(\env(\this))}[\membermeta]}{\val}$ after the transition}}
+	\end{multlined}
+	\label{econtconf:superpropertyset-field}
 	\end{align}
 	\caption{The CESK-transition function for ValuePassingConfiguration: instance property assignment}
 	\label{figure:instance-property-assignment-evalconfigs}
@@ -1596,27 +1613,21 @@ When $\membermeta$ is an instance field, the evaluation proceeds as shown in \eq
 \subsubsection{Super property assignment}
 \label{subsubsec:super-property-assignemnt}
 Kernel supports assignment of a super member with the expression $\SuperPropertySet{\idmeta}{\expressionmeta}$.
-Let $\val = \deref{(\env(\this))}$, $C = \superclass{\val}$ and $M$ the result of looking up $\idmeta$ in $C$.\\
-If $\membermeta$ is a setter method with body $\stmt$ and formal $\formal$:
-\[
-  \begin{array}{lcl}
-	\cesktrans{
-		\contconf{\SuperPropertySetK}{\val}}{
-		\execconf{\stmt}{\env'}{\lbls}{\clbls}{\handler}{\cstrace}{\cex}{\econt}{\scont}}\\
-  \end{array}
-\]
-with $\env' =  \ext{\env_{empty}}{\this :: \formal :: []}{\deref{(\env(\this))} :: \val :: []}, \hspace{2mm}\scont = \emptyset$.\\
-If $\membermeta$ is a implicit field setter:
-\[
-  \begin{array}{lcl}
-	\hspace{2mm}
-	\cesktrans{
-		\contconf{\SuperPropertySetK}{\val}}{
-		\contconf{\econt}{M(\deref{(\env(\this))}, \val)}}
-  \end{array}
-\]
-
-
+Let $\val' = \deref{(\env(\this))}$, $C = \superclass{\val'}$ and $M$ the result of looking up $\idmeta$ in $C$.\\
+The evaluation proceeds with evaluation of the right-hand side expression as shown in \eqref{eval:superpropertyset}.
+After the evaluation of the argument expression to a value $\val$, depending on $\membermeta$, the evaluation continues as follows:
+\begin{itemize}
+\item $\membermeta$ is an instance setter\\
+When $\membermeta$ is an invocation of a setter with body $\stmt$ and formal parameter $\formal$, the evaluation proceeds by executing the body in the environment which binds $\tt{this}$ to a location that contains $\deref{(\env(\this))}$ and the formal parameter $\formal$ to a location that contains $\val$.
+This is shown in the CESK-transition \eqref{econtconf:superpropertyset-setter}.
+Note that we add the special statement continuation $\ExitSK{\val_1}$, that will apply the value $\val$ to the current expression continuation.
+\item $\membermeta$ is a field\\
+When the lookup results with a field, the implicit setter for the field is invoked with the receiver value $\deref{(\env(\this))}$ and the field value $\val$, as shown in \eqref{econtconf:superpropertyset-field}.
+The $\update{\deref{(\env(\this))}[\membermeta]}{\val}$ modifies the value stored in the location of field $\membermeta$ with the right-hand side expression.
+\end{itemize}
+%
+%
+%
 \begin{figure}[Htp]
     \begin{align}
         &\begin{multlined}
