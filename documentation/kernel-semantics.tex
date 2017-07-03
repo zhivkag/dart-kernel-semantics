@@ -1576,11 +1576,22 @@ When $\membermeta$ is a field the value stored at location $\val_0[\membermeta]$
 \end{itemize}
 \subsubsection{Super property get}
 \label{subsubsec:super-property-get}
-%\newcommand{\SuperPropertyGet}[1]{\tt{super}.#1}
 Kernel allows access of a superclass member as a property, which can be either getter access, which executes the getter, or method extraction, which converts a method into a closure.
 \noindent
 Accessing a superclass member is accessed with the expression $\SuperPropertyGet{\idmeta}$ evaluated with the corresponding components: $\env$, $\strace$, $\handler$, $\cstrace$, $\cex$, $\econt$.
-Let $\val = \deref{(\env(\this))}$, $C = \superclass{\val}$ and $M$ the result of looking up $\idmeta$ in $C$.\\
+Let $\val = \deref{(\env(\this))}$, $C = \superclass{\val}$ and $\membermeta$ the result of looking up $\idmeta$ in $C$.
+The evaluation of a super property extraction proceeds as follows:
+\begin{itemize}
+\item $\membermeta$ is a method tear-off\\
+When $\membermeta$ is a method tear-off, the evaluation of super property extraction expression proceeds as shown in \eqref{eval:superpropertyget-tearoff}.
+The member with body $\stmt$ and formal parameters $\formals$ is converted to a value $\val \in \dfunval$.
+The value $\val$ captures the method body, its formal parameters and an environment with a $\tt{this}$ binding to a location that stores the current instance value and the expression continuation $\econt$ is applied to it.
+\item $\membermeta$ is an instance getter\\
+When $\membermeta$ is an instance getter, the statement body of the getter is executed.
+The CESK-transition is shown in \eqref{eval:superpropertyget-getter}.
+\item $\membermeta$ is an instance field\\
+When $\membermeta$ is an instance field, the evaluation proceeds as shown in \eqref{eval:superpropertyget-field}.
+\end{itemize}
 
 \subsubsection{Super property assignment}
 \label{subsubsec:super-property-assignemnt}
