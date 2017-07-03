@@ -1441,33 +1441,10 @@ A statement continuation, $\ExitSK{\econt}{\tt{null}}$ is added as next statemen
 		{\contconf{\econt}{\deref{\val[\membermeta]}}}%
 		{\text{if $\membermeta$ is a field }}
 	\end{multlined}
-	\label{econtconf:dpropertyget-field}\\
-	&\begin{multlined}
-		\cesktranswheresplit*%
-		{\contconf{\PropertySetK}{\val_0}}%
-		{\evalconf{\expressionmeta_1}{\env}{\strace}{\cstrace}{\cex}{\econt'}}%
-		{\text{where $\econt' = \PropertySetVK$}}
-	\end{multlined}
-	\label{econtconf:propertyset-val}\\
-	&\begin{multlined}
-		\cesktranswheresplit*%
-		{\contconf{\PropertySetVK}{\val_1}}%
-		{\execconf{\stmt}{\env}{\lbls}{\clbls}{\handler}{\cstrace}{\cex}{\econt}{\scont}}%
-		{\parbox{10cm}{if \membermeta is setter with statement body $\stmt$ and formal parameter $\formal$\\
-		where $\env = \ext{\env_{empty}}{\mathbf{this} :: \formal :: []}{\val_0 :: \val_1 :: []}$\\
-		$\scont = \ExitSK{\val_1}$}}
-	\end{multlined}
-	\label{econtconf:propertyset-setter}\\
-	&\begin{multlined}
-		\cesktranswheresplit%
-		{\contconf{\PropertySetVK}{\val}}%
-		{\contconf{\econt}{\{\membermeta\}(\val_0, \val_1)}}%
-		{\text{if $\membermeta$ is an implicit setter for field $\idmeta$}}
-	\end{multlined}
-	\label{econtconf:propertyset-field}
+	\label{econtconf:dpropertyget-field}
 	\end{align}
-	\caption{The CESK-transition function for ValuePassingConfiguration: instance property extraction and assignment}
-	\label{figure:instance-property-evalconfigs}
+	\caption{The CESK-transition function for ValuePassingConfiguration: instance property extraction}
+	\label{figure:econtconf:instance-property-extraction}
 \end{figure}
 
 \subsubsection{Property extraction}
@@ -1510,6 +1487,60 @@ When $\membermeta$ is an instance getter, the statement body of the getter is ex
 \item $\membermeta$ is an instance field\\
 When $\membermeta$ is an instance field, the evaluation proceeds as shown in \eqref{econtconf:dpropertyget-field}.
 \end{itemize}
+
+\begin{figure}[Htp]
+    \begin{align}
+	&\begin{multlined}
+		\cesktranswheresplit*%
+		{\contconf{\PropertySetK}{\val_0}}%
+		{\evalconf{\expressionmeta_1}{\env}{\strace}{\cstrace}{\cex}{\econt'}}%
+		{\text{where $\econt' = \PropertySetVK$}}
+	\end{multlined}
+	\label{econtconf:propertyset-val}\\
+	&\begin{multlined}
+		\cesktranswheresplit*%
+		{\contconf{\PropertySetVK}{\val_1}}%
+		{\execconf{\stmt}{\env}{\lbls}{\clbls}{\handler}{\cstrace}{\cex}{\econt}{\scont}}%
+		{\parbox{10cm}{if \membermeta is setter with statement body $\stmt$ and formal parameter $\formal$\\
+		where $\env = \ext{\env_{empty}}{\mathbf{this} :: \formal :: []}{\val_0 :: \val_1 :: []}$\\
+		$\scont = \ExitSK{\val_1}$}}
+	\end{multlined}
+	\label{econtconf:propertyset-setter}\\
+	&\begin{multlined}
+		\cesktranswheresplit%
+		{\contconf{\PropertySetVK}{\val}}%
+		{\contconf{\econt}{\{\membermeta\}(\val_0, \val_1)}}%
+		{\text{if $\membermeta$ is an implicit setter for field $\idmeta$}}
+	\end{multlined}
+	\label{econtconf:propertyset-field}\\
+	&\begin{multlined}
+		\cesktranswheresplit*%
+		{\contconf{\DirectPropertySetK}{\val_0}}%
+		{\evalconf{\expressionmeta_1}{\env}{\strace}{\cstrace}{\cex}{\econt'}}%
+		{\parbox{10cm}{	if $\membermeta$ is setter with statement body $\stmt$ and formal $\formal$\\
+		where $\econt' = \DPropertySetVK$}}
+	\end{multlined}
+	\label{econtconf:dpropertyset-val}\\
+	&\begin{multlined}
+		\cesktranswheresplit*%
+		{\contconf{\DPropertySetVK}{\val_1}}
+		{\execconf{\stmt}{\env}{\lbls}{\clbls}{\handler}{\cstrace}{\cex}{\econt}{\scont}}
+		{\parbox{10cm}{if $\membermeta$ is a setter with body $\stmt$ and formal parameter $\formal$
+		where $\env = \ext{\env_{empty}}{\mathbf{this} :: \formal :: []}{\val_0 :: \val_1 :: []}$\\
+		$\scont = \emptyset$\\}}
+	\end{multlined}
+	\label{econtconf:dpropertyset-setter}\\
+	&\begin{multlined}
+		\cesktranswheresplit*%
+		{\contconf{\DPropertySetVK}{\val_1}}%
+		{\contconf{\econt}{\update{\val_0[\membermeta]}{\val_1}}}%
+		{\text{if $\membermeta$ is a field}}
+	\end{multlined}
+	\label{econtconf:dpropertyset-field}
+	\end{align}
+	\caption{The CESK-transition function for ValuePassingConfiguration: instance property assignment}
+	\label{figure:instance-property-assignment-evalconfigs}
+\end{figure}
 \subsubsection{Property assignment}
 \label{subsubsec:property-assignment}
 An assignment in Kernel results with the invocation of a setter.
@@ -1532,37 +1563,17 @@ The value returned by the implicit function is $\val_1$.
 \end{itemize}
 \subsubsection{Direct property assignment}
 \label{subsubsec:direct-property-assignment}
-In Kernel a property can be set without lookup, by direct reference to the $AST$ node of the property.
-This implies that the lookup step above is bypassed.
-
-\[
-  \begin{array}{lcl@{\hspace{30mm}}}
-	\cesktrans{
-		\contconf{\DirectPropertySetK}{\val_0}}{
-		\evalconf{\expressionmeta_1}{\env}{\strace}{\cstrace}{\cex}{\econt'}}\\
-	\textrm{with}\\
-	\hspace{3mm}
-	\econt' = \DPropertySetVK\\[2mm]
-
-	\textrm{if }\membermeta \textrm{ is setter with statement body }\stmt \textrm{ and formal }\formal :\\
-	\hspace{2mm}
-	\cesktrans{
-		\contconf{\DPropertySetVK}{\val_1}}{
-		\execconf{\stmt}{\env}{\lbls}{\clbls}{\handler}{\cstrace}{\cex}{\econt}{\scont}}\\
-	\textrm{with}\\
-	\hspace{3mm}
-	\env = \ext{\env_{empty}}{\mathbf{this} :: \formal :: []}{\val_0 :: \val_1 :: []}\\
-	\hspace{3mm}
-	\scont = \emptyset\\[2mm]
-
-	\textrm{if }\membermeta \textrm{ is a field } :\\
-	\hspace{2mm}
-	\cesktrans{
-		\contconf{\DPropertySetVK}{\val_1}}{
-		\contconf{\econt}{\update{\val_0[\membermeta]}{\val_1}}}
-  \end{array}
-\]
-
+In Kernel a property can be set without lookup, by direct reference to the member of the instance.
+This implies that the lookup step described in \ref{subsubsec:property-assignment} above is bypassed.
+The evaluation of direct property assignment proceeds by evaluating the right-hand side expression, i.e. the receiver expression as shown in \eqref{eval:dpropertyset}.
+Afterwards, the evaluation continues with the left-hand side expression as shown in \eqref{econtconf:dpropertyset-val}.
+After evaluating the receiver expression to $\val_0$ and the argument expression to $\val_1$, depending on $\membermeta$, the evaluation continues as follows:
+\begin{itemize}
+\item $\membermeta$ is an instance setter\\
+When $\membermeta$ is an instance setter with body $\stmt$ and formal parameter $\formal$, the evaluation of the expression proceeds with execution of the body with an environment binding $\tt{this}$ to a location containing $\val_0$ and the formal parameter $\formal$ to a location storing $\val_1$.
+\item $\membermeta$ is a field\\
+When $\membermeta$ is a field the value stored at location $\val_0[\membermeta]$ is modified to store value the argument expression evaluates to, $\val_1$, as shown in \eqref{econtconf:dpropertyset-field}.
+\end{itemize}
 \subsubsection{Super property get}
 \label{subsubsec:super-property-get}
 %\newcommand{\SuperPropertyGet}[1]{\tt{super}.#1}
