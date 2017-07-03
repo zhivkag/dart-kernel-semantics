@@ -585,6 +585,7 @@ Application continuations, $\acont$, capture the application of a list of values
 \newcommand{\ForInitA}{\mathrm{ForInitA}(\mathrm{\varmeta{s}},\, \expressionmeta,\, \exprs,\, \statementmeta,\, \env,\, \lbls,\, \clbls,\, \handler,\, \cstrace,\, \cex,\, \econt,\, \scont)}
 %
 \newcommand{\ForUpdatesA}[1]{\mathrm{ForUpdatesA}(\mathrm{\varmeta{s}},\, \expressionmeta,\, \exprs,\, \statementmeta,\, \env,\, #1,\, \lbls,\, \clbls,\, \handler,\, \cstrace,\, \cex,\, \econt,\, \scont)}
+\newcommand{\InstanceMethodA}{\mathrm{InstanceMethodA(\idmeta,\,\val,\,\strace,\,\handler,\,\cstrace,\,\cex,\,\econt)}}
 \noindent
 We use the application continuation $\ValueA{\acont}{\val}$, capturing a value and an application continuation, as application that adds a value to the list of values to eventually used by an application continuation that produces a configuration other than ApplicationConfiguration.\\
 \noindent
@@ -1547,7 +1548,7 @@ When $\membermeta$ is an instance field, the evaluation proceeds as shown in \eq
 		{\contconf{\econt}{\update{\val_0[\membermeta]}{\val_1}}}%
 		{\text{if $\membermeta$ is a field}}
 	\end{multlined}
-	\label{econtconf:propertyset-setter}\\
+	\label{econtconf:dpropertyset-field}\\
 	&\begin{multlined}
 		\cesktranswheresplit*%
 		{\contconf{\SuperPropertySetK}{\val}}
@@ -1642,70 +1643,94 @@ The $\update{\deref{(\env(\this))}[\membermeta]}{\val}$ modifies the value store
 %
 \begin{figure}[Htp]
     \begin{align}
-        &\begin{multlined}
+		&\begin{multlined}
 		\cesktranswheresplit%
 			{\evalconf{\InstanceMethodInvocation{\expressionmeta}{\idmeta}{\expressionsmeta}}{\env}{\strace}{\cstrace}{\cex}{\econt}}%
 			{\evalconf{\expressionmeta}{\env}{\strace}{\cstrace}{\cex}{\econt'}}%
 			{\econt' = \InstanceMethodK}
-        \end{multlined}\\
-        &\begin{multlined}
-		\cesktranswheresplit%
+		\end{multlined}
+		\label{eval:instancemethod}\\
+		&\begin{multlined}
+			\cesktranswheresplit%
 			{\evalconf{\DInstanceMethodInvocation{\expressionmeta}{\membermeta}{\expressionsmeta}}{\env}{\strace}{\cstrace}{\cex}{\econt}}%
 			{\evalconf{\expressionmeta}{\env}{\strace}{\cstrace}{\cex}{\econt'}}%
 			{\econt' = \DInstanceMethodK}
-        \end{multlined}\\
-        &\begin{multlined}
-		\cesktranswheresplit%
+		\end{multlined}
+		\label{eval:dinstancemethod}\\
+		&\begin{multlined}
+			\cesktranswheresplit%
 			{\evalconf{\SuperMethodInvocation{\idmeta}{\expressionsmeta}}{\env}{\strace}{\cstrace}{\cex}{\econt}}%
 			{\evallistconf{\expressionsmeta}{\env}{\strace}{\cstrace}{\cex}{\acont}}%
 			{\acont = \SuperMethodA}
-        \end{multlined}\\
-        &\begin{multlined}
-		\cesktranswheresplit%
+		\end{multlined}
+		\label{eval:superinstancemethod}\\
+		&\begin{multlined}
+			\cesktranswheresplit%
 			{\evalconf{\textbf{new Q}(\exprs)}{\env}{st}{cex}{cst}{\econt}}%
 			{\evallistconf{\exprs}{\env}{st}{cex}{cst}{\acont'}}%
 			{\acont' = \ConstructorA{Q}{\econt}}
-        \end{multlined}
-    \end{align}
+		\end{multlined}
+		\label{eval:ctrinvocation}
+	\end{align}
 	\caption{The CESK-transition function for EvalConfiguration: instance method and constructor invocation}
+	\label{figure:instance-method-evalconfigs}
+\end{figure}
+%
+%
+%
+\begin{figure}[Htp]
+    \begin{align}
+    &\begin{multlined}
+		\cesktranswheresplit*%
+		{\contconf{\InstanceMethodK}{\val}}%
+		{\evallistconf{\expressionsmeta}{\env}{\strace}{\cstrace}{\cex}{\acont'}}%
+		{\text{where $\acont' = \InstanceMethodA$}}
+	\end{multlined}
+	\label{econtconf:instancemethod}
+	\end{align}
+	\caption{The CESK-transition function for ValuePassingConfiguration: instance method and constructor invocation}
+	\label{figure:instance-method-evalconfigs}
+\end{figure}
+%
+%
+%
+\begin{figure}[Htp]
+    \begin{align}
+    &\begin{multlined}
+			\cesktranswheresplit*%
+			{\contconf{\InstanceMethodA}{\val{s}}}%
+			{\execconf{\stmt}{\env}{[]}{[]}{\handler}{\cstrace}{\cex}{\econt}{\scont}}
+			{\parbox{10cm}{where $\scont = \ExitSK{\tt{null}}$\\
+			$\env = \ext{\env_{empty}}{\this :: \formals}{\val :: \val{s}}$}}
+	\end{multlined}
+	\label{acontconf:instancemethod}
+	\end{align}
+	\caption{The CESK-transition function for ApplicationConfigurations}
+	\label{figure:instance-method-evalconfigs}
+\end{figure}
+%
+%
+%
+\begin{figure}[Htp]
+    \begin{align}
+    \cesktrans%
+		{\scontconf{\ExitSK{\val}}{\env}}%
+		{\contconf{\econt}{\val}}
+	\end{align}
+	\caption{The CESK-transition function for ForwardConfigurations}
 	\label{figure:instance-method-evalconfigs}
 \end{figure}
 \subsubsection{Instance method invocation}
 \label{subsubsec:instance-method-invoc}
-Method invocation is supported with $\InstanceMethodInvocation{\expressionmeta}{\idmeta}{\expressionsmeta}$.
-
-\noindent
-The arguments $\expressionsmeta$ are evaluated after the evaluation of the receiver.
-\newcommand{\InstanceMethodInvocationArgsApp}{\mathrm{InstanceMethodA(\idmeta,\,\val,\,\strace,\,\handler,\,\cstrace,\,\cex,\,\econt)}}
-\[
-  \begin{array}{lcl}
-	\cesktrans{
-		\contconf{\InstanceMethodK}{\val}}{
-		\evallistconf{\expressionsmeta}{\env}{\strace}{\cstrace}{\cex}{\acont'}}
-	\\
-	\textrm{with } \acont' = \InstanceMethodInvocationArgsApp
-  \end{array}
-\]
-\noindent
-After the evaluation of the receiver expression to a value $\val$ and the argument expressions to $\vals$, the instance method $\idmeta$ is looked up in methods for the value $\val$.
-Let $\membermeta$ be the result of such lookup.
-
-\noindent
-Let $\membermeta$ be a method with statement body $\stmt$ and formal parameters $\formals$:
-\[
-  \begin{array}{lcl}
-	\cesktrans{
-		\contconf{\InstanceMethodInvocationArgsApp}{\val{s}}}{
-		\execconf{\stmt}{\env}{[]}{[]}{\handler}{\cstrace}{\cex}{\econt}{\scont}}
-	\\[2mm]
-	\cesktrans{
-		\scontconf{\ExitSK{\val}}{\env}}{
-		\contconf{\econt}{\val}}
-  \end{array}
-\]
-with $\scont = \ExitSK{\tt{null}}, \env = \ext{\env_{empty}}{\this :: \formals}{\val :: \val{s}}$.\\[2mm]
-
-\noindent
+Method invocation is supported with $\InstanceMethodInvocation{\expressionmeta}{\idmeta}{\expressionsmeta}$.\\
+The evaluation of instance method invocation proceeds with the evaluation of the left-hand side expression, i.e. the receiver expression as shown in \eqref{eval:instancemethod}.
+As shown in the CESK-transition \eqref{econtconf:instancemethod}, the argument expressions evaluate to a list of values.\\
+After the evaluation of the receiver expression to a value $\val$, we proceed with evaluation of the argument expressions.
+After the evaluation of the receiver expression to a value $\val$ and the argument expressions to $\vals$, the instance method $\idmeta$ is looked up in the instance methods for the value $\val$.
+Let $\membermeta$ be the result of such lookup with statement body $\stmt$ and formal parameters $\formals$.
+The body $\stmt$ is then executed with an environment binding $\tt{this}$ to a location storing the instance value $\val$ and the formal parameters to fresh locations each storing the values in $\vals$.
+The CESK-transition is shown in \eqref{acontconf:instancemethod}.
+We add $\ExitSK{\tt{null}}$ as next statement continuation.
 When a $\tt{return}$ statement is missing in the statement body $\stmt$ of the instance method $\membermeta$, the statement continuation $\ExitSK{\val}$ ensures that the execution will proceed to the corresponding expression continuation, in this case with $\val = \tt{null}$.
 
 \subsubsection{Direct instance method invocation}
