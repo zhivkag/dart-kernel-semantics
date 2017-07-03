@@ -1321,6 +1321,10 @@ The evaluation of a static invocation proceeds by evaluating the arguments of th
 After the evaluation of the actual arguments for the invocation, the corresponding application is applied to the resulting list of values, as shown in \eqref{acontconf:staticinvoc}.
 In \eqref{acontconf:staticinvoc}, we apply the application continuation by creating a new environment for the execution of the body of the method by binding its formal parameters to the locations of the values for the actual arguments.
 A statement continuation, $\ExitSK{\econt}{\tt{null}}$ is added as next statement continuation to ensure that the execution of the body of the method returns correctly, when a return statement is not executed after the execution of the last statement of the body.
+%%
+% Figure showing the CESK-transition function strating from
+% ValuePassingConfiguration for instance property extraction and assignment.
+%%
 \begin{figure}[Htp]
     \begin{align}
 		&\begin{multlined}
@@ -1383,6 +1387,9 @@ A statement continuation, $\ExitSK{\econt}{\tt{null}}$ is added as next statemen
 	\caption{The CESK-transition function for EvalConfiguration: instance property extraction and assignment}
 	\label{figure:instance-property-evalconfigs}
 \end{figure}
+%%
+% Figure showing the CESK-transition function strating from ValuePassingConfiguration for instance property extraction.
+%%
 \begin{figure}[Htp]
     \begin{align}
 	&\begin{multlined}
@@ -1446,7 +1453,8 @@ A statement continuation, $\ExitSK{\econt}{\tt{null}}$ is added as next statemen
 	\caption{The CESK-transition function for ValuePassingConfiguration: instance property extraction}
 	\label{figure:econtconf:instance-property-extraction}
 \end{figure}
-
+%
+%
 \subsubsection{Property extraction}
 \label{subsubsec:property-extraction}
 Kernel allows access of a member as a property, which can be either getter access, which executes the getter, or method extraction, which converts a method into a closure, also known as tear-off.
@@ -1469,9 +1477,9 @@ When $\membermeta$ is an implicit getter for field $\idmeta$ it is immediately a
 Application of implicit getter on some instance value returns the value stored in the location this getter contains.
 Afterwards the continuation expression is applied to the value, as shown in \eqref{econtconf:propertyget-field}.
 \end{itemize}
-
 If the lookup fails, a "NoSuchMethod" will be thrown, as shown in \eqref{econtconf:propertyget-nosuchmethod}.
-
+%
+%
 \subsubsection{Direct property extraction}
 \label{subsubsec:direct-property-extraction}
 In Kernel a property can be accessed without lookup, by direct reference to the member $\membermeta$.
@@ -1487,7 +1495,10 @@ When $\membermeta$ is an instance getter, the statement body of the getter is ex
 \item $\membermeta$ is an instance field\\
 When $\membermeta$ is an instance field, the evaluation proceeds as shown in \eqref{econtconf:dpropertyget-field}.
 \end{itemize}
-
+%%
+% Figure showing the CESK-transition function strating from
+% ValuePassingConfiguration for instance property assignment.
+%%
 \begin{figure}[Htp]
     \begin{align}
 	&\begin{multlined}
@@ -1617,6 +1628,7 @@ Let $\val' = \deref{(\env(\this))}$, $C = \superclass{\val'}$ and $M$ the result
 The evaluation proceeds with evaluation of the right-hand side expression as shown in \eqref{eval:superpropertyset}.
 After the evaluation of the argument expression to a value $\val$, depending on $\membermeta$, the evaluation continues as follows:
 \begin{itemize}
+% todo: regroup all property extraction together since text is similar
 \item $\membermeta$ is an instance setter\\
 When $\membermeta$ is an invocation of a setter with body $\stmt$ and formal parameter $\formal$, the evaluation proceeds by executing the body in the environment which binds $\tt{this}$ to a location that contains $\deref{(\env(\this))}$ and the formal parameter $\formal$ to a location that contains $\val$.
 This is shown in the CESK-transition \eqref{econtconf:superpropertyset-setter}.
