@@ -483,7 +483,7 @@ The different expression continuations are shown in Figure~\ref{figure:econts}.
 \newcommand{\StaticSetK}{\mathrm{StaticSetK}(\membermeta,\,\econt)}
 \newcommand{\PropertyGetK}{\mathrm{PropertyGetK}(\idmeta,\,\ExceptionHandlers,\,\econt)}
 \newcommand{\PropertySetK}{\mathrm{PropertySetK}(\idmeta,\,\expressionmeta_1,\,\env,\,\ExceptionHandlers,\,\econt)}
-\newcommand{\PropertySetVK}{\mathrm{PropertySetValueK}(\val_0,\,\idmeta,\,\ExceptionHandlers\,\econt)}
+\newcommand{\PropertySetVK}{\mathrm{PropertySetValueK}(\val_0,\,\idmeta,\,\ExceptionHandlers,\,\econt)}
 \newcommand{\DPropertyGetK}{\mathrm{DPropertyGetK}(\membermeta,\,\ExceptionHandlers,\,\econt)}
 \newcommand{\DirectPropertySetK}{\mathrm{DPropertySetK}(\membermeta,\,\expressionmeta_1,\,\env,\,\ExceptionHandlers,\,\econt)}
 \newcommand{\DPropertySetVK}{\mathrm{DPropertySetValueK}(\val_0,\,\membermeta,\,\ExceptionHandlers,\,\econt)}
@@ -544,7 +544,7 @@ For other types of statement configuration, the environment is ignored.
 \noindent
 We suffix the names of statement continuations with ``$SK$''.
 The different statement continuations are shown in Figure~\ref{figure:sconts}.
-\newcommand{\ExitSK}[1]{\mathrm{ExitSK(\econt,\,#1)}}
+\newcommand{\ExitSK}[1]{\mathrm{ExitSK}(\econt,\,#1)}
 \newcommand{\BlockSK}[2]{\mathrm{BlockSK}({#1},\,{#2},\,\lbls,\,\clbls,\,\handler,\,\cstrace,\,\cex,\,\econt,\,\scont)}
 \newcommand{\WhileSK}{\mathrm{WhileSK}(\expr,\,\stmt,\,\env,\,\lbls,\,\clbls,\,\handler,\,\cstrace,\,\cex,\,\econt,\,\scont)}
 \newcommand{\BodySK}[3]{\mathrm{BodySK}({#1},\,{#2},\,\strace,\,\handler,\,\cstrace,\,\cex,\,{#3})}
@@ -1347,7 +1347,7 @@ A statement continuation, $\ExitSK{\econt}{\tt{null}}$ is added as next statemen
         &\begin{multlined}
 		\cesktranswheresplit%
 			{\evalconf{\DirectPropertySet{\expressionmeta_0}{\membermeta}{\expressionmeta_1}}{\env}{\strace}{\cstrace}{\cex}{\econt}}%
-			{\evalconf{\expressionmeta}{\env}{\strace}{\cstrace}{\cex}{\econt'}}%
+			{\evalconf{\expressionmeta_0}{\env}{\strace}{\cstrace}{\cex}{\econt'}}%
 			{\text{where $\econt' = \DirectPropertySetK$}}
         \end{multlined}
         \label{eval:dpropertyset}\\
@@ -1441,7 +1441,30 @@ A statement continuation, $\ExitSK{\econt}{\tt{null}}$ is added as next statemen
 		{\contconf{\econt}{\deref{\val[\membermeta]}}}%
 		{\text{if $\membermeta$ is a field }}
 	\end{multlined}
-	\label{econtconf:dpropertyget-field}
+	\label{econtconf:dpropertyget-field}\\
+	&\begin{multlined}
+		\cesktranswheresplit*%
+		{\contconf{\PropertySetK}{\val_0}}%
+		{\evalconf{\expressionmeta_1}{\env}{\strace}{\cstrace}{\cex}{\econt'}}%
+		{\text{where $\econt' = \PropertySetVK$}}
+	\end{multlined}
+	\label{econtconf:propertyset-val}\\
+	&\begin{multlined}
+		\cesktranswheresplit*%
+		{\contconf{\PropertySetVK}{\val_1}}%
+		{\execconf{\stmt}{\env}{\lbls}{\clbls}{\handler}{\cstrace}{\cex}{\econt}{\scont}}%
+		{\parbox{10cm}{if \membermeta is setter with statement body $\stmt$ and formal parameter $\formal$\\
+		where $\env = \ext{\env_{empty}}{\mathbf{this} :: \formal :: []}{\val_0 :: \val_1 :: []}$\\
+		$\scont = \ExitSK{\val_1}$}}
+	\end{multlined}
+	\label{econtconf:propertyset-setter}\\
+	&\begin{multlined}
+		\cesktranswheresplit%
+		{\contconf{\PropertySetVK}{\val}}%
+		{\contconf{\econt}{\{\membermeta\}(\val_0, \val_1)}}%
+		{\text{if $\membermeta$ is an implicit setter for field $\idmeta$}}
+	\end{multlined}
+	\label{econtconf:propertyset-field}
 	\end{align}
 	\caption{The CESK-transition function for ValuePassingConfiguration: instance property extraction and assignment}
 	\label{figure:instance-property-evalconfigs}
@@ -1489,40 +1512,24 @@ When $\membermeta$ is an instance field, the evaluation proceeds as shown in \eq
 \end{itemize}
 \subsubsection{Property assignment}
 \label{subsubsec:property-assignment}
-An assignment changes the value stored at the location of the provided property name.
-A property assignment in Kernel can be done by executing a setter or accessing an instance variable and setting its value.
-\[
-  \begin{array}{lcl}
-	\cesktrans{
-		\contconf{\PropertySetK}{\val_0}}{
-		\evalconf{\expressionmeta_1}{\env}{\strace}{\cstrace}{\cex}{\econt'}}\\
-	\econt' = \PropertySetVK
-  \end{array}
-\]
-\noindent
-After the evaluation of the receiver expression to a value $\val_0$ and the argument to value $\val_1$, the property $\idmeta$ is looked up in setters and implicit setters for the value $\val_0$.
+An assignment in Kernel results with the invocation of a setter.
+The evaluation of a property assignment proceeds as follows.\\
+First, the left-hand side expression, i.e. the receiver expression, is evaluated as shown in \eqref{eval:propertyset}.
+Afterwards, the right-hand side expression is evaluated, as shown in \eqref{econtconf:propertyset-val}.
+After the evaluation of the receiver expression to a value $\val_0$ and the argument to value $\val_1$, the property $\idmeta$ is looked up in the properties for the value $\val_0$.
+and implicit setters for the value $\val_0$.
 Let $\membermeta$ be the result of such lookup.
-\[
-  \begin{array}{lcl}
-	\textrm{if \membermeta is setter with statement body }\stmt \textrm{ and formal }\formal :\\
-	\hspace{2mm}
-	\cesktrans{
-		\contconf{\PropertySetVK}{\val_1}}{
-		\execconf{\stmt}{\env}{\lbls}{\clbls}{\handler}{\cstrace}{\cex}{\econt}{\scont}}\\
-	\textrm{with}\\
-	\hspace{3mm}
-	\env = \ext{\env_{empty}}{\mathbf{this} :: \formal :: []}{\val_0 :: \val_1 :: []}\\
-	\hspace{3mm}
-	\scont = \emptyset\\[2mm]
-
-	\textrm{if \membermeta is an implicit setter for field }\idmeta :\\
-	\hspace{2mm}
-	\cesktrans{
-		\contconf{\PropertySetK}{\val}}{
-		\contconf{\econt}{\textrm{R}(\val_0, \val_1)}}
-  \end{array}
-\]
-
+The evaluation proceeds as follows:
+\begin{itemize}
+\item $\membermeta$ is a setter invocation\\
+When $\membermeta$ is an invocation of a setter with body $\stmt$ and formal parameter $\formal$, the evaluation proceeds by executing the body in the environment which binds $\tt{this}$ to a location that contains $\val_0$ and the formal parameter $\formal$ to a location that contains $\val_1$.
+This is shown in the CESK-transition \eqref{econtconf:propertyset-setter}.
+Note that we add the special statement continuation $\ExitSK{\val_1}$, that will apply the value $\val_1$ to the current expression continuation.
+\item $\membermeta$ is a field\\
+When the lookup results with a field, the implicit setter for the field is invoked with the receiver value and the field value as shown in \eqref{econtconf:propertyset-field}.
+The $\{\membermeta\}(\val_0, \val_1)$ is the implicit setter for the field $\membermeta$ which is a function in the domain $\dval \times \dval \rightarrow \dval$.
+The value returned by the implicit function is $\val_1$.
+\end{itemize}
 \subsubsection{Direct property assignment}
 \label{subsubsec:direct-property-assignment}
 In Kernel a property can be set without lookup, by direct reference to the $AST$ node of the property.
