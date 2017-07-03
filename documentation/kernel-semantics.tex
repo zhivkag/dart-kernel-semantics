@@ -372,40 +372,40 @@ Note that for other invocations, we first evaluate the receiver for instance inv
 
 \subsubsection{EvalListConfigruation}
 \label{subsubsec:evallistconfig}
-The configuration EvalListConfiguration is shown in \ref{config:evallist}.
+The configuration EvalListConfiguration is shown in Figure~\ref{config:evallist}.
 The transition step for this configuration dispatches on the expression list, $\exprs$.
 With one step of the CESK-transition function, from EvalListConfifuration the next configuration is either EvalConfiguration, when $\exprs \neq []$, or ApplicationConfiguration, otherwise.
 
 \subsubsection{ExecConfiguration}
 \label{subsubsec:execconfig}
 
-The configuration ExecConfiguration is shown in \ref{config:exec}.
+The configuration ExecConfiguration is shown in Figure~\ref{config:exec}.
 The transition step dispatches on the statement, $\stmt$.
 The next configuration is either EvalConfiguration or ExecConfiguration.
 
 \subsubsection{ValuePassingConfiguration}
 \label{suubsubsec:valuepassingconfig}
 
-The configuration ValuePassingConfiguration is shown in \ref{config:econt}.
+The configuration ValuePassingConfiguration is shown in Figure~\ref{config:econt}.
 The transition step applies the expression continuation component to its value component.
 The expression continuation produces the next configuration.
 
 \subsubsection{ApplicationConfiguration}
 \label{subsubsec:applicationconfig}
 
-The configuration ApplicationConfiguration is shown in \ref{config:acont}.
+The configuration ApplicationConfiguration is shown in Figure~\ref{config:acont}.
 The transition step applies the application continuation component to its list of values component.
 The application continuation produces the next configuration.
 \subsubsection{ForwardConfiguration}
 \label{subsubsec:forwardconfig}
 
-The configuration ForwardConfiguration is shown in \ref{config:scont}.
+The configuration ForwardConfiguration is shown in Figure~\ref{config:scont}.
 The transition step applies the statement continuation component to its environment component.
 The statement continuation produces the next configuration.
 
 \subsubsection{ThrowCongfiguration}
 \label{subsubsec:throwconfig}
-The configuration ThrowConfiguration is shown in \ref{config:throw}.
+The configuration ThrowConfiguration is shown in Figure~\ref{config:throw}.
 The transition step applies the exception handler.
 The next configuration is:
 \begin{itemize}
@@ -414,13 +414,13 @@ The next configuration is:
 \end{itemize}
 \subsubsection{BreakConfiguration}
 \label{subsubsec:breakconfig}
-The configuration BreakConfiguration is shown in \ref{config:bcont}.
+The configuration BreakConfiguration is shown in Figure~\ref{config:bcont}.
 The transition step applies the break continuation component.
 The next configuration is ForwardConfiguration.
 \subsubsection{SwitchConfiguration}
 \label{subsubsec:switchconfig}
 
-The configuration SwitchConfiguration is shown in \ref{config:switchcont}.
+The configuration SwitchConfiguration is shown in Figure~\ref{config:switchcont}.
 The transition step applies the switch continuation component.
 The next configuration is ExecConfiguration.
 
@@ -455,7 +455,7 @@ There are various kinds of configurations, but two more general types can be dis
 \begin{itemize}
 \item Continuations with holes, i.e. expressions to be evaluated\\
 Expression continuations with expressions will produce EvalConfiguration for evaluation of the next expression.
-Note that some continuation will not evaluate the captured expression, when this is not necessary (e.g., \ref{eval:bool-expressions}).
+Note that some continuation will not evaluate the captured expression, when this is not necessary (e.g., \eqref{eval:and}).
 
 \item Continuations without holes\\
 Continuations without holes dispatch on the provided value and produce the next configuration, a ValuePassingConfiguration.
@@ -503,7 +503,7 @@ The different expression continuations are shown in Figure~\ref{figure:econts}.
 %
 %
 \newcommand{\ForCondK}{\mathrm{ForCondK}(\mathrm{\varmeta{s}},\, \expressionmeta,\, \exprs,\, \statementmeta,\, \env,\, \env',\, \lbls,\, \clbls,\, \handler,\, \cstrace,\, \cex,\, \econt,\, \scont)}
-
+\newcommand{\ExpressionK}[2]{\mathrm{ExpressionK}({#1},\,{#2})}
 \begin{figure}[Htp]
   \begin{align}
 	&\VarSetK{\idmeta}{\ExceptionHandlers}{\econt} \label{econt:varset}\\
@@ -527,7 +527,8 @@ The different expression continuations are shown in Figure~\ref{figure:econts}.
 	&\DInstanceMethodK \label{econt:dinstance-method}\\
 	&\VarDeclK{\idmeta}{\env}{\scont} \label{econt:var-decl}\\
 	&\IfCondK{\expressionmeta_1}{\expressionmeta_2} \label{econt:if-cond}\\
-	&\ForCondK \label{econt:for-cond}
+	&\ForCondK \label{econt:for-cond}\\
+	&\ExpressionK{\scont}{\env} \label{econt:expression}
   \end{align}
   \caption{Expression Continuations}
   \label{figure:econts}
@@ -1153,6 +1154,10 @@ The function $\concat$ concatenates the strings from the given meta-list into a 
 \end{align*}
 The evaluation of concatenation expression proceeds by evaluating the target expressions in the specified order, as shown with the CESK-transition \eqref{eval:concat}.
 Once all expressions have been evaluated the corresponding application is applied, as shown in \eqref{acontconf:concat}, which results with an expression continuation application to the resulting $\dstring$.
+\subsubsection{This}
+For the evaluation of $\this$ expression we add a special variable declaration, $\this$.
+In the body of instance methods or constructors, there is a binding in the corresponding environment from $\this$ variable declaration to a location that stores the corresponding value.
+Evaluation of $\this$ expression resolves to that value in one step, as shown in \eqref{eval:this}.
 \subsubsection{Type test}
 \label{subsubsec:type-test}
 Type test expressions evaluate to a boolean literal value, in more than one step.
@@ -1693,7 +1698,7 @@ The $\update{\deref{(\env(\this))}[\membermeta]}{\val}$ modifies the value store
 		{\evallistconf{\expressionsmeta}{\env}{\strace}{\cstrace}{\cex}{\acont'}}%
 		{\text{where $\acont' = \DInstanceMethodA$}}
 	\end{multlined}
-	\label{econtconf:dinstancemthod}
+	\label{econtconf:dinstancemethod}
 	\end{align}
 	\caption{The CESK-transition function for ValuePassingConfiguration: instance method and constructor invocation}
 	\label{figure:instance-method-evalconfigs}
@@ -1720,7 +1725,15 @@ The $\update{\deref{(\env(\this))}[\membermeta]}{\val}$ modifies the value store
 			$\scont = \ExitSK{\tt{null}}$,\\
 			$\env = \ext{\env_{empty}}{\this :: \formals}{\val :: \val{s}}$}}
 	\end{multlined}
-	\label{acontconf:dinstancemethod}
+	\label{acontconf:dinstancemethod}\\
+	&\begin{multlined}
+		\cesktranswheresplit*%
+		{\contconf{\SuperMethodA}{\val{s}}}%
+		{\execconf{\stmt}{\env'}{[]}{[]}{\handler}{\cstrace}{\cex}{\econt}{\scont}}%
+		{\parbox{10cm}{where $\scont = \ExitSK{\tt{null}}$,\\
+		$\env' = \ext{\env_{empty}}{\this :: \formals}{\deref{(\env(\this))} :: \val{s}}$	}}
+	\end{multlined}
+	\label{acontconf:superinstancemethod}
 	\end{align}
 	\caption{The CESK-transition function for ApplicationConfigurations}
 	\label{figure:instance-method-evalconfigs}
@@ -1758,36 +1771,20 @@ After the evaluation of the receiver expression to a value $\val$, the evaluatio
 The argument expressions are evaluated to a list of values $\val$.
 The evaluation of the expression continues with the execution of the statement body in the environment that binds $\tt{this}$ to a location that stores the value $\val$ and the formal parameters to fresh locations storing values from $\vals$ accordingly.
 The CESK-transition is shown in \eqref{acontconf:dinstancemethod}.
-Similarly to \ref{subsubsec:instance-method-invoc}, $\ExitSK{\tt{null}}$ is added as next statement continuation.
+Similarly to Section~\ref{subsubsec:instance-method-invoc}, $\ExitSK{\tt{null}}$ is added as next statement continuation.
 \subsubsection{Super method invocation}
 \label{subsubsec:super-method-invocation}
-Super method invocation is supported with $\SuperMethodInvocation{\idmeta}{\expressionsmeta}$ and the transition step is as follows:
-
-After the evaluation of the expressions $\expressionsmeta$ to values $\val{s}$ for the super method invocation, the method $\idmeta$ is looked up.
+Super method invocation is supported with $\SuperMethodInvocation{\idmeta}{\expressionsmeta}$.
+We first evaluate the argument expressions, as shown in the CESK-transition \eqref{eval:superinstancemethod}.
+After the evaluation of the argument expressions to list of values $\vals$ for the super method invocation, the evaluation continues with lookup for $\idmeta$ in the members of the value bound to $\tt{this}$ in the current environment.
 Let $\val = \deref{(\env(\this))}$, $C = \superclass{\val}$ and $M$ the result of looking up $\idmeta$ in $C$.
-Let $\stmt$ be the statement body and $\formals$ the formal parameters for $\membermeta$ below:
-\[
-  \begin{array}{lcl}
-	\cesktrans{
-		\contconf{\SuperMethodA}{\val{s}}}{
-		\execconf{\stmt}{\env'}{[]}{[]}{\handler}{\cstrace}{\cex}{\econt}{\scont}}
-	\\[2mm]
-	\textrm{with }\\
-	\hspace{3mm}\scont = \ExitSK{\tt{null}},\\
-	\hspace{3mm}\env' = \ext{\env_{empty}}{\this :: \formals}{\deref{(\env(\this))} :: \val{s}}\\[2mm]
-  \end{array}
-\]
-Similarly to \ref{subsubsec:instance-method-invoc}, $\ExitSK{\val}$ is added as next statement continuation.
-
-\subsubsection{This}
-For the evaluation $\this$ expression we add a special variable declaration, $\this$.
-In the body of instance methods or constructors, there is a binding in the corresponding environment from $\this$ variable declaration to a label that stores the corresponding object.
-Evaluation of $\this$ expression resolves to the value in one step.
+Let $\stmt$ be the statement body and $\formals$ the formal parameters for $\membermeta$.
+The statement $\stmt$ is executed in an environment binding $\formals$ to the locations containing the values in $\vals$ and $\tt{this}$ binding to location containing the same value bound to $\tt{this}$ in the current environment.
+Similarly to Section~\ref{subsubsec:instance-method-invoc}, $\ExitSK{\val}$ is added as next statement continuation.
 \subsection{Statement execution}
 \label{subsec:stmt-exectution}
 \newcommand{\execcesktrans}[3]{&\cesktrans{#1}{#2}\,\hspace{2mm}#3\hspace{6mm}\\[2mm]}
 %
-\newcommand{\ExpressionK}[2]{\mathrm{ExpressionK}({#1},\,{#2})}
 %
 \begin{figure}[Htp]
 	$
