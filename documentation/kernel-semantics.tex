@@ -1686,7 +1686,14 @@ The $\update{\deref{(\env(\this))}[\membermeta]}{\val}$ modifies the value store
 		{\evallistconf{\expressionsmeta}{\env}{\strace}{\cstrace}{\cex}{\acont'}}%
 		{\text{where $\acont' = \InstanceMethodA$}}
 	\end{multlined}
-	\label{econtconf:instancemethod}
+	\label{econtconf:instancemethod}\\
+	&\begin{multlined}
+		\cesktranswheresplit*%
+		{\contconf{\DInstanceMethodK}{\val}}%
+		{\evallistconf{\expressionsmeta}{\env}{\strace}{\cstrace}{\cex}{\acont'}}%
+		{\text{where $\acont' = \DInstanceMethodA$}}
+	\end{multlined}
+	\label{econtconf:dinstancemthod}
 	\end{align}
 	\caption{The CESK-transition function for ValuePassingConfiguration: instance method and constructor invocation}
 	\label{figure:instance-method-evalconfigs}
@@ -1699,11 +1706,21 @@ The $\update{\deref{(\env(\this))}[\membermeta]}{\val}$ modifies the value store
     &\begin{multlined}
 			\cesktranswheresplit*%
 			{\contconf{\InstanceMethodA}{\val{s}}}%
-			{\execconf{\stmt}{\env}{[]}{[]}{\handler}{\cstrace}{\cex}{\econt}{\scont}}
-			{\parbox{10cm}{where $\scont = \ExitSK{\tt{null}}$\\
+			{\execconf{\stmt}{\env}{[]}{[]}{\handler}{\cstrace}{\cex}{\econt}{\scont}}%
+			{\parbox{10cm}{where $\membermeta = class(\val).lookup(\idmeta)$ is an instance method with body $\stmt$ and formals $\formals$\\
+			$\scont = \ExitSK{\tt{null}}$\\
 			$\env = \ext{\env_{empty}}{\this :: \formals}{\val :: \val{s}}$}}
 	\end{multlined}
-	\label{acontconf:instancemethod}
+	\label{acontconf:instancemethod}\\
+	&\begin{multlined}
+			\cesktranswheresplit*%
+			{\contconf{\DInstanceMethodA}{\val{s}}}%
+			{\execconf{\stmt}{\env}{[]}{[]}{\handler}{\cstrace}{\cex}{\econt}{\scont}}%
+			{\parbox{10cm}{where $\stmt$ is the statement body and $\formals$ are the formal parameters of the instace method $\membermeta$\\
+			$\scont = \ExitSK{\tt{null}}$,\\
+			$\env = \ext{\env_{empty}}{\this :: \formals}{\val :: \val{s}}$}}
+	\end{multlined}
+	\label{acontconf:dinstancemethod}
 	\end{align}
 	\caption{The CESK-transition function for ApplicationConfigurations}
 	\label{figure:instance-method-evalconfigs}
@@ -1735,33 +1752,13 @@ When a $\tt{return}$ statement is missing in the statement body $\stmt$ of the i
 
 \subsubsection{Direct instance method invocation}
 \label{subsubsec:direct-instance-method-invoc}
-Direct method invocation allows invocation of instance method by providing directly the member method to be invoked and bypass the lookup step described above.
-Let $\membermeta$ be the target method, $\stmt$ the statement body and $\formals$ the corresponding formal parameters.
-
-\[
-  \begin{array}{lcl}
-	\cesktrans{
-		\contconf{\DInstanceMethodK}{\val}}{
-		\evallistconf{\expressionsmeta}{\env}{\strace}{\cstrace}{\cex}{\acont'}}
-	\\[2mm]
-
-	\cesktrans{
-		\contconf{\DInstanceMethodA}{\val{s}}}{
-		\execconf{\stmt}{\env}{[]}{[]}{\handler}{\cstrace}{\cex}{\econt}{\scont}}
-  \end{array}
-\]
-with
-\[
-\begin{array}{l}
-	\acont' = \DInstanceMethodA,\\
-	\scont = \ExitSK{\tt{null}},\\
-	\env = \ext{\env_{empty}}{\this :: \formals}{\val :: \val{s}}
-\end{array}
-\]
-
-\noindent
-Similarly to \ref{subsubsec:instance-method-invoc}, $\ExitSK{\val}$ is added as next statement continuation.
-
+Direct method invocation allows invocation of instance method by providing directly the member method to be invoked and bypass the lookup step described in Section~\ref{subsubsec:instance-method-invoc} above.
+The evaluation of the direct instance method invocation proceeds with the evaluation of the left-hand side expression, i.e., the receiver expression as shown in \eqref{eval:dinstancemethod}.
+After the evaluation of the receiver expression to a value $\val$, the evaluation proceeds with the evaluation of the argument expressions as shown in \eqref{econtconf:dinstancemthod}.
+The argument expressions are evaluated to a list of values $\val$.
+The evaluation of the expression continues with the execution of the statement body in the environment that binds $\tt{this}$ to a location that stores the value $\val$ and the formal parameters to fresh locations storing values from $\vals$ accordingly.
+The CESK-transition is shown in \eqref{acontconf:dinstancemethod}.
+Similarly to \ref{subsubsec:instance-method-invoc}, $\ExitSK{\tt{null}}$ is added as next statement continuation.
 \subsubsection{Super method invocation}
 \label{subsubsec:super-method-invocation}
 Super method invocation is supported with $\SuperMethodInvocation{\idmeta}{\expressionsmeta}$ and the transition step is as follows:
