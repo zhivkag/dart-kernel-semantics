@@ -1884,15 +1884,14 @@ Similarly to Section~\ref{subsubsec:instance-method-invoc}, $\ExitSK{\val}$ is a
 Variable declaration extend the corresponding environment with a new binding.
 The corresponding initializer expression is first evaluated to a value $v$.
 
-\noindent
-Let $\econt' = \VarDeclK{\env}{\varmeta}{\scont}$ below:
-\[
-  \begin{array}{lcl}
-	\cesktrans{
-		\contconf{\econt'}{\val}}{
-		\scontconf{\scont}{\ext{\env}{\varmeta}{\val}}}
-  \end{array}
-\]
+\begin{align*}
+&\cesktrans%
+    {\contconf{\econt'}{\val}}%
+    {\scontconf{\scont}{\ext{\env}{\varmeta}{\val}}},
+\end{align*}
+
+\noindent where $\econt' = \VarDeclK{\env}{\varmeta}{\scont}$.
+
 
 \subsubsection{Empty statement}
 \label{subsubsec:emtpy-stmt}
@@ -1902,95 +1901,91 @@ Let $\econt' = \VarDeclK{\env}{\varmeta}{\scont}$ below:
 \label{expression-stmt}
 
 \subsubsection{Block statements}
-\[
-  \begin{array}{lcl}
-	\cesktrans{
-		\scontconf{\BlockSK{\stmt :: \stmts}{\env}}{\env'}}{
-		\execconf{\stmt}{\env'}{\lbls}{\clbls}{\handler}{\cstrace}{\cex}{\econt}{\scont'}}
-		\\[2mm]
+  \begin{align*}
+    &\begin{multlined}
+        \cesktranssplit%
+          {\scontconf{\BlockSK{\stmt :: \stmts}{\env}}{\env'}}
+          {\execconf{\stmt}{\env'}{\lbls}{\clbls}{\handler}{\cstrace}{\cex}{\econt}{\scont'}}
+    \end{multlined}\\
+    &\cesktrans%
+      {\scontconf{\BlockSK{[]}{\env}}{ \_ }}%
+      {\scontconf{\scont}{\env}},
+  \end{align*}
 
-	\cesktrans{
-		\scontconf{\BlockSK{[]}{\env}}{ \_ }}{
-		\scontconf{\scont}{\env}}
-		\\[2mm]
-  \end{array}
-\]
-\noindent
-with $\scont' = \BlockSK{\stmts}{\env}$.
+\noindent where $\scont' = \BlockSK{\stmts}{\env}$.
 
 \subsubsection{If statement}
 
-Let $\econt' = \IfCondK{\stmti{1}}{\stmti{2}}$ below:
-\[
-  \begin{array}{lcl}
-	\contconf{\econt'}{\true}
-	& \Rightarrow &
-	\execconf{\stmti{1}}{\env}{\lbls}{\clbls}{\handler}{\cstrace}{\cex}{\econt}{\scont}\\[2mm]
+\begin{align*}
+    \cesktransalign%
+        {\contconf{\econt'}{\true}}%
+        {\execconf{\stmti{1}}{\env}{\lbls}{\clbls}{\handler}{\cstrace}{\cex}{\econt}{\scont}}\\
+    \cesktransalign%
+        {\contconf{\econt'}{\false}}%
+        {\execconf{\stmti{2}}{\env}{\lbls}{\clbls}{\handler}{\cstrace}{\cex}{\econt}{\scont}}
+\end{align*}
 
-	\contconf{\econt'}{\false}
-	& \Rightarrow &
-	\execconf{\stmti{2}}{\env}{\lbls}{\clbls}{\handler}{\cstrace}{\cex}{\econt}{\scont}\\
-  \end{array}
-\]
+\noindent where $\econt' = \IfCondK{\stmti{1}}{\stmti{2}}$.
+
 
 \subsubsection{Return statement}
 
+
 \subsubsection{Loops}
-Let $\econt', \scont' = \whilecondk$ below:
-\[
-  \begin{array}{lcl}
-	\contconf{\econt'}{\false}
-	& \Rightarrow &
-	\scontconf{\scont}{\env}\\[2mm]
 
-	\contconf{\econt'}{\true}
-	& \Rightarrow &
-	\execconf{\stmt}{\env}{\lbls}{\clbls}{\handler}{\cstrace}{\cex}{\econt}{\scont'}\\[2mm]
+\begin{align*}
+    \cesktransalign%
+        {\contconf{\econt'}{\false}}%
+        {\scontconf{\scont}{\env}}\\
+    \cesktransalign%
+        {\contconf{\econt'}{\true}}%
+        {\execconf{\stmt}{\env}{\lbls}{\clbls}{\handler}{\cstrace}{\cex}{\econt}{\scont'}}\\
+    \cesktransalign%
+        {\scontconf{\scont'}{\_}}%
+        {\evalconf{\expr}{\env}{\strace}{\cstrace}{\cex}{\econt'}}
+\end{align*}
 
-	\scontconf{\scont'}{\_}
-	& \Rightarrow &
-	\evalconf{\expr}{\env}{\strace}{\cstrace}{\cex}{\econt'}\\
-  \end{array}
-\]
-Loops \textbf{do while}, \textbf{for in}, for can be desugared to while loops with transformations performed before interpreting the program.
+\noindent where $\econt', \scont' = \whilecondk$.
+
+Loops \textbf{do while}, \textbf{for in}, \textbf{for} can be desugared to while loops with transformations performed before interpreting the program.
 
 The execution of \textbf{do while} loops proceeds as shown in Figure~\ref{figure:exec}.
 The execution of \textbf{for} loops proceeds as shown in Figure~\ref{figure:exec}.
-\[
- \begin{array}{l}
-	\acontconf{\ForInitA}{\vals}
-	\Rightarrow
-	\evalconf{\expressionmeta}{\env'}{\strace}{\cstrace}{\cex}{\econt'} \\
-	\env' = \extend(\env, \varmeta{s}, \vals) \\
-	\econt' = \ForCondK
-	\\[2mm]
 
-	\contconf{\ForCondK}{\tt{false}}
-	\Rightarrow
-	\scontconf{\scont}{\env}
-	\\[2mm]
-
-	\contconf{\ForCondK}{\tt{true}}
-	\Rightarrow \\
-	\execconf{\scont}{\env'}{\lbls}{\clbls}{\handler}{\cstrace}{\cex}{\econt}{\scont'} \\
-	\scont' = \ForSK
-	\\[2mm]
-
-	\scontconf{\ForSK}{\_}
-	\Rightarrow
-	\evallistconf{\exprs}{\env_{new}}{st}{cex}{cst}{\acont} \\
-	\acont = \ForUpdatesA{\env_{new}} \\
-	\env_{new} = \extend(\env, \varmeta{s}, \vals), \vals = \{\val_i \mid \deref(\env'(\varmeta_i))\}
-	\\[2mm]
-
-	\acontconf{\ForUpdatesA{\env'}}{\_}
-	\Rightarrow
-	\evalconf{\expressionmeta}{\env'}{\strace}{\cstrace}{\cex}{\econt'}\\
-	\econt' = \ForCondK
- \end{array}
-\]
+\begin{align*}
+    &\begin{multlined}
+        \cesktranswheresplit*%
+            {\acontconf{\ForInitA}{\vals}}%
+            {\evalconf{\expressionmeta}{\env'}{\strace}{\cstrace}{\cex}{\econt'}}%
+            {\parbox{\textwidth-2cm}{where $\env' = \extend(\env, \varmeta{s}, \vals)$,\\$\econt' = \ForCondK$}}
+    \end{multlined}\\
+    &\cesktrans%
+        {\contconf{\ForCondK}{\tt{false}}}%
+        {\scontconf{\scont}{\env}}\\
+    &\begin{multlined}
+        \cesktranswheresplit*%
+            {\contconf{\ForCondK}{\tt{true}}}%
+            {\execconf{\scont}{\env'}{\lbls}{\clbls}{\handler}{\cstrace}{\cex}{\econt}{\scont'}}%
+            {\text{where $\scont' = \ForSK$}}
+    \end{multlined}\\
+    &\begin{multlined}
+        \cesktranswheresplit*%
+            {\scontconf{\ForSK}{\_}}%
+            {\evallistconf{\exprs}{\env_{new}}{st}{cex}{cst}{\acont}}%
+            {\parbox{\textwidth-2cm}{where $\acont = \ForUpdatesA{\env_{new}}$,
+                \\$\env_{new} = \extend(\env, \varmeta{s}, \vals)$, $\vals = \{\val_i \mid \deref(\env'(\varmeta_i))\}$}}
+    \end{multlined}\\
+    &\begin{multlined}
+        \cesktranswheresplit*%
+            {\acontconf{\ForUpdatesA{\env'}}{\_}}%
+            {\evalconf{\expressionmeta}{\env'}{\strace}{\cstrace}{\cex}{\econt'}}%
+            {\text{where $\econt' = \ForCondK$}}
+    \end{multlined}
+\end{align*}
 
 In Kernel, \textbf{for in} loops, will be desugared into while loops and their execution will proceed as the \textbf{while} loop rule shown in Figure~\ref{figure:exec}.
+
+
 \subsection{Labels}
 
 Kernel supports labelling statements, \textbf{L: $\stmt_{L}$}, and breaking to L, \textbf{break L}, which completes the execution of the labelled statement and proceeds to executing the rest of the program.
@@ -1998,62 +1993,60 @@ To support breaking to a label, we add a labels component, $\lbls$, to statement
 $\lbls$ represents a list of pairs mapping a labelled statement, \textbf{L: $\stmt_L$}, to a break statement continuation, $\bcont$.
 Executing a labelled statement inserts a new break label, $\lbl$ in the list of labels $\lbls$.
 
+
 \subsection{Switch}
 Kernel supports dispatching control among a number of cases with \textbf{switch} statements.
 The target expression $\expr$ is evaluated and matched against the different case clauses of the switch statement.
 
-\noindent
 Case clauses can have multiple constant expressions and there is no implicit fall-through between cases.
 Kernel supports continuing to execution of a preceding case clause with continue statements where the target of the continue statement is a preceding case clause, e.g, continue C with C = case $\expri{1..i}$: $\stmt$.
 To support continue, we add an optional $\clbls$ list, similar to the label list, which is set in a switch statement and unset otherwise.
 
-\noindent
 If there is a matching case clause, its statement is executed with a new statement continuation that will throw when reached.
 The new statement continuation is necessary because implicit fall-through is not supported and an explicit break of the flow is required (with either of \textbf{continue, break, return, throw}).
 
+\begin{align*}
+    &\begin{multlined}
+        \cesktranssplit%
+            {\contconf{\SwitchK{\scase :: \scases}{\clbls}}{\val}}%
+            {\execconf{\stmt}{\env}{\lbls}{\clbls}{\handler}{\cstrace}{\cex}{\econt}{\ExitSK{\tt{null}}}},
+    \end{multlined}
+\end{align*}
+
+\noindent where
 \[
-  \begin{array}{lcl}
-	\contconf{\SwitchK{\scase :: \scases}{\clbls}}{\val}
-	\Rightarrow \hspace{30mm}\\
-	\hspace{20mm}\execconf{\stmt}{\env}{\lbls}{\clbls}{\handler}{\cstrace}{\cex}{\econt}{\ExitSK{\tt{null}}}
-  \end{array}
+	\scase = \textbf{case } \expri{1}, \dots, \expri{i} \textbf{ : } \stmt \textrm{ and } \scase \textrm{ is a matching \textbf{case} clause}.
 \]
-with:
-\[
-	\scase = \textbf{case } \expri{1}, \dots, \expri{i} \textbf{ : } \stmt \textrm{ and } \scase \textrm{ is a matching \textbf{case} clause}
-\]
+
 A case clause is matching if is \textbf{default} or there is at least one of the constant expressions in the case clause identical to the target value of the switch.
 
-\noindent
 If a non-matching \textbf{case} clause, $\scase$, is the target of a continue statement, it installs a new continue label, in order to support execution of its statement with the appropriate configuration.
 
-\[
-  \begin{array}{lcl}
-	\contconf{\SwitchK{\scase :: \scases}{\clbls}}{\val}
-	\Rightarrow \hspace{30mm}\\
-	\hspace{20mm}\contconf{\SwitchK{\scases}{\clbl :: \clbls}}{\val}
-  \end{array}
-\]
-with:
-\[
-  \begin{array}{l}
-	\clbl = \continuel{\scase}{\switchcont},\\
-	\switchcont = \ContinueK
-  \end{array}
-\]
-\noindent
-Otherwise, the execution continues as follows:
-\[
-  \begin{array}{lcl}
-    \contconf{\SwitchK{\scase :: \scases}{\clbls}}{\val}
-	\Rightarrow \hspace{30mm}\\
-	\hspace{20mm}\contconf{\SwitchK{\scases}{\clbls}}{\val}\\[2mm]
+\begin{align*}
+    &\begin{multlined}
+        \cesktranssplit
+            {\contconf{\SwitchK{\scase :: \scases}{\clbls}}{\val}}%
+            {\contconf{\SwitchK{\scases}{\clbl :: \clbls}}{\val}},
+    \end{multlined}
+\end{align*}
 
-	\contconf{\SwitchK{[]}{\clbls}}{\val}
-	\Rightarrow
-	\scontconf{\scont}{\env}
-  \end{array}
-\]
+\noindent where
+\begin{align*}
+    &\clbl = \continuel{\scase}{\switchcont},\\
+    &\switchcont = \ContinueK.
+\end{align*}
+
+Otherwise, the execution continues as follows:
+\begin{align*}
+    &\begin{multlined}
+        \cesktranssplit%
+            {\contconf{\SwitchK{\scase :: \scases}{\clbls}}{\val}}%
+            {\contconf{\SwitchK{\scases}{\clbls}}{\val}},
+    \end{multlined}\\
+    &\cesktrans%
+        {\contconf{\SwitchK{[]}{\clbls}}{\val}}%
+        {\scontconf{\scont}{\env}}.
+\end{align*}
 
 \subsection{Exceptions}
 
@@ -2062,92 +2055,81 @@ Exceptions are thrown with \textbf{throw} and \textbf{rethrow} expressions.
 To support throwing exceptions, we add a handler, $\handler$, and a stacktrace, $\strace$, component to expression configurations (and correspondingly, to statement configurations).
 To support \textbf{rethrow}, we add an optional current error, $\cex$, and current stack trace, $\cstrace$, which are set when inside a catch block and unset otherwise.
 
-\[
-  \begin{array}{lcl}
-	\contconf{\ThrowH{\strace}{\handler}}{\val}
-	& \Rightarrow &
-	\throwconf{\handler}{\val}{\strace}\\[2mm]
+\begin{align*}
+    &\cesktrans%
+        {\contconf{\ThrowH{\strace}{\handler}}{\val}}%
+        {\throwconf{\handler}{\val}{\strace}}.
+\end{align*}
 
-  \end{array}
-\]
-
-\noindent
 \textbf{try/catch} handlers contain a list of on-catch handlers, environment, break labels, continue switch labels, exception handler, stacktrace, return continuation, and statement continuation.
 The handlers are tried in order to see if they match against the type of the exception.
 If none match, the exception is rethrown.
 
-\noindent
-Let $\econt' = \CatchH{(\textbf{on T catch (e, s) }\stmt) :: cs}$ be a catch continuation containing a non-empty list of on-catch handlers:
-\[
-  \begin{array}{lcll}
-	\throwconf{\econt'}{\val}{\strace'}
-	& \Rightarrow &
-	\execconf{\stmt}{\env'}{\lbls}{\clbls}{\handler}{inr(\val)}{inr(\strace')}{\econt}{\scont}
-	&\textrm{ if V is T}\\[1mm]
+\begin{align*}
+    \cesktranswherealign%
+        {\throwconf{\econt'}{\val}{\strace'}}%
+        {\execconf{\stmt}{\env'}{\lbls}{\clbls}{\handler}{inr(\val)}{inr(\strace')}{\econt}{\scont}}%
+        {\text{if $V$ is $T$}}\\
+    \cesktranswherealign%
+        {\throwconf{\econt'}{\val}{\strace'}}%
+        {\throwconf{\CatchH{cs}}{\val}{\strace'}}%
+        {\text{otherwise}}
+\end{align*}
 
-	&&\textrm{with } \env' = \extend(\env, e :: s :: [], \val :: \strace' :: [])\\[2mm]
+\noindent where $\econt' = \CatchH{(\textbf{on T catch (e, s) }\stmt) :: cs}$ is a catch continuation containing a non-empty list of on-catch handlers, and $\env' = \extend(\env, e :: s :: [], \val :: \strace' :: [])$.
 
-	\throwconf{\econt'}{\val}{\strace'}
-	& \Rightarrow &
-	\throwconf{\CatchH{cs}}{\val}{\strace'}	&\textrm{ otherwise}\\[2mm]
-	&&\textrm{with } \env' = \extend(\env, e :: s :: [], \val :: \strace' :: [])
-  \end{array}
-\]
-\noindent
 When a catch handler with no on-catch handlers is reached, the exception is rethrown.
-\[
-  \begin{array}{lcll}
-	\throwconf{\CatchH{[]}}{\val}{\strace'}
-	& \Rightarrow &
-	\throwconf{\handler}{\val}{\strace'}\hspace{20mm}
-  \end{array}
-\]
-\noindent
+
+\begin{align*}
+    &\cesktrans%
+        {\throwconf{\CatchH{[]}}{\val}{\strace'}}%
+        {\throwconf{\handler}{\val}{\strace'}}
+\end{align*}
+
 \textbf{try/finally} handlers contain a statement, environment, break labels, continue switch labels, exception handler, stacktrace, and return continuation.
 Note that they do not contain a statement continuation because when control falls off the end of the finally statement the exception is rethrown.
 The statement is unconditionally executed:
 
-\[
-  \begin{array}{lcl}
-	\throwconf{\FinallyK{\stmt}}{\val}{\strace'}
-	\Rightarrow \\
-	\hspace{10mm}\execconf{\stmt}{\env}{\lbls}{\clbls}{\handler}{inl()}{inl()}{\econt}{\RethrowSK{\val}{\strace'}{\handler}}\hspace{20mm}\\[2mm]
+\begin{align*}
+    &\begin{multlined}
+        \cesktranssplit%
+            {\throwconf{\FinallyK{\stmt}}{\val}{\strace'}}%
+            {\execconf{\stmt}{\env}{\lbls}{\clbls}{\handler}{inl()}{inl()}{\econt}{\RethrowSK{\val}{\strace'}{\handler}}},
+    \end{multlined}\\
+    &\cesktrans%
+        {\scontconf{\RethrowSK{\val}{\strace}{\handler}}{\_}}%
+        {\throwconf{\handler}{\val}{\strace}}.
+\end{align*}
 
-	\scontconf{\RethrowSK{\val}{\strace}{\handler}}{\_}
-	\Rightarrow \throwconf{\handler}{\val}{\strace}
-
-  \end{array}
-\]
-\noindent
 \textbf{try/catch} statements execute their body with a new handler.
 
-\noindent
 \textbf{try/finally} statements execute their body with a new handler and additionally install new break and continue switch labels, a new return continuation, and a new statement continuation:
 
-\[
-  \begin{array}{lcl}
-	\execconf{\TryFinally{\stmti{0}}{\stmti{1}}}{\env}{\lbls}{\clbls}{\handler}{\cex}{\cstrace}{\econt}{\scont}
-	\Rightarrow\\
-	\execconf{\stmti{0}}{\env}{\lbls'}{\clbls'}{\handler'}{\cex}{\cstrace}{\econt'}{\scont'}
-	  \end{array}
-\]
-where:
+\begin{align*}
+    &\begin{multlined}
+        \cesktranssplit
+            {\execconf{\TryFinally{\stmti{0}}{\stmti{1}}}{\env}{\lbls}{\clbls}{\handler}{\cex}{\cstrace}{\econt}{\scont}}%
+            {\execconf{\stmti{0}}{\env}{\lbls'}{\clbls'}{\handler'}{\cex}{\cstrace}{\econt'}{\scont'}}
+    \end{multlined}
+\end{align*}
 
-\[
-  \begin{array}{lcl}
-	\handler' = \FinallyK{\stmti{0}}\hspace{50mm}\\[2mm]
+\noindent where:
 
-	\econt' = \FinallyReturnK{\stmti{1}}\\[2mm]
+\begin{align*}
+&\handler' = \FinallyK{\stmti{0}},\\
+&\econt' = \FinallyReturnK{\stmti{1}},\\
+&\scont' = \FinallySK{\stmti{1}},\\
+&\begin{multlined}
+    \lbls' = \lbrace \mathrm{Label}(L, \bcont') \mid \mathrm{Label}(L, \bcont) \in \lbls\rbrace,\\
+    \bcont = \FinallyBreak{\stmti{1}}{\bcont},
+\end{multlined}\\
+&\begin{multlined}
+    \clbls' =  \lbrace \continuel{C}{\switchcont'} \mid  \continuel{C}{\switchcont} \in \clbls\rbrace,\\
+    \switchcont' = \FinallyContinue{\stmti{1}}{\switchcont}.
+\end{multlined}
+\end{align*}
 
-	\scont' = \FinallySK{\stmti{1}}\\[2mm]
 
-	\lbls' = \lbrace \mathrm{Label}(L, \bcont') \mid \mathrm{Label}(L, \bcont) \in \lbls\rbrace \\
-	\hspace{10mm}\textrm{where } \bcont = \FinallyBreak{\stmti{1}}{\bcont}\\[2mm]
-	\clbls' =  \lbrace \continuel{C}{\switchcont'} \mid  \continuel{C}{\switchcont} \in \clbls\rbrace\\
-	\hspace{10mm}\textrm{where } \switchcont' = \FinallyContinue{\stmti{1}}{\switchcont}
-
-  \end{array}
-\]
 \subsection{Break}
 \textbf{break L} statements break from an enclosing label \textbf{L} and execute the break continuation corresponding to the label in the list of labels $\lbls$.
 
