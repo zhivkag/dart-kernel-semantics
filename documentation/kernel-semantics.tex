@@ -1860,106 +1860,121 @@ Similarly to Section~\ref{subsubsec:instance-method-invoc}, $\ExitSK{\val}$ is a
                 {\execconf{\VarDeclaration{\varmeta}{\expr}}{\env}{\lbls}{\clbls}{\handler}{\cstrace}{\cex}{\econt}{\scont}}%
                 {\evalconf{\expr}{\env}{\strace}{\cstrace}{\cex}{\econt'}}%
                 {\text{where $\econt' = \VarDeclK{\env}{\varmeta}{\scont}$}}
-        \end{multlined}\\
+        \end{multlined}
+        \label{execconf:vardecl}\\
         &\cesktrans%
             {\execconf{\EmptyStatement}{\env}{\lbls}{\clbls}{\handler}{\cstrace}{\cex}{\econt}{\scont}}%
-            {\scontconf{\scont}{\env}}\\
+            {\scontconf{\scont}{\env}}
+        \label{execconf:empty}\\
         &\begin{multlined}
             \cesktranswheresplit%
                 {\execconf{\ExpressionStatement{\expressionmeta}}{\env}{\lbls}{\clbls}{\handler}{\cstrace}{\cex}{\econt}{\scont}}%
                 {\evalconf{\expr}{\env}{\strace}{\cstrace}{\cex}{\econt'}}%
                 {\text{where $\econt' = \ExpressionK{\scont}{\env}$}}
-        \end{multlined}\\
+        \end{multlined}
+        \label{execconf:expresion}\\
         &\begin{multlined}
             \cesktranswheresplit*%
                 {\execconf{\Block{\stmt_1}}{\env}{\lbls}{\clbls}{\handler}{\cstrace}{\cex}{\econt}{\scont}}%
                 {\execconf{\stmt_1}{\env}{\lbls}{\clbls}{\handler}{\cstrace}{\cex}{\econt}{\scont'}}%
                 {\text{where $\scont' = \BlockSK{\stmt*}{\env}$}}
-        \end{multlined}\\
+        \end{multlined}
+        \label{execconf:block}\\
         &\begin{multlined}
             \cesktranswheresplit*%
                 {\execconf{\IfStatement{\expr}{\stmti{1}}{\stmti{2}}}{\env}{\lbls}{\clbls}{\handler}{\cstrace}{\cex}{\econt}{\scont}}%
                 {\evalconf{\expr}{\env}{\strace}{\cstrace}{\cex}{\econt'}}%
                 {\text{where $\econt' = \IfCondK{\stmti{1}}{\stmti{2}}$}}
-        \end{multlined}\\
+        \end{multlined}
+        \label{execconf:if}\\
         &\cesktrans%
             {\execconf{\ReturnStatement{\expr}}{\env}{\lbls}{\clbls}{\handler}{\cstrace}{\cex}{\econt}{\scont}}%
-            {\evalconf{\expr}{\env}{\strace}{\cstrace}{\cex}{\econt}}\\
+            {\evalconf{\expr}{\env}{\strace}{\cstrace}{\cex}{\econt}}
+        \label{execconf:return}\\
         &\cesktrans%
             {\execconf{\ReturnStatement{}}{\env}{\lbls}{\clbls}{\handler}{\cstrace}{\cex}{\econt}{\scont}}%
-            {\contconf{\econt}{\textbf{null}}}\\
+            {\contconf{\econt}{\textbf{null}}}
+        \label{execconf:return-empty}\\
         &\begin{multlined}
             \cesktranswheresplit*%
                 {\execconf{\DoStatement{\statementmeta}{\expressionmeta}}{\env}{\lbls}{\clbls}{\handler}{\cstrace}{\cex}{\econt}{\scont}}%
                 {\execconf{\statementmeta}{\env}{\lbls}{\clbls}{\handler}{\cstrace}{\cex}{\econt}{\scont'}}%
                 {\text{where $\scont' = \whilecondk$}}
-        \end{multlined}\\
+        \end{multlined}
+        \label{execconf:do}\\
         &\begin{multlined}
             \cesktranswheresplit*%
                 {\execconf{\WhileStatement{\expr}{\stmt}}{\env}{\lbls}{\clbls}{\handler}{\cstrace}{\cex}{\econt}{\scont}}%
                 {\evalconf{\expr}{\env}{\strace}{\cstrace}{\cex}{\econt'}}%
                 {\text{where $\econt', \scont' = \whilecondk$}}
-        \end{multlined}\\
+        \end{multlined}
+        \label{execconf:while}\\
         &\begin{multlined}
             \cesktranswheresplit*%
                 {\execconf{\ForStatement{\varmeta{s}}{\expressionmeta}{\exprs}{\statementmeta}}{\env}{\lbls}{\clbls}{\handler}{\cstrace}{\cex}{\econt}{\scont}}%
                 {\evallistconf{\exprs'}{\env}{\strace}{\cex}{\cstrace}{\acont}}%
-                {\parbox{\textwidth-2cm}{where $\acont = \ForInitA$,\\$\exprs' =$ initializer expressions for the list of variable declarations $\varmeta{s}$}}
-        \end{multlined}\\
+                {\parbox{\textwidth-2cm}{where $\acont = \ForInitA$,\\
+                $\exprs' =$ initializer expressions for the list of variable declarations $\varmeta{s}$}}
+        \end{multlined}
+        \label{execconf:for}\\
         &\begin{multlined}
             \cesktranswheresplit*%
                 {\execconf{\LabeledStatement{L}{\stmt_{L}}}{\env}{\lbls}{\clbls}{\handler}{\cstrace}{\cex}{\econt}{\scont}}%
                 {\execconf{\stmt_{L}}{\env}{\lbl :: \lbls}{\clbls}{\handler}{\cstrace}{\cex}{\econt}{\scont}}%
                 {\text{where $\lbl = \mathrm{Label}(L, \bcont)$, $\bcont = \mathrm{Break}(\env, \scont)$}}
-        \end{multlined}\\
+        \end{multlined}
+        \label{execconf:labeled}\\
         &\begin{multlined}
             \cesktranswheresplit*%
                 {\execconf{\SwitchStatement{\expr}{\scases}}{\env}{\lbls}{\clbls}{\handler}{\cstrace}{\cex}{\econt}{\scont}}%
                 {\evalconf{\expr}{\env}{\strace}{\cstrace}{\cex}{\econt'}}%
                 {\text{where $\econt' = \SwitchK{\scases}{\clbls}$}}
-        \end{multlined}\\
+        \end{multlined}
+        \label{execconf:switch}\\
         &\begin{multlined}
             \cesktranswheresplit*%
                 {\execconf{\TryCatch{\stmt}{cs}}{\env}{\lbls}{\clbls}{\handler}{\cex}{\cstrace}{\econt}{\scont}}%
                 {\execconf{\stmt}{\env}{\lbls}{\clbls}{\handler'}{\cex}{\cstrace}{\econt}{\scont}}%
                 {\text{where $\handler' = \CatchH{cs}$}}
-        \end{multlined}\\
+        \end{multlined}
+        \label{execconf:try}\\
         &\begin{multlined}
             \cesktranswheresplit%
                 {\execconf{\BreakStatement{L}}{\env}{\lbls}{\clbls}{\handler}{\cex}{\cstrace}{\econt}{\scont}}%
                 {\breakconf{\bcont}}%
                 {\text{where $\lbl = Label(L', \bcont) \in \lbls \text{ with } L' == \mathbf{L}$}}
-        \end{multlined}\\
+        \end{multlined}
+        \label{execconf:break}\\
         &\begin{multlined}
             \cesktranswheresplit%
                 {\execconf{\ContinueSwitchStatement{\stmt}}{\env}{\lbls}{\clbls}{\handler}{\cex}{\cstrace}{\econt}{\scont}}%
                 {\switchconf{\switchcont}}%
                 {\text{where $\clbl = \continuel{\stmt'}{\switchcont} \in \clbls \text{ with } \stmt' == \stmt$}}
-        \end{multlined}\\
+        \end{multlined}
+        \label{execconf:continue}\\
         &\begin{multlined}
             \cesktranswheresplit*%
                 {\execconf{fun(\formals) \stmt_{body}}{\env}{\lbls}{\clbls}{\handler}{\cstrace}{\cex}{\econt}{\scont}}%
                 {\contconf{\econt}{\funval{\stmt_{body}}{\formals}{\env'}}}%
                 {\text{where $\env' = \ext{\env}{fun}{\funval{\stmt_{body}}{\formals}{\env'}}$}}
         \end{multlined}
+        \label{execconf:function}
     \end{align}
-    \caption{The CESK-transition function for statements}
+    \caption{The CESK-transition function starting in ExecConfiguration}
     \label{figure:exec}
 \end{figure}
-
+\begin{figure}
+    \begin{align}
+       &\cesktrans%
+           {\contconf{\VarDeclK{\env}{\varmeta}{\scont}}{\val}}%
+           {\scontconf{\scont}{\ext{\env}{\varmeta}{\val}}}
+       \label{econtconf:vardecl}
+    \end{align}
+       \caption{The CESK-transition function starting in ValuePassingConfiguration: statements}
+\end{figure}
 \subsubsection{Variable Declaration}
-Variable declaration extend the corresponding environment with a new binding.
-The corresponding initializer expression is first evaluated to a value $v$.
-
-\begin{align*}
-&\cesktrans%
-    {\contconf{\econt'}{\val}}%
-    {\scontconf{\scont}{\ext{\env}{\varmeta}{\val}}},
-\end{align*}
-
-\noindent where $\econt' = \VarDeclK{\env}{\varmeta}{\scont}$.
-
-
+Execution of a variable declaration statement proceeds by evaluating the right-hand side expression as shown in \eqref{execconf:vardecl}.
+After the evaluation of the initializer expression to a value $\val$, the corresponding environment is extended with a new binding to a location that stores the value $\val$, as shown in \eqref{econtconf:vardecl}.
 \subsubsection{Empty statement}
 \label{subsubsec:emtpy-stmt}
 
