@@ -201,58 +201,58 @@ Note that the word ``List'' here is not in bold, so that it isn't confused with 
 \newcommand{\dformals}{\mathbf{Formals}}
 \[
   \begin{array}{ccll}
-	\expr, \expri{i}
-	& : & \dexpr & \textrm{syntactic domain of expressions}\\
-	\exprs
-	& : & \mlist{\dexpr}\\[2mm]
+    \expr, \expri{i}
+    & : & \dexpr & \textrm{syntactic domain of expressions}\\
+    \exprs
+    & : & \mlist{\dexpr}\\[2mm]
 
-	\stmt, \stmti{i}
-	& : & \dstmt & \textrm{syntactic domain of statements}\\
-	\stmts
-	& : & \mlist{\dstmt}  & \textrm{}\\[2mm]
+    \stmt, \stmti{i}
+    & : & \dstmt & \textrm{syntactic domain of statements}\\
+    \stmts
+    & : & \mlist{\dstmt}  & \textrm{}\\[2mm]
 
-	\econt
-	& : & \decont & \textrm{domain of expression continuations}\\
-	\acont
-	& : & \dacont & \textrm{domain of application continuations}\\
-	\scont
-	& : & \dscont & \textrm{domain of statement continuations}\\
-	\bcont
-	& : & \dbcont & \textrm{domain of break continuations}\\
-	\switchcont
-	& : & \dswitchcont & \textrm{domain of switch continuations}\\[2mm]
+    \econt
+    & : & \decont & \textrm{domain of expression continuations}\\
+    \acont
+    & : & \dacont & \textrm{domain of application continuations}\\
+    \scont
+    & : & \dscont & \textrm{domain of statement continuations}\\
+    \bcont
+    & : & \dbcont & \textrm{domain of break continuations}\\
+    \switchcont
+    & : & \dswitchcont & \textrm{domain of switch continuations}\\[2mm]
 
-	\lbl & : & \dlbl & \textrm{domain of labels}\\
-	\lbls & : & \mlist{\dlbl} \\
-	\clbl & : & \dclbl & \textrm{domain of switch labels}\\
-	\clbls & : & \mlist{\dclbl} \\[2mm]
+    \lbl & : & \dlbl & \textrm{domain of labels}\\
+    \lbls & : & \mlist{\dlbl} \\
+    \clbl & : & \dclbl & \textrm{domain of switch labels}\\
+    \clbls & : & \mlist{\dclbl} \\[2mm]
 
-	\handler
-	& : & \dhandler & \textrm{syntactic domain of exception handlers} \\
-	\strace
-	& : & \mlist{\dexpr} & \textrm{domain of stack traces}\\
-	\cex
-	& : &  \emptyset + \dval & \textrm{domain of current expetion values}\\
-	\cstrace
-	& : & \emptyset + \mlist{\dexpr} & \textrm{domain of current exception stack traces}\\[2mm]
+    \handler
+    & : & \dhandler & \textrm{syntactic domain of exception handlers} \\
+    \strace
+    & : & \mlist{\dexpr} & \textrm{domain of stack traces}\\
+    \cex
+    & : &  \emptyset + \dval & \textrm{domain of current expetion values}\\
+    \cstrace
+    & : & \emptyset + \mlist{\dexpr} & \textrm{domain of current exception stack traces}\\[2mm]
 
-	\varmeta
-	& : & \dvardecl & \textrm{domain of variable declarations}\\
-	\loc
-	& : & \dlocation & \textrm{domain of store locations}\\
-	\val
-	& : & \dval & \textrm{domain of values}\\
-	\vals
-	& : & \mlist{\dval}\\
-	\env
-	& : & \denv & \textrm{domain of environments}\\[2mm]
+    \varmeta
+    & : & \dvardecl & \textrm{domain of variable declarations}\\
+    \loc
+    & : & \dlocation & \textrm{domain of store locations}\\
+    \val
+    & : & \dval & \textrm{domain of values}\\
+    \vals
+    & : & \mlist{\dval}\\
+    \env
+    & : & \denv & \textrm{domain of environments}\\[2mm]
   \end{array}
 \]
 
 \[
   \begin{array}{ccll}
-	\formal, \formali{i} & : & \dvardecl\\
-	\formals & : & \dformals = \mlist{\dvardecl} &\textrm{ domain of formals}\\
+    \formal, \formali{i} & : & \dvardecl\\
+    \formals & : & \dformals = \mlist{\dvardecl} &\textrm{ domain of formals}\\
 
   \end{array}
 \]
@@ -310,10 +310,10 @@ Function ``$\extend$'' creates a new environment by extending the provided envir
 \end{align*}
 with
 \[
-	\env'(\varmeta) =\begin{cases}
-	\loc_i & \textrm{with }\deref{\loc_i} = \val_i\textrm{ if }\exists\varmeta_i \in \varmeta{s} \textrm{ s.t. } \varmeta_i = \varmeta\\
-	\env(\varmeta) &\textrm{otherwise}
-	\end{cases}
+    \env'(\varmeta) =\begin{cases}
+    \loc_i & \textrm{with }\deref{\loc_i} = \val_i\textrm{ if }\exists\varmeta_i \in \varmeta{s} \textrm{ s.t. } \varmeta_i = \varmeta\\
+    \env(\varmeta) &\textrm{otherwise}
+    \end{cases}
 \]
 
 For simpler notation, we allow ``$\extend$'' to be called with singleton lists as $\ext{\env}{\varmeta}{\val}$, which we consider equivalent to $\ext{\env}{\varmeta :: []}{\val :: []}$.
@@ -341,17 +341,17 @@ Configurations contain different components and the transition step dispatches t
 % Transition
 \begin{figure}[Htp]
   \begin{align}
-	&\evalconf{\expr}{\env}{st}{cex}{cst}{\econt} & :\quad & \text{EvalConfiguration} \label{config:eval}\\
-	&\evallistconf{\exprs}{\env}{st}{cex}{cst}{\acont} & :\quad & \text{EvalListConfiguration} \label{config:evallist}\\
-	&\execconf{\stmt}{\env}{\lbls}{\clbls}{\handler}{\cex}{\cstrace}{\econt}{\scont}  & :\quad & \text{ExecConfiguration} \label{config:exec}\\
-	&\contconf{\econt}{\val} & :\quad & \text{ValuePassingConfiguration} \label{config:econt}\\
-	&\acontconf{\acont}{\vals} & :\quad & \text{ApplicationConfiguration} \label{config:acont}\\
-	&\scontconf{\scont}{\env} & :\quad & \text{ForwardConfiguration} \label{config:scont}\\
-	&\throwconf{\handler}{\val}{\strace} & :\quad & \text{ThrowConfiguration} \label{config:throw}\\
-	&\breakconf{\bcont} & :\quad & \text{BreakConfiguration} \label{config:bcont}\\
-	&\switchconf{\switchcont} & :\quad &
-	\text{SwitchConfiguration}
-	\label{config:switchcont}
+    &\evalconf{\expr}{\env}{st}{cex}{cst}{\econt} & :\quad & \text{EvalConfiguration} \label{config:eval}\\
+    &\evallistconf{\exprs}{\env}{st}{cex}{cst}{\acont} & :\quad & \text{EvalListConfiguration} \label{config:evallist}\\
+    &\execconf{\stmt}{\env}{\lbls}{\clbls}{\handler}{\cex}{\cstrace}{\econt}{\scont}  & :\quad & \text{ExecConfiguration} \label{config:exec}\\
+    &\contconf{\econt}{\val} & :\quad & \text{ValuePassingConfiguration} \label{config:econt}\\
+    &\acontconf{\acont}{\vals} & :\quad & \text{ApplicationConfiguration} \label{config:acont}\\
+    &\scontconf{\scont}{\env} & :\quad & \text{ForwardConfiguration} \label{config:scont}\\
+    &\throwconf{\handler}{\val}{\strace} & :\quad & \text{ThrowConfiguration} \label{config:throw}\\
+    &\breakconf{\bcont} & :\quad & \text{BreakConfiguration} \label{config:bcont}\\
+    &\switchconf{\switchcont} & :\quad &
+    \text{SwitchConfiguration}
+    \label{config:switchcont}
   \end{align}
   \caption{States for the CESK machine}
 \end{figure}
@@ -505,29 +505,29 @@ The different expression continuations are shown in Figure~\ref{figure:econts}.
 \newcommand{\ExpressionK}[2]{\mathrm{ExpressionK}({#1},\,{#2})}
 \begin{figure}[Htp]
   \begin{align}
-	&\VarSetK{\idmeta}{\ExceptionHandlers}{\econt} \label{econt:varset}\\
-	&\ExpressionsK{\exprs}{\env}{\acont} \label{econt:expressions}\\
-	&\NotK{\econt} \label{econt:not}\\
-	&\AndK{\expressionmeta}{\ExceptionHandlers}{\econt} \label{econt:and}\\
-	&\OrK{\expressionmeta}{\ExceptionHandlers}{\econt} \label{econt:or}\\
-	&\ConditionalK{\expressionmeta_1}{\expressionmeta_2}{\ExceptionHandlers}{\econt} \label{econt:cond}\\
-	&\LetK{\idmeta}{\expressionmeta}{\ExceptionHandlers}{\econt} \label{econt:let}\\
-	&\IsExpressionK \label{econt:is}\\
-	&\AsExpressionK \label{econt:as}\\
-	&\StaticGetK \label{econt:static-get}\\
-	&\StaticSetK \label{econt:static-set}\\
-	&\DPropertyGetK \label{econt:dproperty-get}\\
-	&\PropertySetK \label{econt:property-set}\\
-	&\PropertySetVK \label{econt:property-set}\\
-	&\DPropertyGetK \label{econt:dproperty-set}\\
-	&\DPropertySetVK \label{econt:dproperty-set-v}\\
-	&\SuperPropertySetK \label{econt:super-property-set}\\
-	&\InstanceMethodK \label{econt:instance-method}\\
-	&\DInstanceMethodK \label{econt:dinstance-method}\\
-	&\VarDeclK{\idmeta}{\env}{\scont} \label{econt:var-decl}\\
-	&\IfCondK{\expressionmeta_1}{\expressionmeta_2} \label{econt:if-cond}\\
-	&\ForCondK \label{econt:for-cond}\\
-	&\ExpressionK{\scont}{\env} \label{econt:expression}
+    &\VarSetK{\idmeta}{\ExceptionHandlers}{\econt} \label{econt:varset}\\
+    &\ExpressionsK{\exprs}{\env}{\acont} \label{econt:expressions}\\
+    &\NotK{\econt} \label{econt:not}\\
+    &\AndK{\expressionmeta}{\ExceptionHandlers}{\econt} \label{econt:and}\\
+    &\OrK{\expressionmeta}{\ExceptionHandlers}{\econt} \label{econt:or}\\
+    &\ConditionalK{\expressionmeta_1}{\expressionmeta_2}{\ExceptionHandlers}{\econt} \label{econt:cond}\\
+    &\LetK{\idmeta}{\expressionmeta}{\ExceptionHandlers}{\econt} \label{econt:let}\\
+    &\IsExpressionK \label{econt:is}\\
+    &\AsExpressionK \label{econt:as}\\
+    &\StaticGetK \label{econt:static-get}\\
+    &\StaticSetK \label{econt:static-set}\\
+    &\DPropertyGetK \label{econt:dproperty-get}\\
+    &\PropertySetK \label{econt:property-set}\\
+    &\PropertySetVK \label{econt:property-set}\\
+    &\DPropertyGetK \label{econt:dproperty-set}\\
+    &\DPropertySetVK \label{econt:dproperty-set-v}\\
+    &\SuperPropertySetK \label{econt:super-property-set}\\
+    &\InstanceMethodK \label{econt:instance-method}\\
+    &\DInstanceMethodK \label{econt:dinstance-method}\\
+    &\VarDeclK{\idmeta}{\env}{\scont} \label{econt:var-decl}\\
+    &\IfCondK{\expressionmeta_1}{\expressionmeta_2} \label{econt:if-cond}\\
+    &\ForCondK \label{econt:for-cond}\\
+    &\ExpressionK{\scont}{\env} \label{econt:expression}
   \end{align}
   \caption{Expression Continuations}
   \label{figure:econts}
@@ -555,14 +555,14 @@ The different statement continuations are shown in Figure~\ref{figure:sconts}.
 \newcommand{\ForSK}{\mathrm{ForSK}(\mathrm{\varmeta{s}},\, \expressionmeta,\, \exprs,\, \statementmeta,\, \env,\, \env',\, \lbls,\, \clbls,\, \handler,\, \cstrace,\, \cex,\, \econt,\, \scont)}
 \begin{figure}[Htp]
   \begin{align}
-	&\ExitSK{\val} \label{scont:exit}\\
-	&\BlockSK{\stmts}{\env} \label{scont:block}\\
-	&\WhileSK \label{scont:while}\\
-	&\BodySK{\stmt}{\env}{\scont} \label{scont:body}\\
-	&\NewSK{\econt}{\loc} \label{scont:new}\\
-	&\FinallySK{\stmt} \label{scont:finally}\\
-	&\RethrowSK{\val}{\strace}{\handler} \label{scont:rethrow}\\
-	&\ForSK \label{scont:for}
+    &\ExitSK{\val} \label{scont:exit}\\
+    &\BlockSK{\stmts}{\env} \label{scont:block}\\
+    &\WhileSK \label{scont:while}\\
+    &\BodySK{\stmt}{\env}{\scont} \label{scont:body}\\
+    &\NewSK{\econt}{\loc} \label{scont:new}\\
+    &\FinallySK{\stmt} \label{scont:finally}\\
+    &\RethrowSK{\val}{\strace}{\handler} \label{scont:rethrow}\\
+    &\ForSK \label{scont:for}
   \end{align}
   \caption{Statement Continuations}
   \label{figure:sconts}
@@ -593,16 +593,16 @@ We suffix the names of application continuations with ``$A$''.
 The different application continuations are shown in Figure~\ref{figure:acont}.
 \begin{figure}[Htp]
   \begin{align}
-	&\ValueA{\val}{\acont} \label{acont:value}\\
-	&\StringConcatenationA \label{acont:stringconcat}\\
-	&\ForInitA \label{acont:forinit}\\
-	&\ForUpdatesA{\env'} \label{acont:forupdates}\\
-	&\SuperMethodA \label{acont:supermethod}\\
-	&\DInstanceMethodA \label{acont:staticinv}\\
-	&\FieldsA{\env}{Izs}{\loc}{\scont} \label{acont:fields}\\
-	&\ConstructorA{Q}{\econt} \label{acont:constructor}\\
-	&\SuperA{Q}{\loc}{\scont} \label{acont:super}\\
-	&\RedirectingA{Q}{\loc}{\scont} \label{acont:redirecting}
+    &\ValueA{\val}{\acont} \label{acont:value}\\
+    &\StringConcatenationA \label{acont:stringconcat}\\
+    &\ForInitA \label{acont:forinit}\\
+    &\ForUpdatesA{\env'} \label{acont:forupdates}\\
+    &\SuperMethodA \label{acont:supermethod}\\
+    &\DInstanceMethodA \label{acont:staticinv}\\
+    &\FieldsA{\env}{Izs}{\loc}{\scont} \label{acont:fields}\\
+    &\ConstructorA{Q}{\econt} \label{acont:constructor}\\
+    &\SuperA{Q}{\loc}{\scont} \label{acont:super}\\
+    &\RedirectingA{Q}{\loc}{\scont} \label{acont:redirecting}
   \end{align}
   \caption{Application Continuations}
   \label{figure:acont}
@@ -676,8 +676,8 @@ Literal values are special values that store the specific payload and an associa
 The different literal values are presented below:
 \[
   \begin{array}{lcl}
-	\val \in \dlitval &=& \mathbf{int} + \mathbf{bool} + \mathbf{double}\\
-	&& + \mathbf{List} + \mathbf{Map} + \mathbf{String} + \mathbf{Symbol} + \mathbf{Type}
+    \val \in \dlitval &=& \mathbf{int} + \mathbf{bool} + \mathbf{double}\\
+    && + \mathbf{List} + \mathbf{Map} + \mathbf{String} + \mathbf{Symbol} + \mathbf{Type}
   \end{array}
 \]
 Literal values are special values that store the specific payload and an associated class.
@@ -686,7 +686,7 @@ Each of the specific literal values contains predefined operators and/or methods
 \label{subsec:object-values}
 Object values have a $\tt{class}$ component and a $\tt{fields}$ component which is list of locations for each field, as shown below:
 \[
-	\dobjval : \dclass \times \mlist{\dlocation}
+    \dobjval : \dclass \times \mlist{\dlocation}
 \]
 The $\tt{class}$ component captures the properties of the object, see Section~\eqref{subsec:class}.\\
 The object also stores a list of locations that represent the values of the fields for the given object.
@@ -706,7 +706,7 @@ Let $\loc$ be the location of field $fName$ for the object value $\val_0$:
   \setter \in \dobjval \times \mathbf{Name} \times \dval &\rightarrow \dval \hspace{100mm} \\
   \setter(\val_0, fName, \val_1) &= \val_1
 \end{align*}
-where $\val_1$ is the value to be stored in $\loc$ after the invocation of the implicit setter. 
+where $\val_1$ is the value to be stored in $\loc$ after the invocation of the implicit setter.
 This implies that invocation of implicit setter will modify the global store and  $\deref{\loc} = \val_1$ will hold after the transition.
 \subsection{Class}
 \label{subsec:class}
@@ -717,7 +717,7 @@ A $\tt{class} \in \dclass$ component captures the different properties for a def
 
 \subsubsection{Property Lookup}
 \label{subsubsec:property-lookup}
-% lookup getters 
+% lookup getters
 % lookup implicit getters
 \subsubsection{Method Lookup}
 \label{subsubsec:method-lookup}
@@ -728,7 +728,7 @@ The class component captures the immediate superclass and we allow access to it 
 \subsection{Function values}
 \label{subsec:function-values}
 \[
-	\dfunval : \dformals \times \dstmt \times \denv
+    \dfunval : \dformals \times \dstmt \times \denv
 \]
 
 \section{Abstract Syntax}
@@ -931,15 +931,15 @@ The value corresponding to the evaluated expression is captured by the applicati
 % expressions.
 %%
 \begin{figure}[Htp]
-	\begin{align}
+    \begin{align}
         &\cesktranswhere%
-			{\evalconf{\IntLiteral{\integermeta}}{\env}{\strace}{\cstrace}{\cex}{\econt}}%
-			{\contconf{\econt}{\val}}%
+            {\evalconf{\IntLiteral{\integermeta}}{\env}{\strace}{\cstrace}{\cex}{\econt}}%
+            {\contconf{\econt}{\val}}%
             {\text{where $\val = \mathrm{IntLiteral(\integermeta)} \in \mathbf{int}$}}
             \label{eval:int}\\
         &\cesktranswhere%
-			{\evalconf{\DoubleLiteral{\doublemeta}}{\env}{\strace}{\cstrace}{\cex}{\econt}}%
-			{\contconf{\econt}{\val}}%
+            {\evalconf{\DoubleLiteral{\doublemeta}}{\env}{\strace}{\cstrace}{\cex}{\econt}}%
+            {\contconf{\econt}{\val}}%
             {\text{where $\val = \mathrm{DoubleLiteral(\doublemeta)} \in \mathbf{double}$}}
             \label{eval:double}\\
         &\begin{multlined}
@@ -1037,9 +1037,9 @@ The value corresponding to the evaluated expression is captured by the applicati
                 {\contconf{\econt}{\funval{\formals}{\stmt}{\env}}}%
                 {\text{where $F$ is a function expression with formal parameters $\formals$ and body $\stmt$}}
         \end{multlined}
-	\end{align}
-	\caption{The CESK-transition function for EvalConfiguration: simple expressions}
-	\label{figure:expressions-evalconfigs}
+    \end{align}
+    \caption{The CESK-transition function for EvalConfiguration: simple expressions}
+    \label{figure:expressions-evalconfigs}
 \end{figure}
 %
 \newcommand{\true}{\tt{true}}
@@ -1049,84 +1049,84 @@ The value corresponding to the evaluated expression is captured by the applicati
 % for simple expressions
 %%
 \begin{figure}[Htp]
-	\begin{align}
-		&\begin{multlined}
+    \begin{align}
+        &\begin{multlined}
         \cesktranssplit%
             {\contconf{\ExpressionsK{\exprs}{\env}{\acont}}{\val}}%
             {\evallistconf{\exprs}{\env}{\strace}{\cstrace}{\cex}{\ValueA{\val}{\acont}}}
         \end{multlined}
         \label{econtconf:exprs}\\
-		&\cesktranswhere%
-			{\contconf{\VarSetK{\env}{\varmeta}{\econt}}{\val}}%
-			{\contconf{\econt}{\val}}%
-			{\deref{\env(\varmeta)} = \val \text{ after transition}}
-			\label{econtconf:varset}\\
-		&\cesktrans%
-			{\contconf{\NotK{\econt}}{\true}}%
-			{\contconf{\econt}{\false}}
+        &\cesktranswhere%
+            {\contconf{\VarSetK{\env}{\varmeta}{\econt}}{\val}}%
+            {\contconf{\econt}{\val}}%
+            {\deref{\env(\varmeta)} = \val \text{ after transition}}
+            \label{econtconf:varset}\\
+        &\cesktrans%
+            {\contconf{\NotK{\econt}}{\true}}%
+            {\contconf{\econt}{\false}}
         \label{econtconf:not-true}\\
-		&\cesktrans%
-			{\contconf{\NotK{\econt}}{\false}}%
-			{\contconf{\econt}{\true}}
+        &\cesktrans%
+            {\contconf{\NotK{\econt}}{\false}}%
+            {\contconf{\econt}{\true}}
         \label{econtconf:not-false}\\
-		&\cesktrans%
-			{\contconf{\AndK{\expressionmeta}{\env}{\econt}}{\true}}%
-			{\evalconf{\expressionmeta}{\env}{\strace}{\cstrace}{\cex}{\econt}}
+        &\cesktrans%
+            {\contconf{\AndK{\expressionmeta}{\env}{\econt}}{\true}}%
+            {\evalconf{\expressionmeta}{\env}{\strace}{\cstrace}{\cex}{\econt}}
         \label{econtconf:and-true}\\
-		&\cesktrans%
-			{\contconf{\AndK{\expressionmeta}{\env}{\econt}}{\false}}%
-			{\contconf{\econt}{\false}}
+        &\cesktrans%
+            {\contconf{\AndK{\expressionmeta}{\env}{\econt}}{\false}}%
+            {\contconf{\econt}{\false}}
         \label{econtconf:and-false}\\
-		&\cesktrans%
-			{\contconf{\OrK{\expressionmeta}{\env}{\econt}}{\false}}%
-			{\evalconf{\expressionmeta}{\env}{\strace}{\cstrace}{\cex}{\econt}}
+        &\cesktrans%
+            {\contconf{\OrK{\expressionmeta}{\env}{\econt}}{\false}}%
+            {\evalconf{\expressionmeta}{\env}{\strace}{\cstrace}{\cex}{\econt}}
         \label{econtconf:or-false}\\
-		&\cesktrans%
-			{\contconf{\OrK{\expressionmeta}{\env}{\econt}}{\true}}%
-			{\contconf{\econt}{\true}}
+        &\cesktrans%
+            {\contconf{\OrK{\expressionmeta}{\env}{\econt}}{\true}}%
+            {\contconf{\econt}{\true}}
         \label{econtconf:or-true}\\
-		&\begin{multlined}
-		\cesktranssplit%
-			{\contconf{\ConditionalK{\expri{1}}{\expri{2}}{\env}{\econt}}{\true}}%
-			{\evalconf{\expri{1}}{\env}{\strace}{\cstrace}{\cex}{\econt}}
+        &\begin{multlined}
+        \cesktranssplit%
+            {\contconf{\ConditionalK{\expri{1}}{\expri{2}}{\env}{\econt}}{\true}}%
+            {\evalconf{\expri{1}}{\env}{\strace}{\cstrace}{\cex}{\econt}}
         \end{multlined}
         \label{econtconf:cond-true}\\
-		&\begin{multlined}
-		\cesktranssplit%
-			{\contconf{\ConditionalK{\expri{1}}{\expri{2}}{\env}{\econt}}{\false}}%
-			{\evalconf{\expri{2}}{\env}{\strace}{\cstrace}{\cex}{\econt}}
+        &\begin{multlined}
+        \cesktranssplit%
+            {\contconf{\ConditionalK{\expri{1}}{\expri{2}}{\env}{\econt}}{\false}}%
+            {\evalconf{\expri{2}}{\env}{\strace}{\cstrace}{\cex}{\econt}}
         \end{multlined}
         \label{econtconf:cond-false}\\
-		&\begin{multlined}
-		\cesktranswheresplit%
-			{\contconf{\LetK{\expri{2}}{\env}{\varmeta}{\econt}}{\val}}%
-			{\evalconf{\expri{2}}{\env'}{\strace}{\cstrace}{\cex}{\econt}}%
-			{\env'=\ext{\env}{\varmeta}{\val}}
+        &\begin{multlined}
+        \cesktranswheresplit%
+            {\contconf{\LetK{\expri{2}}{\env}{\varmeta}{\econt}}{\val}}%
+            {\evalconf{\expri{2}}{\env'}{\strace}{\cstrace}{\cex}{\econt}}%
+            {\env'=\ext{\env}{\varmeta}{\val}}
         \end{multlined}
         \label{econtconf:let}\\
         &\cesktranswhere%
-			{\contconf{\IsExpressionK}{\val}}%
-			{\contconf{\econt}{\true}}%
-			{\text{if $\val \textrm{ is } \tt{T}$}}
-		\label{econtconf:is-true}\\
-		&\cesktranswhere%
-			{\contconf{\IsExpressionK}{\val}}%
-			{\contconf{\econt}{\false}}%
-			{\text{otherwise}}
-		\label{econtconf:is-false}\\
-		&\cesktranswhere%
-			{\contconf{\AsExpressionK}{\val}}%
-			{\contconf{\econt}{\val}}%
-			{\text{if $\val \textrm{ is } \tt{T}$}}
-		\label{econtconf:as-true}\\
-		&\cesktranswhere%
-			{\contconf{\AsExpressionK}{\val}}%
-			{\throwconf{\handler}{\AsExpression{\expressionmeta}{\tt{T}} :: \strace}{\tt{CastError}}}%
-			{\text{if $\val \textrm{ is not } \tt{T}$}}
-		\label{econtconf:as-false}
-	\end{align}
-	\caption{The CESK-transition function for ValuePassingConfiguration: simple expressions}
-	\label{figure:cont-config}
+            {\contconf{\IsExpressionK}{\val}}%
+            {\contconf{\econt}{\true}}%
+            {\text{if $\val \textrm{ is } \tt{T}$}}
+        \label{econtconf:is-true}\\
+        &\cesktranswhere%
+            {\contconf{\IsExpressionK}{\val}}%
+            {\contconf{\econt}{\false}}%
+            {\text{otherwise}}
+        \label{econtconf:is-false}\\
+        &\cesktranswhere%
+            {\contconf{\AsExpressionK}{\val}}%
+            {\contconf{\econt}{\val}}%
+            {\text{if $\val \textrm{ is } \tt{T}$}}
+        \label{econtconf:as-true}\\
+        &\cesktranswhere%
+            {\contconf{\AsExpressionK}{\val}}%
+            {\throwconf{\handler}{\AsExpression{\expressionmeta}{\tt{T}} :: \strace}{\tt{CastError}}}%
+            {\text{if $\val \textrm{ is not } \tt{T}$}}
+        \label{econtconf:as-false}
+    \end{align}
+    \caption{The CESK-transition function for ValuePassingConfiguration: simple expressions}
+    \label{figure:cont-config}
 \end{figure}
 \subsubsection{Basic literal evaluation}
 \label{subsubsec:basic-literal-eval}
@@ -1243,8 +1243,8 @@ Otherwise, the evaluation of the expression results with an error, as shown in \
         \end{multlined}
         \label{eval:staticinvoc}
     \end{align}
-	\caption{The CESK-transition function for EvalConfiguration: static variable extraction and assignment, and static method invocation}
-	\label{table:static-evalconfigs}
+    \caption{The CESK-transition function for EvalConfiguration: static variable extraction and assignment, and static method invocation}
+    \label{table:static-evalconfigs}
 \end{figure}
 %%
 % Figure showing the CESK-transition function strating from ValuePassingConfiguration for
@@ -1252,31 +1252,31 @@ Otherwise, the evaluation of the expression results with an error, as shown in \
 %%
 \begin{figure}[Htp]
     \begin{align}
-		&\cesktranswhere%
-			{\contconf{\StaticGetK}{\val}}%
-			{\contconf{\econt}{\val}}%
-			{\env^{M} = \ext{\env^{M}}{\membermeta}{\val}}
-		\label{econtconf:staticget}\\
-		&\cesktranswhere%
-			{\contconf{\StaticSetK}{\val}}%
-			{\contconf{\econt}{\val}}
-			{\text{$\env^{M} = \ext{\env^{M}}{\membermeta}{\val}$ if $\membermeta \notin \env^M$}}
-		\label{econtconf:staticset-var-new}\\
-		&\cesktranswhere%
-			{\contconf{\StaticSetK}{\val}}%
-			{\contconf{\econt}{\val}}
-			{\text{$\update{\env^{M}(\membermeta)}{\val}$ if $\membermeta \in \env^M$}}
+        &\cesktranswhere%
+            {\contconf{\StaticGetK}{\val}}%
+            {\contconf{\econt}{\val}}%
+            {\env^{M} = \ext{\env^{M}}{\membermeta}{\val}}
+        \label{econtconf:staticget}\\
+        &\cesktranswhere%
+            {\contconf{\StaticSetK}{\val}}%
+            {\contconf{\econt}{\val}}
+            {\text{$\env^{M} = \ext{\env^{M}}{\membermeta}{\val}$ if $\membermeta \notin \env^M$}}
+        \label{econtconf:staticset-var-new}\\
+        &\cesktranswhere%
+            {\contconf{\StaticSetK}{\val}}%
+            {\contconf{\econt}{\val}}
+            {\text{$\update{\env^{M}(\membermeta)}{\val}$ if $\membermeta \in \env^M$}}
         \label{econtconf:staticset-var}\\
         &\begin{multlined}
-		\cesktranswheresplit%
-			{\contconf{\StaticSetK}{\val}}%
-			{\execconf{\stmt}{\env}{[]}{[]}{\handler}{\cstrace}{\cex}{\econt}{\scont}}%
-			{\text{$\scont = \ExitSK{\val}$, $\env = \ext{\env_{empty}}{\formal}{\val}$}}
-		\end{multlined}
-		\label{econtconf:staticset-setter}
+        \cesktranswheresplit%
+            {\contconf{\StaticSetK}{\val}}%
+            {\execconf{\stmt}{\env}{[]}{[]}{\handler}{\cstrace}{\cex}{\econt}{\scont}}%
+            {\text{$\scont = \ExitSK{\val}$, $\env = \ext{\env_{empty}}{\formal}{\val}$}}
+        \end{multlined}
+        \label{econtconf:staticset-setter}
     \end{align}
-	\caption{The CESK-transition function for ValuePassingConfiguration: static variable extraction and assignment, and static method invocation}
-	\label{table:static-evalconfigs}
+    \caption{The CESK-transition function for ValuePassingConfiguration: static variable extraction and assignment, and static method invocation}
+    \label{table:static-evalconfigs}
 \end{figure}
 %%
 % Figure showing the CESK-transition function strating from ApplicationConfiguration.
@@ -1284,21 +1284,21 @@ Otherwise, the evaluation of the expression results with an error, as shown in \
 \begin{figure}[Htp]
     \begin{align}
        &\begin{multlined}
-		\cesktrans%
-			{\acontconf{\StringConcatenationA}{\vals}}%
-			{\contconf{\econt}{\concat(\vals)}}
+        \cesktrans%
+            {\acontconf{\StringConcatenationA}{\vals}}%
+            {\contconf{\econt}{\concat(\vals)}}
         \end{multlined}
         \label{acontconf:concat}\\
-		&\begin{multlined}
-		\cesktranswheresplit*%
-			{\acontconf{\StaticInvA{\formals}{\stmt}{\strace}{\econt}}{\val{s}}}%
-			{\execconf{\stmt}{\env'}{[]}{[]}{\handler}{\cstrace}{\cex}{\econt}{\scont}}%
-			{\parbox{10cm}{where $\scont = \ExitSK{\tt{null}}$,\\ $\env' = \ext{\env_{empty}}{\formals}{\val{s}}$}}
-		\end{multlined}
-		\label{acontconf:staticinvoc}
+        &\begin{multlined}
+        \cesktranswheresplit*%
+            {\acontconf{\StaticInvA{\formals}{\stmt}{\strace}{\econt}}{\val{s}}}%
+            {\execconf{\stmt}{\env'}{[]}{[]}{\handler}{\cstrace}{\cex}{\econt}{\scont}}%
+            {\parbox{10cm}{where $\scont = \ExitSK{\tt{null}}$,\\ $\env' = \ext{\env_{empty}}{\formals}{\val{s}}$}}
+        \end{multlined}
+        \label{acontconf:staticinvoc}
     \end{align}
-	\caption{The CESK-transition function for ApplicationConfiguration}
-	\label{table:static-evalconfigs}
+    \caption{The CESK-transition function for ApplicationConfiguration}
+    \label{table:static-evalconfigs}
 \end{figure}
 
 \subsubsection{Static and library fields}
@@ -1354,131 +1354,131 @@ A statement continuation, $\ExitSK{\econt}{\tt{null}}$ is added as next statemen
 %%
 \begin{figure}[Htp]
     \begin{align}
-		&\begin{multlined}
-		\cesktranswheresplit%
-			{\evalconf{\PropertyGet{\expressionmeta}{\idmeta}}{\env}{\strace}{\cstrace}{\cex}{\econt}}%
-			{\evalconf{\expressionmeta}{\env}{\strace}{\cstrace}{\cex}{\econt'}}%
-			{\text{where $\econt' = \PropertyGetK$}}
-		\end{multlined}
-		\label{eval:propertyget}\\
-		&\begin{multlined}
-		\cesktranswheresplit%
-			{\evalconf{\DirectPropertyGet{\expressionmeta}{\membermeta}}{\env}{\strace}{\cstrace}{\cex}{\econt}}%
-			{\evalconf{\expressionmeta}{\env}{\strace}{\cstrace}{\cex}{\econt'}}%
-			{\text{where $\econt' = \DPropertyGetK$}}
+        &\begin{multlined}
+        \cesktranswheresplit%
+            {\evalconf{\PropertyGet{\expressionmeta}{\idmeta}}{\env}{\strace}{\cstrace}{\cex}{\econt}}%
+            {\evalconf{\expressionmeta}{\env}{\strace}{\cstrace}{\cex}{\econt'}}%
+            {\text{where $\econt' = \PropertyGetK$}}
+        \end{multlined}
+        \label{eval:propertyget}\\
+        &\begin{multlined}
+        \cesktranswheresplit%
+            {\evalconf{\DirectPropertyGet{\expressionmeta}{\membermeta}}{\env}{\strace}{\cstrace}{\cex}{\econt}}%
+            {\evalconf{\expressionmeta}{\env}{\strace}{\cstrace}{\cex}{\econt'}}%
+            {\text{where $\econt' = \DPropertyGetK$}}
         \end{multlined}
         \label{eval:dpropertyget}\\
         &\begin{multlined}
-		\cesktranswheresplit%
-			{\evalconf{\PropertySet{\expressionmeta_0}{\idmeta}{\expressionmeta_1}}{\env}{\strace}{\cstrace}{\cex}{\econt}}%
-			{\evalconf{\expressionmeta_0}{\env}{\strace}{\cstrace}{\cex}{\econt'}}%
-			{\text{where $\econt' = \PropertySetK$}}
+        \cesktranswheresplit%
+            {\evalconf{\PropertySet{\expressionmeta_0}{\idmeta}{\expressionmeta_1}}{\env}{\strace}{\cstrace}{\cex}{\econt}}%
+            {\evalconf{\expressionmeta_0}{\env}{\strace}{\cstrace}{\cex}{\econt'}}%
+            {\text{where $\econt' = \PropertySetK$}}
         \end{multlined}
         \label{eval:propertyset}\\
         &\begin{multlined}
-		\cesktranswheresplit%
-			{\evalconf{\DirectPropertySet{\expressionmeta_0}{\membermeta}{\expressionmeta_1}}{\env}{\strace}{\cstrace}{\cex}{\econt}}%
-			{\evalconf{\expressionmeta_0}{\env}{\strace}{\cstrace}{\cex}{\econt'}}%
-			{\text{where $\econt' = \DirectPropertySetK$}}
+        \cesktranswheresplit%
+            {\evalconf{\DirectPropertySet{\expressionmeta_0}{\membermeta}{\expressionmeta_1}}{\env}{\strace}{\cstrace}{\cex}{\econt}}%
+            {\evalconf{\expressionmeta_0}{\env}{\strace}{\cstrace}{\cex}{\econt'}}%
+            {\text{where $\econt' = \DirectPropertySetK$}}
         \end{multlined}
         \label{eval:dpropertyset}\\
         &\begin{multlined}
-		\cesktranswheresplit%
-			{\evalconf{\SuperPropertyGet{\idmeta}}{\env}{\strace}{\cstrace}{\cex}{\econt}}%
-			{\contconf{\econt}{\funval{\formals}{\stmt}{\env'}}}%
+        \cesktranswheresplit%
+            {\evalconf{\SuperPropertyGet{\idmeta}}{\env}{\strace}{\cstrace}{\cex}{\econt}}%
+            {\contconf{\econt}{\funval{\formals}{\stmt}{\env'}}}%
             {\parbox{10cm}{where $\env' = \ext{\env_{empty}}{\this}{\deref{(\env(\this))}}$,\\ $\membermeta = \superclass{\deref{\env(\this)}}.lookup(\idmeta)$,\\ $\membermeta$ is a method tear-off with formal parameters $\formals$, and body $\stmt$}}
         \end{multlined}
         \label{eval:superpropertyget-tearoff}\\
         &\begin{multlined}
-		\cesktranswheresplit%
-			{\evalconf{\SuperPropertyGet{\idmeta}}{\env}{\strace}{\cstrace}{\cex}{\econt}}%
-			{\execconf{\stmt}{\env'}{\lbls}{\clbls}{\handler}{\cstrace}{\cex}{\econt}{\scont}}%
+        \cesktranswheresplit%
+            {\evalconf{\SuperPropertyGet{\idmeta}}{\env}{\strace}{\cstrace}{\cex}{\econt}}%
+            {\execconf{\stmt}{\env'}{\lbls}{\clbls}{\handler}{\cstrace}{\cex}{\econt}{\scont}}%
             {\parbox{10cm}{where $\env' = \ext{\env_{empty}}{\this}{\deref{(\env(\this))}}$,\\ $\scont = \emptyset$, $\membermeta = \superclass{\deref{\env(\this)}}.lookup(\idmeta)$,\\ $\membermeta$ is a getter method with body $\stmt$}}
         \end{multlined}
         \label{eval:superpropertyget-getter}\\
         &\begin{multlined}
-		\cesktranswheresplit%
-			{\evalconf{\SuperPropertyGet{\idmeta}}{\env}{\strace}{\cstrace}{\cex}{\econt}}%
-			{\contconf{\econt}{M(\deref{(\env(\this))})}}%
+        \cesktranswheresplit%
+            {\evalconf{\SuperPropertyGet{\idmeta}}{\env}{\strace}{\cstrace}{\cex}{\econt}}%
+            {\contconf{\econt}{M(\deref{(\env(\this))})}}%
             {\text{where $\membermeta = \superclass{\deref{\env(\this)}}.lookup(\idmeta)$, $\membermeta$ is a implicit field getter}}
         \end{multlined}
         \label{eval:superpropertyget-field}\\
         &\begin{multlined}
-		\cesktranswheresplit%
-			{\evalconf{\SuperPropertySet{\idmeta}{\expressionmeta}}{\env}{\strace}{\cstrace}{\cex}{\econt}}%
-			{\evalconf{\expressionmeta}{\env}{\strace}{\cstrace}{\cex}{\econt'}}%
+        \cesktranswheresplit%
+            {\evalconf{\SuperPropertySet{\idmeta}{\expressionmeta}}{\env}{\strace}{\cstrace}{\cex}{\econt}}%
+            {\evalconf{\expressionmeta}{\env}{\strace}{\cstrace}{\cex}{\econt'}}%
             {\text{where $\econt' = \SuperPropertySetK$}}
         \end{multlined}
         \label{eval:superpropertyset}
     \end{align}
-	\caption{The CESK-transition function for EvalConfiguration: instance property extraction and assignment}
-	\label{figure:instance-property-evalconfigs}
+    \caption{The CESK-transition function for EvalConfiguration: instance property extraction and assignment}
+    \label{figure:instance-property-evalconfigs}
 \end{figure}
 %%
 % Figure showing the CESK-transition function strating from ValuePassingConfiguration for instance property extraction.
 %%
 \begin{figure}[Htp]
     \begin{align}
-	&\begin{multlined}
-	\cesktranswheresplit*%
-		{\contconf{\PropertyGetK}{\val}}%
-		{\contconf{\econt}{\funval{\formals}{\stmt}{\env}}}
-		{\parbox{10cm}{if $\membermeta$ is a method with body $\stmt$ and formals $\formals$ \\
-		where $\env = \ext{\env_{empty}}{\mathbf{this}}{\val}$}}
-	\end{multlined}
-	\label{econtconf:propertyget-tearoff}\\
-	&\begin{multlined}
-		\cesktranswheresplit*%
-		{\contconf{\PropertyGetK}{\val}}%
-		{\execconf{\stmt}{\env}{[]}{[]}{\handler}{\cstrace}{\cex}{\econt}{\scont}}%
-		{\parbox{10cm}{if $\membermeta$ is a getter with body $\stmt$\\
-		where $\env = \ext{\env_{empty}}{\mathbf{this}}{\val}$\\
-		$\scont = \emptyset$}}
-	\end{multlined}
-	\label{econtconf:propertyget-getter}\\
-	&\begin{multlined}
-		\cesktranswheresplit%
-		{\contconf{\PropertyGetK}{\val}}%
-		{\contconf{\econt}{\textrm{\membermeta}(\val)}}%
-		{\parbox{10cm}{if $\membermeta$ is an implicit getter for field $\idmeta$\\
-		where $\env = \ext{\env_{empty}}{\mathbf{this}}{\val}$\\
-		$\scont = \emptyset$}}
-	\end{multlined}
-	\label{econtconf:propertyget-field}\\
-	&\begin{multlined}
-		\cesktranswheresplit*%
-		{\contconf{\PropertyGetK}{\val}}%
-		{\throwconf{\handler}{(\tt{throw}\text{ NoSuchMethod}) :: \strace}{\textrm{NoSuchMethod}}}%
-		{\parbox{10cm}{if lookup of name $\idmeta$ was unsuccessful in class of value $\val$}}
-	\end{multlined}
-	\label{econtconf:propertyget-nosuchmethod}\\
-	&\begin{multlined}
-		\cesktranswheresplit*%
-		{\contconf{\DPropertyGetK}{\val}}%
-		{\contconf{\econt}{\funval{\formals}{\stmt}{\env}}}%
-		{\parbox{10cm}{if $\membermeta$ is a method with body $\stmt$ and formals $\formals$\\
-		where $\env = \ext{\env_{empty}}{\mathbf{this}}{\val}$}}
-	\end{multlined}
-	\label{econtconf:dpropertyget-tearoff}\\
-	&\begin{multlined}
-		\cesktranswheresplit*%
-			{\contconf{\DPropertyGetK}{\val}}%
-			{\execconf{\stmt}{\env}{[]}{[]}{\handler}{\cstrace}{\cex}{\econt}{\scont}}%
-			{\parbox{10cm}{if $\membermeta$ is getter with statement body $\stmt$ \\
-			where $\env = \ext{\env_{empty}}{\mathbf{this}}{\val}$ \\
-			$\scont = \emptyset$}}
-	\end{multlined}
-	\label{econtconf:dpropertyget-getter}\\
-	&\begin{multlined}
-		\cesktranswhere%
-		{\contconf{\DPropertyGetK}{\val}}%
-		{\contconf{\econt}{\deref{\val[\membermeta]}}}%
-		{\text{if $\membermeta$ is a field }}
-	\end{multlined}
-	\label{econtconf:dpropertyget-field}
-	\end{align}
-	\caption{The CESK-transition function for ValuePassingConfiguration: instance property extraction}
-	\label{figure:econtconf:instance-property-extraction}
+    &\begin{multlined}
+    \cesktranswheresplit*%
+        {\contconf{\PropertyGetK}{\val}}%
+        {\contconf{\econt}{\funval{\formals}{\stmt}{\env}}}
+        {\parbox{10cm}{if $\membermeta$ is a method with body $\stmt$ and formals $\formals$ \\
+        where $\env = \ext{\env_{empty}}{\mathbf{this}}{\val}$}}
+    \end{multlined}
+    \label{econtconf:propertyget-tearoff}\\
+    &\begin{multlined}
+        \cesktranswheresplit*%
+        {\contconf{\PropertyGetK}{\val}}%
+        {\execconf{\stmt}{\env}{[]}{[]}{\handler}{\cstrace}{\cex}{\econt}{\scont}}%
+        {\parbox{10cm}{if $\membermeta$ is a getter with body $\stmt$\\
+        where $\env = \ext{\env_{empty}}{\mathbf{this}}{\val}$\\
+        $\scont = \emptyset$}}
+    \end{multlined}
+    \label{econtconf:propertyget-getter}\\
+    &\begin{multlined}
+        \cesktranswheresplit%
+        {\contconf{\PropertyGetK}{\val}}%
+        {\contconf{\econt}{\textrm{\membermeta}(\val)}}%
+        {\parbox{10cm}{if $\membermeta$ is an implicit getter for field $\idmeta$\\
+        where $\env = \ext{\env_{empty}}{\mathbf{this}}{\val}$\\
+        $\scont = \emptyset$}}
+    \end{multlined}
+    \label{econtconf:propertyget-field}\\
+    &\begin{multlined}
+        \cesktranswheresplit*%
+        {\contconf{\PropertyGetK}{\val}}%
+        {\throwconf{\handler}{(\tt{throw}\text{ NoSuchMethod}) :: \strace}{\textrm{NoSuchMethod}}}%
+        {\parbox{10cm}{if lookup of name $\idmeta$ was unsuccessful in class of value $\val$}}
+    \end{multlined}
+    \label{econtconf:propertyget-nosuchmethod}\\
+    &\begin{multlined}
+        \cesktranswheresplit*%
+        {\contconf{\DPropertyGetK}{\val}}%
+        {\contconf{\econt}{\funval{\formals}{\stmt}{\env}}}%
+        {\parbox{10cm}{if $\membermeta$ is a method with body $\stmt$ and formals $\formals$\\
+        where $\env = \ext{\env_{empty}}{\mathbf{this}}{\val}$}}
+    \end{multlined}
+    \label{econtconf:dpropertyget-tearoff}\\
+    &\begin{multlined}
+        \cesktranswheresplit*%
+            {\contconf{\DPropertyGetK}{\val}}%
+            {\execconf{\stmt}{\env}{[]}{[]}{\handler}{\cstrace}{\cex}{\econt}{\scont}}%
+            {\parbox{10cm}{if $\membermeta$ is getter with statement body $\stmt$ \\
+            where $\env = \ext{\env_{empty}}{\mathbf{this}}{\val}$ \\
+            $\scont = \emptyset$}}
+    \end{multlined}
+    \label{econtconf:dpropertyget-getter}\\
+    &\begin{multlined}
+        \cesktranswhere%
+        {\contconf{\DPropertyGetK}{\val}}%
+        {\contconf{\econt}{\deref{\val[\membermeta]}}}%
+        {\text{if $\membermeta$ is a field }}
+    \end{multlined}
+    \label{econtconf:dpropertyget-field}
+    \end{align}
+    \caption{The CESK-transition function for ValuePassingConfiguration: instance property extraction}
+    \label{figure:econtconf:instance-property-extraction}
 \end{figure}
 %
 %
@@ -1528,73 +1528,73 @@ When $\membermeta$ is an instance field, the evaluation proceeds as shown in \eq
 %%
 \begin{figure}[Htp]
     \begin{align}
-	&\begin{multlined}
-		\cesktranswheresplit*%
-		{\contconf{\PropertySetK}{\val_0}}%
-		{\evalconf{\expressionmeta_1}{\env}{\strace}{\cstrace}{\cex}{\econt'}}%
-		{\text{where $\econt' = \PropertySetVK$}}
-	\end{multlined}
-	\label{econtconf:propertyset-val}\\
-	&\begin{multlined}
-		\cesktranswheresplit*%
-		{\contconf{\PropertySetVK}{\val_1}}%
-		{\execconf{\stmt}{\env}{\lbls}{\clbls}{\handler}{\cstrace}{\cex}{\econt}{\scont}}%
-		{\parbox{10cm}{if \membermeta is setter with statement body $\stmt$ and formal parameter $\formal$\\
-		where $\env = \ext{\env_{empty}}{\mathbf{this} :: \formal :: []}{\val_0 :: \val_1 :: []}$\\
-		$\scont = \ExitSK{\val_1}$}}
-	\end{multlined}
-	\label{econtconf:propertyset-setter}\\
-	&\begin{multlined}
-		\cesktranswheresplit%
-		{\contconf{\PropertySetVK}{\val}}%
-		{\contconf{\econt}{\{\membermeta\}(\val_0, \val_1)}}%
-		{\text{if $\membermeta$ is an implicit setter for field $\idmeta$}}
-	\end{multlined}
-	\label{econtconf:propertyset-field}\\
-	&\begin{multlined}
-		\cesktranswheresplit*%
-		{\contconf{\DirectPropertySetK}{\val_0}}%
-		{\evalconf{\expressionmeta_1}{\env}{\strace}{\cstrace}{\cex}{\econt'}}%
-		{\parbox{10cm}{	if $\membermeta$ is setter with statement body $\stmt$ and formal $\formal$\\
-		where $\econt' = \DPropertySetVK$}}
-	\end{multlined}
-	\label{econtconf:dpropertyset-val}\\
-	&\begin{multlined}
-		\cesktranswheresplit*%
-		{\contconf{\DPropertySetVK}{\val_1}}
-		{\execconf{\stmt}{\env}{\lbls}{\clbls}{\handler}{\cstrace}{\cex}{\econt}{\scont}}
-		{\parbox{10cm}{if $\membermeta$ is a setter with body $\stmt$ and formal parameter $\formal$
-		where $\env = \ext{\env_{empty}}{\mathbf{this} :: \formal :: []}{\val_0 :: \val_1 :: []}$\\
-		$\scont = \emptyset$\\}}
-	\end{multlined}
-	\label{econtconf:dpropertyset-setter}\\
-	&\begin{multlined}
-		\cesktranswheresplit*%
-		{\contconf{\DPropertySetVK}{\val_1}}%
-		{\contconf{\econt}{\update{\val_0[\membermeta]}{\val_1}}}%
-		{\text{if $\membermeta$ is a field}}
-	\end{multlined}
-	\label{econtconf:dpropertyset-field}\\
-	&\begin{multlined}
-		\cesktranswheresplit*%
-		{\contconf{\SuperPropertySetK}{\val}}
-		{\execconf{\stmt}{\env'}{\lbls}{\clbls}{\handler}{\cstrace}{\cex}{\econt}{\scont}}
-		{\parbox{10cm}{if $\membermeta$ is a setter method with body $\stmt$ and formal $\formal$\\
-		where $\env' =  \ext{\env_{empty}}{\this :: \formal :: []}{\deref{(\env(\this))} :: \val :: []}$,\\
-		$\scont = \emptyset$}}
-	\end{multlined}
-	\label{econtconf:superpropertyset-setter}\\
-	&\begin{multlined}
-		\cesktranswheresplit%
-		{\contconf{\SuperPropertySetK}{\val}}%
-		{\contconf{\econt}{\val}}%
-		{\parbox{10cm}{if $\membermeta$ is a field\\
-		where $\update{\deref{(\env(\this))}[\membermeta]}{\val}$ after the transition}}
-	\end{multlined}
-	\label{econtconf:superpropertyset-field}
-	\end{align}
-	\caption{The CESK-transition function for ValuePassingConfiguration: instance property assignment}
-	\label{figure:instance-property-assignment-evalconfigs}
+    &\begin{multlined}
+        \cesktranswheresplit*%
+        {\contconf{\PropertySetK}{\val_0}}%
+        {\evalconf{\expressionmeta_1}{\env}{\strace}{\cstrace}{\cex}{\econt'}}%
+        {\text{where $\econt' = \PropertySetVK$}}
+    \end{multlined}
+    \label{econtconf:propertyset-val}\\
+    &\begin{multlined}
+        \cesktranswheresplit*%
+        {\contconf{\PropertySetVK}{\val_1}}%
+        {\execconf{\stmt}{\env}{\lbls}{\clbls}{\handler}{\cstrace}{\cex}{\econt}{\scont}}%
+        {\parbox{10cm}{if \membermeta is setter with statement body $\stmt$ and formal parameter $\formal$\\
+        where $\env = \ext{\env_{empty}}{\mathbf{this} :: \formal :: []}{\val_0 :: \val_1 :: []}$\\
+        $\scont = \ExitSK{\val_1}$}}
+    \end{multlined}
+    \label{econtconf:propertyset-setter}\\
+    &\begin{multlined}
+        \cesktranswheresplit%
+        {\contconf{\PropertySetVK}{\val}}%
+        {\contconf{\econt}{\{\membermeta\}(\val_0, \val_1)}}%
+        {\text{if $\membermeta$ is an implicit setter for field $\idmeta$}}
+    \end{multlined}
+    \label{econtconf:propertyset-field}\\
+    &\begin{multlined}
+        \cesktranswheresplit*%
+        {\contconf{\DirectPropertySetK}{\val_0}}%
+        {\evalconf{\expressionmeta_1}{\env}{\strace}{\cstrace}{\cex}{\econt'}}%
+        {\parbox{10cm}{    if $\membermeta$ is setter with statement body $\stmt$ and formal $\formal$\\
+        where $\econt' = \DPropertySetVK$}}
+    \end{multlined}
+    \label{econtconf:dpropertyset-val}\\
+    &\begin{multlined}
+        \cesktranswheresplit*%
+        {\contconf{\DPropertySetVK}{\val_1}}
+        {\execconf{\stmt}{\env}{\lbls}{\clbls}{\handler}{\cstrace}{\cex}{\econt}{\scont}}
+        {\parbox{10cm}{if $\membermeta$ is a setter with body $\stmt$ and formal parameter $\formal$
+        where $\env = \ext{\env_{empty}}{\mathbf{this} :: \formal :: []}{\val_0 :: \val_1 :: []}$\\
+        $\scont = \emptyset$\\}}
+    \end{multlined}
+    \label{econtconf:dpropertyset-setter}\\
+    &\begin{multlined}
+        \cesktranswheresplit*%
+        {\contconf{\DPropertySetVK}{\val_1}}%
+        {\contconf{\econt}{\update{\val_0[\membermeta]}{\val_1}}}%
+        {\text{if $\membermeta$ is a field}}
+    \end{multlined}
+    \label{econtconf:dpropertyset-field}\\
+    &\begin{multlined}
+        \cesktranswheresplit*%
+        {\contconf{\SuperPropertySetK}{\val}}
+        {\execconf{\stmt}{\env'}{\lbls}{\clbls}{\handler}{\cstrace}{\cex}{\econt}{\scont}}
+        {\parbox{10cm}{if $\membermeta$ is a setter method with body $\stmt$ and formal $\formal$\\
+        where $\env' =  \ext{\env_{empty}}{\this :: \formal :: []}{\deref{(\env(\this))} :: \val :: []}$,\\
+        $\scont = \emptyset$}}
+    \end{multlined}
+    \label{econtconf:superpropertyset-setter}\\
+    &\begin{multlined}
+        \cesktranswheresplit%
+        {\contconf{\SuperPropertySetK}{\val}}%
+        {\contconf{\econt}{\val}}%
+        {\parbox{10cm}{if $\membermeta$ is a field\\
+        where $\update{\deref{(\env(\this))}[\membermeta]}{\val}$ after the transition}}
+    \end{multlined}
+    \label{econtconf:superpropertyset-field}
+    \end{align}
+    \caption{The CESK-transition function for ValuePassingConfiguration: instance property assignment}
+    \label{figure:instance-property-assignment-evalconfigs}
 \end{figure}
 \subsubsection{Property assignment}
 \label{subsubsec:property-assignment}
@@ -1669,37 +1669,37 @@ The $\update{\deref{(\env(\this))}[\membermeta]}{\val}$ modifies the value store
 %
 \begin{figure}[Htp]
     \begin{align}
-		&\begin{multlined}
-		\cesktranswheresplit%
-			{\evalconf{\InstanceMethodInvocation{\expressionmeta}{\idmeta}{\expressionsmeta}}{\env}{\strace}{\cstrace}{\cex}{\econt}}%
-			{\evalconf{\expressionmeta}{\env}{\strace}{\cstrace}{\cex}{\econt'}}%
-			{\econt' = \InstanceMethodK}
-		\end{multlined}
-		\label{eval:instancemethod}\\
-		&\begin{multlined}
-			\cesktranswheresplit%
-			{\evalconf{\DInstanceMethodInvocation{\expressionmeta}{\membermeta}{\expressionsmeta}}{\env}{\strace}{\cstrace}{\cex}{\econt}}%
-			{\evalconf{\expressionmeta}{\env}{\strace}{\cstrace}{\cex}{\econt'}}%
-			{\econt' = \DInstanceMethodK}
-		\end{multlined}
-		\label{eval:dinstancemethod}\\
-		&\begin{multlined}
-			\cesktranswheresplit%
-			{\evalconf{\SuperMethodInvocation{\idmeta}{\expressionsmeta}}{\env}{\strace}{\cstrace}{\cex}{\econt}}%
-			{\evallistconf{\expressionsmeta}{\env}{\strace}{\cstrace}{\cex}{\acont}}%
-			{\acont = \SuperMethodA}
-		\end{multlined}
-		\label{eval:superinstancemethod}\\
-		&\begin{multlined}
-			\cesktranswheresplit%
-			{\evalconf{\textbf{new Q}(\exprs)}{\env}{st}{cex}{cst}{\econt}}%
-			{\evallistconf{\exprs}{\env}{st}{cex}{cst}{\acont'}}%
-			{\acont' = \ConstructorA{Q}{\econt}}
-		\end{multlined}
-		\label{eval:ctrinvocation}
-	\end{align}
-	\caption{The CESK-transition function for EvalConfiguration: instance method and constructor invocation}
-	\label{figure:instance-method-evalconfigs}
+        &\begin{multlined}
+        \cesktranswheresplit%
+            {\evalconf{\InstanceMethodInvocation{\expressionmeta}{\idmeta}{\expressionsmeta}}{\env}{\strace}{\cstrace}{\cex}{\econt}}%
+            {\evalconf{\expressionmeta}{\env}{\strace}{\cstrace}{\cex}{\econt'}}%
+            {\econt' = \InstanceMethodK}
+        \end{multlined}
+        \label{eval:instancemethod}\\
+        &\begin{multlined}
+            \cesktranswheresplit%
+            {\evalconf{\DInstanceMethodInvocation{\expressionmeta}{\membermeta}{\expressionsmeta}}{\env}{\strace}{\cstrace}{\cex}{\econt}}%
+            {\evalconf{\expressionmeta}{\env}{\strace}{\cstrace}{\cex}{\econt'}}%
+            {\econt' = \DInstanceMethodK}
+        \end{multlined}
+        \label{eval:dinstancemethod}\\
+        &\begin{multlined}
+            \cesktranswheresplit%
+            {\evalconf{\SuperMethodInvocation{\idmeta}{\expressionsmeta}}{\env}{\strace}{\cstrace}{\cex}{\econt}}%
+            {\evallistconf{\expressionsmeta}{\env}{\strace}{\cstrace}{\cex}{\acont}}%
+            {\acont = \SuperMethodA}
+        \end{multlined}
+        \label{eval:superinstancemethod}\\
+        &\begin{multlined}
+            \cesktranswheresplit%
+            {\evalconf{\textbf{new Q}(\exprs)}{\env}{st}{cex}{cst}{\econt}}%
+            {\evallistconf{\exprs}{\env}{st}{cex}{cst}{\acont'}}%
+            {\acont' = \ConstructorA{Q}{\econt}}
+        \end{multlined}
+        \label{eval:ctrinvocation}
+    \end{align}
+    \caption{The CESK-transition function for EvalConfiguration: instance method and constructor invocation}
+    \label{figure:instance-method-evalconfigs}
 \end{figure}
 %
 %
@@ -1707,22 +1707,22 @@ The $\update{\deref{(\env(\this))}[\membermeta]}{\val}$ modifies the value store
 \begin{figure}[Htp]
     \begin{align}
     &\begin{multlined}
-		\cesktranswheresplit*%
-		{\contconf{\InstanceMethodK}{\val}}%
-		{\evallistconf{\expressionsmeta}{\env}{\strace}{\cstrace}{\cex}{\acont'}}%
-		{\text{where $\acont' = \InstanceMethodA$}}
-	\end{multlined}
-	\label{econtconf:instancemethod}\\
-	&\begin{multlined}
-		\cesktranswheresplit*%
-		{\contconf{\DInstanceMethodK}{\val}}%
-		{\evallistconf{\expressionsmeta}{\env}{\strace}{\cstrace}{\cex}{\acont'}}%
-		{\text{where $\acont' = \DInstanceMethodA$}}
-	\end{multlined}
-	\label{econtconf:dinstancemethod}
-	\end{align}
-	\caption{The CESK-transition function for ValuePassingConfiguration: instance method and constructor invocation}
-	\label{figure:instance-method-evalconfigs}
+        \cesktranswheresplit*%
+        {\contconf{\InstanceMethodK}{\val}}%
+        {\evallistconf{\expressionsmeta}{\env}{\strace}{\cstrace}{\cex}{\acont'}}%
+        {\text{where $\acont' = \InstanceMethodA$}}
+    \end{multlined}
+    \label{econtconf:instancemethod}\\
+    &\begin{multlined}
+        \cesktranswheresplit*%
+        {\contconf{\DInstanceMethodK}{\val}}%
+        {\evallistconf{\expressionsmeta}{\env}{\strace}{\cstrace}{\cex}{\acont'}}%
+        {\text{where $\acont' = \DInstanceMethodA$}}
+    \end{multlined}
+    \label{econtconf:dinstancemethod}
+    \end{align}
+    \caption{The CESK-transition function for ValuePassingConfiguration: instance method and constructor invocation}
+    \label{figure:instance-method-evalconfigs}
 \end{figure}
 %
 %
@@ -1730,34 +1730,34 @@ The $\update{\deref{(\env(\this))}[\membermeta]}{\val}$ modifies the value store
 \begin{figure}[Htp]
     \begin{align}
     &\begin{multlined}
-			\cesktranswheresplit*%
-			{\contconf{\InstanceMethodA}{\val{s}}}%
-			{\execconf{\stmt}{\env}{[]}{[]}{\handler}{\cstrace}{\cex}{\econt}{\scont}}%
-			{\parbox{10cm}{where $\membermeta = class(\val).lookup(\idmeta)$ is an instance method with body $\stmt$ and formals $\formals$\\
-			$\scont = \ExitSK{\tt{null}}$\\
-			$\env = \ext{\env_{empty}}{\this :: \formals}{\val :: \val{s}}$}}
-	\end{multlined}
-	\label{acontconf:instancemethod}\\
-	&\begin{multlined}
-			\cesktranswheresplit*%
-			{\contconf{\DInstanceMethodA}{\val{s}}}%
-			{\execconf{\stmt}{\env}{[]}{[]}{\handler}{\cstrace}{\cex}{\econt}{\scont}}%
-			{\parbox{10cm}{where $\stmt$ is the statement body and $\formals$ are the formal parameters of the instace method $\membermeta$\\
-			$\scont = \ExitSK{\tt{null}}$,\\
-			$\env = \ext{\env_{empty}}{\this :: \formals}{\val :: \val{s}}$}}
-	\end{multlined}
-	\label{acontconf:dinstancemethod}\\
-	&\begin{multlined}
-		\cesktranswheresplit*%
-		{\contconf{\SuperMethodA}{\val{s}}}%
-		{\execconf{\stmt}{\env'}{[]}{[]}{\handler}{\cstrace}{\cex}{\econt}{\scont}}%
-		{\parbox{10cm}{where $\scont = \ExitSK{\tt{null}}$,\\
-		$\env' = \ext{\env_{empty}}{\this :: \formals}{\deref{(\env(\this))} :: \val{s}}$	}}
-	\end{multlined}
-	\label{acontconf:superinstancemethod}
-	\end{align}
-	\caption{The CESK-transition function for ApplicationConfigurations}
-	\label{figure:instance-method-evalconfigs}
+            \cesktranswheresplit*%
+            {\contconf{\InstanceMethodA}{\val{s}}}%
+            {\execconf{\stmt}{\env}{[]}{[]}{\handler}{\cstrace}{\cex}{\econt}{\scont}}%
+            {\parbox{10cm}{where $\membermeta = class(\val).lookup(\idmeta)$ is an instance method with body $\stmt$ and formals $\formals$\\
+            $\scont = \ExitSK{\tt{null}}$\\
+            $\env = \ext{\env_{empty}}{\this :: \formals}{\val :: \val{s}}$}}
+    \end{multlined}
+    \label{acontconf:instancemethod}\\
+    &\begin{multlined}
+            \cesktranswheresplit*%
+            {\contconf{\DInstanceMethodA}{\val{s}}}%
+            {\execconf{\stmt}{\env}{[]}{[]}{\handler}{\cstrace}{\cex}{\econt}{\scont}}%
+            {\parbox{10cm}{where $\stmt$ is the statement body and $\formals$ are the formal parameters of the instace method $\membermeta$\\
+            $\scont = \ExitSK{\tt{null}}$,\\
+            $\env = \ext{\env_{empty}}{\this :: \formals}{\val :: \val{s}}$}}
+    \end{multlined}
+    \label{acontconf:dinstancemethod}\\
+    &\begin{multlined}
+        \cesktranswheresplit*%
+        {\contconf{\SuperMethodA}{\val{s}}}%
+        {\execconf{\stmt}{\env'}{[]}{[]}{\handler}{\cstrace}{\cex}{\econt}{\scont}}%
+        {\parbox{10cm}{where $\scont = \ExitSK{\tt{null}}$,\\
+        $\env' = \ext{\env_{empty}}{\this :: \formals}{\deref{(\env(\this))} :: \val{s}}$    }}
+    \end{multlined}
+    \label{acontconf:superinstancemethod}
+    \end{align}
+    \caption{The CESK-transition function for ApplicationConfigurations}
+    \label{figure:instance-method-evalconfigs}
 \end{figure}
 %
 %
@@ -1765,11 +1765,11 @@ The $\update{\deref{(\env(\this))}[\membermeta]}{\val}$ modifies the value store
 \begin{figure}[Htp]
     \begin{align}
     \cesktrans%
-		{\scontconf{\ExitSK{\val}}{\env}}%
-		{\contconf{\econt}{\val}}
-	\end{align}
-	\caption{The CESK-transition function for ForwardConfigurations}
-	\label{figure:instance-method-evalconfigs}
+        {\scontconf{\ExitSK{\val}}{\env}}%
+        {\contconf{\econt}{\val}}
+    \end{align}
+    \caption{The CESK-transition function for ForwardConfigurations}
+    \label{figure:instance-method-evalconfigs}
 \end{figure}
 \subsubsection{Instance method invocation}
 \label{subsubsec:instance-method-invoc}
@@ -1815,8 +1815,8 @@ Similarly to Section~\ref{subsubsec:instance-method-invoc}, $\ExitSK{\val}$ is a
                 {\text{where $\econt' = \VarDeclK{\env}{\varmeta}{\scont}$}}
         \end{multlined}\\
         &\cesktrans%
-			{\execconf{\EmptyStatement}{\env}{\lbls}{\clbls}{\handler}{\cstrace}{\cex}{\econt}{\scont}}%
-			{\scontconf{\scont}{\env}}\\
+            {\execconf{\EmptyStatement}{\env}{\lbls}{\clbls}{\handler}{\cstrace}{\cex}{\econt}{\scont}}%
+            {\scontconf{\scont}{\env}}\\
         &\begin{multlined}
             \cesktranswheresplit%
                 {\execconf{\ExpressionStatement{\expressionmeta}}{\env}{\lbls}{\clbls}{\handler}{\cstrace}{\cex}{\econt}{\scont}}%
@@ -1836,11 +1836,11 @@ Similarly to Section~\ref{subsubsec:instance-method-invoc}, $\ExitSK{\val}$ is a
                 {\text{where $\econt' = \IfCondK{\stmti{1}}{\stmti{2}}$}}
         \end{multlined}\\
         &\cesktrans%
-			{\execconf{\ReturnStatement{\expr}}{\env}{\lbls}{\clbls}{\handler}{\cstrace}{\cex}{\econt}{\scont}}%
-			{\evalconf{\expr}{\env}{\strace}{\cstrace}{\cex}{\econt}}\\
+            {\execconf{\ReturnStatement{\expr}}{\env}{\lbls}{\clbls}{\handler}{\cstrace}{\cex}{\econt}{\scont}}%
+            {\evalconf{\expr}{\env}{\strace}{\cstrace}{\cex}{\econt}}\\
         &\cesktrans%
-			{\execconf{\ReturnStatement{}}{\env}{\lbls}{\clbls}{\handler}{\cstrace}{\cex}{\econt}{\scont}}%
-			{\contconf{\econt}{\textbf{null}}}\\
+            {\execconf{\ReturnStatement{}}{\env}{\lbls}{\clbls}{\handler}{\cstrace}{\cex}{\econt}{\scont}}%
+            {\contconf{\econt}{\textbf{null}}}\\
         &\begin{multlined}
             \cesktranswheresplit*%
                 {\execconf{\DoStatement{\statementmeta}{\expressionmeta}}{\env}{\lbls}{\clbls}{\handler}{\cstrace}{\cex}{\econt}{\scont}}%
@@ -1895,9 +1895,9 @@ Similarly to Section~\ref{subsubsec:instance-method-invoc}, $\ExitSK{\val}$ is a
                 {\contconf{\econt}{\funval{\stmt_{body}}{\formals}{\env'}}}%
                 {\text{where $\env' = \ext{\env}{fun}{\funval{\stmt_{body}}{\formals}{\env'}}$}}
         \end{multlined}
-	\end{align}
-	\caption{The CESK-transition function for statements}
-	\label{figure:exec}
+    \end{align}
+    \caption{The CESK-transition function for statements}
+    \label{figure:exec}
 \end{figure}
 
 \subsubsection{Variable Declaration}
