@@ -1,31 +1,39 @@
-\documentclass{article}
+\documentclass[a4paper,oneside]{article}
 
+
+\usepackage[utf8]{inputenc}
 \usepackage[fleqn]{amsmath}
-%
 \usepackage{a4wide}
-%
-\usepackage{url,cite,amssymb,stmaryrd,alltt,xypic,appendix}
-%
-\usepackage{color,alltt}
-%
-\definecolor{shade}{gray}{0.75}
-%
+\usepackage{url}
+\usepackage{cite}
+\usepackage{amssymb}
+\usepackage{stmaryrd}
+\usepackage{alltt}
+\usepackage{xypic}
+\usepackage{appendix}
+\usepackage{color}
 \usepackage{hyperref}
 \usepackage{chngcntr}
 \usepackage{ifthen}
 \usepackage[fleqn]{mathtools}
-%
-\newcommand{\shadethis}[1]{\colorbox{shade}
-{\protect\rule[-0.95mm]{0mm}{3.95mm}\hspace{0.3mm}#1\hspace{0.3mm}}}
-%
+
+
+\definecolor{shade}{gray}{0.75}
+\newcommand{\shadethis}[1]{\colorbox{shade}%
+    {\protect\rule[-0.95mm]{0mm}{3.95mm}\hspace{0.3mm}#1\hspace{0.3mm}}}
+
+
 % Macros used below have been contributed in part by Olivier Danvy and Kevin Millikin
 \input{danvy-millikin-LMCS.mac}
+
 
 \renewcommand{\emptyset}{\varnothing}
 \DeclareMathOperator{\extend}{extend}
 \DeclareMathOperator{\concat}{concat}
 \DeclareMathOperator{\getter}{implicitGetter}
 \DeclareMathOperator{\setter}{implicitSetter}
+
+
 %%
 % Commands to typeset transitions of CESK machine.
 %
