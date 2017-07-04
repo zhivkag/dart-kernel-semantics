@@ -1,25 +1,32 @@
-\documentclass{article}
+\documentclass[a4paper,oneside]{article}
 
+
+\usepackage[utf8]{inputenc}
 \usepackage[fleqn]{amsmath}
-%
 \usepackage{a4wide}
-%
-\usepackage{url,cite,amssymb,stmaryrd,alltt,xypic,appendix}
-%
-\usepackage{color,alltt}
-%
-\definecolor{shade}{gray}{0.75}
-%
+\usepackage{url}
+\usepackage{cite}
+\usepackage{amssymb}
+\usepackage{stmaryrd}
+\usepackage{alltt}
+\usepackage{xypic}
+\usepackage{appendix}
+\usepackage{color}
 \usepackage{hyperref}
 \usepackage{chngcntr}
 \usepackage{ifthen}
 \usepackage[fleqn]{mathtools}
-%
-\newcommand{\shadethis}[1]{\colorbox{shade}
-{\protect\rule[-0.95mm]{0mm}{3.95mm}\hspace{0.3mm}#1\hspace{0.3mm}}}
-%
+\usepackage{geometry}
+
+
+\definecolor{shade}{gray}{0.75}
+\newcommand{\shadethis}[1]{\colorbox{shade}%
+    {\protect\rule[-0.95mm]{0mm}{3.95mm}\hspace{0.3mm}#1\hspace{0.3mm}}}
+
+
 % Macros used below have been contributed in part by Olivier Danvy and Kevin Millikin
 \input{danvy-millikin-LMCS.mac}
+
 
 \renewcommand{\emptyset}{\varnothing}
 \DeclareMathOperator{\extend}{extend}
@@ -28,6 +35,7 @@
 \DeclareMathOperator{\setter}{implicitSetter}
 \DeclareMathOperator{\lookup}{lookup}
 \DeclareMathOperator{\methodLookup}{methodLookup}
+
 %%
 % Commands to typeset transitions of CESK machine.
 %
@@ -109,6 +117,15 @@
 \makeatother
 
 
+\setlength{\itemsep}{0pt}
+\geometry{%
+    top=2cm,%
+    right=2cm,%
+    bottom=2cm,%
+    left=3cm,%
+}
+
+
 \begin{document}
 \title{Dart Kernel Semantics \\ (draft)}
 
@@ -119,10 +136,12 @@ The machine is defined by a single step transition function where each step of t
 
 \section{Definitions}
 \label{sec:definitions}
+
+
 \subsection{Conventions}
 \label{subsec:conventions}
+
 \begin{itemize}
-\setlength{\itemsep}{0pt}
 \item Symbols ``:'' and ``$\in$'' are used interchangeably.
 \item Names of variables are italicized.
 \item Names of variables of syntactic domains start with an upper case letter.
@@ -203,58 +222,58 @@ Note that the word ``List'' here is not in bold, so that it isn't confused with 
 \newcommand{\dformals}{\mathbf{Formals}}
 \[
   \begin{array}{ccll}
-	\expr, \expri{i}
-	& : & \dexpr & \textrm{syntactic domain of expressions}\\
-	\exprs
-	& : & \mlist{\dexpr}\\[2mm]
+    \expr, \expri{i}
+    & : & \dexpr & \textrm{syntactic domain of expressions}\\
+    \exprs
+    & : & \mlist{\dexpr}\\[2mm]
 
-	\stmt, \stmti{i}
-	& : & \dstmt & \textrm{syntactic domain of statements}\\
-	\stmts
-	& : & \mlist{\dstmt}  & \textrm{}\\[2mm]
+    \stmt, \stmti{i}
+    & : & \dstmt & \textrm{syntactic domain of statements}\\
+    \stmts
+    & : & \mlist{\dstmt}  & \textrm{}\\[2mm]
 
-	\econt
-	& : & \decont & \textrm{domain of expression continuations}\\
-	\acont
-	& : & \dacont & \textrm{domain of application continuations}\\
-	\scont
-	& : & \dscont & \textrm{domain of statement continuations}\\
-	\bcont
-	& : & \dbcont & \textrm{domain of break continuations}\\
-	\switchcont
-	& : & \dswitchcont & \textrm{domain of switch continuations}\\[2mm]
+    \econt
+    & : & \decont & \textrm{domain of expression continuations}\\
+    \acont
+    & : & \dacont & \textrm{domain of application continuations}\\
+    \scont
+    & : & \dscont & \textrm{domain of statement continuations}\\
+    \bcont
+    & : & \dbcont & \textrm{domain of break continuations}\\
+    \switchcont
+    & : & \dswitchcont & \textrm{domain of switch continuations}\\[2mm]
 
-	\lbl & : & \dlbl & \textrm{domain of labels}\\
-	\lbls & : & \mlist{\dlbl} \\
-	\clbl & : & \dclbl & \textrm{domain of switch labels}\\
-	\clbls & : & \mlist{\dclbl} \\[2mm]
+    \lbl & : & \dlbl & \textrm{domain of labels}\\
+    \lbls & : & \mlist{\dlbl} \\
+    \clbl & : & \dclbl & \textrm{domain of switch labels}\\
+    \clbls & : & \mlist{\dclbl} \\[2mm]
 
-	\handler
-	& : & \dhandler & \textrm{syntactic domain of exception handlers} \\
-	\strace
-	& : & \mlist{\dexpr} & \textrm{domain of stack traces}\\
-	\cex
-	& : &  \emptyset + \dval & \textrm{domain of current expetion values}\\
-	\cstrace
-	& : & \emptyset + \mlist{\dexpr} & \textrm{domain of current exception stack traces}\\[2mm]
+    \handler
+    & : & \dhandler & \textrm{syntactic domain of exception handlers} \\
+    \strace
+    & : & \mlist{\dexpr} & \textrm{domain of stack traces}\\
+    \cex
+    & : &  \emptyset + \dval & \textrm{domain of current expetion values}\\
+    \cstrace
+    & : & \emptyset + \mlist{\dexpr} & \textrm{domain of current exception stack traces}\\[2mm]
 
-	\varmeta
-	& : & \dvardecl & \textrm{domain of variable declarations}\\
-	\loc
-	& : & \dlocation & \textrm{domain of store locations}\\
-	\val
-	& : & \dval & \textrm{domain of values}\\
-	\vals
-	& : & \mlist{\dval}\\
-	\env
-	& : & \denv & \textrm{domain of environments}\\[2mm]
+    \varmeta
+    & : & \dvardecl & \textrm{domain of variable declarations}\\
+    \loc
+    & : & \dlocation & \textrm{domain of store locations}\\
+    \val
+    & : & \dval & \textrm{domain of values}\\
+    \vals
+    & : & \mlist{\dval}\\
+    \env
+    & : & \denv & \textrm{domain of environments}\\[2mm]
   \end{array}
 \]
 
 \[
   \begin{array}{ccll}
-	\formal, \formali{i} & : & \dvardecl\\
-	\formals & : & \dformals = \mlist{\dvardecl} &\textrm{ domain of formals}\\
+    \formal, \formali{i} & : & \dvardecl\\
+    \formals & : & \dformals = \mlist{\dvardecl} &\textrm{ domain of formals}\\
 
   \end{array}
 \]
@@ -307,15 +326,15 @@ When an environment is needed to further execute the program, it is saved by the
 
 Function ``$\extend$'' creates a new environment by extending the provided environment with new bindings for the variable declarations to fresh locations for each of the provided values.
 \begin{align*}
-  \extend \in \denv \times \mlist{\dvardecl} \times \mlist{\dval} &\rightarrow  \denv \hspace{100mm} \\
+  \extend \in \denv \times \mlist{\dvardecl} \times \mlist{\dval} &\rightarrow  \denv\\
   \ext{\env}{\varmeta{s}}{\vals} &= \env'
 \end{align*}
 with
 \[
-	\env'(\varmeta) =\begin{cases}
-	\loc_i & \textrm{with }\deref{\loc_i} = \val_i\textrm{ if }\exists\varmeta_i \in \varmeta{s} \textrm{ s.t. } \varmeta_i = \varmeta\\
-	\env(\varmeta) &\textrm{otherwise}
-	\end{cases}
+    \env'(\varmeta) =\begin{cases}
+    \loc_i & \textrm{with }\deref{\loc_i} = \val_i\textrm{ if }\exists\varmeta_i \in \varmeta{s} \textrm{ s.t. } \varmeta_i = \varmeta\\
+    \env(\varmeta) &\textrm{otherwise}
+    \end{cases}
 \]
 
 For simpler notation, we allow ``$\extend$'' to be called with singleton lists as $\ext{\env}{\varmeta}{\val}$, which we consider equivalent to $\ext{\env}{\varmeta :: []}{\val :: []}$.
@@ -343,17 +362,17 @@ Configurations contain different components and the transition step dispatches t
 % Transition
 \begin{figure}[Htp]
   \begin{align}
-	&\evalconf{\expr}{\env}{st}{cex}{cst}{\econt} & :\quad & \text{EvalConfiguration} \label{config:eval}\\
-	&\evallistconf{\exprs}{\env}{st}{cex}{cst}{\acont} & :\quad & \text{EvalListConfiguration} \label{config:evallist}\\
-	&\execconf{\stmt}{\env}{\lbls}{\clbls}{\handler}{\cex}{\cstrace}{\econt}{\scont}  & :\quad & \text{ExecConfiguration} \label{config:exec}\\
-	&\contconf{\econt}{\val} & :\quad & \text{ValuePassingConfiguration} \label{config:econt}\\
-	&\acontconf{\acont}{\vals} & :\quad & \text{ApplicationConfiguration} \label{config:acont}\\
-	&\scontconf{\scont}{\env} & :\quad & \text{ForwardConfiguration} \label{config:scont}\\
-	&\throwconf{\handler}{\val}{\strace} & :\quad & \text{ThrowConfiguration} \label{config:throw}\\
-	&\breakconf{\bcont} & :\quad & \text{BreakConfiguration} \label{config:bcont}\\
-	&\switchconf{\switchcont} & :\quad &
-	\text{SwitchConfiguration}
-	\label{config:switchcont}
+    &\evalconf{\expr}{\env}{st}{cex}{cst}{\econt} & :\quad & \text{EvalConfiguration} \label{config:eval}\\
+    &\evallistconf{\exprs}{\env}{st}{cex}{cst}{\acont} & :\quad & \text{EvalListConfiguration} \label{config:evallist}\\
+    &\execconf{\stmt}{\env}{\lbls}{\clbls}{\handler}{\cex}{\cstrace}{\econt}{\scont}  & :\quad & \text{ExecConfiguration} \label{config:exec}\\
+    &\contconf{\econt}{\val} & :\quad & \text{ValuePassingConfiguration} \label{config:econt}\\
+    &\acontconf{\acont}{\vals} & :\quad & \text{ApplicationConfiguration} \label{config:acont}\\
+    &\scontconf{\scont}{\env} & :\quad & \text{ForwardConfiguration} \label{config:scont}\\
+    &\throwconf{\handler}{\val}{\strace} & :\quad & \text{ThrowConfiguration} \label{config:throw}\\
+    &\breakconf{\bcont} & :\quad & \text{BreakConfiguration} \label{config:bcont}\\
+    &\switchconf{\switchcont} & :\quad &
+    \text{SwitchConfiguration}
+    \label{config:switchcont}
   \end{align}
   \caption{States for the CESK machine}
 \end{figure}
@@ -507,29 +526,29 @@ The different expression continuations are shown in Figure~\ref{figure:econts}.
 \newcommand{\ExpressionK}[2]{\mathrm{ExpressionK}({#1},\,{#2})}
 \begin{figure}[Htp]
   \begin{align}
-	&\VarSetK{\idmeta}{\ExceptionHandlers}{\econt} \label{econt:varset}\\
-	&\ExpressionsK{\exprs}{\env}{\acont} \label{econt:expressions}\\
-	&\NotK{\econt} \label{econt:not}\\
-	&\AndK{\expressionmeta}{\ExceptionHandlers}{\econt} \label{econt:and}\\
-	&\OrK{\expressionmeta}{\ExceptionHandlers}{\econt} \label{econt:or}\\
-	&\ConditionalK{\expressionmeta_1}{\expressionmeta_2}{\ExceptionHandlers}{\econt} \label{econt:cond}\\
-	&\LetK{\idmeta}{\expressionmeta}{\ExceptionHandlers}{\econt} \label{econt:let}\\
-	&\IsExpressionK \label{econt:is}\\
-	&\AsExpressionK \label{econt:as}\\
-	&\StaticGetK \label{econt:static-get}\\
-	&\StaticSetK \label{econt:static-set}\\
-	&\DPropertyGetK \label{econt:dproperty-get}\\
-	&\PropertySetK \label{econt:property-set}\\
-	&\PropertySetVK \label{econt:property-set}\\
-	&\DPropertyGetK \label{econt:dproperty-set}\\
-	&\DPropertySetVK \label{econt:dproperty-set-v}\\
-	&\SuperPropertySetK \label{econt:super-property-set}\\
-	&\InstanceMethodK \label{econt:instance-method}\\
-	&\DInstanceMethodK \label{econt:dinstance-method}\\
-	&\VarDeclK{\idmeta}{\env}{\scont} \label{econt:var-decl}\\
-	&\IfCondK{\expressionmeta_1}{\expressionmeta_2} \label{econt:if-cond}\\
-	&\ForCondK \label{econt:for-cond}\\
-	&\ExpressionK{\scont}{\env} \label{econt:expression}
+    &\VarSetK{\idmeta}{\ExceptionHandlers}{\econt} \label{econt:varset}\\
+    &\ExpressionsK{\exprs}{\env}{\acont} \label{econt:expressions}\\
+    &\NotK{\econt} \label{econt:not}\\
+    &\AndK{\expressionmeta}{\ExceptionHandlers}{\econt} \label{econt:and}\\
+    &\OrK{\expressionmeta}{\ExceptionHandlers}{\econt} \label{econt:or}\\
+    &\ConditionalK{\expressionmeta_1}{\expressionmeta_2}{\ExceptionHandlers}{\econt} \label{econt:cond}\\
+    &\LetK{\idmeta}{\expressionmeta}{\ExceptionHandlers}{\econt} \label{econt:let}\\
+    &\IsExpressionK \label{econt:is}\\
+    &\AsExpressionK \label{econt:as}\\
+    &\StaticGetK \label{econt:static-get}\\
+    &\StaticSetK \label{econt:static-set}\\
+    &\DPropertyGetK \label{econt:dproperty-get}\\
+    &\PropertySetK \label{econt:property-set}\\
+    &\PropertySetVK \label{econt:property-set}\\
+    &\DPropertyGetK \label{econt:dproperty-set}\\
+    &\DPropertySetVK \label{econt:dproperty-set-v}\\
+    &\SuperPropertySetK \label{econt:super-property-set}\\
+    &\InstanceMethodK \label{econt:instance-method}\\
+    &\DInstanceMethodK \label{econt:dinstance-method}\\
+    &\VarDeclK{\idmeta}{\env}{\scont} \label{econt:var-decl}\\
+    &\IfCondK{\expressionmeta_1}{\expressionmeta_2} \label{econt:if-cond}\\
+    &\ForCondK \label{econt:for-cond}\\
+    &\ExpressionK{\scont}{\env} \label{econt:expression}
   \end{align}
   \caption{Expression Continuations}
   \label{figure:econts}
@@ -557,14 +576,14 @@ The different statement continuations are shown in Figure~\ref{figure:sconts}.
 \newcommand{\ForSK}{\mathrm{ForSK}(\mathrm{\varmeta{s}},\, \expressionmeta,\, \exprs,\, \statementmeta,\, \env,\, \env',\, \lbls,\, \clbls,\, \handler,\, \cstrace,\, \cex,\, \econt,\, \scont)}
 \begin{figure}[Htp]
   \begin{align}
-	&\ExitSK{\val} \label{scont:exit}\\
-	&\BlockSK{\stmts}{\env} \label{scont:block}\\
-	&\WhileSK \label{scont:while}\\
-	&\BodySK{\stmt}{\env}{\scont} \label{scont:body}\\
-	&\NewSK{\econt}{\loc} \label{scont:new}\\
-	&\FinallySK{\stmt} \label{scont:finally}\\
-	&\RethrowSK{\val}{\strace}{\handler} \label{scont:rethrow}\\
-	&\ForSK \label{scont:for}
+    &\ExitSK{\val} \label{scont:exit}\\
+    &\BlockSK{\stmts}{\env} \label{scont:block}\\
+    &\WhileSK \label{scont:while}\\
+    &\BodySK{\stmt}{\env}{\scont} \label{scont:body}\\
+    &\NewSK{\econt}{\loc} \label{scont:new}\\
+    &\FinallySK{\stmt} \label{scont:finally}\\
+    &\RethrowSK{\val}{\strace}{\handler} \label{scont:rethrow}\\
+    &\ForSK \label{scont:for}
   \end{align}
   \caption{Statement Continuations}
   \label{figure:sconts}
@@ -595,16 +614,16 @@ We suffix the names of application continuations with ``$A$''.
 The different application continuations are shown in Figure~\ref{figure:acont}.
 \begin{figure}[Htp]
   \begin{align}
-	&\ValueA{\val}{\acont} \label{acont:value}\\
-	&\StringConcatenationA \label{acont:stringconcat}\\
-	&\ForInitA \label{acont:forinit}\\
-	&\ForUpdatesA{\env'} \label{acont:forupdates}\\
-	&\SuperMethodA \label{acont:supermethod}\\
-	&\DInstanceMethodA \label{acont:staticinv}\\
-	&\FieldsA{\env}{Izs}{\loc}{\scont} \label{acont:fields}\\
-	&\ConstructorA{Q}{\econt} \label{acont:constructor}\\
-	&\SuperA{Q}{\loc}{\scont} \label{acont:super}\\
-	&\RedirectingA{Q}{\loc}{\scont} \label{acont:redirecting}
+    &\ValueA{\val}{\acont} \label{acont:value}\\
+    &\StringConcatenationA \label{acont:stringconcat}\\
+    &\ForInitA \label{acont:forinit}\\
+    &\ForUpdatesA{\env'} \label{acont:forupdates}\\
+    &\SuperMethodA \label{acont:supermethod}\\
+    &\DInstanceMethodA \label{acont:staticinv}\\
+    &\FieldsA{\env}{Izs}{\loc}{\scont} \label{acont:fields}\\
+    &\ConstructorA{Q}{\econt} \label{acont:constructor}\\
+    &\SuperA{Q}{\loc}{\scont} \label{acont:super}\\
+    &\RedirectingA{Q}{\loc}{\scont} \label{acont:redirecting}
   \end{align}
   \caption{Application Continuations}
   \label{figure:acont}
@@ -678,8 +697,8 @@ Literal values are special values that store the specific payload and an associa
 The different literal values are presented below:
 \[
   \begin{array}{lcl}
-	\val \in \dlitval &=& \mathbf{int} + \mathbf{bool} + \mathbf{double}\\
-	&& + \mathbf{List} + \mathbf{Map} + \mathbf{String} + \mathbf{Symbol} + \mathbf{Type}
+    \val \in \dlitval &=& \mathbf{int} + \mathbf{bool} + \mathbf{double}\\
+    && + \mathbf{List} + \mathbf{Map} + \mathbf{String} + \mathbf{Symbol} + \mathbf{Type}
   \end{array}
 \]
 Literal values are special values that store the specific payload and an associated class.
@@ -688,7 +707,7 @@ Each of the specific literal values contains predefined operators and/or methods
 \label{subsec:object-values}
 Object values have a $\tt{class}$ component and a $\tt{fields}$ component which is list of locations for each field, as shown below:
 \[
-	\dobjval : \dclass \times \mlist{\dlocation}
+    \dobjval : \dclass \times \mlist{\dlocation}
 \]
 The $\tt{class}$ component captures the properties of the object, see Section~\eqref{subsec:class}.\\
 The object also stores a list of locations that represent the values of the fields for the given object.
@@ -697,18 +716,21 @@ A field is modified by changing the value stored at the location for the said fi
 Access and modification of fields is enabled with implicit getters and setters defined in the associated class component.
 Each field has an associated implicit getter, as defined below.
 Let $\loc$ be the location of field with name $fName$ for the object value $\val_0$:
+
 \begin{align*}
-  \getter \in \dobjval \times \mathbf{Name} &\rightarrow \dval \hspace{100mm} \\
+  \getter \in \dobjval \times \mathbf{Name} &\rightarrow \dval\\
   \getter(\val_0, fName) &= \val_1
 \end{align*}
-where $\val_1 = \deref{\loc}$.\\
+
+\noindent where $\val_1 = \deref{\loc}$.
+
 Each non-final field has an associated implicit setter, as defined below.
 Let $\loc$ be the location of field $fName$ for the object value $\val_0$:
 \begin{align*}
-  \setter \in \dobjval \times \mathbf{Name} \times \dval &\rightarrow \dval \hspace{100mm} \\
+  \setter \in \dobjval \times \mathbf{Name} \times \dval &\rightarrow \dval\\
   \setter(\val_0, fName, \val_1) &= \val_1
 \end{align*}
-where $\val_1$ is the value to be stored in $\loc$ after the invocation of the implicit setter. 
+where $\val_1$ is the value to be stored in $\loc$ after the invocation of the implicit setter.
 This implies that invocation of implicit setter will modify the global store and  $\deref{\loc} = \val_1$ will hold after the transition.
 \subsection{Class}
 \label{subsec:class}
@@ -740,21 +762,21 @@ The $\tt{methods}$ component captures the methods for the given class and all it
 \label{subsubsec:property-lookup}
 A property lookup searches for an instance method, a getter or a field with the given property name. If none of the following is found, an error is returned.
 \begin{align*}
-\lookup \in \dclass \times \mathbf{Name} &\rightarrow \mathbf{Member}\\
-\lookup(\idmeta) &= \membermeta
+    \lookup \in \dclass \times \mathbf{Name} &\rightarrow \mathbf{Member}\\
+    \lookup(\idmeta) &= \membermeta
 \end{align*}
 where $\membermeta$ is an instance method, when $\idmeta$ is a method name, a getter when $\idmeta$ is a getter name or an implicit getter when $\idmeta$ is a field name.
 \subsubsection{Method Lookup}
 \label{subsubsec:method-lookup}
 A method lookup searches for an instance method in the given class given the name of the method.
 \begin{align*}
-\methodLookup \in \dclass \times \mathbf{Name} &\rightarrow \mathbf{Member}\\
-\methodLookup(\idmeta) &= \membermeta
+    \methodLookup \in \dclass \times \mathbf{Name} &\rightarrow \mathbf{Member}\\
+    \methodLookup(\idmeta) &= \membermeta
 \end{align*}
 \subsection{Function values}
 \label{subsec:function-values}
 \[
-	\dfunval : \dformals \times \dstmt \times \denv
+    \dfunval : \dformals \times \dstmt \times \denv
 \]
 \section{Abstract Syntax}
 \label{sec:abstract-syntax}
@@ -956,15 +978,15 @@ The value corresponding to the evaluated expression is captured by the applicati
 % expressions.
 %%
 \begin{figure}[Htp]
-	\begin{align}
+    \begin{align}
         &\cesktranswhere%
-			{\evalconf{\IntLiteral{\integermeta}}{\env}{\strace}{\cstrace}{\cex}{\econt}}%
-			{\contconf{\econt}{\val}}%
+            {\evalconf{\IntLiteral{\integermeta}}{\env}{\strace}{\cstrace}{\cex}{\econt}}%
+            {\contconf{\econt}{\val}}%
             {\text{where $\val = \mathrm{IntLiteral(\integermeta)} \in \mathbf{int}$}}
             \label{eval:int}\\
         &\cesktranswhere%
-			{\evalconf{\DoubleLiteral{\doublemeta}}{\env}{\strace}{\cstrace}{\cex}{\econt}}%
-			{\contconf{\econt}{\val}}%
+            {\evalconf{\DoubleLiteral{\doublemeta}}{\env}{\strace}{\cstrace}{\cex}{\econt}}%
+            {\contconf{\econt}{\val}}%
             {\text{where $\val = \mathrm{DoubleLiteral(\doublemeta)} \in \mathbf{double}$}}
             \label{eval:double}\\
         &\begin{multlined}
@@ -1062,9 +1084,9 @@ The value corresponding to the evaluated expression is captured by the applicati
                 {\contconf{\econt}{\funval{\formals}{\stmt}{\env}}}%
                 {\text{where $F$ is a function expression with formal parameters $\formals$ and body $\stmt$}}
         \end{multlined}
-	\end{align}
-	\caption{The CESK-transition function for EvalConfiguration: simple expressions}
-	\label{figure:expressions-evalconfigs}
+    \end{align}
+    \caption{The CESK-transition function for EvalConfiguration: simple expressions}
+    \label{figure:expressions-evalconfigs}
 \end{figure}
 %
 \newcommand{\true}{\tt{true}}
@@ -1074,84 +1096,84 @@ The value corresponding to the evaluated expression is captured by the applicati
 % for simple expressions
 %%
 \begin{figure}[Htp]
-	\begin{align}
-		&\begin{multlined}
+    \begin{align}
+        &\begin{multlined}
         \cesktranssplit%
             {\contconf{\ExpressionsK{\exprs}{\env}{\acont}}{\val}}%
             {\evallistconf{\exprs}{\env}{\strace}{\cstrace}{\cex}{\ValueA{\val}{\acont}}}
         \end{multlined}
         \label{econtconf:exprs}\\
-		&\cesktranswhere%
-			{\contconf{\VarSetK{\env}{\varmeta}{\econt}}{\val}}%
-			{\contconf{\econt}{\val}}%
-			{\deref{\env(\varmeta)} = \val \text{ after transition}}
-			\label{econtconf:varset}\\
-		&\cesktrans%
-			{\contconf{\NotK{\econt}}{\true}}%
-			{\contconf{\econt}{\false}}
+        &\cesktranswhere%
+            {\contconf{\VarSetK{\env}{\varmeta}{\econt}}{\val}}%
+            {\contconf{\econt}{\val}}%
+            {\deref{\env(\varmeta)} = \val \text{ after transition}}
+            \label{econtconf:varset}\\
+        &\cesktrans%
+            {\contconf{\NotK{\econt}}{\true}}%
+            {\contconf{\econt}{\false}}
         \label{econtconf:not-true}\\
-		&\cesktrans%
-			{\contconf{\NotK{\econt}}{\false}}%
-			{\contconf{\econt}{\true}}
+        &\cesktrans%
+            {\contconf{\NotK{\econt}}{\false}}%
+            {\contconf{\econt}{\true}}
         \label{econtconf:not-false}\\
-		&\cesktrans%
-			{\contconf{\AndK{\expressionmeta}{\env}{\econt}}{\true}}%
-			{\evalconf{\expressionmeta}{\env}{\strace}{\cstrace}{\cex}{\econt}}
+        &\cesktrans%
+            {\contconf{\AndK{\expressionmeta}{\env}{\econt}}{\true}}%
+            {\evalconf{\expressionmeta}{\env}{\strace}{\cstrace}{\cex}{\econt}}
         \label{econtconf:and-true}\\
-		&\cesktrans%
-			{\contconf{\AndK{\expressionmeta}{\env}{\econt}}{\false}}%
-			{\contconf{\econt}{\false}}
+        &\cesktrans%
+            {\contconf{\AndK{\expressionmeta}{\env}{\econt}}{\false}}%
+            {\contconf{\econt}{\false}}
         \label{econtconf:and-false}\\
-		&\cesktrans%
-			{\contconf{\OrK{\expressionmeta}{\env}{\econt}}{\false}}%
-			{\evalconf{\expressionmeta}{\env}{\strace}{\cstrace}{\cex}{\econt}}
+        &\cesktrans%
+            {\contconf{\OrK{\expressionmeta}{\env}{\econt}}{\false}}%
+            {\evalconf{\expressionmeta}{\env}{\strace}{\cstrace}{\cex}{\econt}}
         \label{econtconf:or-false}\\
-		&\cesktrans%
-			{\contconf{\OrK{\expressionmeta}{\env}{\econt}}{\true}}%
-			{\contconf{\econt}{\true}}
+        &\cesktrans%
+            {\contconf{\OrK{\expressionmeta}{\env}{\econt}}{\true}}%
+            {\contconf{\econt}{\true}}
         \label{econtconf:or-true}\\
-		&\begin{multlined}
-		\cesktranssplit%
-			{\contconf{\ConditionalK{\expri{1}}{\expri{2}}{\env}{\econt}}{\true}}%
-			{\evalconf{\expri{1}}{\env}{\strace}{\cstrace}{\cex}{\econt}}
+        &\begin{multlined}
+        \cesktranssplit%
+            {\contconf{\ConditionalK{\expri{1}}{\expri{2}}{\env}{\econt}}{\true}}%
+            {\evalconf{\expri{1}}{\env}{\strace}{\cstrace}{\cex}{\econt}}
         \end{multlined}
         \label{econtconf:cond-true}\\
-		&\begin{multlined}
-		\cesktranssplit%
-			{\contconf{\ConditionalK{\expri{1}}{\expri{2}}{\env}{\econt}}{\false}}%
-			{\evalconf{\expri{2}}{\env}{\strace}{\cstrace}{\cex}{\econt}}
+        &\begin{multlined}
+        \cesktranssplit%
+            {\contconf{\ConditionalK{\expri{1}}{\expri{2}}{\env}{\econt}}{\false}}%
+            {\evalconf{\expri{2}}{\env}{\strace}{\cstrace}{\cex}{\econt}}
         \end{multlined}
         \label{econtconf:cond-false}\\
-		&\begin{multlined}
-		\cesktranswheresplit%
-			{\contconf{\LetK{\expri{2}}{\env}{\varmeta}{\econt}}{\val}}%
-			{\evalconf{\expri{2}}{\env'}{\strace}{\cstrace}{\cex}{\econt}}%
-			{\env'=\ext{\env}{\varmeta}{\val}}
+        &\begin{multlined}
+        \cesktranswheresplit%
+            {\contconf{\LetK{\expri{2}}{\env}{\varmeta}{\econt}}{\val}}%
+            {\evalconf{\expri{2}}{\env'}{\strace}{\cstrace}{\cex}{\econt}}%
+            {\env'=\ext{\env}{\varmeta}{\val}}
         \end{multlined}
         \label{econtconf:let}\\
         &\cesktranswhere%
-			{\contconf{\IsExpressionK}{\val}}%
-			{\contconf{\econt}{\true}}%
-			{\text{if $\val \textrm{ is } \tt{T}$}}
-		\label{econtconf:is-true}\\
-		&\cesktranswhere%
-			{\contconf{\IsExpressionK}{\val}}%
-			{\contconf{\econt}{\false}}%
-			{\text{otherwise}}
-		\label{econtconf:is-false}\\
-		&\cesktranswhere%
-			{\contconf{\AsExpressionK}{\val}}%
-			{\contconf{\econt}{\val}}%
-			{\text{if $\val \textrm{ is } \tt{T}$}}
-		\label{econtconf:as-true}\\
-		&\cesktranswhere%
-			{\contconf{\AsExpressionK}{\val}}%
-			{\throwconf{\handler}{\AsExpression{\expressionmeta}{\tt{T}} :: \strace}{\tt{CastError}}}%
-			{\text{if $\val \textrm{ is not } \tt{T}$}}
-		\label{econtconf:as-false}
-	\end{align}
-	\caption{The CESK-transition function for ValuePassingConfiguration: simple expressions}
-	\label{figure:cont-config}
+            {\contconf{\IsExpressionK}{\val}}%
+            {\contconf{\econt}{\true}}%
+            {\text{if $\val \textrm{ is } \tt{T}$}}
+        \label{econtconf:is-true}\\
+        &\cesktranswhere%
+            {\contconf{\IsExpressionK}{\val}}%
+            {\contconf{\econt}{\false}}%
+            {\text{otherwise}}
+        \label{econtconf:is-false}\\
+        &\cesktranswhere%
+            {\contconf{\AsExpressionK}{\val}}%
+            {\contconf{\econt}{\val}}%
+            {\text{if $\val \textrm{ is } \tt{T}$}}
+        \label{econtconf:as-true}\\
+        &\cesktranswhere%
+            {\contconf{\AsExpressionK}{\val}}%
+            {\throwconf{\handler}{\AsExpression{\expressionmeta}{\tt{T}} :: \strace}{\tt{CastError}}}%
+            {\text{if $\val \textrm{ is not } \tt{T}$}}
+        \label{econtconf:as-false}
+    \end{align}
+    \caption{The CESK-transition function for ValuePassingConfiguration: simple expressions}
+    \label{figure:cont-config}
 \end{figure}
 \subsubsection{Basic literal evaluation}
 \label{subsubsec:basic-literal-eval}
@@ -1195,7 +1217,7 @@ It proceeds by extending the environment for the evaluation of the right-hand si
 \label{subsubsec:string-concatenation}
 The function $\concat$ concatenates the strings from the given meta-list into a single value.
 \begin{align*}
-  \concat : \mlist{\dstring} &\rightarrow \dstring \hspace{100mm} \\
+  \concat : \mlist{\dstring} &\rightarrow \dstring\\
   \concat( s_1 :: \dots :: s_n :: []) &= s_1 \dots s_n
 \end{align*}
 The evaluation of concatenation expression proceeds by evaluating the target expressions in the specified order, as shown with the CESK-transition \eqref{eval:concat}.
@@ -1268,8 +1290,8 @@ Otherwise, the evaluation of the expression results with an error, as shown in \
         \end{multlined}
         \label{eval:staticinvoc}
     \end{align}
-	\caption{The CESK-transition function for EvalConfiguration: static variable extraction and assignment, and static method invocation}
-	\label{table:static-evalconfigs}
+    \caption{The CESK-transition function for EvalConfiguration: static variable extraction and assignment, and static method invocation}
+    \label{table:static-evalconfigs}
 \end{figure}
 %%
 % Figure showing the CESK-transition function strating from ValuePassingConfiguration for
@@ -1277,31 +1299,31 @@ Otherwise, the evaluation of the expression results with an error, as shown in \
 %%
 \begin{figure}[Htp]
     \begin{align}
-		&\cesktranswhere%
-			{\contconf{\StaticGetK}{\val}}%
-			{\contconf{\econt}{\val}}%
-			{\env^{M} = \ext{\env^{M}}{\membermeta}{\val}}
-		\label{econtconf:staticget}\\
-		&\cesktranswhere%
-			{\contconf{\StaticSetK}{\val}}%
-			{\contconf{\econt}{\val}}
-			{\text{$\env^{M} = \ext{\env^{M}}{\membermeta}{\val}$ if $\membermeta \notin \env^M$}}
-		\label{econtconf:staticset-var-new}\\
-		&\cesktranswhere%
-			{\contconf{\StaticSetK}{\val}}%
-			{\contconf{\econt}{\val}}
-			{\text{$\update{\env^{M}(\membermeta)}{\val}$ if $\membermeta \in \env^M$}}
+        &\cesktranswhere%
+            {\contconf{\StaticGetK}{\val}}%
+            {\contconf{\econt}{\val}}%
+            {\env^{M} = \ext{\env^{M}}{\membermeta}{\val}}
+        \label{econtconf:staticget}\\
+        &\cesktranswhere%
+            {\contconf{\StaticSetK}{\val}}%
+            {\contconf{\econt}{\val}}
+            {\text{$\env^{M} = \ext{\env^{M}}{\membermeta}{\val}$ if $\membermeta \notin \env^M$}}
+        \label{econtconf:staticset-var-new}\\
+        &\cesktranswhere%
+            {\contconf{\StaticSetK}{\val}}%
+            {\contconf{\econt}{\val}}
+            {\text{$\update{\env^{M}(\membermeta)}{\val}$ if $\membermeta \in \env^M$}}
         \label{econtconf:staticset-var}\\
         &\begin{multlined}
-		\cesktranswheresplit%
-			{\contconf{\StaticSetK}{\val}}%
-			{\execconf{\stmt}{\env}{[]}{[]}{\handler}{\cstrace}{\cex}{\econt}{\scont}}%
-			{\text{$\scont = \ExitSK{\val}$, $\env = \ext{\env_{empty}}{\formal}{\val}$}}
-		\end{multlined}
-		\label{econtconf:staticset-setter}
+        \cesktranswheresplit%
+            {\contconf{\StaticSetK}{\val}}%
+            {\execconf{\stmt}{\env}{[]}{[]}{\handler}{\cstrace}{\cex}{\econt}{\scont}}%
+            {\text{$\scont = \ExitSK{\val}$, $\env = \ext{\env_{empty}}{\formal}{\val}$}}
+        \end{multlined}
+        \label{econtconf:staticset-setter}
     \end{align}
-	\caption{The CESK-transition function for ValuePassingConfiguration: static variable extraction and assignment, and static method invocation}
-	\label{table:static-evalconfigs}
+    \caption{The CESK-transition function for ValuePassingConfiguration: static variable extraction and assignment, and static method invocation}
+    \label{table:static-evalconfigs}
 \end{figure}
 %%
 % Figure showing the CESK-transition function strating from ApplicationConfiguration.
@@ -1309,21 +1331,21 @@ Otherwise, the evaluation of the expression results with an error, as shown in \
 \begin{figure}[Htp]
     \begin{align}
        &\begin{multlined}
-		\cesktrans%
-			{\acontconf{\StringConcatenationA}{\vals}}%
-			{\contconf{\econt}{\concat(\vals)}}
+        \cesktrans%
+            {\acontconf{\StringConcatenationA}{\vals}}%
+            {\contconf{\econt}{\concat(\vals)}}
         \end{multlined}
         \label{acontconf:concat}\\
-		&\begin{multlined}
-		\cesktranswheresplit*%
-			{\acontconf{\StaticInvA{\formals}{\stmt}{\strace}{\econt}}{\val{s}}}%
-			{\execconf{\stmt}{\env'}{[]}{[]}{\handler}{\cstrace}{\cex}{\econt}{\scont}}%
-			{\parbox{10cm}{where $\scont = \ExitSK{\tt{null}}$,\\ $\env' = \ext{\env_{empty}}{\formals}{\val{s}}$}}
-		\end{multlined}
-		\label{acontconf:staticinvoc}
+        &\begin{multlined}
+        \cesktranswheresplit*%
+            {\acontconf{\StaticInvA{\formals}{\stmt}{\strace}{\econt}}{\val{s}}}%
+            {\execconf{\stmt}{\env'}{[]}{[]}{\handler}{\cstrace}{\cex}{\econt}{\scont}}%
+            {\parbox{10cm}{where $\scont = \ExitSK{\tt{null}}$,\\ $\env' = \ext{\env_{empty}}{\formals}{\val{s}}$}}
+        \end{multlined}
+        \label{acontconf:staticinvoc}
     \end{align}
-	\caption{The CESK-transition function for ApplicationConfiguration}
-	\label{table:static-evalconfigs}
+    \caption{The CESK-transition function for ApplicationConfiguration}
+    \label{table:static-evalconfigs}
 \end{figure}
 
 \subsubsection{Static and library fields}
@@ -1379,131 +1401,131 @@ A statement continuation, $\ExitSK{\econt}{\tt{null}}$ is added as next statemen
 %%
 \begin{figure}[Htp]
     \begin{align}
-		&\begin{multlined}
-		\cesktranswheresplit%
-			{\evalconf{\PropertyGet{\expressionmeta}{\idmeta}}{\env}{\strace}{\cstrace}{\cex}{\econt}}%
-			{\evalconf{\expressionmeta}{\env}{\strace}{\cstrace}{\cex}{\econt'}}%
-			{\text{where $\econt' = \PropertyGetK$}}
-		\end{multlined}
-		\label{eval:propertyget}\\
-		&\begin{multlined}
-		\cesktranswheresplit%
-			{\evalconf{\DirectPropertyGet{\expressionmeta}{\membermeta}}{\env}{\strace}{\cstrace}{\cex}{\econt}}%
-			{\evalconf{\expressionmeta}{\env}{\strace}{\cstrace}{\cex}{\econt'}}%
-			{\text{where $\econt' = \DPropertyGetK$}}
+        &\begin{multlined}
+        \cesktranswheresplit%
+            {\evalconf{\PropertyGet{\expressionmeta}{\idmeta}}{\env}{\strace}{\cstrace}{\cex}{\econt}}%
+            {\evalconf{\expressionmeta}{\env}{\strace}{\cstrace}{\cex}{\econt'}}%
+            {\text{where $\econt' = \PropertyGetK$}}
+        \end{multlined}
+        \label{eval:propertyget}\\
+        &\begin{multlined}
+        \cesktranswheresplit%
+            {\evalconf{\DirectPropertyGet{\expressionmeta}{\membermeta}}{\env}{\strace}{\cstrace}{\cex}{\econt}}%
+            {\evalconf{\expressionmeta}{\env}{\strace}{\cstrace}{\cex}{\econt'}}%
+            {\text{where $\econt' = \DPropertyGetK$}}
         \end{multlined}
         \label{eval:dpropertyget}\\
         &\begin{multlined}
-		\cesktranswheresplit%
-			{\evalconf{\PropertySet{\expressionmeta_0}{\idmeta}{\expressionmeta_1}}{\env}{\strace}{\cstrace}{\cex}{\econt}}%
-			{\evalconf{\expressionmeta_0}{\env}{\strace}{\cstrace}{\cex}{\econt'}}%
-			{\text{where $\econt' = \PropertySetK$}}
+        \cesktranswheresplit%
+            {\evalconf{\PropertySet{\expressionmeta_0}{\idmeta}{\expressionmeta_1}}{\env}{\strace}{\cstrace}{\cex}{\econt}}%
+            {\evalconf{\expressionmeta_0}{\env}{\strace}{\cstrace}{\cex}{\econt'}}%
+            {\text{where $\econt' = \PropertySetK$}}
         \end{multlined}
         \label{eval:propertyset}\\
         &\begin{multlined}
-		\cesktranswheresplit%
-			{\evalconf{\DirectPropertySet{\expressionmeta_0}{\membermeta}{\expressionmeta_1}}{\env}{\strace}{\cstrace}{\cex}{\econt}}%
-			{\evalconf{\expressionmeta_0}{\env}{\strace}{\cstrace}{\cex}{\econt'}}%
-			{\text{where $\econt' = \DirectPropertySetK$}}
+        \cesktranswheresplit%
+            {\evalconf{\DirectPropertySet{\expressionmeta_0}{\membermeta}{\expressionmeta_1}}{\env}{\strace}{\cstrace}{\cex}{\econt}}%
+            {\evalconf{\expressionmeta_0}{\env}{\strace}{\cstrace}{\cex}{\econt'}}%
+            {\text{where $\econt' = \DirectPropertySetK$}}
         \end{multlined}
         \label{eval:dpropertyset}\\
         &\begin{multlined}
-		\cesktranswheresplit%
-			{\evalconf{\SuperPropertyGet{\idmeta}}{\env}{\strace}{\cstrace}{\cex}{\econt}}%
-			{\contconf{\econt}{\funval{\formals}{\stmt}{\env'}}}%
+        \cesktranswheresplit%
+            {\evalconf{\SuperPropertyGet{\idmeta}}{\env}{\strace}{\cstrace}{\cex}{\econt}}%
+            {\contconf{\econt}{\funval{\formals}{\stmt}{\env'}}}%
             {\parbox{10cm}{where $\env' = \ext{\env_{empty}}{\this}{\deref{(\env(\this))}}$,\\ $\membermeta = \superclass{\deref{\env(\this)}}.lookup(\idmeta)$,\\ $\membermeta$ is a method tear-off with formal parameters $\formals$, and body $\stmt$}}
         \end{multlined}
         \label{eval:superpropertyget-tearoff}\\
         &\begin{multlined}
-		\cesktranswheresplit%
-			{\evalconf{\SuperPropertyGet{\idmeta}}{\env}{\strace}{\cstrace}{\cex}{\econt}}%
-			{\execconf{\stmt}{\env'}{\lbls}{\clbls}{\handler}{\cstrace}{\cex}{\econt}{\scont}}%
+        \cesktranswheresplit%
+            {\evalconf{\SuperPropertyGet{\idmeta}}{\env}{\strace}{\cstrace}{\cex}{\econt}}%
+            {\execconf{\stmt}{\env'}{\lbls}{\clbls}{\handler}{\cstrace}{\cex}{\econt}{\scont}}%
             {\parbox{10cm}{where $\env' = \ext{\env_{empty}}{\this}{\deref{(\env(\this))}}$,\\ $\scont = \emptyset$, $\membermeta = \superclass{\deref{\env(\this)}}.lookup(\idmeta)$,\\ $\membermeta$ is a getter method with body $\stmt$}}
         \end{multlined}
         \label{eval:superpropertyget-getter}\\
         &\begin{multlined}
-		\cesktranswheresplit%
-			{\evalconf{\SuperPropertyGet{\idmeta}}{\env}{\strace}{\cstrace}{\cex}{\econt}}%
-			{\contconf{\econt}{M(\deref{(\env(\this))})}}%
+        \cesktranswheresplit%
+            {\evalconf{\SuperPropertyGet{\idmeta}}{\env}{\strace}{\cstrace}{\cex}{\econt}}%
+            {\contconf{\econt}{M(\deref{(\env(\this))})}}%
             {\text{where $\membermeta = \superclass{\deref{\env(\this)}}.lookup(\idmeta)$, $\membermeta$ is a implicit field getter}}
         \end{multlined}
         \label{eval:superpropertyget-field}\\
         &\begin{multlined}
-		\cesktranswheresplit%
-			{\evalconf{\SuperPropertySet{\idmeta}{\expressionmeta}}{\env}{\strace}{\cstrace}{\cex}{\econt}}%
-			{\evalconf{\expressionmeta}{\env}{\strace}{\cstrace}{\cex}{\econt'}}%
+        \cesktranswheresplit%
+            {\evalconf{\SuperPropertySet{\idmeta}{\expressionmeta}}{\env}{\strace}{\cstrace}{\cex}{\econt}}%
+            {\evalconf{\expressionmeta}{\env}{\strace}{\cstrace}{\cex}{\econt'}}%
             {\text{where $\econt' = \SuperPropertySetK$}}
         \end{multlined}
         \label{eval:superpropertyset}
     \end{align}
-	\caption{The CESK-transition function for EvalConfiguration: instance property extraction and assignment}
-	\label{figure:instance-property-evalconfigs}
+    \caption{The CESK-transition function for EvalConfiguration: instance property extraction and assignment}
+    \label{figure:instance-property-evalconfigs}
 \end{figure}
 %%
 % Figure showing the CESK-transition function strating from ValuePassingConfiguration for instance property extraction.
 %%
 \begin{figure}[Htp]
     \begin{align}
-	&\begin{multlined}
-	\cesktranswheresplit*%
-		{\contconf{\PropertyGetK}{\val}}%
-		{\contconf{\econt}{\funval{\formals}{\stmt}{\env}}}
-		{\parbox{10cm}{if $\membermeta$ is a method with body $\stmt$ and formals $\formals$ \\
-		where $\env = \ext{\env_{empty}}{\mathbf{this}}{\val}$}}
-	\end{multlined}
-	\label{econtconf:propertyget-tearoff}\\
-	&\begin{multlined}
-		\cesktranswheresplit*%
-		{\contconf{\PropertyGetK}{\val}}%
-		{\execconf{\stmt}{\env}{[]}{[]}{\handler}{\cstrace}{\cex}{\econt}{\scont}}%
-		{\parbox{10cm}{if $\membermeta$ is a getter with body $\stmt$\\
-		where $\env = \ext{\env_{empty}}{\mathbf{this}}{\val}$\\
-		$\scont = \emptyset$}}
-	\end{multlined}
-	\label{econtconf:propertyget-getter}\\
-	&\begin{multlined}
-		\cesktranswheresplit%
-		{\contconf{\PropertyGetK}{\val}}%
-		{\contconf{\econt}{\textrm{\membermeta}(\val)}}%
-		{\parbox{10cm}{if $\membermeta$ is an implicit getter for field $\idmeta$\\
-		where $\env = \ext{\env_{empty}}{\mathbf{this}}{\val}$\\
-		$\scont = \emptyset$}}
-	\end{multlined}
-	\label{econtconf:propertyget-field}\\
-	&\begin{multlined}
-		\cesktranswheresplit*%
-		{\contconf{\PropertyGetK}{\val}}%
-		{\throwconf{\handler}{(\tt{throw}\text{ NoSuchMethod}) :: \strace}{\textrm{NoSuchMethod}}}%
-		{\parbox{10cm}{if lookup of name $\idmeta$ was unsuccessful in class of value $\val$}}
-	\end{multlined}
-	\label{econtconf:propertyget-nosuchmethod}\\
-	&\begin{multlined}
-		\cesktranswheresplit*%
-		{\contconf{\DPropertyGetK}{\val}}%
-		{\contconf{\econt}{\funval{\formals}{\stmt}{\env}}}%
-		{\parbox{10cm}{if $\membermeta$ is a method with body $\stmt$ and formals $\formals$\\
-		where $\env = \ext{\env_{empty}}{\mathbf{this}}{\val}$}}
-	\end{multlined}
-	\label{econtconf:dpropertyget-tearoff}\\
-	&\begin{multlined}
-		\cesktranswheresplit*%
-			{\contconf{\DPropertyGetK}{\val}}%
-			{\execconf{\stmt}{\env}{[]}{[]}{\handler}{\cstrace}{\cex}{\econt}{\scont}}%
-			{\parbox{10cm}{if $\membermeta$ is getter with statement body $\stmt$ \\
-			where $\env = \ext{\env_{empty}}{\mathbf{this}}{\val}$ \\
-			$\scont = \emptyset$}}
-	\end{multlined}
-	\label{econtconf:dpropertyget-getter}\\
-	&\begin{multlined}
-		\cesktranswhere%
-		{\contconf{\DPropertyGetK}{\val}}%
-		{\contconf{\econt}{\deref{\val[\membermeta]}}}%
-		{\text{if $\membermeta$ is a field }}
-	\end{multlined}
-	\label{econtconf:dpropertyget-field}
-	\end{align}
-	\caption{The CESK-transition function for ValuePassingConfiguration: instance property extraction}
-	\label{figure:econtconf:instance-property-extraction}
+    &\begin{multlined}
+    \cesktranswheresplit*%
+        {\contconf{\PropertyGetK}{\val}}%
+        {\contconf{\econt}{\funval{\formals}{\stmt}{\env}}}
+        {\parbox{10cm}{if $\membermeta$ is a method with body $\stmt$ and formals $\formals$ \\
+        where $\env = \ext{\env_{empty}}{\mathbf{this}}{\val}$}}
+    \end{multlined}
+    \label{econtconf:propertyget-tearoff}\\
+    &\begin{multlined}
+        \cesktranswheresplit*%
+        {\contconf{\PropertyGetK}{\val}}%
+        {\execconf{\stmt}{\env}{[]}{[]}{\handler}{\cstrace}{\cex}{\econt}{\scont}}%
+        {\parbox{10cm}{if $\membermeta$ is a getter with body $\stmt$\\
+        where $\env = \ext{\env_{empty}}{\mathbf{this}}{\val}$\\
+        $\scont = \emptyset$}}
+    \end{multlined}
+    \label{econtconf:propertyget-getter}\\
+    &\begin{multlined}
+        \cesktranswheresplit%
+        {\contconf{\PropertyGetK}{\val}}%
+        {\contconf{\econt}{\textrm{\membermeta}(\val)}}%
+        {\parbox{10cm}{if $\membermeta$ is an implicit getter for field $\idmeta$\\
+        where $\env = \ext{\env_{empty}}{\mathbf{this}}{\val}$\\
+        $\scont = \emptyset$}}
+    \end{multlined}
+    \label{econtconf:propertyget-field}\\
+    &\begin{multlined}
+        \cesktranswheresplit*%
+        {\contconf{\PropertyGetK}{\val}}%
+        {\throwconf{\handler}{(\tt{throw}\text{ NoSuchMethod}) :: \strace}{\textrm{NoSuchMethod}}}%
+        {\parbox{10cm}{if lookup of name $\idmeta$ was unsuccessful in class of value $\val$}}
+    \end{multlined}
+    \label{econtconf:propertyget-nosuchmethod}\\
+    &\begin{multlined}
+        \cesktranswheresplit*%
+        {\contconf{\DPropertyGetK}{\val}}%
+        {\contconf{\econt}{\funval{\formals}{\stmt}{\env}}}%
+        {\parbox{10cm}{if $\membermeta$ is a method with body $\stmt$ and formals $\formals$\\
+        where $\env = \ext{\env_{empty}}{\mathbf{this}}{\val}$}}
+    \end{multlined}
+    \label{econtconf:dpropertyget-tearoff}\\
+    &\begin{multlined}
+        \cesktranswheresplit*%
+            {\contconf{\DPropertyGetK}{\val}}%
+            {\execconf{\stmt}{\env}{[]}{[]}{\handler}{\cstrace}{\cex}{\econt}{\scont}}%
+            {\parbox{10cm}{if $\membermeta$ is getter with statement body $\stmt$ \\
+            where $\env = \ext{\env_{empty}}{\mathbf{this}}{\val}$ \\
+            $\scont = \emptyset$}}
+    \end{multlined}
+    \label{econtconf:dpropertyget-getter}\\
+    &\begin{multlined}
+        \cesktranswhere%
+        {\contconf{\DPropertyGetK}{\val}}%
+        {\contconf{\econt}{\deref{\val[\membermeta]}}}%
+        {\text{if $\membermeta$ is a field }}
+    \end{multlined}
+    \label{econtconf:dpropertyget-field}
+    \end{align}
+    \caption{The CESK-transition function for ValuePassingConfiguration: instance property extraction}
+    \label{figure:econtconf:instance-property-extraction}
 \end{figure}
 %
 %
@@ -1553,73 +1575,73 @@ When $\membermeta$ is an instance field, the evaluation proceeds as shown in \eq
 %%
 \begin{figure}[Htp]
     \begin{align}
-	&\begin{multlined}
-		\cesktranswheresplit*%
-		{\contconf{\PropertySetK}{\val_0}}%
-		{\evalconf{\expressionmeta_1}{\env}{\strace}{\cstrace}{\cex}{\econt'}}%
-		{\text{where $\econt' = \PropertySetVK$}}
-	\end{multlined}
-	\label{econtconf:propertyset-val}\\
-	&\begin{multlined}
-		\cesktranswheresplit*%
-		{\contconf{\PropertySetVK}{\val_1}}%
-		{\execconf{\stmt}{\env}{\lbls}{\clbls}{\handler}{\cstrace}{\cex}{\econt}{\scont}}%
-		{\parbox{10cm}{if \membermeta is setter with statement body $\stmt$ and formal parameter $\formal$\\
-		where $\env = \ext{\env_{empty}}{\mathbf{this} :: \formal :: []}{\val_0 :: \val_1 :: []}$\\
-		$\scont = \ExitSK{\val_1}$}}
-	\end{multlined}
-	\label{econtconf:propertyset-setter}\\
-	&\begin{multlined}
-		\cesktranswheresplit%
-		{\contconf{\PropertySetVK}{\val}}%
-		{\contconf{\econt}{\{\membermeta\}(\val_0, \val_1)}}%
-		{\text{if $\membermeta$ is an implicit setter for field $\idmeta$}}
-	\end{multlined}
-	\label{econtconf:propertyset-field}\\
-	&\begin{multlined}
-		\cesktranswheresplit*%
-		{\contconf{\DirectPropertySetK}{\val_0}}%
-		{\evalconf{\expressionmeta_1}{\env}{\strace}{\cstrace}{\cex}{\econt'}}%
-		{\parbox{10cm}{	if $\membermeta$ is setter with statement body $\stmt$ and formal $\formal$\\
-		where $\econt' = \DPropertySetVK$}}
-	\end{multlined}
-	\label{econtconf:dpropertyset-val}\\
-	&\begin{multlined}
-		\cesktranswheresplit*%
-		{\contconf{\DPropertySetVK}{\val_1}}
-		{\execconf{\stmt}{\env}{\lbls}{\clbls}{\handler}{\cstrace}{\cex}{\econt}{\scont}}
-		{\parbox{10cm}{if $\membermeta$ is a setter with body $\stmt$ and formal parameter $\formal$
-		where $\env = \ext{\env_{empty}}{\mathbf{this} :: \formal :: []}{\val_0 :: \val_1 :: []}$\\
-		$\scont = \emptyset$\\}}
-	\end{multlined}
-	\label{econtconf:dpropertyset-setter}\\
-	&\begin{multlined}
-		\cesktranswheresplit*%
-		{\contconf{\DPropertySetVK}{\val_1}}%
-		{\contconf{\econt}{\update{\val_0[\membermeta]}{\val_1}}}%
-		{\text{if $\membermeta$ is a field}}
-	\end{multlined}
-	\label{econtconf:dpropertyset-field}\\
-	&\begin{multlined}
-		\cesktranswheresplit*%
-		{\contconf{\SuperPropertySetK}{\val}}
-		{\execconf{\stmt}{\env'}{\lbls}{\clbls}{\handler}{\cstrace}{\cex}{\econt}{\scont}}
-		{\parbox{10cm}{if $\membermeta$ is a setter method with body $\stmt$ and formal $\formal$\\
-		where $\env' =  \ext{\env_{empty}}{\this :: \formal :: []}{\deref{(\env(\this))} :: \val :: []}$,\\
-		$\scont = \emptyset$}}
-	\end{multlined}
-	\label{econtconf:superpropertyset-setter}\\
-	&\begin{multlined}
-		\cesktranswheresplit%
-		{\contconf{\SuperPropertySetK}{\val}}%
-		{\contconf{\econt}{\val}}%
-		{\parbox{10cm}{if $\membermeta$ is a field\\
-		where $\update{\deref{(\env(\this))}[\membermeta]}{\val}$ after the transition}}
-	\end{multlined}
-	\label{econtconf:superpropertyset-field}
-	\end{align}
-	\caption{The CESK-transition function for ValuePassingConfiguration: instance property assignment}
-	\label{figure:instance-property-assignment-evalconfigs}
+    &\begin{multlined}
+        \cesktranswheresplit*%
+        {\contconf{\PropertySetK}{\val_0}}%
+        {\evalconf{\expressionmeta_1}{\env}{\strace}{\cstrace}{\cex}{\econt'}}%
+        {\text{where $\econt' = \PropertySetVK$}}
+    \end{multlined}
+    \label{econtconf:propertyset-val}\\
+    &\begin{multlined}
+        \cesktranswheresplit*%
+        {\contconf{\PropertySetVK}{\val_1}}%
+        {\execconf{\stmt}{\env}{\lbls}{\clbls}{\handler}{\cstrace}{\cex}{\econt}{\scont}}%
+        {\parbox{10cm}{if \membermeta is setter with statement body $\stmt$ and formal parameter $\formal$\\
+        where $\env = \ext{\env_{empty}}{\mathbf{this} :: \formal :: []}{\val_0 :: \val_1 :: []}$\\
+        $\scont = \ExitSK{\val_1}$}}
+    \end{multlined}
+    \label{econtconf:propertyset-setter}\\
+    &\begin{multlined}
+        \cesktranswheresplit%
+        {\contconf{\PropertySetVK}{\val}}%
+        {\contconf{\econt}{\{\membermeta\}(\val_0, \val_1)}}%
+        {\text{if $\membermeta$ is an implicit setter for field $\idmeta$}}
+    \end{multlined}
+    \label{econtconf:propertyset-field}\\
+    &\begin{multlined}
+        \cesktranswheresplit*%
+        {\contconf{\DirectPropertySetK}{\val_0}}%
+        {\evalconf{\expressionmeta_1}{\env}{\strace}{\cstrace}{\cex}{\econt'}}%
+        {\parbox{10cm}{    if $\membermeta$ is setter with statement body $\stmt$ and formal $\formal$\\
+        where $\econt' = \DPropertySetVK$}}
+    \end{multlined}
+    \label{econtconf:dpropertyset-val}\\
+    &\begin{multlined}
+        \cesktranswheresplit*%
+        {\contconf{\DPropertySetVK}{\val_1}}
+        {\execconf{\stmt}{\env}{\lbls}{\clbls}{\handler}{\cstrace}{\cex}{\econt}{\scont}}
+        {\parbox{10cm}{if $\membermeta$ is a setter with body $\stmt$ and formal parameter $\formal$
+        where $\env = \ext{\env_{empty}}{\mathbf{this} :: \formal :: []}{\val_0 :: \val_1 :: []}$\\
+        $\scont = \emptyset$\\}}
+    \end{multlined}
+    \label{econtconf:dpropertyset-setter}\\
+    &\begin{multlined}
+        \cesktranswheresplit*%
+        {\contconf{\DPropertySetVK}{\val_1}}%
+        {\contconf{\econt}{\update{\val_0[\membermeta]}{\val_1}}}%
+        {\text{if $\membermeta$ is a field}}
+    \end{multlined}
+    \label{econtconf:dpropertyset-field}\\
+    &\begin{multlined}
+        \cesktranswheresplit*%
+        {\contconf{\SuperPropertySetK}{\val}}
+        {\execconf{\stmt}{\env'}{\lbls}{\clbls}{\handler}{\cstrace}{\cex}{\econt}{\scont}}
+        {\parbox{10cm}{if $\membermeta$ is a setter method with body $\stmt$ and formal $\formal$\\
+        where $\env' =  \ext{\env_{empty}}{\this :: \formal :: []}{\deref{(\env(\this))} :: \val :: []}$,\\
+        $\scont = \emptyset$}}
+    \end{multlined}
+    \label{econtconf:superpropertyset-setter}\\
+    &\begin{multlined}
+        \cesktranswheresplit%
+        {\contconf{\SuperPropertySetK}{\val}}%
+        {\contconf{\econt}{\val}}%
+        {\parbox{10cm}{if $\membermeta$ is a field\\
+        where $\update{\deref{(\env(\this))}[\membermeta]}{\val}$ after the transition}}
+    \end{multlined}
+    \label{econtconf:superpropertyset-field}
+    \end{align}
+    \caption{The CESK-transition function for ValuePassingConfiguration: instance property assignment}
+    \label{figure:instance-property-assignment-evalconfigs}
 \end{figure}
 \subsubsection{Property assignment}
 \label{subsubsec:property-assignment}
@@ -1694,37 +1716,37 @@ The $\update{\deref{(\env(\this))}[\membermeta]}{\val}$ modifies the value store
 %
 \begin{figure}[Htp]
     \begin{align}
-		&\begin{multlined}
-		\cesktranswheresplit%
-			{\evalconf{\InstanceMethodInvocation{\expressionmeta}{\idmeta}{\expressionsmeta}}{\env}{\strace}{\cstrace}{\cex}{\econt}}%
-			{\evalconf{\expressionmeta}{\env}{\strace}{\cstrace}{\cex}{\econt'}}%
-			{\econt' = \InstanceMethodK}
-		\end{multlined}
-		\label{eval:instancemethod}\\
-		&\begin{multlined}
-			\cesktranswheresplit%
-			{\evalconf{\DInstanceMethodInvocation{\expressionmeta}{\membermeta}{\expressionsmeta}}{\env}{\strace}{\cstrace}{\cex}{\econt}}%
-			{\evalconf{\expressionmeta}{\env}{\strace}{\cstrace}{\cex}{\econt'}}%
-			{\econt' = \DInstanceMethodK}
-		\end{multlined}
-		\label{eval:dinstancemethod}\\
-		&\begin{multlined}
-			\cesktranswheresplit%
-			{\evalconf{\SuperMethodInvocation{\idmeta}{\expressionsmeta}}{\env}{\strace}{\cstrace}{\cex}{\econt}}%
-			{\evallistconf{\expressionsmeta}{\env}{\strace}{\cstrace}{\cex}{\acont}}%
-			{\acont = \SuperMethodA}
-		\end{multlined}
-		\label{eval:superinstancemethod}\\
-		&\begin{multlined}
-			\cesktranswheresplit%
-			{\evalconf{\textbf{new Q}(\exprs)}{\env}{st}{cex}{cst}{\econt}}%
-			{\evallistconf{\exprs}{\env}{st}{cex}{cst}{\acont'}}%
-			{\acont' = \ConstructorA{Q}{\econt}}
-		\end{multlined}
-		\label{eval:ctrinvocation}
-	\end{align}
-	\caption{The CESK-transition function for EvalConfiguration: instance method and constructor invocation}
-	\label{figure:instance-method-evalconfigs}
+        &\begin{multlined}
+        \cesktranswheresplit%
+            {\evalconf{\InstanceMethodInvocation{\expressionmeta}{\idmeta}{\expressionsmeta}}{\env}{\strace}{\cstrace}{\cex}{\econt}}%
+            {\evalconf{\expressionmeta}{\env}{\strace}{\cstrace}{\cex}{\econt'}}%
+            {\econt' = \InstanceMethodK}
+        \end{multlined}
+        \label{eval:instancemethod}\\
+        &\begin{multlined}
+            \cesktranswheresplit%
+            {\evalconf{\DInstanceMethodInvocation{\expressionmeta}{\membermeta}{\expressionsmeta}}{\env}{\strace}{\cstrace}{\cex}{\econt}}%
+            {\evalconf{\expressionmeta}{\env}{\strace}{\cstrace}{\cex}{\econt'}}%
+            {\econt' = \DInstanceMethodK}
+        \end{multlined}
+        \label{eval:dinstancemethod}\\
+        &\begin{multlined}
+            \cesktranswheresplit%
+            {\evalconf{\SuperMethodInvocation{\idmeta}{\expressionsmeta}}{\env}{\strace}{\cstrace}{\cex}{\econt}}%
+            {\evallistconf{\expressionsmeta}{\env}{\strace}{\cstrace}{\cex}{\acont}}%
+            {\acont = \SuperMethodA}
+        \end{multlined}
+        \label{eval:superinstancemethod}\\
+        &\begin{multlined}
+            \cesktranswheresplit%
+            {\evalconf{\textbf{new Q}(\exprs)}{\env}{st}{cex}{cst}{\econt}}%
+            {\evallistconf{\exprs}{\env}{st}{cex}{cst}{\acont'}}%
+            {\acont' = \ConstructorA{Q}{\econt}}
+        \end{multlined}
+        \label{eval:ctrinvocation}
+    \end{align}
+    \caption{The CESK-transition function for EvalConfiguration: instance method and constructor invocation}
+    \label{figure:instance-method-evalconfigs}
 \end{figure}
 %
 %
@@ -1732,22 +1754,22 @@ The $\update{\deref{(\env(\this))}[\membermeta]}{\val}$ modifies the value store
 \begin{figure}[Htp]
     \begin{align}
     &\begin{multlined}
-		\cesktranswheresplit*%
-		{\contconf{\InstanceMethodK}{\val}}%
-		{\evallistconf{\expressionsmeta}{\env}{\strace}{\cstrace}{\cex}{\acont'}}%
-		{\text{where $\acont' = \InstanceMethodA$}}
-	\end{multlined}
-	\label{econtconf:instancemethod}\\
-	&\begin{multlined}
-		\cesktranswheresplit*%
-		{\contconf{\DInstanceMethodK}{\val}}%
-		{\evallistconf{\expressionsmeta}{\env}{\strace}{\cstrace}{\cex}{\acont'}}%
-		{\text{where $\acont' = \DInstanceMethodA$}}
-	\end{multlined}
-	\label{econtconf:dinstancemethod}
-	\end{align}
-	\caption{The CESK-transition function for ValuePassingConfiguration: instance method and constructor invocation}
-	\label{figure:instance-method-evalconfigs}
+        \cesktranswheresplit*%
+        {\contconf{\InstanceMethodK}{\val}}%
+        {\evallistconf{\expressionsmeta}{\env}{\strace}{\cstrace}{\cex}{\acont'}}%
+        {\text{where $\acont' = \InstanceMethodA$}}
+    \end{multlined}
+    \label{econtconf:instancemethod}\\
+    &\begin{multlined}
+        \cesktranswheresplit*%
+        {\contconf{\DInstanceMethodK}{\val}}%
+        {\evallistconf{\expressionsmeta}{\env}{\strace}{\cstrace}{\cex}{\acont'}}%
+        {\text{where $\acont' = \DInstanceMethodA$}}
+    \end{multlined}
+    \label{econtconf:dinstancemethod}
+    \end{align}
+    \caption{The CESK-transition function for ValuePassingConfiguration: instance method and constructor invocation}
+    \label{figure:instance-method-evalconfigs}
 \end{figure}
 %
 %
@@ -1755,34 +1777,34 @@ The $\update{\deref{(\env(\this))}[\membermeta]}{\val}$ modifies the value store
 \begin{figure}[Htp]
     \begin{align}
     &\begin{multlined}
-			\cesktranswheresplit*%
-			{\contconf{\InstanceMethodA}{\val{s}}}%
-			{\execconf{\stmt}{\env}{[]}{[]}{\handler}{\cstrace}{\cex}{\econt}{\scont}}%
-			{\parbox{10cm}{where $\membermeta = class(\val).lookup(\idmeta)$ is an instance method with body $\stmt$ and formals $\formals$\\
-			$\scont = \ExitSK{\tt{null}}$\\
-			$\env = \ext{\env_{empty}}{\this :: \formals}{\val :: \val{s}}$}}
-	\end{multlined}
-	\label{acontconf:instancemethod}\\
-	&\begin{multlined}
-			\cesktranswheresplit*%
-			{\contconf{\DInstanceMethodA}{\val{s}}}%
-			{\execconf{\stmt}{\env}{[]}{[]}{\handler}{\cstrace}{\cex}{\econt}{\scont}}%
-			{\parbox{10cm}{where $\stmt$ is the statement body and $\formals$ are the formal parameters of the instace method $\membermeta$\\
-			$\scont = \ExitSK{\tt{null}}$,\\
-			$\env = \ext{\env_{empty}}{\this :: \formals}{\val :: \val{s}}$}}
-	\end{multlined}
-	\label{acontconf:dinstancemethod}\\
-	&\begin{multlined}
-		\cesktranswheresplit*%
-		{\contconf{\SuperMethodA}{\val{s}}}%
-		{\execconf{\stmt}{\env'}{[]}{[]}{\handler}{\cstrace}{\cex}{\econt}{\scont}}%
-		{\parbox{10cm}{where $\scont = \ExitSK{\tt{null}}$,\\
-		$\env' = \ext{\env_{empty}}{\this :: \formals}{\deref{(\env(\this))} :: \val{s}}$	}}
-	\end{multlined}
-	\label{acontconf:superinstancemethod}
-	\end{align}
-	\caption{The CESK-transition function for ApplicationConfigurations}
-	\label{figure:instance-method-evalconfigs}
+            \cesktranswheresplit*%
+            {\contconf{\InstanceMethodA}{\val{s}}}%
+            {\execconf{\stmt}{\env}{[]}{[]}{\handler}{\cstrace}{\cex}{\econt}{\scont}}%
+            {\parbox{10cm}{where $\membermeta = class(\val).lookup(\idmeta)$ is an instance method with body $\stmt$ and formals $\formals$\\
+            $\scont = \ExitSK{\tt{null}}$\\
+            $\env = \ext{\env_{empty}}{\this :: \formals}{\val :: \val{s}}$}}
+    \end{multlined}
+    \label{acontconf:instancemethod}\\
+    &\begin{multlined}
+            \cesktranswheresplit*%
+            {\contconf{\DInstanceMethodA}{\val{s}}}%
+            {\execconf{\stmt}{\env}{[]}{[]}{\handler}{\cstrace}{\cex}{\econt}{\scont}}%
+            {\parbox{10cm}{where $\stmt$ is the statement body and $\formals$ are the formal parameters of the instace method $\membermeta$\\
+            $\scont = \ExitSK{\tt{null}}$,\\
+            $\env = \ext{\env_{empty}}{\this :: \formals}{\val :: \val{s}}$}}
+    \end{multlined}
+    \label{acontconf:dinstancemethod}\\
+    &\begin{multlined}
+        \cesktranswheresplit*%
+        {\contconf{\SuperMethodA}{\val{s}}}%
+        {\execconf{\stmt}{\env'}{[]}{[]}{\handler}{\cstrace}{\cex}{\econt}{\scont}}%
+        {\parbox{10cm}{where $\scont = \ExitSK{\tt{null}}$,\\
+        $\env' = \ext{\env_{empty}}{\this :: \formals}{\deref{(\env(\this))} :: \val{s}}$    }}
+    \end{multlined}
+    \label{acontconf:superinstancemethod}
+    \end{align}
+    \caption{The CESK-transition function for ApplicationConfigurations}
+    \label{figure:instance-method-evalconfigs}
 \end{figure}
 %
 %
@@ -1790,11 +1812,11 @@ The $\update{\deref{(\env(\this))}[\membermeta]}{\val}$ modifies the value store
 \begin{figure}[Htp]
     \begin{align}
     \cesktrans%
-		{\scontconf{\ExitSK{\val}}{\env}}%
-		{\contconf{\econt}{\val}}
-	\end{align}
-	\caption{The CESK-transition function for ForwardConfigurations}
-	\label{figure:instance-method-evalconfigs}
+        {\scontconf{\ExitSK{\val}}{\env}}%
+        {\contconf{\econt}{\val}}
+    \end{align}
+    \caption{The CESK-transition function for ForwardConfigurations}
+    \label{figure:instance-method-evalconfigs}
 \end{figure}
 \subsubsection{Instance method invocation}
 \label{subsubsec:instance-method-invoc}
@@ -1840,8 +1862,8 @@ Similarly to Section~\ref{subsubsec:instance-method-invoc}, $\ExitSK{\val}$ is a
                 {\text{where $\econt' = \VarDeclK{\env}{\varmeta}{\scont}$}}
         \end{multlined}\\
         &\cesktrans%
-			{\execconf{\EmptyStatement}{\env}{\lbls}{\clbls}{\handler}{\cstrace}{\cex}{\econt}{\scont}}%
-			{\scontconf{\scont}{\env}}\\
+            {\execconf{\EmptyStatement}{\env}{\lbls}{\clbls}{\handler}{\cstrace}{\cex}{\econt}{\scont}}%
+            {\scontconf{\scont}{\env}}\\
         &\begin{multlined}
             \cesktranswheresplit%
                 {\execconf{\ExpressionStatement{\expressionmeta}}{\env}{\lbls}{\clbls}{\handler}{\cstrace}{\cex}{\econt}{\scont}}%
@@ -1861,11 +1883,11 @@ Similarly to Section~\ref{subsubsec:instance-method-invoc}, $\ExitSK{\val}$ is a
                 {\text{where $\econt' = \IfCondK{\stmti{1}}{\stmti{2}}$}}
         \end{multlined}\\
         &\cesktrans%
-			{\execconf{\ReturnStatement{\expr}}{\env}{\lbls}{\clbls}{\handler}{\cstrace}{\cex}{\econt}{\scont}}%
-			{\evalconf{\expr}{\env}{\strace}{\cstrace}{\cex}{\econt}}\\
+            {\execconf{\ReturnStatement{\expr}}{\env}{\lbls}{\clbls}{\handler}{\cstrace}{\cex}{\econt}{\scont}}%
+            {\evalconf{\expr}{\env}{\strace}{\cstrace}{\cex}{\econt}}\\
         &\cesktrans%
-			{\execconf{\ReturnStatement{}}{\env}{\lbls}{\clbls}{\handler}{\cstrace}{\cex}{\econt}{\scont}}%
-			{\contconf{\econt}{\textbf{null}}}\\
+            {\execconf{\ReturnStatement{}}{\env}{\lbls}{\clbls}{\handler}{\cstrace}{\cex}{\econt}{\scont}}%
+            {\contconf{\econt}{\textbf{null}}}\\
         &\begin{multlined}
             \cesktranswheresplit*%
                 {\execconf{\DoStatement{\statementmeta}{\expressionmeta}}{\env}{\lbls}{\clbls}{\handler}{\cstrace}{\cex}{\econt}{\scont}}%
@@ -1920,9 +1942,9 @@ Similarly to Section~\ref{subsubsec:instance-method-invoc}, $\ExitSK{\val}$ is a
                 {\contconf{\econt}{\funval{\stmt_{body}}{\formals}{\env'}}}%
                 {\text{where $\env' = \ext{\env}{fun}{\funval{\stmt_{body}}{\formals}{\env'}}$}}
         \end{multlined}
-	\end{align}
-	\caption{The CESK-transition function for statements}
-	\label{figure:exec}
+    \end{align}
+    \caption{The CESK-transition function for statements}
+    \label{figure:exec}
 \end{figure}
 
 \subsubsection{Variable Declaration}
@@ -2040,6 +2062,7 @@ Executing a labelled statement inserts a new break label, $\lbl$ in the list of 
 
 
 \subsection{Switch}
+
 Kernel supports dispatching control among a number of cases with \textbf{switch} statements.
 The target expression $\expr$ is evaluated and matched against the different case clauses of the switch statement.
 
@@ -2058,10 +2081,7 @@ The new statement continuation is necessary because implicit fall-through is not
     \end{multlined}
 \end{align*}
 
-\noindent where
-\[
-	\scase = \textbf{case } \expri{1}, \dots, \expri{i} \textbf{ : } \stmt \textrm{ and } \scase \textrm{ is a matching \textbf{case} clause}.
-\]
+\noindent where $\scase = \textbf{case } \expri{1}, \dots, \expri{i} \textbf{ : } \stmt \textrm{ and } \scase \textrm{ is a matching \textbf{case} clause}$.
 
 A case clause is matching if is \textbf{default} or there is at least one of the constant expressions in the case clause identical to the target value of the switch.
 
@@ -2176,45 +2196,48 @@ The statement is unconditionally executed:
 
 
 \subsection{Break}
+
 \textbf{break L} statements break from an enclosing label \textbf{L} and execute the break continuation corresponding to the label in the list of labels $\lbls$.
 
-Let $\lbl = Label(L', \bcont) \in \lbls \textrm{ with } L' == \mathbf{L}$ below:
-\[
-  \begin{array}{lcl}
-	\breakconf{\Break{\env}{\scont}}
-	& \Rightarrow &
-	\scontconf{\scont}{\env}\\[2mm]
+\begin{align*}
+    &\cesktrans%
+        {\breakconf{\Break{\env}{\scont}}}%
+        {\scontconf{\scont}{\env}},\\
+    &\begin{multlined}
+        \cesktranssplit%
+            {\breakconf{\FinallyBreak{\stmt}{\bcont}}}%
+            {\execconf{\stmt}{\env}{\lbls}{\clbls}{\handler}{\cex}{\cstrace}{\econt}{\mathrm{BreakSK}(\bcont)}},
+    \end{multlined}\\
+    &\cesktrans%
+        {\scontconf{\mathrm{BreakSK}(\bcont)}{\env}}%
+        {\breakconf{\bcont}},
+\end{align*}
 
-	\breakconf{\FinallyBreak{\stmt}{\bcont}}
-	& \Rightarrow \\
-	\hspace{10mm}\execconf{\stmt}{\env}{\lbls}{\clbls}{\handler}{\cex}{\cstrace}{\econt}{\mathrm{BreakSK}(\bcont)}\\[2mm]
+\noindent where $\lbl = Label(L', \bcont) \in \lbls \textrm{ with } L' == \mathbf{L}$.
 
-	\scontconf{\mathrm{BreakSK}(\bcont)}{\env}
-	& \Rightarrow &
-	\breakconf{\bcont}
-
-  \end{array}
-\]
 
 \subsection{Continue}
 \textbf{continue L} statements continue to executing the statement of a preceding case clause, labelled with \textbf{L} and execute the continue continuation corresponding to the label in the list of labels $\clbls$.
 
-Let $\clbl = \continuel{L'}{\switchcont} \in \clbls \textrm{ with } L' == \mathbf{L}$ below:
-\[
-  \begin{array}{lcl}
-	\switchconf{\ContinueK}
-	& \Rightarrow \\
-	\hspace{10mm}\execconf{\stmt}{\env}{\lbls}{\clbls}{\handler}{\cex}{\cstrace}{\econt}{\scont}\\[2mm]
+\begin{align*}
+    &\begin{multlined}
+        \cesktranssplit%
+            {\switchconf{\ContinueK}}%
+            {\execconf{\stmt}{\env}{\lbls}{\clbls}{\handler}{\cex}{\cstrace}{\econt}{\scont}},
+    \end{multlined}\\
+    &\begin{multlined}
+        \cesktranssplit%
+            {\switchconf{\FinallyContinue{\stmt}{\switchcont}}}%
+            {\execconf{\stmt}{\env}{\lbls}{\clbls}{\handler}{\cex}{\cstrace}{\econt}{\mathrm{SwitchContinueSK}(\switchcont)}},
+    \end{multlined}\\
+    &\cesktrans%
+        {\scontconf{\mathrm{SwitchContinueSK}(\switchcont)}{\env}}%
+        {\switchconf{\switchcont}},
+\end{align*}
 
-	\switchconf{\FinallyContinue{\stmt}{\switchcont}}
-	& \Rightarrow \\
-	\hspace{10mm}\execconf{\stmt}{\env}{\lbls}{\clbls}{\handler}{\cex}{\cstrace}{\econt}{\mathrm{SwitchContinueSK}(\switchcont)}\\[2mm]
+\noindent where $\clbl = \continuel{L'}{\switchcont} \in \clbls \textrm{ with } L' == \mathbf{L}$.
 
-	\scontconf{\mathrm{SwitchContinueSK}(\switchcont)}{\env}
-	& \Rightarrow \\
-	\hspace{10mm}\switchconf{\switchcont}
-  \end{array}
-\]
+
 \subsection{Closures}
 \subsubsection{Function expressions}
 
@@ -2223,11 +2246,15 @@ To support function expressions we introduce $fv = \funval{\stmt_{body}}{\formal
 This ensures that there are no free variables in the body of $fv$.
 $fv \in \dfunval$ has only one method, $call$.
 
+
 \subsubsection{Function declaration}
+
 Kernel supports local function declaration, where a final variable stores a function value.
 Let $F$ be a function with a body $\stmt_{body}$ and a list of formal parameters, $\formals$, and let $fun \in \dvardecl$ be the corresponding final variable declaration.
 
+
 \subsection{New instance creation}
+
 \newcommand{\Initializer}[1]{\mathrm{Initializer}(#1)}
 \newcommand{\SuperInitializer}[2]{\mathrm{SuperInitializer}(#1,\,#2)}
 \newcommand{\RedirectingInitializer}[2]{\mathrm{RedirectingInitializer}(#1,\,#2)}
@@ -2235,227 +2262,190 @@ Let $F$ be a function with a body $\stmt_{body}$ and a list of formal parameters
 The expression \textbf{new} invokes a constructor to produce a new instance.
 The target constructor \textbf{Q} has a list of formal parameters, $\formals$, a list of initializers, $Izs$, and a statement body, $\stmt_{body}$.
 The invocation of a constructor \textbf{Q} with \textbf{new Q}($\exprs$) proceeds as follows:
-\[
-  \begin{array}{lcl}
-	\acontconf{\ConstructorA{\textbf{Q}}{\econt}}{\val{s}}
-	& \Rightarrow &
-	\contconf{\InitK{Q}{\env}{\scont}}{!\loc}
-  \end{array}
-\]
-\noindent
-where $\loc$ is the location of the newly allocated instance, $\val \in \dobjval$, in the store.
+
+\begin{align*}
+    &\cesktrans%
+        {\acontconf{\ConstructorA{\textbf{Q}}{\econt}}{\val{s}}}%
+        {\contconf{\InitK{Q}{\env}{\scont}}{!\loc}},
+\end{align*}
+
+\noindent where $\loc$ is the location of the newly allocated instance, $\val \in \dobjval$, in the store.
 The value $\val$ stores the class of the object and the fields, as a list of freshly allocated locations for each field of the new instance.
-\[
-  \begin{array}{l}
-	\deref{\loc} = \objval \in \dobjval, fields \in \mlist{\dlocation}\\
-	\env' = \extend(\env_{empty}, \formals, \val{s})\\
-	\scont = \NewSK{\econt}{\loc} \\[2mm]
 
-	\scontconf{\NewSK{\econt}{\loc}}{\env}
-	\Rightarrow
-	\contconf{\econt}{\deref{\loc}}
-  \end{array}
-\]
+\begin{align*}
+    &\deref{\loc} = \objval \in \dobjval, fields \in \mlist{\dlocation},\\
+    &\env' = \extend(\env_{empty}, \formals, \val{s}),\\
+    &\scont = \NewSK{\econt}{\loc},\\
+    &\cesktrans{\scontconf{\NewSK{\econt}{\loc}}{\env}}{\contconf{\econt}{\deref{\loc}}}.
+\end{align*}
 
-\noindent
 Let $li = last(Izs)$ be the last initializer in the list of initializers, $Izs$, of constructor \textbf{Q}.
-
-\noindent
 When $li$ is a redirecting initializer to target constructor \textbf{G}, then execution of constructor \textbf{Q} proceeds immediately with execution of its initializer list, $Izs$.
-\[
-  \begin{array}{lcl}
-	\contconf{\InitK{Q}{\env}{\scont}}{\val}
-	& \Rightarrow &
-	\evallistconf{\exprs}{\env}{\strace}{\cstrace}{\cex}{\acont}\\
-	&&
-	\textrm{if } Izs = RedirectingI(G, \exprs) :: []\\
-	\textrm{where:}\\
-	\acont = \RedirectingA{G}{\loc}{\scont}\\
-	\deref{\loc} = \val
-	\\[2mm]
 
-	\contconf{\InitK{Q}{\env}{\scont}}{\val}
-	& \Rightarrow &
-	\evalconf{\expr}{\env}{st}{cex}{cst}{\econt'}\\
-	&&
-	\textrm{otherwise}\\
-	\textrm{where:}\\
+\begin{align*}
+    &\begin{multlined}
+        \cesktranswheresplit%
+            {\contconf{\InitK{Q}{\env}{\scont}}{\val}}%
+            {\evallistconf{\exprs}{\env}{\strace}{\cstrace}{\cex}{\acont}}%
+            {\parbox{\textwidth-2cm}{if $Izs = RedirectingI(G, \exprs) :: []$,\\
+                where $\acont = \RedirectingA{G}{\loc}{\scont}$, $\deref{\loc} = \val$,}}
+    \end{multlined}\\
+    &\begin{multlined}
+        \cesktranswheresplit%
+            {\contconf{\InitK{Q}{\env}{\scont}}{\val}}%
+            {\evalconf{\expr}{\env}{st}{cex}{cst}{\econt'}}%
+            {\parbox{\textwidth-2cm}{otherwise, where $fi = Initializer(\expr)$, first initializer in $Izs$,\\
+                $\econt' = \InitializerK{Izs}{\loc}{\env}{\scont}, \deref{\loc} = \val$,}}
+    \end{multlined}\\
+    &\begin{multlined}
+        \cesktranswheresplit*%
+            {\acontconf{\RedirectingA{G}{\loc}{\scont}}{\val{s}}}%
+            {\contconf{\InitK{G}{\env'}{\scont}}{\deref{\loc}}}%
+            {\text{where $\env' = \extend(\env_{empty}, \formals, \val{s})$}}.
+    \end{multlined}
+\end{align*}
 
-	fi = Initializer(\expr) \textrm{, first initializer in }Izs\\
-	\econt' = \InitializerK{Izs}{\loc}{\env}{\scont}\\
-	\deref{\loc} = \val\\[2mm]
-
-	\acontconf{\RedirectingA{G}{\loc}{\scont}}{\val{s}}
-	& \Rightarrow &
-	\contconf{\InitK{G}{\env'}{\scont}}{\deref{\loc}}\\[2mm]
-	\textrm{where:}\\
-	\env' = \extend(\env_{empty}, \formals, \val{s})
-  \end{array}
-\]
-\noindent
 Otherwise, \textbf{Q} is a non-redirecting generative constructor, and execution of \textbf{Q} proceeds with evaluation of field initializers in the immediately enclosing class.
-\noindent
 Let \textbf{Q} be a constructor with non empty initializer list, $Izs$ and a constructor body $\stmt_{body}$.
-\[
-  \begin{array}{lcl}
-	\contconf{\InitK{Q}{\env}{\scont}}{\val}
-	& \Rightarrow &
-	\evallistconf{\exprs}{\env}{\strace}{\cstrace}{\cex}{\acont}\\[2mm]
 
-	\textrm{where:}\\
-	\env' = \ext{\env}{\mathbf{this}}{\deref{\loc}}
-	&&
-	\exprs = \textrm{initializer expressions for instance fields}\\
-	\deref{\loc} = \val
-	&&
-	\acont = \FieldsA{\env}{Izs}{\loc}{\scont'}\\
-	&&
-	\scont' = \BodySK{\stmt_{body}}{\env'}{\scont}
-  \end{array}
-\]
-\noindent
+\begin{align*}
+    &\begin{multlined}
+        \cesktranswheresplit%
+            {\contconf{\InitK{Q}{\env}{\scont}}{\val}}%
+            {\evallistconf{\exprs}{\env}{\strace}{\cstrace}{\cex}{\acont}}%
+            {\begin{aligned}
+                \text{where }   \env'  &= \ext{\env}{\text{\textbf{this}}}{\deref{\loc}},\\
+                                \exprs &= \text{initializer expressions for instance fields},\\
+                                \deref{\loc} &= \val,\\
+                                \acont &= \FieldsA{\env}{Izs}{\loc}{\scont'},\\
+                                \scont' &= \BodySK{\stmt_{body}}{\env'}{\scont}.
+            \end{aligned}}
+    \end{multlined}
+\end{align*}
+
+
 To further initialize the new instance, the body of the constructor will be executed.
 In Kernel the body of a constructor is executed after the execution of the initializer list and its super constructor.
-\noindent
 To support this, we add a new statement continuation, $BodySK$, that has the constructor body statement, the environment, the error handlers and stacktraces, and the next statement continuation.
-\[
-  \begin{array}{lcl}
-	\scontconf{\BodySK{\stmt}{\env}{\scont}}{\_}
-	& \Rightarrow &
-	\execconf{\stmt}{\env}{[]}{[]}{\handler}{\cex}{\cstrace}{\econt}{\scont}
-  \end{array}
-\]
 
-\noindent
+\begin{align*}
+    &\cesktrans%
+        {\scontconf{\BodySK{\stmt}{\env}{\scont}}{\_}}%
+        {\execconf{\stmt}{\env}{[]}{[]}{\handler}{\cex}{\cstrace}{\econt}{\scont}}.
+\end{align*}
+
 After the evaluation of the initializer expressions, the locations for each field in the object value are updated accordingly.
 An update of field $f_i$, stored at location $\loc' = (\deref{\loc})[f_i]$ with value $\val_i$ is expressed as $\update{(\deref{\loc})[f_i]}{\val_{i}}$, so the following holds $\deref{\loc'} = \deref{\deref{\loc[f_i]}} = \val_{i}$ after the update.
 
-\noindent
 Let $Fs$ be the list of fields for value $\deref{\loc}$ for the class immediately enclosing the current constructor below.
 
 If the initializer list is empty, $Izs = []$, the next statement continuation is executed.
-\[
-  \begin{array}{lcl@{\hspace{30mm}}}
-	\acontconf{\FieldsA{\env}{Izs}{\loc}{\scont}}{\val{s}}
-	& \Rightarrow &
-	\scontconf{\scont}{\env}\\[2mm]
-	&&\textrm{with }\deref{\deref\loc[f_i]} = \val_{i}, \forall f_i \in Fs, \forall \val_i \in \val{s}
-  \end{array}
-\]
-\noindent
-In Kernel, a super initializer or a redirecting initializer, when present, will appear last in the initializer list.\\
+
+\begin{align*}
+    &\begin{multlined}
+        \cesktranswheresplit%
+            {\acontconf{\FieldsA{\env}{Izs}{\loc}{\scont}}{\val{s}}}%
+            {\scontconf{\scont}{\env}}%
+            {\text{where $\deref{\deref\loc[f_i]} = \val_{i}, \forall f_i \in Fs, \forall \val_i \in \val{s}$}}.
+    \end{multlined}
+\end{align*}
+
+In Kernel, a super initializer or a redirecting initializer, when present, will appear last in the initializer list.
 If the initializer list contains at least two initializers, $Izs = Ininitalizer(E) :: Izs', Izs' \neq []$, we can assume that the next initializer to execute is a local or a field initializer.
-\[
-  \begin{array}{lcl@{\hspace{30mm}}}
-	\acontconf{\FieldsA{\env}{Izs}{\loc}{\scont}}{\val{s}}
-	& \Rightarrow &
-	\evalconf{\expr}{\env}{st}{cex}{cst}{\econt'}\\[2mm]
-	&&\textrm{with }\deref{\deref{\loc[f_i]}} = \val_{i}, \forall f_i \in Fs, \forall \val_i \in \val{s}\\
-	\textrm{where:}\\
-	\hspace{5mm}\econt' = \InitK{Izs}{\loc}{\env}
-  \end{array}
-\]
 
-\noindent
+\begin{align*}
+    &\begin{multlined}
+        \cesktranswheresplit%
+            {\acontconf{\FieldsA{\env}{Izs}{\loc}{\scont}}{\val{s}}}%
+            {\evalconf{\expr}{\env}{st}{cex}{cst}{\econt'}}
+            {\text{where $\deref{\deref{\loc[f_i]}} = \val_{i}$, $\forall f_i \in Fs, \forall \val_i \in \val{s}$, $\econt' = \InitK{Izs}{\loc}{\env}$}}.
+    \end{multlined}
+\end{align*}
+
 Otherwise, there is only one initializer to execute in the initializer list, $li$: \\
-\begin{itemize}
 
+\begin{itemize}
 \item When $li$ is field or local initializer, the transition is identical to the rule for non empty and non singleton initializer lists, described above.\\
 \item When the last initializer is a redirecting constructor, i.e. $li = RedirectingI(G, \exprs)$, the transition is as follows:
-\[
-  \begin{array}{lcl@{\hspace{30mm}}}
-	\acontconf{\FieldsA{\env}{li::[]}{\loc}{\scont}}{\val{s}}
-	& \Rightarrow &
-	\evallistconf{\exprs}{\env}{\strace}{\cstrace}{\cex}{\acont}\\
-	&&\textrm{with }\deref{\deref{\loc[f_i]}} = \val_{i}, \forall f_i \in Fs, \forall \val_i \in \val{s}\\
-	\textrm{where:}\\
-	\acont = \RedirectingA{G}{\loc}{\scont}\\[2mm]
-  \end{array}
-\]
+    \begin{align*}
+        \cesktranswheresplit%
+            {\acontconf{\FieldsA{\env}{li::[]}{\loc}{\scont}}{\val{s}}}%
+            {\evallistconf{\exprs}{\env}{\strace}{\cstrace}{\cex}{\acont}}%
+            {\text{where $\deref{\deref{\loc[f_i]}} = \val_{i}$, $\forall f_i \in Fs$, $\forall \val_i \in \val{s}$, $\acont = \RedirectingA{G}{\loc}{\scont}$}}.
+    \end{align*}
 
 \item Otherwise, the last initializer is a super initializer, $li = Super(G, \exprs)$:
-\[
-  \begin{array}{lcl@{\hspace{30mm}}}
-	\acontconf{\FieldsA{\env}{li::[]}{\loc}{\scont}}{\val{s}}
-	& \Rightarrow &
-	\evallistconf{\exprs}{\env}{\strace}{\cstrace}{\cex}{\acont}\\
-	&&\textrm{with }\deref{\deref{\loc[f_i]}} = \val_{i}, \forall f_i \in Fs, \forall \val_i \in \val{s}\\
-	\textrm{where:}\\
-	\acont = \SuperA{G}{\loc}{\scont}\\[2mm]
-  \end{array}
-\]
+    \begin{align*}
+        \cesktranswheresplit%
+            {\acontconf{\FieldsA{\env}{li::[]}{\loc}{\scont}}{\val{s}}}%
+            {\evallistconf{\exprs}{\env}{\strace}{\cstrace}{\cex}{\acont}}%
+            {\text{where $\deref{\deref{\loc[f_i]}} = \val_{i}$, $\forall f_i \in Fs$, $\forall \val_i \in \val{s}$, $\acont = \SuperA{G}{\loc}{\scont}$}}.
+    \end{align*}
 \end{itemize}
-The transitions for the initializer continuation are described below.\\[2mm]
-\noindent
-Besides redirecting and super initializers, in Kernel we also have field and local initializers, both containing an expression to evaluate, denoted as $Initializer(\expr) : LocalI(\variablemeta, \expr) + FieldI(f, \expr)$.\\[2mm]
+
+The transitions for the initializer continuation are described below.
+Besides redirecting and super initializers, in Kernel we also have field and local initializers, both containing an expression to evaluate, denoted as $Initializer(\expr) : LocalI(\variablemeta, \expr) + FieldI(f, \expr)$.
 Local initializers are special initializers in Kernel and they extend the environment for the execution of the initializer list.
 The transition steps for initializer continuation are as follows:
-\[
-  \begin{array}{lcl@{\hspace{30mm}}}
-	\contconf{\InitK{Local(\variablemeta, \expr) :: []}{\loc}{\scont}}{\val}
-	& \Rightarrow &
-	\scontconf{\scont}{\env'}\\[1mm]
-	\textrm{where:}\\
-	\hspace{5mm}\env' = \ext{\env}{\variablemeta}{\val}\\[2mm]
 
-	\contconf{\InitK{Local(\variablemeta, \expr) :: li :: []}{\loc}{\scont}}{\val}
-	& \Rightarrow &
-	\evallistconf{\exprs}{\env'}{\strace}{\cstrace}{\cex}{\acont}\\[1mm]
-	\textrm{where:}\\
-	\hspace{5mm}\env' = \ext{\env}{\variablemeta}{\val}\\
-	\hspace{5mm}\textrm{if } li = Super(G, \exprs):\\
-	\hspace{8mm}\acont = \SuperA{G}{\loc}{\scont}\\
-	\hspace{5mm}\textrm{if } li = Redirecting(G, \exprs):\\
-	\hspace{8mm}\acont = \RedirectingA{G}{\loc}{\scont}\\[2mm]
+\begin{align*}
+    &\begin{multlined}
+        \cesktranswheresplit%
+            {\contconf{\InitK{Local(\variablemeta, \expr) :: []}{\loc}{\scont}}{\val}}%
+            {\scontconf{\scont}{\env'}}%
+            {\text{where $\env' = \ext{\env}{\variablemeta}{\val}$}},
+    \end{multlined}\\
+    &\begin{multlined}
+        \cesktranswheresplit*%
+            {\contconf{\InitK{Local(\variablemeta, \expr) :: li :: []}{\loc}{\scont}}{\val}}%
+            {\evallistconf{\exprs}{\env'}{\strace}{\cstrace}{\cex}{\acont}}%
+            {\begin{aligned}
+                \text{where }   \env' &= \ext{\env}{\variablemeta}{\val},\\
+                                \acont &= \SuperA{G}{\loc}{\scont}, \text{ if } li = Super(G, \exprs),\\
+                                \acont &= \RedirectingA{G}{\loc}{\scont}, \text{ if } li = Redirecting(G, \exprs).\\
+            \end{aligned}}
+    \end{multlined}\\
+    &\begin{multlined}
+        \cesktranswheresplit%
+            {\contconf{\InitK{Local(\variablemeta, \expri{0}) :: Izs}{\loc}{\scont}}{\val}}%
+            {\evalconf{\expri{1}}{\env'}{st}{cex}{cst}{\econt'}}%
+            {\parbox{\textwidth-2cm}{where $\env' = \ext{\env}{\variablemeta}{\val}$, $Izs = Initializer(\expri{1}) :: Izs'$,\\
+                $\econt' = \InitK{Izs}{\loc}{\env'}$}}
+    \end{multlined}
+\end{align*}
 
-	\contconf{\InitK{Local(\variablemeta, \expri{0}) :: Izs}{\loc}{\scont}}{\val}
-	& \Rightarrow &
-	\evalconf{\expri{1}}{\env'}{st}{cex}{cst}{\econt'}\\[2mm]
-	\textrm{where:}\\
-	\hspace{5mm}\env' = \ext{\env}{\variablemeta}{\val}\\
-	\hspace{5mm}Izs = Initializer(\expri{1}) :: Izs'\\
-	\hspace{5mm}\econt' = \InitK{Izs}{\loc}{\env'}
-  \end{array}
-\]
-\noindent
 Note that when a local initializer is last in the initializer list, the environment resulted after the transition is discarded.
 However, the corresponding expression has to be executed, because of side effects.
-\\[2mm]
-\noindent
 Field initializers further initialize fields of the fresh instance.
 Let $Field(f, \expr)$ be a field initializer.
 Then the value stored at location $\loc' = (\deref{\loc})[f]$ in the store $S$ will be modified, where $\loc$ is the location of the previously allocated fresh instance for the object currently being initialized.
 
-\[
-  \begin{array}{lcl@{\hspace{30mm}}}
-	\contconf{\InitK{Field(f, \expr) :: []}{\loc}{\scont}}{\val}
-	& \Rightarrow &
-	\scontconf{\scont}{\env'}\\[1mm]
-	\textrm{where:}\\
-	\hspace{5mm}\update{(\deref{\loc})[f]}{\val}\\[2mm]
+\begin{align*}
+    &\begin{multlined}
+        \cesktranswheresplit%
+            {\contconf{\InitK{Field(f, \expr) :: []}{\loc}{\scont}}{\val}}%
+            {\scontconf{\scont}{\env'}}%
+            {\text{where $\update{(\deref{\loc})[f]}{\val}$,}}
+    \end{multlined}\\
+    &\begin{multlined}
+        \cesktranswheresplit*%
+            {\contconf{\InitK{Field(f, \expr) :: li :: []}{\loc}{\scont}}{\val}}%
+            {\evallistconf{\exprs}{\env}{\strace}{\cstrace}{\cex}{\acont}}%
+            {\parbox{\textwidth-2cm}{%
+                where $\update{(\deref{\loc})[f]}{\val}$,\\
+                $\acont = \SuperA{G}{\loc}{\scont}, \text{ if } li = Super(G, \exprs)$,\\
+                $\acont = \RedirectingA{G}{\loc}{\scont}, \text{ if } li = Redirecting(G, \exprs)$,}}
+    \end{multlined}\\
+    &\begin{multlined}
+        \cesktranswheresplit%
+            {\contconf{\InitK{Field(f, \expri{0}) :: Izs}{\loc}{\scont}}{\val}}%
+            {\evalconf{\expri{1}}{\env}{st}{cex}{cst}{\econt}}%
+            {\text{where $\update{(\deref\loc)[f]}{\val}$, $Izs = Initializer(\expri{1}) :: Izs'$, $\econt' = \InitK{Izs}{\loc}{\env}$.}}
+    \end{multlined}
+\end{align*}
 
-	\contconf{\InitK{Field(f, \expr) :: li :: []}{\loc}{\scont}}{\val}
-	& \Rightarrow &
-	\evallistconf{\exprs}{\env}{\strace}{\cstrace}{\cex}{\acont}\\[1mm]
-	\textrm{where:}\\
-	\hspace{5mm}\update{(\deref{\loc})[f]}{\val}\\
-	\hspace{5mm}\textrm{if } li = Super(G, \exprs):\\
-	\hspace{8mm}\acont = \SuperA{G}{\loc}{\scont}\\
-	\hspace{5mm}\textrm{if } li = Redirecting(G, \exprs):\\
-	\hspace{8mm}\acont = \RedirectingA{G}{\loc}{\scont}\\[2mm]
-
-	\contconf{\InitK{Field(f, \expri{0}) :: Izs}{\loc}{\scont}}{\val}
-	& \Rightarrow &
-	\evalconf{\expri{1}}{\env}{st}{cex}{cst}{\econt}\\[2mm]
-	\textrm{where:}\\
-	\hspace{5mm}\update{(\deref\loc)[f]}{\val}\\
-	\hspace{5mm}Izs = Initializer(\expri{1}) :: Izs'\\
-	\hspace{5mm}\econt' = \InitK{Izs}{\loc}{\env}
-  \end{array}
-\]
 
 \subsection{Yield}
-
 
 
 \end{document}
