@@ -358,7 +358,7 @@ Configurations contain different components and the transition step dispatches t
 \subsubsection{EvalConfiguration}
 \label{subsubsec:evalconfig}
 
-The configuration EvalConfiguration is shown in \ref{config:eval}. 
+The configuration EvalConfiguration is shown in \ref{config:eval}.
 The transition step for this configuration dispatches on the expression component, $\expr$.
 With one transition step of the CESK-transition function, from the EvalConfiguration the next configuration can be one of the following:
 \begin{itemize}
@@ -627,7 +627,7 @@ The different break continuations are shown in Figure~\ref{figure:breakcont}.
 \end{figure}
 \noindent
 The break continuation Break, \ref{breakcont:break}, captures a statement continuation and the environment corresponding to a target label or a break statement.\\
-The break continuation FinallyBreak, \ref{breakcont:finallybreak}, captures the statement body and the components necessary for the execution of an enclosing Finally statement. 
+The break continuation FinallyBreak, \ref{breakcont:finallybreak}, captures the statement body and the components necessary for the execution of an enclosing Finally statement.
 They are added when a try/finally statement is executed.
 \subsubsection{Switch continuations}
 \label{subsubsec:switch-continuations}
@@ -671,7 +671,7 @@ The different exception handlers are shown in Figure~\ref{figure:handlers}.
 \subsection{Literal values}
 \label{subsubsec:literal-values}
 Literal values are special values that store the specific payload and an associated class.
-The different literal values are presented below: 
+The different literal values are presented below:
 \[
   \begin{array}{lcl}
 	\val \in \dlitval &=& \mathbf{int} + \mathbf{bool} + \mathbf{double}\\
@@ -696,7 +696,7 @@ Object values have the following properties: class, lookup, lookupMethod. % TBD
 \label{subsubsec:property-lookup}
 
 
-% lookup getters 
+% lookup getters
 % lookup implicit getters
 \subsubsection{Method Lookup}
 \label{subsubsec:method-lookup}
@@ -906,7 +906,7 @@ The value corresponding to the evaluated expression is captured by the applicati
 \end{figure}
 
 %%
-% Figure showing the CEK-transition function starting from EvalConfiguration for simple 
+% Figure showing the CEK-transition function starting from EvalConfiguration for simple
 % expressions.
 %%
 \begin{figure}[Htp]
@@ -1162,7 +1162,7 @@ Evaluation of $\this$ expression resolves to that value in one step, as shown in
 \label{subsubsec:type-test}
 Type test expressions evaluate to a boolean literal value, in more than one step.
 The evaluation of this kind of expression proceeds by evaluating the target expression, as in CESK-transition \eqref{eval:is}.
-When the target expression evaluates to a value $\val$ such that ``$\val $ is $\tt{T}$" holds, the value $true$ is applied to the expression continuation, $\econt$, as shown in \eqref{econtconf:is-true}, otherwise $\false$ is applied to $\econt$, as in \eqref{econtconf:is-false}. 
+When the target expression evaluates to a value $\val$ such that ``$\val $ is $\tt{T}$" holds, the value $true$ is applied to the expression continuation, $\econt$, as shown in \eqref{econtconf:is-true}, otherwise $\false$ is applied to $\econt$, as in \eqref{econtconf:is-false}.
 \subsubsection{Type cast}
 \label{subsubsec:type-cast}
 Evaluation of type cast expression proceed to evaluation of the target expression to the corresponding value, as shown in \eqref{eval:as}.
@@ -1283,13 +1283,13 @@ Otherwise, the evaluation of the expression results with an error, as shown in \
 \subsubsection{Static and library fields}
 \label{subsubsec:static-and-library-fields}
 
-In order to remember initialization and assignment of library variables and static variables, we introduce a global environment $\env^{M}$. 
+In order to remember initialization and assignment of library variables and static variables, we introduce a global environment $\env^{M}$.
 The environment $\env^{M}$ stores bindings for static and library fields to locations for all static and library fields previously accessed or set during the execution of the program.\\
 Static and library variables are accessed with $\StaticGet{\membermeta}$.
 The member $\membermeta$ can be a static or library field, a getter or a method tear-off.
 \begin{itemize}
 \item $\membermeta$ is a static or library field\\
-Let $\expressionmeta_{\membermeta}$ be $\membermeta$'s initializer expression. 
+Let $\expressionmeta_{\membermeta}$ be $\membermeta$'s initializer expression.
 When $\membermeta$ is accessed for the first time during the program's execution, the evaluation of $\StaticGet{\membermeta}$ proceeds with evaluation of the initializer expression $\expressionmeta_{\membermeta}$.\\
 \noindent
 When $\expressionmeta$ is $\tt{null}$, the environment is extended with a binding to a fresh location that stores a $\tt{null}$ value for the field $\membermeta$, as shown in \eqref{eval:staticget-varnew-null}.\\
@@ -1469,7 +1469,7 @@ The evaluation of this expression is shown in \eqref{eval:propertyget}.\\
 \noindent
 After the evaluation of the receiver expression to a value $\val$, the property $\idmeta$ is looked up in methods, getters and implicit getters for the value $\val$.
 Let $\membermeta$ be the instance member result of such successful lookup below and in \eqref{econtconf:propertyget-field}, \eqref{econtconf:propertyget-getter} and \eqref{econtconf:propertyget-tearoff}.
-The evaluation of the expression proceeds as follow: 
+The evaluation of the expression proceeds as follow:
 \begin{itemize}
 \item $\membermeta$ is a method tear-off\\
 When $\membermeta$ is a method tear-off, the evaluation of the property extraction expression proceeds as shown in \eqref{econtconf:propertyget-tearoff}.
@@ -1781,103 +1781,104 @@ Let $\val = \deref{(\env(\this))}$, $C = \superclass{\val}$ and $M$ the result o
 Let $\stmt$ be the statement body and $\formals$ the formal parameters for $\membermeta$.
 The statement $\stmt$ is executed in an environment binding $\formals$ to the locations containing the values in $\vals$ and $\tt{this}$ binding to location containing the same value bound to $\tt{this}$ in the current environment.
 Similarly to Section~\ref{subsubsec:instance-method-invoc}, $\ExitSK{\val}$ is added as next statement continuation.
+
+
 \subsection{Statement execution}
 \label{subsec:stmt-exectution}
-\newcommand{\execcesktrans}[3]{&\cesktrans{#1}{#2}\,\hspace{2mm}#3\hspace{6mm}\\[2mm]}
-%
-%
+
 \begin{figure}[Htp]
-	$
-	\begin{array}{cl}
-		\execcesktrans
-			{\execconf{\VarDeclaration{\varmeta}{\expr}}{\env}{\lbls}{\clbls}{\handler}{\cstrace}{\cex}{\econt}{\scont}}
-			{\evalconf{\expr}{\env}{\strace}{\cstrace}{\cex}{\econt'}}
-			{\\&\econt' = \VarDeclK{\env}{\varmeta}{\scont}}
-
-		\execcesktrans
-			{\execconf{\EmptyStatement}{\env}{\lbls}{\clbls}{\handler}{\cstrace}{\cex}{\econt}{\scont}}
-			{\scontconf{\scont}{\env}}
-			{}
-
-		\execcesktrans
-			{\execconf{\ExpressionStatement{\expressionmeta}}{\env}{\lbls}{\clbls}{\handler}{\cstrace}{\cex}{\econt}{\scont}}
-			{\evalconf{\expr}{\env}{\strace}{\cstrace}{\cex}{\econt'}}
-			{\\&\econt' = \ExpressionK{\scont}{\env}}
-
-		\execcesktrans
-			{\execconf{\Block{\stmt_1}}{\env}{\lbls}{\clbls}{\handler}{\cstrace}{\cex}{\econt}{\scont}}
-			{}
-			{\\&\hspace{4mm}\execconf{\stmt_1}{\env}{\lbls}{\clbls}{\handler}{\cstrace}{\cex}{\econt}{\scont'}
-			\\&\scont' = \BlockSK{\stmt*}{\env}}
-
-		\execcesktrans
-			{\execconf{\IfStatement{\expr}{\stmti{1}}{\stmti{2}}}{\env}{\lbls}{\clbls}{\handler}{\cstrace}{\cex}{\econt}{\scont}}
-			{\evalconf{\expr}{\env}{\strace}{\cstrace}{\cex}{\econt'}}
-			{\\&\econt' = \IfCondK{\stmti{1}}{\stmti{2}}}
-
-		\execcesktrans
-			{\execconf{\ReturnStatement{\expr}}{\env}{\lbls}{\clbls}{\handler}{\cstrace}{\cex}{\econt}{\scont}}
-			{\evalconf{\expr}{\env}{\strace}{\cstrace}{\cex}{\econt}}
-			{}
-
-		\execcesktrans
-			{\execconf{\ReturnStatement{}}{\env}{\lbls}{\clbls}{\handler}{\cstrace}{\cex}{\econt}{\scont}}
-			{\contconf{\econt}{\textbf{null}}}
-			{}
-
-		\execcesktrans
-			{\execconf{\DoStatement{\statementmeta}{\expressionmeta}}{\env}{\lbls}{\clbls}{\handler}{\cstrace}{\cex}{\econt}{\scont}}
-			{\execconf{\statementmeta}{\env}{\lbls}{\clbls}{\handler}{\cstrace}{\cex}{\econt}{\scont'}}
-			{\\&\scont' = \whilecondk\hspace{2cm}}
-
-		\execcesktrans
-			{\execconf{\WhileStatement{\expr}{\stmt}}{\env}{\lbls}{\clbls}{\handler}{\cstrace}{\cex}{\econt}{\scont}}
-			{\evalconf{\expr}{\env}{\strace}{\cstrace}{\cex}{\econt'}}
-			{\\&\econt', \scont' = \whilecondk}
-
-		\execcesktrans
-			{\execconf{\ForStatement{\varmeta{s}}{\expressionmeta}{\exprs}{\statementmeta}}{\env}{\lbls}{\clbls}{\handler}{\cstrace}{\cex}{\econt}{\scont}}
-			{\evallistconf{\exprs'}{\env}{\strace}{\cex}{\cstrace}{\acont}}
-			{\\&\acont = \ForInitA
-			\\&\exprs' = \text{initializer expressions for the list of variable declarations }\varmeta{s}}
-
-		\execcesktrans
-			{\execconf{\LabeledStatement{L}{\stmt_{L}}}{\env}{\lbls}{\clbls}{\handler}{\cstrace}{\cex}{\econt}{\scont}}
-			{}
-			{\\&\hspace{4mm}\execconf{\stmt_{L}}{\env}{\lbl :: \lbls}{\clbls}{\handler}{\cstrace}{\cex}{\econt}{\scont}
-			\\&\lbl = \mathrm{Label}(L, \bcont), \bcont = \mathrm{Break}(\env, \scont)}
-
-		\execcesktrans
-			{\execconf{\SwitchStatement{\expr}{\scases}}{\env}{\lbls}{\clbls}{\handler}{\cstrace}{\cex}{\econt}{\scont}}
-			{\evalconf{\expr}{\env}{\strace}{\cstrace}{\cex}{\econt'}}
-			{\\&\econt' = \SwitchK{\scases}{\clbls}}
-
-		\execcesktrans
-			{\execconf{\TryCatch{\stmt}{cs}}{\env}{\lbls}{\clbls}{\handler}{\cex}{\cstrace}{\econt}{\scont}}
-			{}
-			{\\&\hspace{4mm}\execconf{\stmt}{\env}{\lbls}{\clbls}{\handler'}{\cex}{\cstrace}{\econt}{\scont}
-			\\&\handler' = \CatchH{cs}}
-
-		\execcesktrans
-			{\execconf{\BreakStatement{L}}{\env}{\lbls}{\clbls}{\handler}{\cex}{\cstrace}{\econt}{\scont}}
-			{\breakconf{\bcont}}
-			{\\&\lbl = Label(L', \bcont) \in \lbls \textrm{ with } L' == \mathbf{L}}
-
-		\execcesktrans
-			{\execconf{\ContinueSwitchStatement{\stmt}}{\env}{\lbls}{\clbls}{\handler}{\cex}{\cstrace}{\econt}{\scont}}
-			{\switchconf{\switchcont}}
-			{\\&\clbl = \continuel{\stmt'}{\switchcont} \in \clbls \textrm{ with } \stmt' == \stmt}
-
-		\execcesktrans
-			{\execconf{fun(\formals) \stmt_{body}}{\env}{\lbls}{\clbls}{\handler}{\cstrace}{\cex}{\econt}{\scont}}
-			{}
-			{\\&\hspace{4mm}\contconf{\econt}{\funval{\stmt_{body}}{\formals}{\env'}}
-			\\&\env' = \ext{\env}{fun}{\funval{\stmt_{body}}{\formals}{\env'}}}
-	\end{array}
-	$
+    \begin{align}
+        &\begin{multlined}
+            \cesktranswheresplit*%
+                {\execconf{\VarDeclaration{\varmeta}{\expr}}{\env}{\lbls}{\clbls}{\handler}{\cstrace}{\cex}{\econt}{\scont}}%
+                {\evalconf{\expr}{\env}{\strace}{\cstrace}{\cex}{\econt'}}%
+                {\text{where $\econt' = \VarDeclK{\env}{\varmeta}{\scont}$}}
+        \end{multlined}\\
+        &\cesktrans%
+			{\execconf{\EmptyStatement}{\env}{\lbls}{\clbls}{\handler}{\cstrace}{\cex}{\econt}{\scont}}%
+			{\scontconf{\scont}{\env}}\\
+        &\begin{multlined}
+            \cesktranswheresplit%
+                {\execconf{\ExpressionStatement{\expressionmeta}}{\env}{\lbls}{\clbls}{\handler}{\cstrace}{\cex}{\econt}{\scont}}%
+                {\evalconf{\expr}{\env}{\strace}{\cstrace}{\cex}{\econt'}}%
+                {\text{where $\econt' = \ExpressionK{\scont}{\env}$}}
+        \end{multlined}\\
+        &\begin{multlined}
+            \cesktranswheresplit*%
+                {\execconf{\Block{\stmt_1}}{\env}{\lbls}{\clbls}{\handler}{\cstrace}{\cex}{\econt}{\scont}}%
+                {\execconf{\stmt_1}{\env}{\lbls}{\clbls}{\handler}{\cstrace}{\cex}{\econt}{\scont'}}%
+                {\text{where $\scont' = \BlockSK{\stmt*}{\env}$}}
+        \end{multlined}\\
+        &\begin{multlined}
+            \cesktranswheresplit*%
+                {\execconf{\IfStatement{\expr}{\stmti{1}}{\stmti{2}}}{\env}{\lbls}{\clbls}{\handler}{\cstrace}{\cex}{\econt}{\scont}}%
+                {\evalconf{\expr}{\env}{\strace}{\cstrace}{\cex}{\econt'}}%
+                {\text{where $\econt' = \IfCondK{\stmti{1}}{\stmti{2}}$}}
+        \end{multlined}\\
+        &\cesktrans%
+			{\execconf{\ReturnStatement{\expr}}{\env}{\lbls}{\clbls}{\handler}{\cstrace}{\cex}{\econt}{\scont}}%
+			{\evalconf{\expr}{\env}{\strace}{\cstrace}{\cex}{\econt}}\\
+        &\cesktrans%
+			{\execconf{\ReturnStatement{}}{\env}{\lbls}{\clbls}{\handler}{\cstrace}{\cex}{\econt}{\scont}}%
+			{\contconf{\econt}{\textbf{null}}}\\
+        &\begin{multlined}
+            \cesktranswheresplit*%
+                {\execconf{\DoStatement{\statementmeta}{\expressionmeta}}{\env}{\lbls}{\clbls}{\handler}{\cstrace}{\cex}{\econt}{\scont}}%
+                {\execconf{\statementmeta}{\env}{\lbls}{\clbls}{\handler}{\cstrace}{\cex}{\econt}{\scont'}}%
+                {\text{where $\scont' = \whilecondk$}}
+        \end{multlined}\\
+        &\begin{multlined}
+            \cesktranswheresplit*%
+                {\execconf{\WhileStatement{\expr}{\stmt}}{\env}{\lbls}{\clbls}{\handler}{\cstrace}{\cex}{\econt}{\scont}}%
+                {\evalconf{\expr}{\env}{\strace}{\cstrace}{\cex}{\econt'}}%
+                {\text{where $\econt', \scont' = \whilecondk$}}
+        \end{multlined}\\
+        &\begin{multlined}
+            \cesktranswheresplit*%
+                {\execconf{\ForStatement{\varmeta{s}}{\expressionmeta}{\exprs}{\statementmeta}}{\env}{\lbls}{\clbls}{\handler}{\cstrace}{\cex}{\econt}{\scont}}%
+                {\evallistconf{\exprs'}{\env}{\strace}{\cex}{\cstrace}{\acont}}%
+                {\parbox{\textwidth-2cm}{where $\acont = \ForInitA$,\\$\exprs' =$ initializer expressions for the list of variable declarations $\varmeta{s}$}}
+        \end{multlined}\\
+        &\begin{multlined}
+            \cesktranswheresplit*%
+                {\execconf{\LabeledStatement{L}{\stmt_{L}}}{\env}{\lbls}{\clbls}{\handler}{\cstrace}{\cex}{\econt}{\scont}}%
+                {\execconf{\stmt_{L}}{\env}{\lbl :: \lbls}{\clbls}{\handler}{\cstrace}{\cex}{\econt}{\scont}}%
+                {\text{where $\lbl = \mathrm{Label}(L, \bcont)$, $\bcont = \mathrm{Break}(\env, \scont)$}}
+        \end{multlined}\\
+        &\begin{multlined}
+            \cesktranswheresplit*%
+                {\execconf{\SwitchStatement{\expr}{\scases}}{\env}{\lbls}{\clbls}{\handler}{\cstrace}{\cex}{\econt}{\scont}}%
+                {\evalconf{\expr}{\env}{\strace}{\cstrace}{\cex}{\econt'}}%
+                {\text{where $\econt' = \SwitchK{\scases}{\clbls}$}}
+        \end{multlined}\\
+        &\begin{multlined}
+            \cesktranswheresplit*%
+                {\execconf{\TryCatch{\stmt}{cs}}{\env}{\lbls}{\clbls}{\handler}{\cex}{\cstrace}{\econt}{\scont}}%
+                {\execconf{\stmt}{\env}{\lbls}{\clbls}{\handler'}{\cex}{\cstrace}{\econt}{\scont}}%
+                {\text{where $\handler' = \CatchH{cs}$}}
+        \end{multlined}\\
+        &\begin{multlined}
+            \cesktranswheresplit%
+                {\execconf{\BreakStatement{L}}{\env}{\lbls}{\clbls}{\handler}{\cex}{\cstrace}{\econt}{\scont}}%
+                {\breakconf{\bcont}}%
+                {\text{where $\lbl = Label(L', \bcont) \in \lbls \text{ with } L' == \mathbf{L}$}}
+        \end{multlined}\\
+        &\begin{multlined}
+            \cesktranswheresplit%
+                {\execconf{\ContinueSwitchStatement{\stmt}}{\env}{\lbls}{\clbls}{\handler}{\cex}{\cstrace}{\econt}{\scont}}%
+                {\switchconf{\switchcont}}%
+                {\text{where $\clbl = \continuel{\stmt'}{\switchcont} \in \clbls \text{ with } \stmt' == \stmt$}}
+        \end{multlined}\\
+        &\begin{multlined}
+            \cesktranswheresplit*%
+                {\execconf{fun(\formals) \stmt_{body}}{\env}{\lbls}{\clbls}{\handler}{\cstrace}{\cex}{\econt}{\scont}}%
+                {\contconf{\econt}{\funval{\stmt_{body}}{\formals}{\env'}}}%
+                {\text{where $\env' = \ext{\env}{fun}{\funval{\stmt_{body}}{\formals}{\env'}}$}}
+        \end{multlined}
+	\end{align}
 	\caption{The CESK-transition function for statements}
 	\label{figure:exec}
-	\end{figure}
+\end{figure}
 
 \subsubsection{Variable Declaration}
 Variable declaration extend the corresponding environment with a new binding.
