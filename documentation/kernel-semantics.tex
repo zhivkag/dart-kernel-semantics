@@ -26,6 +26,8 @@
 \DeclareMathOperator{\concat}{concat}
 \DeclareMathOperator{\getter}{implicitGetter}
 \DeclareMathOperator{\setter}{implicitSetter}
+\DeclareMathOperator{\lookup}{lookup}
+\DeclareMathOperator{\methodLookup}{methodLookup}
 %%
 % Commands to typeset transitions of CESK machine.
 %
@@ -710,27 +712,50 @@ where $\val_1$ is the value to be stored in $\loc$ after the invocation of the i
 This implies that invocation of implicit setter will modify the global store and  $\deref{\loc} = \val_1$ will hold after the transition.
 \subsection{Class}
 \label{subsec:class}
-A $\tt{class} \in \dclass$ component captures the different properties for a defined class in Kernel.
-\[
-\dclass : \tt{superclass} \times \tt{interfaces} \times \tt{fields} \times \tt{getters} \times \tt{setters} \times \tt{methods}
-\]
-
+A $\tt{class} \in \dclass$ captures the different properties for a defined class in Dart Kernel. 
+\begin{align}
+\notag
+\dclass &\in \tt{superclass} \times \tt{interfaces} \times \tt{fieldGetters}\\\notag
+&\times \tt{fieldSetters} \times \tt{getters} \times \tt{setters} \times \tt{methods}
+\end{align}
+The different components of $\tt{class}$ capture the following properties:
+\begin{itemize}
+\item $\tt{superclass}$\\
+The class component captures the immediate superclass and we allow access to it in the different continuations in various steps defined below.
+\item $\tt{interfaces}$\\
+% TBD
+\item $\tt{fieldGetters}$, $\tt{fieldSetters}$\\
+The $\tt{fieldGetters}$ and $\tt{fieldSetters}$ components capture the functions allowing access to field members of the current class and the superclasses recursively.
+The layout of the field members starts with the first field of the superclass highest in the class hierarchy and is continuous.
+We create implicit getters for all instance fields and setters for all non-final instance fields.
+For definition of implicit getters and setters see Section~\ref{subsec:object-values}.\\
+To enable proper direct field member access, we create implicit getters and setters bound to the members also, not only the names.
+Using only the identifier of the member for lookup of a direct member access is problematic because of possible overwrite of a member.
+\item $\tt{getters}$, $\tt{setters}$\\
+The $\tt{getters}$ and $\tt{setters}$ components capture the getters and the setters for the given class and all its superclasses recursively.
+\item $\tt{methods}$\\
+The $\tt{methods}$ component captures the methods for the given class and all its superclasses recursively.
+\end{itemize}
 \subsubsection{Property Lookup}
 \label{subsubsec:property-lookup}
-% lookup getters 
-% lookup implicit getters
+A property lookup searches for an instance method, a getter or a field with the given property name. If none of the following is found, an error is returned.
+\begin{align*}
+\lookup \in \dclass \times \mathbf{Name} &\rightarrow \mathbf{Member}\\
+\lookup(\idmeta) &= \membermeta
+\end{align*}
+where $\membermeta$ is an instance method, when $\idmeta$ is a method name, a getter when $\idmeta$ is a getter name or an implicit getter when $\idmeta$ is a field name.
 \subsubsection{Method Lookup}
 \label{subsubsec:method-lookup}
-% lookup method
-\subsubsection{Superclass}
-\label{subsubsec:superclass}
-The class component captures the immediate superclass and we allow access to it in the different continuations during their application in various steps defined below.
+A method lookup searches for an instance method in the given class given the name of the method.
+\begin{align*}
+\methodLookup \in \dclass \times \mathbf{Name} &\rightarrow \mathbf{Member}\\
+\methodLookup(\idmeta) &= \membermeta
+\end{align*}
 \subsection{Function values}
 \label{subsec:function-values}
 \[
 	\dfunval : \dformals \times \dstmt \times \denv
 \]
-
 \section{Abstract Syntax}
 \label{sec:abstract-syntax}
 
