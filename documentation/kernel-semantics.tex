@@ -16,6 +16,7 @@
 \usepackage{chngcntr}
 \usepackage{ifthen}
 \usepackage[fleqn]{mathtools}
+\usepackage{geometry}
 
 
 \definecolor{shade}{gray}{0.75}
@@ -115,6 +116,15 @@
 \makeatother
 
 
+\setlength{\itemsep}{0pt}
+\geometry{%
+    top=2cm,%
+    right=2cm,%
+    bottom=2cm,%
+    left=3cm,%
+}
+
+
 \begin{document}
 \title{Dart Kernel Semantics \\ (draft)}
 
@@ -125,10 +135,12 @@ The machine is defined by a single step transition function where each step of t
 
 \section{Definitions}
 \label{sec:definitions}
+
+
 \subsection{Conventions}
 \label{subsec:conventions}
+
 \begin{itemize}
-\setlength{\itemsep}{0pt}
 \item Symbols ``:'' and ``$\in$'' are used interchangeably.
 \item Names of variables are italicized.
 \item Names of variables of syntactic domains start with an upper case letter.
