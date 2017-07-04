@@ -24,7 +24,8 @@
 \renewcommand{\emptyset}{\varnothing}
 \DeclareMathOperator{\extend}{extend}
 \DeclareMathOperator{\concat}{concat}
-
+\DeclareMathOperator{\getter}{implicitGetter}
+\DeclareMathOperator{\setter}{implicitSetter}
 %%
 % Commands to typeset transitions of CESK machine.
 %
@@ -325,7 +326,7 @@ For definition of ``$\deref$'' see Section~\ref{subsubsection:dereferecing}.
 \label{subsec:cesk-configs}
 The state space of the CESK machine contains various kinds of configurations.
 Configurations contain different components and the transition step dispatches to the next configuration based on one of the components of the configuration.
-
+%
 % Named Configuration for CESK transitions
 \newcommand{\breakconf}[1]{\confsingle{#1}_{\mathrm{breakCont}}}
 \newcommand{\switchconf}[1]{\confsingle{#1}_{\mathrm{switchCont}}}
@@ -419,11 +420,9 @@ The transition step applies the break continuation component.
 The next configuration is ForwardConfiguration.
 \subsubsection{SwitchConfiguration}
 \label{subsubsec:switchconfig}
-
 The configuration SwitchConfiguration is shown in Figure~\ref{config:switchcont}.
 The transition step applies the switch continuation component.
 The next configuration is ExecConfiguration.
-
 \subsection{Continuations}
 \label{subsec:continuations-definition}
 
@@ -668,34 +667,55 @@ The different exception handlers are shown in Figure~\ref{figure:handlers}.
 
 \section{Values}
 \label{sec:values}
+The values supported by Dart Kernel are $\tt{literal}$ values (Section~\ref{subsec:literal-values}) and $\tt{object}$ values (Section~\ref{subsec:object-values}).
+Values are irreducible terms, i.e, results of evaluation of expressions.
+
 \subsection{Literal values}
-\label{subsubsec:literal-values}
-Literal values are special values that store the specific payload and an associated class.
-The different literal values are presented below: 
+\label{subsec:literal-values}
+There are multiple kinds of $\tt{literal}$ values:
 \[
   \begin{array}{lcl}
 	\val \in \dlitval &=& \mathbf{int} + \mathbf{bool} + \mathbf{double}\\
 	&& + \mathbf{List} + \mathbf{Map} + \mathbf{String} + \mathbf{Symbol} + \mathbf{Type}
   \end{array}
 \]
+Literal values are special values that store the specific payload and an associated class.
 Each of the specific literal values contains predefined operators and/or methods, whose semantics we are not going to specify in this document.
 \subsection{Object values}
 \label{subsec:object-values}
-Object values are represented as follows:
+Object values have a $\tt{class}$ component and a $\tt{fields}$ component which is list of locations for each field, as shown below:
 \[
-	\dobjval : \dclass \times \mlist{\dlocation}\\
+	\dobjval : \dclass \times \mlist{\dlocation}
 \]
-Object values have the following properties: class, lookup, lookupMethod. % TBD
-\subsubsection{Class}
-\label{subsubsec:class}
+The $\tt{class}$ component captures the properties of the object, see Section~\eqref{subsec:class}.\\
+The object also stores a list of locations that represent the values of the fields for the given object.
+An object is mutated by modifying a field.
+A field is modified by changing the value stored at the location for the said field in the list of locations for the given object.
+Access and modification of fields is enabled with implicit getters and setters defined in the associated class component.
+Each field has an associated implicit getter, as defined below.
+Let $\loc$ be the location of field with name $fName$ for the object value $\val_0$:
+\begin{align*}
+  \getter \in \dobjval \times \mathbf{Name} &\rightarrow \dval \hspace{100mm} \\
+  \getter(\val_0, fName) &= \val_1
+\end{align*}
+where $\val_1 = \deref{\loc}$.\\
+Each non-final field has an associated implicit setter, as defined below.
+Let $\loc$ be the location of field $fName$ for the object value $\val_0$:
+\begin{align*}
+  \setter \in \dobjval \times \mathbf{Name} \times \dval &\rightarrow \dval \hspace{100mm} \\
+  \setter(\val_0, fName, \val_1) &= \val_1
+\end{align*}
+where $\val_1$ is the value to be stored in $\loc$ after the invocation of the implicit setter. 
+This implies that invocation of implicit setter will modify the global store and  $\deref{\loc} = \val_1$ will hold after the transition.
+\subsection{Class}
+\label{subsec:class}
+A $\tt{class} \in \dclass$ component captures the different properties for a defined class in Kernel.
+\[
+\dclass : \tt{superclass} \times \tt{interfaces} \times \tt{fields} \times \tt{getters} \times \tt{setters} \times \tt{methods}
+\]
 
-\[
-\dclass : superclass \times interfaces \times fields \times getters \times setters \times methods
-\]
 \subsubsection{Property Lookup}
 \label{subsubsec:property-lookup}
-
-
 % lookup getters 
 % lookup implicit getters
 \subsubsection{Method Lookup}
@@ -703,7 +723,7 @@ Object values have the following properties: class, lookup, lookupMethod. % TBD
 % lookup method
 \subsubsection{Superclass}
 \label{subsubsec:superclass}
-
+The class component captures the immediate superclass and we allow access to it in the different continuations during their application in various steps defined below.
 \subsection{Function values}
 \label{subsec:function-values}
 \[
@@ -1762,16 +1782,15 @@ The body $\stmt$ is then executed with an environment binding $\tt{this}$ to a l
 The CESK-transition is shown in \eqref{acontconf:instancemethod}.
 We add $\ExitSK{\tt{null}}$ as next statement continuation.
 When a $\tt{return}$ statement is missing in the statement body $\stmt$ of the instance method $\membermeta$, the statement continuation $\ExitSK{\val}$ ensures that the execution will proceed to the corresponding expression continuation, in this case with $\val = \tt{null}$.
-
 \subsubsection{Direct instance method invocation}
 \label{subsubsec:direct-instance-method-invoc}
 Direct method invocation allows invocation of instance method by providing directly the member method to be invoked and bypass the lookup step described in Section~\ref{subsubsec:instance-method-invoc} above.
 The evaluation of the direct instance method invocation proceeds with the evaluation of the left-hand side expression, i.e., the receiver expression as shown in \eqref{eval:dinstancemethod}.
-After the evaluation of the receiver expression to a value $\val$, the evaluation proceeds with the evaluation of the argument expressions as shown in \eqref{econtconf:dinstancemthod}.
-The argument expressions are evaluated to a list of values $\val$.
-The evaluation of the expression continues with the execution of the statement body in the environment that binds $\tt{this}$ to a location that stores the value $\val$ and the formal parameters to fresh locations storing values from $\vals$ accordingly.
-The CESK-transition is shown in \eqref{acontconf:dinstancemethod}.
-Similarly to Section~\ref{subsubsec:instance-method-invoc}, $\ExitSK{\tt{null}}$ is added as next statement continuation.
+After the evaluation of the receiver expression to a value $\val$, the evaluation proceeds with the evaluation of the argument expressions as shown in \eqref{acontconf:dinstancemethod}.
+The argument expressions are evaluated to a list of values $\vals$.\\
+The evaluation of the expression continues with the execution of the statement body in the environment that binds $\tt{this}$ to a location that stores the value $\val$ and the formal parameters $\formals$ to fresh locations storing values from $\vals$ accordingly.
+The CESK-transition is shown in \eqref{acontconf:dinstancemethod}.\\
+Similar to Section~\ref{subsubsec:instance-method-invoc}, $\ExitSK{\tt{null}}$ is added as next statement continuation.
 \subsubsection{Super method invocation}
 \label{subsubsec:super-method-invocation}
 Super method invocation is supported with $\SuperMethodInvocation{\idmeta}{\expressionsmeta}$.
