@@ -325,7 +325,7 @@ When an environment is needed to further execute the program, it is saved by the
 
 Function ``$\extend$'' creates a new environment by extending the provided environment with new bindings for the variable declarations to fresh locations for each of the provided values.
 \begin{align*}
-  \extend \in \denv \times \mlist{\dvardecl} \times \mlist{\dval} &\rightarrow  \denv \hspace{100mm} \\
+  \extend \in \denv \times \mlist{\dvardecl} \times \mlist{\dval} &\rightarrow  \denv\\
   \ext{\env}{\varmeta{s}}{\vals} &= \env'
 \end{align*}
 with
@@ -715,15 +715,18 @@ A field is modified by changing the value stored at the location for the said fi
 Access and modification of fields is enabled with implicit getters and setters defined in the associated class component.
 Each field has an associated implicit getter, as defined below.
 Let $\loc$ be the location of field with name $fName$ for the object value $\val_0$:
+
 \begin{align*}
-  \getter \in \dobjval \times \mathbf{Name} &\rightarrow \dval \hspace{100mm} \\
+  \getter \in \dobjval \times \mathbf{Name} &\rightarrow \dval\\
   \getter(\val_0, fName) &= \val_1
 \end{align*}
-where $\val_1 = \deref{\loc}$.\\
+
+\noindent where $\val_1 = \deref{\loc}$.
+
 Each non-final field has an associated implicit setter, as defined below.
 Let $\loc$ be the location of field $fName$ for the object value $\val_0$:
 \begin{align*}
-  \setter \in \dobjval \times \mathbf{Name} \times \dval &\rightarrow \dval \hspace{100mm} \\
+  \setter \in \dobjval \times \mathbf{Name} \times \dval &\rightarrow \dval\\
   \setter(\val_0, fName, \val_1) &= \val_1
 \end{align*}
 where $\val_1$ is the value to be stored in $\loc$ after the invocation of the implicit setter.
@@ -1190,7 +1193,7 @@ It proceeds by extending the environment for the evaluation of the right-hand si
 \label{subsubsec:string-concatenation}
 The function $\concat$ concatenates the strings from the given meta-list into a single value.
 \begin{align*}
-  \concat : \mlist{\dstring} &\rightarrow \dstring \hspace{100mm} \\
+  \concat : \mlist{\dstring} &\rightarrow \dstring\\
   \concat( s_1 :: \dots :: s_n :: []) &= s_1 \dots s_n
 \end{align*}
 The evaluation of concatenation expression proceeds by evaluating the target expressions in the specified order, as shown with the CESK-transition \eqref{eval:concat}.
