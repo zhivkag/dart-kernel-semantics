@@ -37,7 +37,8 @@
 \DeclareMathOperator{\concat}{concat}
 \DeclareMathOperator{\getter}{implicitGetter}
 \DeclareMathOperator{\setter}{implicitSetter}
-
+\DeclareMathOperator{\lookup}{lookup}
+\DeclareMathOperator{\methodLookup}{methodLookup}
 
 % Keywords and syntactic constructs of Dart Kernel to be used in math mode.
 \newcommand{\synt}[1]{\ensuremath{\text{\textbf{#1}}}}
@@ -247,57 +248,57 @@ Note that the word ``List'' here is not in bold, so that it isn't confused with 
 \[
   \begin{array}{ccll}
     \expr, \expri{i}
-    & : & \dexpr & \textrm{syntactic domain of expressions}\\
+    & : & \dexpr & \text{syntactic domain of expressions}\\
     \exprs
     & : & \mlist{\dexpr}\\[2mm]
 
     \stmt, \stmti{i}
-    & : & \dstmt & \textrm{syntactic domain of statements}\\
+    & : & \dstmt & \text{syntactic domain of statements}\\
     \stmts
-    & : & \mlist{\dstmt}  & \textrm{}\\[2mm]
+    & : & \mlist{\dstmt}  & \text{}\\[2mm]
 
     \econt
-    & : & \decont & \textrm{domain of expression continuations}\\
+    & : & \decont & \text{domain of expression continuations}\\
     \acont
-    & : & \dacont & \textrm{domain of application continuations}\\
+    & : & \dacont & \text{domain of application continuations}\\
     \scont
-    & : & \dscont & \textrm{domain of statement continuations}\\
+    & : & \dscont & \text{domain of statement continuations}\\
     \bcont
-    & : & \dbcont & \textrm{domain of break continuations}\\
+    & : & \dbcont & \text{domain of break continuations}\\
     \switchcont
-    & : & \dswitchcont & \textrm{domain of switch continuations}\\[2mm]
+    & : & \dswitchcont & \text{domain of switch continuations}\\[2mm]
 
-    \lbl & : & \dlbl & \textrm{domain of labels}\\
+    \lbl & : & \dlbl & \text{domain of labels}\\
     \lbls & : & \mlist{\dlbl} \\
-    \clbl & : & \dclbl & \textrm{domain of switch labels}\\
+    \clbl & : & \dclbl & \text{domain of switch labels}\\
     \clbls & : & \mlist{\dclbl} \\[2mm]
 
     \handler
-    & : & \dhandler & \textrm{syntactic domain of exception handlers} \\
+    & : & \dhandler & \text{syntactic domain of exception handlers} \\
     \strace
-    & : & \mlist{\dexpr} & \textrm{domain of stack traces}\\
+    & : & \mlist{\dexpr} & \text{domain of stack traces}\\
     \cex
-    & : &  \emptyset + \dval & \textrm{domain of current expetion values}\\
+    & : &  \emptyset + \dval & \text{domain of current expetion values}\\
     \cstrace
-    & : & \emptyset + \mlist{\dexpr} & \textrm{domain of current exception stack traces}\\[2mm]
+    & : & \emptyset + \mlist{\dexpr} & \text{domain of current exception stack traces}\\[2mm]
 
     \varmeta
-    & : & \dvardecl & \textrm{domain of variable declarations}\\
+    & : & \dvardecl & \text{domain of variable declarations}\\
     \loc
-    & : & \dlocation & \textrm{domain of store locations}\\
+    & : & \dlocation & \text{domain of store locations}\\
     \val
-    & : & \dval & \textrm{domain of values}\\
+    & : & \dval & \text{domain of values}\\
     \vals
     & : & \mlist{\dval}\\
     \env
-    & : & \denv & \textrm{domain of environments}\\[2mm]
+    & : & \denv & \text{domain of environments}\\[2mm]
   \end{array}
 \]
 
 \[
   \begin{array}{ccll}
     \formal, \formali{i} & : & \dvardecl\\
-    \formals & : & \dformals = \mlist{\dvardecl} &\textrm{ domain of formals}\\
+    \formals & : & \dformals = \mlist{\dvardecl} &\text{ domain of formals}\\
 
   \end{array}
 \]
@@ -328,7 +329,7 @@ The location is stored in the environment, or in the list of field locations for
 
 \begin{align*}
   \deref{} \in \dlocation &\rightarrow \dval \\
-  \deref{\loc} &=  \val, \textrm{ with $\val$ the value in store at location } \loc
+  \deref{\loc} &=  \val, \text{ with $\val$ the value in store at location } \loc
 \end{align*}
 \subsubsection{Update}
 \label{subsubsec:store-update}
@@ -337,7 +338,7 @@ Function ``$\update{\loc}{\val}$'' updates the store at location $\loc \in \dloc
 It has an implicit argument which is the store of the CESK machine.
 \begin{align*}
   \update{}{} \in \dlocation \times \dval &\rightarrow  \dval\\
-  \update{\loc}{\val} &= \val, \textrm{ with $\val$ the value in store at location $\loc$}
+  \update{\loc}{\val} &= \val, \text{ with $\val$ the value in store at location $\loc$}
 \end{align*}
 \subsection{Environment}
 \label{subsec:env-definition}
@@ -356,8 +357,8 @@ Function ``$\extend$'' creates a new environment by extending the provided envir
 with
 \[
     \env'(\varmeta) =\begin{cases}
-    \loc_i & \textrm{with }\deref{\loc_i} = \val_i\textrm{ if }\exists\varmeta_i \in \varmeta{s} \textrm{ s.t. } \varmeta_i = \varmeta\\
-    \env(\varmeta) &\textrm{otherwise}
+    \loc_i & \text{with }\deref{\loc_i} = \val_i\text{ if }\exists\varmeta_i \in \varmeta{s} \text{ s.t. } \varmeta_i = \varmeta\\
+    \env(\varmeta) &\text{otherwise}
     \end{cases}
 \]
 
@@ -758,27 +759,50 @@ where $\val_1$ is the value to be stored in $\loc$ after the invocation of the i
 This implies that invocation of implicit setter will modify the global store and  $\deref{\loc} = \val_1$ will hold after the transition.
 \subsection{Class}
 \label{subsec:class}
-A $\tt{class} \in \dclass$ component captures the different properties for a defined class in Kernel.
-\[
-\dclass : \tt{superclass} \times \tt{interfaces} \times \tt{fields} \times \tt{getters} \times \tt{setters} \times \tt{methods}
-\]
-
+A $\tt{class} \in \dclass$ captures the different properties for a defined class in Dart Kernel.
+\begin{align}
+\notag
+\dclass &\in \tt{superclass} \times \tt{interfaces} \times \tt{fieldGetters}\\\notag
+&\times \tt{fieldSetters} \times \tt{getters} \times \tt{setters} \times \tt{methods}
+\end{align}
+The different components of $\tt{class}$ capture the following properties:
+\begin{itemize}
+\item $\tt{superclass}$\\
+The class component captures the immediate superclass and we allow access to it in the different continuations in various steps defined below.
+\item $\tt{interfaces}$\\
+% TBD
+\item $\tt{fieldGetters}$, $\tt{fieldSetters}$\\
+The $\tt{fieldGetters}$ and $\tt{fieldSetters}$ components capture the functions allowing access to field members of the current class and the superclasses recursively.
+The layout of the field members starts with the first field of the superclass highest in the class hierarchy and is continuous.
+We create implicit getters for all instance fields and setters for all non-final instance fields.
+For definition of implicit getters and setters see Section~\ref{subsec:object-values}.\\
+To enable proper direct field member access, we create implicit getters and setters bound to the members also, not only the names.
+Using only the identifier of the member for lookup of a direct member access is problematic because of possible overwrite of a member.
+\item $\tt{getters}$, $\tt{setters}$\\
+The $\tt{getters}$ and $\tt{setters}$ components capture the getters and the setters for the given class and all its superclasses recursively.
+\item $\tt{methods}$\\
+The $\tt{methods}$ component captures the methods for the given class and all its superclasses recursively.
+\end{itemize}
 \subsubsection{Property Lookup}
 \label{subsubsec:property-lookup}
-% lookup getters
-% lookup implicit getters
+A property lookup searches for an instance method, a getter or a field with the given property name. If none of the following is found, an error is returned.
+\begin{align*}
+    \lookup \in \dclass \times \mathbf{Name} &\rightarrow \mathbf{Member}\\
+    \lookup(\idmeta) &= \membermeta
+\end{align*}
+where $\membermeta$ is an instance method, when $\idmeta$ is a method name, a getter when $\idmeta$ is a getter name or an implicit getter when $\idmeta$ is a field name.
 \subsubsection{Method Lookup}
 \label{subsubsec:method-lookup}
-% lookup method
-\subsubsection{Superclass}
-\label{subsubsec:superclass}
-The class component captures the immediate superclass and we allow access to it in the different continuations during their application in various steps defined below.
+A method lookup searches for an instance method in the given class given the name of the method.
+\begin{align*}
+    \methodLookup \in \dclass \times \mathbf{Name} &\rightarrow \mathbf{Member}\\
+    \methodLookup(\idmeta) &= \membermeta
+\end{align*}
 \subsection{Function values}
 \label{subsec:function-values}
 \[
     \dfunval : \dformals \times \dstmt \times \denv
 \]
-
 \section{Abstract Syntax}
 \label{sec:abstract-syntax}
 
@@ -1155,7 +1179,7 @@ The value corresponding to the evaluated expression is captured by the applicati
         &\cesktranswhere%
             {\contconf{\IsExpressionK}{\val}}%
             {\contconf{\econt}{\true}}%
-            {\text{if $\val \textrm{ is } \tt{T}$}}
+            {\text{if $\val \text{ is } \tt{T}$}}
         \label{econtconf:is-true}\\
         &\cesktranswhere%
             {\contconf{\IsExpressionK}{\val}}%
@@ -1165,12 +1189,12 @@ The value corresponding to the evaluated expression is captured by the applicati
         &\cesktranswhere%
             {\contconf{\AsExpressionK}{\val}}%
             {\contconf{\econt}{\val}}%
-            {\text{if $\val \textrm{ is } \tt{T}$}}
+            {\text{if $\val \text{ is } \tt{T}$}}
         \label{econtconf:as-true}\\
         &\cesktranswhere%
             {\contconf{\AsExpressionK}{\val}}%
             {\throwconf{\handler}{\AsExpression{\expressionmeta}{\tt{T}} :: \strace}{\tt{CastError}}}%
-            {\text{if $\val \textrm{ is not } \tt{T}$}}
+            {\text{if $\val \text{ is not } \tt{T}$}}
         \label{econtconf:as-false}
     \end{align}
     \caption{The CESK-transition function for ValuePassingConfiguration: simple expressions}
@@ -1487,7 +1511,7 @@ A statement continuation, $\ExitSK{\econt}{\tt{null}}$ is added as next statemen
     &\begin{multlined}
         \cesktranswheresplit%
         {\contconf{\PropertyGetK}{\val}}%
-        {\contconf{\econt}{\textrm{\membermeta}(\val)}}%
+        {\contconf{\econt}{\text{\membermeta}(\val)}}%
         {\parbox{10cm}{if $\membermeta$ is an implicit getter for field $\idmeta$\\
         where $\env = \ext{\env_{empty}}{\mathbf{this}}{\val}$\\
         $\scont = \emptyset$}}
@@ -1496,7 +1520,7 @@ A statement continuation, $\ExitSK{\econt}{\tt{null}}$ is added as next statemen
     &\begin{multlined}
         \cesktranswheresplit*%
         {\contconf{\PropertyGetK}{\val}}%
-        {\throwconf{\handler}{(\tt{throw}\text{ NoSuchMethod}) :: \strace}{\textrm{NoSuchMethod}}}%
+        {\throwconf{\handler}{(\tt{throw}\text{ NoSuchMethod}) :: \strace}{\text{NoSuchMethod}}}%
         {\parbox{10cm}{if lookup of name $\idmeta$ was unsuccessful in class of value $\val$}}
     \end{multlined}
     \label{econtconf:propertyget-nosuchmethod}\\
@@ -1861,144 +1885,166 @@ Similarly to Section~\ref{subsubsec:instance-method-invoc}, $\ExitSK{\val}$ is a
                 {\execconf{\VarDeclaration{\varmeta}{\expr}}{\env}{\lbls}{\clbls}{\handler}{\cstrace}{\cex}{\econt}{\scont}}%
                 {\evalconf{\expr}{\env}{\strace}{\cstrace}{\cex}{\econt'}}%
                 {\text{where $\econt' = \VarDeclK{\env}{\varmeta}{\scont}$}}
-        \end{multlined}\\
+        \end{multlined}
+        \label{execconf:vardecl}\\
         &\cesktrans%
             {\execconf{\EmptyStatement}{\env}{\lbls}{\clbls}{\handler}{\cstrace}{\cex}{\econt}{\scont}}%
-            {\scontconf{\scont}{\env}}\\
+            {\scontconf{\scont}{\env}}
+        \label{execconf:empty}\\
         &\begin{multlined}
             \cesktranswheresplit%
                 {\execconf{\ExpressionStatement{\expressionmeta}}{\env}{\lbls}{\clbls}{\handler}{\cstrace}{\cex}{\econt}{\scont}}%
                 {\evalconf{\expr}{\env}{\strace}{\cstrace}{\cex}{\econt'}}%
                 {\text{where $\econt' = \ExpressionK{\scont}{\env}$}}
-        \end{multlined}\\
+        \end{multlined}
+        \label{execconf:expresion}\\
         &\begin{multlined}
             \cesktranswheresplit*%
                 {\execconf{\Block{\stmt_1}}{\env}{\lbls}{\clbls}{\handler}{\cstrace}{\cex}{\econt}{\scont}}%
                 {\execconf{\stmt_1}{\env}{\lbls}{\clbls}{\handler}{\cstrace}{\cex}{\econt}{\scont'}}%
                 {\text{where $\scont' = \BlockSK{\stmt*}{\env}$}}
-        \end{multlined}\\
+        \end{multlined}
+        \label{execconf:block}\\
         &\begin{multlined}
             \cesktranswheresplit*%
                 {\execconf{\IfStatement{\expr}{\stmti{1}}{\stmti{2}}}{\env}{\lbls}{\clbls}{\handler}{\cstrace}{\cex}{\econt}{\scont}}%
                 {\evalconf{\expr}{\env}{\strace}{\cstrace}{\cex}{\econt'}}%
                 {\text{where $\econt' = \IfCondK{\stmti{1}}{\stmti{2}}$}}
-        \end{multlined}\\
+        \end{multlined}
+        \label{execconf:if}\\
         &\cesktrans%
             {\execconf{\ReturnStatement{\expr}}{\env}{\lbls}{\clbls}{\handler}{\cstrace}{\cex}{\econt}{\scont}}%
-            {\evalconf{\expr}{\env}{\strace}{\cstrace}{\cex}{\econt}}\\
+            {\evalconf{\expr}{\env}{\strace}{\cstrace}{\cex}{\econt}}
+        \label{execconf:return}\\
         &\cesktrans%
             {\execconf{\ReturnStatement{}}{\env}{\lbls}{\clbls}{\handler}{\cstrace}{\cex}{\econt}{\scont}}%
-            {\contconf{\econt}{\nnull}}\\
+            {\contconf{\econt}{\nnull}}
+        \label{execconf:return-empty}\\
         &\begin{multlined}
             \cesktranswheresplit*%
                 {\execconf{\DoStatement{\statementmeta}{\expressionmeta}}{\env}{\lbls}{\clbls}{\handler}{\cstrace}{\cex}{\econt}{\scont}}%
                 {\execconf{\statementmeta}{\env}{\lbls}{\clbls}{\handler}{\cstrace}{\cex}{\econt}{\scont'}}%
                 {\text{where $\scont' = \whilecondk$}}
-        \end{multlined}\\
+        \end{multlined}
+        \label{execconf:do}\\
         &\begin{multlined}
             \cesktranswheresplit*%
                 {\execconf{\WhileStatement{\expr}{\stmt}}{\env}{\lbls}{\clbls}{\handler}{\cstrace}{\cex}{\econt}{\scont}}%
                 {\evalconf{\expr}{\env}{\strace}{\cstrace}{\cex}{\econt'}}%
                 {\text{where $\econt', \scont' = \whilecondk$}}
-        \end{multlined}\\
+        \end{multlined}
+        \label{execconf:while}\\
         &\begin{multlined}
             \cesktranswheresplit*%
                 {\execconf{\ForStatement{\varmeta{s}}{\expressionmeta}{\exprs}{\statementmeta}}{\env}{\lbls}{\clbls}{\handler}{\cstrace}{\cex}{\econt}{\scont}}%
                 {\evallistconf{\exprs'}{\env}{\strace}{\cex}{\cstrace}{\acont}}%
-                {\parbox{\textwidth-2cm}{where $\acont = \ForInitA$,\\$\exprs' =$ initializer expressions for the list of variable declarations $\varmeta{s}$}}
-        \end{multlined}\\
+                {\parbox{\textwidth-2cm}{where $\acont = \ForInitA$,\\
+                $\exprs' =$ initializer expressions for the list of variable declarations $\varmeta{s}$}}
+        \end{multlined}
+        \label{execconf:for}\\
         &\begin{multlined}
             \cesktranswheresplit*%
                 {\execconf{\LabeledStatement{L}{\stmt_{L}}}{\env}{\lbls}{\clbls}{\handler}{\cstrace}{\cex}{\econt}{\scont}}%
                 {\execconf{\stmt_{L}}{\env}{\lbl :: \lbls}{\clbls}{\handler}{\cstrace}{\cex}{\econt}{\scont}}%
                 {\text{where $\lbl = \mathrm{Label}(L, \bcont)$, $\bcont = \mathrm{Break}(\env, \scont)$}}
-        \end{multlined}\\
+        \end{multlined}
+        \label{execconf:labeled}\\
         &\begin{multlined}
             \cesktranswheresplit*%
                 {\execconf{\SwitchStatement{\expr}{\scases}}{\env}{\lbls}{\clbls}{\handler}{\cstrace}{\cex}{\econt}{\scont}}%
                 {\evalconf{\expr}{\env}{\strace}{\cstrace}{\cex}{\econt'}}%
                 {\text{where $\econt' = \SwitchK{\scases}{\clbls}$}}
-        \end{multlined}\\
+        \end{multlined}
+        \label{execconf:switch}\\
         &\begin{multlined}
             \cesktranswheresplit*%
                 {\execconf{\TryCatch{\stmt}{cs}}{\env}{\lbls}{\clbls}{\handler}{\cex}{\cstrace}{\econt}{\scont}}%
                 {\execconf{\stmt}{\env}{\lbls}{\clbls}{\handler'}{\cex}{\cstrace}{\econt}{\scont}}%
                 {\text{where $\handler' = \CatchH{cs}$}}
-        \end{multlined}\\
+        \end{multlined}
+        \label{execconf:try}\\
         &\begin{multlined}
             \cesktranswheresplit%
                 {\execconf{\BreakStatement{L}}{\env}{\lbls}{\clbls}{\handler}{\cex}{\cstrace}{\econt}{\scont}}%
                 {\breakconf{\bcont}}%
                 {\text{where $\lbl = Label(L', \bcont) \in \lbls \text{ with } L' == \mathbf{L}$}}
-        \end{multlined}\\
+        \end{multlined}
+        \label{execconf:break}\\
         &\begin{multlined}
             \cesktranswheresplit%
                 {\execconf{\ContinueSwitchStatement{\stmt}}{\env}{\lbls}{\clbls}{\handler}{\cex}{\cstrace}{\econt}{\scont}}%
                 {\switchconf{\switchcont}}%
                 {\text{where $\clbl = \continuel{\stmt'}{\switchcont} \in \clbls \text{ with } \stmt' == \stmt$}}
-        \end{multlined}\\
+        \end{multlined}
+        \label{execconf:continue}\\
         &\begin{multlined}
             \cesktranswheresplit*%
                 {\execconf{fun(\formals) \stmt_{body}}{\env}{\lbls}{\clbls}{\handler}{\cstrace}{\cex}{\econt}{\scont}}%
                 {\contconf{\econt}{\funval{\stmt_{body}}{\formals}{\env'}}}%
                 {\text{where $\env' = \ext{\env}{fun}{\funval{\stmt_{body}}{\formals}{\env'}}$}}
         \end{multlined}
+        \label{execconf:function}
     \end{align}
-    \caption{The CESK-transition function for statements}
+    \caption{The CESK-transition function starting in ExecConfiguration}
     \label{figure:exec}
 \end{figure}
-
-\subsubsection{Variable Declaration}
-Variable declaration extend the corresponding environment with a new binding.
-The corresponding initializer expression is first evaluated to a value $v$.
-
-\begin{align*}
-&\cesktrans%
-    {\contconf{\econt'}{\val}}%
-    {\scontconf{\scont}{\ext{\env}{\varmeta}{\val}}},
-\end{align*}
-
-\noindent where $\econt' = \VarDeclK{\env}{\varmeta}{\scont}$.
-
-
-\subsubsection{Empty statement}
-\label{subsubsec:emtpy-stmt}
-
-
-\subsubsection{Expression statement}
-\label{expression-stmt}
-
-\subsubsection{Block statements}
-  \begin{align*}
-    &\begin{multlined}
+\begin{figure}
+    \begin{align}
+       &\cesktrans%
+           {\contconf{\VarDeclK{\env}{\varmeta}{\scont}}{\val}}%
+           {\scontconf{\scont}{\ext{\env}{\varmeta}{\val}}}
+       \label{econtconf:vardecl}\\
+       &\begin{multlined}
+           \cesktranssplit%
+                {\contconf{\IfCondK{\stmti{1}}{\stmti{2}}}{\true}}%
+                {\execconf{\stmti{1}}{\env}{\lbls}{\clbls}{\handler}{\cstrace}{\cex}{\econt}{\scont}}
+       \end{multlined}
+       \label{econtconf:if-true}\\
+       &\begin{multlined}
+           \cesktranssplit%
+                {\contconf{\IfCondK{\stmti{1}}{\stmti{2}}}{\false}}%
+                {\execconf{\stmti{1}}{\env}{\lbls}{\clbls}{\handler}{\cstrace}{\cex}{\econt}{\scont}}
+       \end{multlined}
+       \label{econtconf:if-false}\\
+       \end{align}
+       \caption{The CESK-transition function starting in ValuePassingConfiguration: statements}
+\end{figure}
+\begin{figure}
+    \begin{align}
+       &\begin{multlined}
         \cesktranssplit%
           {\scontconf{\BlockSK{\stmt :: \stmts}{\env}}{\env'}}
           {\execconf{\stmt}{\env'}{\lbls}{\clbls}{\handler}{\cstrace}{\cex}{\econt}{\scont'}}
-    \end{multlined}\\
+    \end{multlined}
+    \label{scontconf:block}\\
     &\cesktrans%
       {\scontconf{\BlockSK{[]}{\env}}{ \_ }}%
       {\scontconf{\scont}{\env}},
-  \end{align*}
-
-\noindent where $\scont' = \BlockSK{\stmts}{\env}$.
-
+    \label{scontconf:block-empty}
+    \end{align}
+       \caption{The CESK-transition function starting in ForwardConfiguration: statements}
+\end{figure}
+\subsubsection{Variable Declaration}
+Execution of a variable declaration statement proceeds by evaluating the right-hand side expression as shown in \eqref{execconf:vardecl}.
+After the evaluation of the initializer expression to a value $\val$, the corresponding environment is extended with a new binding to a location that stores the value $\val$, as shown in \eqref{econtconf:vardecl}.
+\subsubsection{Empty statement}
+\label{subsubsec:emtpy-stmt}
+Execution of empty statement proceeds to the next ForwardConfiguration, as shown in \eqref{execconf:empty}.
+\subsubsection{Expression statement}
+\label{expression-stmt}
+Execution of expression statement proceeds by evaluating the expression, as shown in \eqref{execconf:expresion}.
+\subsubsection{Block statements}
+Execution of block statements proceeds by executing each statement of the block with the environment function after the execution of the previous statement.
+The CESK-transition function for block statements is shown in \eqref{execconf:block}, \eqref{scontconf:block} and \eqref{scontconf:block-empty}.
 \subsubsection{If statement}
-
-\begin{align*}
-    \cesktransalign%
-        {\contconf{\econt'}{\true}}%
-        {\execconf{\stmti{1}}{\env}{\lbls}{\clbls}{\handler}{\cstrace}{\cex}{\econt}{\scont}}\\
-    \cesktransalign%
-        {\contconf{\econt'}{\false}}%
-        {\execconf{\stmti{2}}{\env}{\lbls}{\clbls}{\handler}{\cstrace}{\cex}{\econt}{\scont}}
-\end{align*}
-
-\noindent where $\econt' = \IfCondK{\stmti{1}}{\stmti{2}}$.
-
-
+Execution of conditional statements proceeds by evaluating the condition to a value, as shown in \eqref{execconf:if}.
+The expression continuation for the execution of the rest of the statement will dispatch on the value the condition expression evaluates to and produce a configuration for the execution of the next statement, as shown in \eqref{econtconf:if-true} and \eqref{econtconf:if-false}.
 \subsubsection{Return statement}
-
-
+Kernel supports return statements with or without an expression.
+In the first case, the execution proceeds with evaluation of the return expression, as shown in \eqref{execconf:return}.
+The expression continuation component in the ExecConfiguration is the return expression continuation.
+This is the expression continuation that is applied to the value the return expression evaluates to.\\
+When the return expression is empty, the value $\tt{null}$ is applied to the return expression continuation component in the ExecConfiguration as shown in \eqref{execconf:return-empty}.
 \subsubsection{Loops}
 
 \begin{align*}
@@ -2214,7 +2260,7 @@ $\bbreak \synt{L}$ statements break from an enclosing label $\synt{L}$ and execu
         {\breakconf{\bcont}},
 \end{align*}
 
-\noindent where $\lbl = Label(L', \bcont) \in \lbls \textrm{ with } L' == \mathbf{L}$.
+\noindent where $\lbl = Label(L', \bcont) \in \lbls \text{ with } L' == \mathbf{L}$.
 
 
 \subsection{Continue}
@@ -2237,7 +2283,7 @@ $\continue \synt{L}$ statements continue to executing the statement of a precedi
         {\switchconf{\switchcont}},
 \end{align*}
 
-\noindent where $\clbl = \continuel{L'}{\switchcont} \in \clbls \textrm{ with } L' == \mathbf{L}$.
+\noindent where $\clbl = \continuel{L'}{\switchcont} \in \clbls \text{ with } L' == \mathbf{L}$.
 
 
 \subsection{Closures}
