@@ -168,14 +168,14 @@ The machine is defined by a single step transition function where each step of t
 \label{subsec:conventions}
 
 \begin{itemize}
-\item Symbols ``:'' and ``$\in$'' are used interchangeably.
-\item Names of variables are italicized.
-\item Names of variables of syntactic domains start with an upper case letter.
-\item Names of domains are written in bold (e.g. ``$\mathbf{X}$'').
-\item Names of continuation kinds are written in normal text (e.g. VarSetK).
-\item Names of meta-functions start with lower case letter (e.g. $\extend$).
-\item ``$\mlist{\mathbf{X}}$'' denotes the domain of meta-lists of elements from domain ``$\mathbf{X}$''.
-Note that the word ``List'' here is not in bold, so that it isn't confused with the domain $\mathbf{List}$ of Dart objects.
+    \item Symbols ``:'' and ``$\in$'' are used interchangeably.
+    \item Names of variables are italicized.
+    \item Names of variables of syntactic domains start with an upper case letter.
+    \item Names of domains are written in bold (e.g. ``$\mathbf{X}$'').
+    \item Names of continuation kinds are written in normal text (e.g. VarSetK).
+    \item Names of meta-functions start with lower case letter (e.g. $\extend$).
+    \item ``$\mlist{\mathbf{X}}$'' denotes the domain of meta-lists of elements from domain ``$\mathbf{X}$''.
+        Note that the word ``List'' here is not in bold, so that it isn't confused with the domain $\mathbf{List}$ of Dart objects.
 \end{itemize}
 
 
@@ -431,13 +431,14 @@ Configurations contain different components and the transition step dispatches t
 The configuration EvalConfiguration is shown in \ref{config:eval}.
 The transition step for this configuration dispatches on the expression component, $\expr$.
 With one transition step of the CESK-transition function, from the EvalConfiguration the next configuration can be one of the following:
+
 \begin{itemize}
-\item ValuePassingConfiguration, when the current expression evaluates to a value in one step.
-\item ExecConfiguration, when the current expression results with an invocation, i.e. execution of statement body of a getter.
-Note that for other invocations, we first evaluate the receiver for instance invocations, or the arguments for static or constructor invocations.
-\item EvalListConfiguration, when the current expression implies evaluation of a list of expressions.
-\item ThrowConfiguration, when the current expression throws, i.e. is a throw expression.
-\item EvalConfiguration, otherwise.
+    \item ValuePassingConfiguration, when the current expression evaluates to a value in one step.
+    \item ExecConfiguration, when the current expression results with an invocation, i.e. execution of statement body of a getter.
+        Note that for other invocations, we first evaluate the receiver for instance invocations, or the arguments for static or constructor invocations.
+    \item EvalListConfiguration, when the current expression implies evaluation of a list of expressions.
+    \item ThrowConfiguration, when the current expression throws, i.e. is a throw expression.
+    \item EvalConfiguration, otherwise.
 \end{itemize}
 
 
@@ -487,9 +488,10 @@ The statement continuation produces the next configuration.
 The configuration ThrowConfiguration is shown in Figure~\ref{config:throw}.
 The transition step applies the exception handler.
 The next configuration is:
+
 \begin{itemize}
-\item ThrowConfiguration, when the exception is not handled by the first catch clause of a catch handler.
-\item ExecConfiguration, for the statement body of the matching catch or the finally statement, when no catch clauses are present.
+    \item ThrowConfiguration, when the exception is not handled by the first catch clause of a catch handler.
+    \item ExecConfiguration, for the statement body of the matching catch or the finally statement, when no catch clauses are present.
 \end{itemize}
 
 
@@ -539,14 +541,17 @@ Expression continuations, $\econt$, capture the steps after the evaluation of a 
 They accept a value and produce the next configuration.
 
 There are various kinds of configurations, but two more general types can be distinguished:
-\begin{itemize}
-\item Continuations with holes, i.e. expressions to be evaluated\\
-Expression continuations with expressions will produce EvalConfiguration for evaluation of the next expression.
-Note that some continuation will not evaluate the captured expression, when this is not necessary (e.g., \eqref{eval:and}).
 
-\item Continuations without holes\\
-Continuations without holes dispatch on the provided value and produce the next configuration, a ValuePassingConfiguration.
+\begin{itemize}
+    \item Continuations with holes, i.e. expressions to be evaluated\\
+        Expression continuations with expressions will produce EvalConfiguration for evaluation of the next expression.
+        Note that some continuation will not evaluate the captured expression, when this is not necessary (e.g., \eqref{eval:and}).
+
+    \item Continuations without holes\\
+        Continuations without holes dispatch on the provided value and produce the next configuration, a ValuePassingConfiguration.
+
 \end{itemize}
+
 We suffix the names of expression continuations with ``$K$''.
 The different expression continuations are shown in Figure~\ref{figure:econts}.
 %
@@ -821,28 +826,36 @@ This implies that invocation of implicit setter will modify the global store and
 \label{subsec:class}
 
 A $\tt{class} \in \dclass$ captures the different properties for a defined class in Dart Kernel.
+
 \begin{align}
 \notag
 \dclass &\in \tt{superclass} \times \tt{interfaces} \times \tt{fieldGetters}\\\notag
 &\times \tt{fieldSetters} \times \tt{getters} \times \tt{setters} \times \tt{methods}
 \end{align}
+
 The different components of $\tt{class}$ capture the following properties:
+
 \begin{itemize}
-\item $\tt{superclass}$\\
-The class component captures the immediate superclass and we allow access to it in the different continuations in various steps defined below.
-\item $\tt{interfaces}$\\
-% TBD
-\item $\tt{fieldGetters}$, $\tt{fieldSetters}$\\
-The $\tt{fieldGetters}$ and $\tt{fieldSetters}$ components capture the functions allowing access to field members of the current class and the superclasses recursively.
-The layout of the field members starts with the first field of the superclass highest in the class hierarchy and is continuous.
-We create implicit getters for all instance fields and setters for all non-final instance fields.
-For definition of implicit getters and setters see Section~\ref{subsec:object-values}.\\
-To enable proper direct field member access, we create implicit getters and setters bound to the members also, not only the names.
-Using only the identifier of the member for lookup of a direct member access is problematic because of possible overwrite of a member.
-\item $\tt{getters}$, $\tt{setters}$\\
-The $\tt{getters}$ and $\tt{setters}$ components capture the getters and the setters for the given class and all its superclasses recursively.
-\item $\tt{methods}$\\
-The $\tt{methods}$ component captures the methods for the given class and all its superclasses recursively.
+    \item $\tt{superclass}$\\
+        The class component captures the immediate superclass and we allow access to it in the different continuations in various steps defined below.
+
+    \item $\tt{interfaces}$\\
+        % TBD
+
+    \item $\tt{fieldGetters}$, $\tt{fieldSetters}$\\
+        The $\tt{fieldGetters}$ and $\tt{fieldSetters}$ components capture the functions allowing access to field members of the current class and the superclasses recursively.
+        The layout of the field members starts with the first field of the superclass highest in the class hierarchy and is continuous.
+        We create implicit getters for all instance fields and setters for all non-final instance fields.
+        For definition of implicit getters and setters see Section~\ref{subsec:object-values}.\\
+        To enable proper direct field member access, we create implicit getters and setters bound to the members also, not only the names.
+        Using only the identifier of the member for lookup of a direct member access is problematic because of possible overwrite of a member.
+
+    \item $\tt{getters}$, $\tt{setters}$\\
+        The $\tt{getters}$ and $\tt{setters}$ components capture the getters and the setters for the given class and all its superclasses recursively.
+
+    \item $\tt{methods}$\\
+        The $\tt{methods}$ component captures the methods for the given class and all its superclasses recursively.
+
 \end{itemize}
 
 
@@ -1301,24 +1314,29 @@ The evaluation of this expression proceeds by evaluating the right-hand side exp
 \label{subsubsec:bool-expressions}
 
 The CESK-transition function for boolean expressions is show in Figure~\ref{figure:expressions-evalconfigs}, rules \eqref{eval:not} - \eqref{eval:cond}.
+
 \begin{itemize}
-\item Not expression\\
-The target expression is evaluated, as shown in \eqref{eval:not} and proceed by dispatching on the value the expression evaluates to according to \eqref{econtconf:not-true} and \eqref{econtconf:not-false}.
-\item And expression\\
-The left-hand side expression is evaluated, according to \eqref{eval:and}.
-We dispatch on the value the expression evaluates to.
-If the expression evaluate to $\false$, according to \eqref{econtconf:and-false}, the value is immediately applied to the current expression continuation.
-Otherwise, we proceed with the CESK-transition \eqref{econtconf:and-true}, by also evaluating the right-hand side.
-\item Or expression\\
-The left-hand side expression is evaluated, as shown in the CESK-transition \eqref{eval:or}.
-We dispatch on the value the expression evaluates to.
-If the expression evaluates to $\true$, according to \eqref{econtconf:or-true}, the value is immediately applied to the current expression continuation.
-Otherwise, we proceed with the CESK-transition \eqref{econtconf:or-false}, by also evaluating the right-hand side.
-\item Conditional expression\\
-The condition expression is evaluated, as shown in the CESK-transition \eqref{eval:cond}.
-We dispatch on the value the expression evaluates to.
-If the expression evaluates to $\true$, the next configuration evaluates the first expression and is produced with the CESK-transition \eqref{econtconf:cond-true}.
-Otherwise, the next configuration evaluates the second expression and is produced with the transition \eqref{econtconf:cond-false}.
+    \item Not expression\\
+        The target expression is evaluated, as shown in \eqref{eval:not} and proceed by dispatching on the value the expression evaluates to according to \eqref{econtconf:not-true} and \eqref{econtconf:not-false}.
+
+    \item And expression\\
+        The left-hand side expression is evaluated, according to \eqref{eval:and}.
+        We dispatch on the value the expression evaluates to.
+        If the expression evaluate to $\false$, according to \eqref{econtconf:and-false}, the value is immediately applied to the current expression continuation.
+        Otherwise, we proceed with the CESK-transition \eqref{econtconf:and-true}, by also evaluating the right-hand side.
+
+    \item Or expression\\
+        The left-hand side expression is evaluated, as shown in the CESK-transition \eqref{eval:or}.
+        We dispatch on the value the expression evaluates to.
+        If the expression evaluates to $\true$, according to \eqref{econtconf:or-true}, the value is immediately applied to the current expression continuation.
+        Otherwise, we proceed with the CESK-transition \eqref{econtconf:or-false}, by also evaluating the right-hand side.
+
+    \item Conditional expression\\
+        The condition expression is evaluated, as shown in the CESK-transition \eqref{eval:cond}.
+        We dispatch on the value the expression evaluates to.
+        If the expression evaluates to $\true$, the next configuration evaluates the first expression and is produced with the CESK-transition \eqref{econtconf:cond-true}.
+        Otherwise, the next configuration evaluates the second expression and is produced with the transition \eqref{econtconf:cond-false}.
+
 \end{itemize}
 
 
@@ -1482,31 +1500,40 @@ In order to remember initialization and assignment of library variables and stat
 The environment $\env^{M}$ stores bindings for static and library fields to locations for all static and library fields previously accessed or set during the execution of the program.
 Static and library variables are accessed with $\StaticGet{\membermeta}$.
 The member $\membermeta$ can be a static or library field, a getter or a method tear-off.
+
 \begin{itemize}
-\item $\membermeta$ is a static or library field\\
-Let $\expressionmeta_{\membermeta}$ be $\membermeta$'s initializer expression.
-When $\membermeta$ is accessed for the first time during the program's execution, the evaluation of $\StaticGet{\membermeta}$ proceeds with evaluation of the initializer expression $\expressionmeta_{\membermeta}$.\\
-When $\expressionmeta$ is $\tt{null}$, the environment is extended with a binding to a fresh location that stores a $\tt{null}$ value for the field $\membermeta$, as shown in \eqref{eval:staticget-varnew-null}.\\
-When $\expressionmeta$ is an expression, this expression is evaluated as shown in \eqref{eval:staticget-varnew}.
-The expression will evaluate to some value $\val$ that will be applied to the corresponding continuations, as shown in \eqref{econtconf:staticget}: the environment is extended with a binding to a fresh location that stores the value $\val$ and the continuation $\econt$ is applied to the value $\val$.\\
-When there is already a binding for the member $\membermeta$ in the global environment $\env_{M}$, the continuation $\econt$ is applied to the stored value, as shown in \eqref{eval:staticget-var}.
-\item $\membermeta$ is a static getter\\
-When $\membermeta$ is a static getter, the body of the getter is executed, as shown in \eqref{eval:staticget-getter}.
-\item $\membermeta$ is a static method tear-off\\
-When $\membermeta$ is a method with formal parameters $\formals$ and body $\stmt$, a new $\funval{\formals}{\stmt}{\env_{empty}}$ is created and bound to the member in the global environment $\env^{M}$, as shown in \eqref{eval:staticget-tearoff}.
-The continuation $\econt$ is applied to this value.
+    \item $\membermeta$ is a static or library field\\
+        Let $\expressionmeta_{\membermeta}$ be $\membermeta$'s initializer expression.
+        When $\membermeta$ is accessed for the first time during the program's execution, the evaluation of $\StaticGet{\membermeta}$ proceeds with evaluation of the initializer expression $\expressionmeta_{\membermeta}$.\\
+        When $\expressionmeta$ is $\tt{null}$, the environment is extended with a binding to a fresh location that stores a $\tt{null}$ value for the field $\membermeta$, as shown in \eqref{eval:staticget-varnew-null}.\\
+        When $\expressionmeta$ is an expression, this expression is evaluated as shown in \eqref{eval:staticget-varnew}.
+        The expression will evaluate to some value $\val$ that will be applied to the corresponding continuations, as shown in \eqref{econtconf:staticget}: the environment is extended with a binding to a fresh location that stores the value $\val$ and the continuation $\econt$ is applied to the value $\val$.\\
+        When there is already a binding for the member $\membermeta$ in the global environment $\env_{M}$, the continuation $\econt$ is applied to the stored value, as shown in \eqref{eval:staticget-var}.
+
+    \item $\membermeta$ is a static getter\\
+        When $\membermeta$ is a static getter, the body of the getter is executed, as shown in \eqref{eval:staticget-getter}.
+
+    \item $\membermeta$ is a static method tear-off\\
+        When $\membermeta$ is a method with formal parameters $\formals$ and body $\stmt$, a new $\funval{\formals}{\stmt}{\env_{empty}}$ is created and bound to the member in the global environment $\env^{M}$, as shown in \eqref{eval:staticget-tearoff}.
+        The continuation $\econt$ is applied to this value.
+
 \end{itemize}
+
 Static and library variables are set with $\StaticSet{\membermeta}{\expressionmeta}$.
 The target member can either be a static or library field, or it can be a static setter. For both cases, the right-hand side expression is evaluated first, as shown in \eqref{eval:staticset}.
+
 \begin{itemize}
-\item $\membermeta$ is a static or library field\\
-The evaluation proceeds by extending the environment $\env^{M}$, when $\membermeta \notin \env^{M}$, as shown in \eqref{econtconf:staticset-var-new}.\\
-Otherwise, when $\membermeta \in \env^{M}$, the value stored at location $\env^{M}(\membermeta)$ is modified accordingly, as shown in \eqref{econtconf:staticset-var}.
-\item $\membermeta$ is a static setter\\
-The evaluation proceeds by executing the statement body of the setter. A statement continuation $\ExitSK{\econt}{\val}$ is added that applies the given expression continuation $\econt$ to the value of the right-hand side expression.
-The statement body is executed in an environment that has only the binding from the formal parameter of the static setter to the value of the right-hand side expression, as shown in \eqref{econtconf:staticset-setter}.
+    \item $\membermeta$ is a static or library field\\
+        The evaluation proceeds by extending the environment $\env^{M}$, when $\membermeta \notin \env^{M}$, as shown in \eqref{econtconf:staticset-var-new}.\\
+        Otherwise, when $\membermeta \in \env^{M}$, the value stored at location $\env^{M}(\membermeta)$ is modified accordingly, as shown in \eqref{econtconf:staticset-var}.
+
+    \item $\membermeta$ is a static setter\\
+        The evaluation proceeds by executing the statement body of the setter. A statement continuation $\ExitSK{\econt}{\val}$ is added that applies the given expression continuation $\econt$ to the value of the right-hand side expression.
+        The statement body is executed in an environment that has only the binding from the formal parameter of the static setter to the value of the right-hand side expression, as shown in \eqref{econtconf:staticset-setter}.
+
+    \item Otherwise, $\membermeta$ is a static or library setter with body $\stmt$ and formal parameter $\formal$.
+
 \end{itemize}
-Otherwise, $\membermeta$ is a static or library setter with body $\stmt$ and formal parameter $\formal$.
 
 
 \subsubsection{Static Invocation}
@@ -1659,19 +1686,24 @@ The evaluation of this expression is shown in \eqref{eval:propertyget}.
 After the evaluation of the receiver expression to a value $\val$, the property $\idmeta$ is looked up in methods, getters and implicit getters for the value $\val$.
 Let $\membermeta$ be the instance member result of such successful lookup below and in \eqref{econtconf:propertyget-field}, \eqref{econtconf:propertyget-getter} and \eqref{econtconf:propertyget-tearoff}.
 The evaluation of the expression proceeds as follow:
+
 \begin{itemize}
-\item $\membermeta$ is a method tear-off\\
-When $\membermeta$ is a method tear-off, the evaluation of the property extraction expression proceeds as shown in \eqref{econtconf:propertyget-tearoff}.
-The member is converted to a value $\val \in \dfunval$, capturing the method body, its formal parameters and an environment with a $\tt{this}$ binding to a location that stores the current instance value and the expression continuation $\econt$ is applied to it.
-\item $\membermeta$ is a getter\\
-When $\membermeta$ is a getter, the body of the getter is executed as shown in the CESK-transition function step \eqref{econtconf:propertyget-getter}.
-The statement body is executed with an environment with a $\tt{this}$ binding to a location that stores the current instance value and no statement continuation.
-A getter should always contain a reachable return statement.
-\item $\membermeta$ is an implicit getter for a field $\idmeta$\\
-When $\membermeta$ is an implicit getter for field $\idmeta$ it is immediately applied on the receiver expression.
-Application of implicit getter on some instance value returns the value stored in the location this getter contains.
-Afterwards the continuation expression is applied to the value, as shown in \eqref{econtconf:propertyget-field}.
+    \item $\membermeta$ is a method tear-off\\
+        When $\membermeta$ is a method tear-off, the evaluation of the property extraction expression proceeds as shown in \eqref{econtconf:propertyget-tearoff}.
+        The member is converted to a value $\val \in \dfunval$, capturing the method body, its formal parameters and an environment with a $\tt{this}$ binding to a location that stores the current instance value and the expression continuation $\econt$ is applied to it.
+
+    \item $\membermeta$ is a getter\\
+        When $\membermeta$ is a getter, the body of the getter is executed as shown in the CESK-transition function step \eqref{econtconf:propertyget-getter}.
+        The statement body is executed with an environment with a $\tt{this}$ binding to a location that stores the current instance value and no statement continuation.
+        A getter should always contain a reachable return statement.
+
+    \item $\membermeta$ is an implicit getter for a field $\idmeta$\\
+        When $\membermeta$ is an implicit getter for field $\idmeta$ it is immediately applied on the receiver expression.
+        Application of implicit getter on some instance value returns the value stored in the location this getter contains.
+        Afterwards the continuation expression is applied to the value, as shown in \eqref{econtconf:propertyget-field}.
+
 \end{itemize}
+
 If the lookup fails, a "NoSuchMethod" will be thrown, as shown in \eqref{econtconf:propertyget-nosuchmethod}.
 
 
@@ -1682,15 +1714,20 @@ In Kernel a property can be accessed without lookup, by direct reference to the 
 This implies that the lookup step above is bypassed.
 Similar to Section~\ref{subsubsec:property-extraction}, this expression can be either getter access, which executes the getter, or method extraction, which converts a method into a closure, also known as tear-off.
 The evaluation proceeds as follows:
+
 \begin{itemize}
-\item $\membermeta$ is an instance method\\
-When $\membermeta$ is an instance method the evaluation of the direct property extraction expression proceeds in the same way as in Section~\ref{subsubsec:property-extraction}.
-The exact CESK-transition function for this case is shown in \eqref{econtconf:dpropertyget-tearoff}.
-\item $\membermeta$ is an instance getter\\
-When $\membermeta$ is an instance getter, the statement body of the getter is executed, as described in the previous section with the CESK-transition function shown in \eqref{econtconf:dpropertyget-getter}.
-\item $\membermeta$ is an instance field\\
-When $\membermeta$ is an instance field, the evaluation proceeds as shown in \eqref{econtconf:dpropertyget-field}.
+    \item $\membermeta$ is an instance method\\
+        When $\membermeta$ is an instance method the evaluation of the direct property extraction expression proceeds in the same way as in Section~\ref{subsubsec:property-extraction}.
+        The exact CESK-transition function for this case is shown in \eqref{econtconf:dpropertyget-tearoff}.
+
+    \item $\membermeta$ is an instance getter\\
+        When $\membermeta$ is an instance getter, the statement body of the getter is executed, as described in the previous section with the CESK-transition function shown in \eqref{econtconf:dpropertyget-getter}.
+
+    \item $\membermeta$ is an instance field\\
+        When $\membermeta$ is an instance field, the evaluation proceeds as shown in \eqref{econtconf:dpropertyget-field}.
+
 \end{itemize}
+
 %%
 % Figure showing the CESK-transition function strating from
 % ValuePassingConfiguration for instance property assignment.
@@ -1778,15 +1815,18 @@ After the evaluation of the receiver expression to a value $\val_0$ and the argu
 and implicit setters for the value $\val_0$.
 Let $\membermeta$ be the result of such lookup.
 The evaluation proceeds as follows:
+
 \begin{itemize}
-\item $\membermeta$ is a setter invocation\\
-When $\membermeta$ is an invocation of a setter with body $\stmt$ and formal parameter $\formal$, the evaluation proceeds by executing the body in the environment which binds $\tt{this}$ to a location that contains $\val_0$ and the formal parameter $\formal$ to a location that contains $\val_1$.
-This is shown in the CESK-transition \eqref{econtconf:propertyset-setter}.
-Note that we add the special statement continuation $\ExitSK{\val_1}$, that will apply the value $\val_1$ to the current expression continuation.
-\item $\membermeta$ is a field\\
-When the lookup results with a field, the implicit setter for the field is invoked with the receiver value and the field value as shown in \eqref{econtconf:propertyset-field}.
-The $\{\membermeta\}(\val_0, \val_1)$ is the implicit setter for the field $\membermeta$ which is a function in the domain $\dval \times \dval \rightarrow \dval$.
-The value returned by the implicit function is $\val_1$.
+    \item $\membermeta$ is a setter invocation\\
+        When $\membermeta$ is an invocation of a setter with body $\stmt$ and formal parameter $\formal$, the evaluation proceeds by executing the body in the environment which binds $\tt{this}$ to a location that contains $\val_0$ and the formal parameter $\formal$ to a location that contains $\val_1$.
+        This is shown in the CESK-transition \eqref{econtconf:propertyset-setter}.
+        Note that we add the special statement continuation $\ExitSK{\val_1}$, that will apply the value $\val_1$ to the current expression continuation.
+
+    \item $\membermeta$ is a field\\
+        When the lookup results with a field, the implicit setter for the field is invoked with the receiver value and the field value as shown in \eqref{econtconf:propertyset-field}.
+        The $\{\membermeta\}(\val_0, \val_1)$ is the implicit setter for the field $\membermeta$ which is a function in the domain $\dval \times \dval \rightarrow \dval$.
+        The value returned by the implicit function is $\val_1$.
+
 \end{itemize}
 
 
@@ -1798,11 +1838,14 @@ This implies that the lookup step described in \ref{subsubsec:property-assignmen
 The evaluation of direct property assignment proceeds by evaluating the right-hand side expression, i.e. the receiver expression as shown in \eqref{eval:dpropertyset}.
 Afterwards, the evaluation continues with the left-hand side expression as shown in \eqref{econtconf:dpropertyset-val}.
 After evaluating the receiver expression to $\val_0$ and the argument expression to $\val_1$, depending on $\membermeta$, the evaluation continues as follows:
+
 \begin{itemize}
-\item $\membermeta$ is an instance setter\\
-When $\membermeta$ is an instance setter with body $\stmt$ and formal parameter $\formal$, the evaluation of the expression proceeds with execution of the body with an environment binding $\tt{this}$ to a location containing $\val_0$ and the formal parameter $\formal$ to a location storing $\val_1$.
-\item $\membermeta$ is a field\\
-When $\membermeta$ is a field the value stored at location $\val_0[\membermeta]$ is modified to store value the argument expression evaluates to, $\val_1$, as shown in \eqref{econtconf:dpropertyset-field}.
+    \item $\membermeta$ is an instance setter\\
+        When $\membermeta$ is an instance setter with body $\stmt$ and formal parameter $\formal$, the evaluation of the expression proceeds with execution of the body with an environment binding $\tt{this}$ to a location containing $\val_0$ and the formal parameter $\formal$ to a location storing $\val_1$.
+
+    \item $\membermeta$ is a field\\
+        When $\membermeta$ is a field the value stored at location $\val_0[\membermeta]$ is modified to store value the argument expression evaluates to, $\val_1$, as shown in \eqref{econtconf:dpropertyset-field}.
+
 \end{itemize}
 
 
@@ -1813,16 +1856,20 @@ Kernel allows access of a superclass member as a property, which can be either g
 Accessing a superclass member is accessed with the expression $\SuperPropertyGet{\idmeta}$ evaluated with the corresponding components: $\env$, $\strace$, $\handler$, $\cstrace$, $\cex$, $\econt$.
 Let $\val = \deref{(\env(\this))}$, $C = \superclass{\val}$ and $\membermeta$ the result of looking up $\idmeta$ in $C$.
 The evaluation of a super property extraction proceeds as follows:
+
 \begin{itemize}
-\item $\membermeta$ is a method tear-off\\
-When $\membermeta$ is a method tear-off, the evaluation of super property extraction expression proceeds as shown in \eqref{eval:superpropertyget-tearoff}.
-The member with body $\stmt$ and formal parameters $\formals$ is converted to a value $\val \in \dfunval$.
-The value $\val$ captures the method body, its formal parameters and an environment with a $\tt{this}$ binding to a location that stores the current instance value and the expression continuation $\econt$ is applied to it.
-\item $\membermeta$ is an instance getter\\
-When $\membermeta$ is an instance getter, the statement body of the getter is executed.
-The CESK-transition is shown in \eqref{eval:superpropertyget-getter}.
-\item $\membermeta$ is an instance field\\
-When $\membermeta$ is an instance field, the evaluation proceeds as shown in \eqref{eval:superpropertyget-field}.
+    \item $\membermeta$ is a method tear-off\\
+        When $\membermeta$ is a method tear-off, the evaluation of super property extraction expression proceeds as shown in \eqref{eval:superpropertyget-tearoff}.
+        The member with body $\stmt$ and formal parameters $\formals$ is converted to a value $\val \in \dfunval$.
+        The value $\val$ captures the method body, its formal parameters and an environment with a $\tt{this}$ binding to a location that stores the current instance value and the expression continuation $\econt$ is applied to it.
+
+    \item $\membermeta$ is an instance getter\\
+        When $\membermeta$ is an instance getter, the statement body of the getter is executed.
+        The CESK-transition is shown in \eqref{eval:superpropertyget-getter}.
+
+    \item $\membermeta$ is an instance field\\
+        When $\membermeta$ is an instance field, the evaluation proceeds as shown in \eqref{eval:superpropertyget-field}.
+
 \end{itemize}
 
 
@@ -1833,19 +1880,20 @@ Kernel supports assignment of a super member with the expression $\SuperProperty
 Let $\val' = \deref{(\env(\this))}$, $C = \superclass{\val'}$ and $M$ the result of looking up $\idmeta$ in $C$.
 The evaluation proceeds with evaluation of the right-hand side expression as shown in \eqref{eval:superpropertyset}.
 After the evaluation of the argument expression to a value $\val$, depending on $\membermeta$, the evaluation continues as follows:
+
 \begin{itemize}
-% todo: regroup all property extraction together since text is similar
-\item $\membermeta$ is an instance setter\\
-When $\membermeta$ is an invocation of a setter with body $\stmt$ and formal parameter $\formal$, the evaluation proceeds by executing the body in the environment which binds $\tt{this}$ to a location that contains $\deref{(\env(\this))}$ and the formal parameter $\formal$ to a location that contains $\val$.
-This is shown in the CESK-transition \eqref{econtconf:superpropertyset-setter}.
-Note that we add the special statement continuation $\ExitSK{\val_1}$, that will apply the value $\val$ to the current expression continuation.
-\item $\membermeta$ is a field\\
-When the lookup results with a field, the implicit setter for the field is invoked with the receiver value $\deref{(\env(\this))}$ and the field value $\val$, as shown in \eqref{econtconf:superpropertyset-field}.
-The $\update{\deref{(\env(\this))}[\membermeta]}{\val}$ modifies the value stored in the location of field $\membermeta$ with the right-hand side expression.
+    % todo: regroup all property extraction together since text is similar
+    \item $\membermeta$ is an instance setter\\
+        When $\membermeta$ is an invocation of a setter with body $\stmt$ and formal parameter $\formal$, the evaluation proceeds by executing the body in the environment which binds $\tt{this}$ to a location that contains $\deref{(\env(\this))}$ and the formal parameter $\formal$ to a location that contains $\val$.
+        This is shown in the CESK-transition \eqref{econtconf:superpropertyset-setter}.
+        Note that we add the special statement continuation $\ExitSK{\val_1}$, that will apply the value $\val$ to the current expression continuation.
+
+    \item $\membermeta$ is a field\\
+        When the lookup results with a field, the implicit setter for the field is invoked with the receiver value $\deref{(\env(\this))}$ and the field value $\val$, as shown in \eqref{econtconf:superpropertyset-field}.
+        The $\update{\deref{(\env(\this))}[\membermeta]}{\val}$ modifies the value stored in the location of field $\membermeta$ with the right-hand side expression.
+
 \end{itemize}
-%
-%
-%
+
 \begin{figure}[Htp]
     \begin{align}
         &\begin{multlined}
@@ -2217,21 +2265,27 @@ When the return expression is empty, the value $\tt{null}$ is applied to the ret
 
 In Dart Kernel there are $\dowhile$, $\forin$, $\for$ and $\while$ loop statements.
 The execution of the different loop statements is defined below:
+
 \begin{itemize}
-\item  $\while$\\
-The execution of  $\while$ statement loops proceeds with evaluation of the condition expression as shown in \eqref{execconf:while}.
-The expression continuation for the execution of the remainder of the statement dispatches on the value of the condition expression.
-The body of the while loop is executed when this value is identical to $\true$, as shown in \eqref{econtconf:while-true}.
-Otherwise, the execution proceeds with the next ForwardConfiguration as shown in \eqref{econtconf:while-false}.
-\item $\dowhile$\\
-The execution of do while loop statement is similar to while loop statements.
-First the statement body of the loop is executed as shown in \eqref{execconf:do}.
-We add while statement continuation as next statement continuation that will evaluate the condition expression accordingly, as shown in \eqref{scontconf:while}.
-\item $\forin$\\
-In Kernel, $\forin$ loops, will be desugared into while loops and their execution will proceed as the $\while$ loop rule shown in Figure~\ref{figure:exec}.
-\item $\for$\\
-The execution of $\for$ loops proceeds as shown in Figure~\ref{figure:exec}.
+    \item  $\while$\\
+        The execution of  $\while$ statement loops proceeds with evaluation of the condition expression as shown in \eqref{execconf:while}.
+        The expression continuation for the execution of the remainder of the statement dispatches on the value of the condition expression.
+        The body of the while loop is executed when this value is identical to $\true$, as shown in \eqref{econtconf:while-true}.
+        Otherwise, the execution proceeds with the next ForwardConfiguration as shown in \eqref{econtconf:while-false}.
+
+    \item $\dowhile$\\
+        The execution of do while loop statement is similar to while loop statements.
+        First the statement body of the loop is executed as shown in \eqref{execconf:do}.
+        We add while statement continuation as next statement continuation that will evaluate the condition expression accordingly, as shown in \eqref{scontconf:while}.
+
+    \item $\forin$\\
+        In Kernel, $\forin$ loops, will be desugared into while loops and their execution will proceed as the $\while$ loop rule shown in Figure~\ref{figure:exec}.
+
+    \item $\for$\\
+        The execution of $\for$ loops proceeds as shown in Figure~\ref{figure:exec}.
+
 \end{itemize}
+
 Loops $\dowhile$, $\forin$, $\for$ can be desugared to while loops with transformations performed before interpreting the program.
 
 \begin{align*}
@@ -2576,22 +2630,24 @@ If the initializer list contains at least two initializers, $Izs = Ininitalizer(
 Otherwise, there is only one initializer to execute in the initializer list, $li$:
 
 \begin{itemize}
-\item When $li$ is field or local initializer, the transition is identical to the rule for non empty and non singleton initializer lists, described above.\\
-\item When the last initializer is a redirecting constructor, i.e. $li = RedirectingI(G, \exprs)$, the transition is as follows:
-    \begin{align*}
-        \cesktranswheresplit%
-            {\acontconf{\FieldsA{\env}{li::[]}{\loc}{\scont}}{\val{s}}}%
-            {\evallistconf{\exprs}{\env}{\strace}{\cstrace}{\cex}{\acont}}%
-            {\text{where $\deref{\deref{\loc[f_i]}} = \val_{i}$, $\forall f_i \in Fs$, $\forall \val_i \in \val{s}$, $\acont = \RedirectingA{G}{\loc}{\scont}$}}.
-    \end{align*}
+    \item When $li$ is field or local initializer, the transition is identical to the rule for non empty and non singleton initializer lists, described above.\\
 
-\item Otherwise, the last initializer is a super initializer, $li = Super(G, \exprs)$:
-    \begin{align*}
-        \cesktranswheresplit%
-            {\acontconf{\FieldsA{\env}{li::[]}{\loc}{\scont}}{\val{s}}}%
-            {\evallistconf{\exprs}{\env}{\strace}{\cstrace}{\cex}{\acont}}%
-            {\text{where $\deref{\deref{\loc[f_i]}} = \val_{i}$, $\forall f_i \in Fs$, $\forall \val_i \in \val{s}$, $\acont = \SuperA{G}{\loc}{\scont}$}}.
-    \end{align*}
+    \item When the last initializer is a redirecting constructor, i.e. $li = RedirectingI(G, \exprs)$, the transition is as follows:
+        \begin{align*}
+            \cesktranswheresplit%
+                {\acontconf{\FieldsA{\env}{li::[]}{\loc}{\scont}}{\val{s}}}%
+                {\evallistconf{\exprs}{\env}{\strace}{\cstrace}{\cex}{\acont}}%
+                {\text{where $\deref{\deref{\loc[f_i]}} = \val_{i}$, $\forall f_i \in Fs$, $\forall \val_i \in \val{s}$, $\acont = \RedirectingA{G}{\loc}{\scont}$}}.
+        \end{align*}
+
+    \item Otherwise, the last initializer is a super initializer, $li = Super(G, \exprs)$:
+        \begin{align*}
+            \cesktranswheresplit%
+                {\acontconf{\FieldsA{\env}{li::[]}{\loc}{\scont}}{\val{s}}}%
+                {\evallistconf{\exprs}{\env}{\strace}{\cstrace}{\cex}{\acont}}%
+                {\text{where $\deref{\deref{\loc[f_i]}} = \val_{i}$, $\forall f_i \in Fs$, $\forall \val_i \in \val{s}$, $\acont = \SuperA{G}{\loc}{\scont}$}}.
+        \end{align*}
+
 \end{itemize}
 
 The transitions for the initializer continuation are described below.
