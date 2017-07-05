@@ -254,12 +254,12 @@ The machine is defined by a single step transition function where each step of t
     \expr, \expri{i}
     & : & \dexpr & \text{syntactic domain of expressions}\\
     \exprs
-    & : & \mlist{\dexpr}\\[2mm]
+    & : & \mlist{\dexpr}\\
 
     \stmt, \stmti{i}
     & : & \dstmt & \text{syntactic domain of statements}\\
     \stmts
-    & : & \mlist{\dstmt}  & \text{}\\[2mm]
+    & : & \mlist{\dstmt}  & \text{}\\
 
     \econt
     & : & \decont & \text{domain of expression continuations}\\
@@ -270,12 +270,12 @@ The machine is defined by a single step transition function where each step of t
     \bcont
     & : & \dbcont & \text{domain of break continuations}\\
     \switchcont
-    & : & \dswitchcont & \text{domain of switch continuations}\\[2mm]
+    & : & \dswitchcont & \text{domain of switch continuations}\\
 
     \lbl & : & \dlbl & \text{domain of labels}\\
     \lbls & : & \mlist{\dlbl} \\
     \clbl & : & \dclbl & \text{domain of switch labels}\\
-    \clbls & : & \mlist{\dclbl} \\[2mm]
+    \clbls & : & \mlist{\dclbl} \\
 
     \handler
     & : & \dhandler & \text{syntactic domain of exception handlers} \\
@@ -284,7 +284,7 @@ The machine is defined by a single step transition function where each step of t
     \cex
     & : &  \emptyset + \dval & \text{domain of current expetion values}\\
     \cstrace
-    & : & \emptyset + \mlist{\dexpr} & \text{domain of current exception stack traces}\\[2mm]
+    & : & \emptyset + \mlist{\dexpr} & \text{domain of current exception stack traces}\\
 
     \varmeta
     & : & \dvardecl & \text{domain of variable declarations}\\
@@ -295,7 +295,7 @@ The machine is defined by a single step transition function where each step of t
     \vals
     & : & \mlist{\dval}\\
     \env
-    & : & \denv & \text{domain of environments}\\[2mm]
+    & : & \denv & \text{domain of environments}\\
   \end{array}
 \]
 
@@ -1305,7 +1305,7 @@ Transitions of the CESK machine for basic literals are presented in Figure~\ref{
 \subsubsection{Variable assignment and lookup}
 \label{subsubsec:variable-assignment-and-lookup}
 
-A variable $\varmeta$ is accessed by reading the value stored at location $\env(\varmeta)$ in the store, \eqref{eval:varget}.\\[2mm]
+A variable $\varmeta$ is accessed by reading the value stored at location $\env(\varmeta)$ in the store, \eqref{eval:varget}.\\
 Assigning a value to a variable $\varmeta$ will modify the store, more specifically the value stored at location  $\env(\varmeta)$.
 The evaluation of this expression proceeds by evaluating the right-hand side expression, as shown in \eqref{eval:varset} and setting the location $\env(\varmeta)$ in the store to the value this expression evaluates to, as shown in \eqref{econtconf:varset}.
 
