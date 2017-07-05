@@ -630,7 +630,6 @@ They accept an environment and produce the next configuration.
 Statements in a block expressions can extend the environment function and this is visible to the subsequent statements in the same block.
 For other types of statement configuration, the environment is ignored.
 
-\noindent
 We suffix the names of statement continuations with ``$SK$''.
 The different statement continuations are shown in Figure~\ref{figure:sconts}.
 \newcommand{\ExitSK}[1]{\mathrm{ExitSK}(\econt,\,#1)}
@@ -676,9 +675,8 @@ Application continuations, $\acont$, capture the application of a list of values
 %
 \newcommand{\ForUpdatesA}[1]{\mathrm{ForUpdatesA}(\mathrm{\varmeta{s}},\, \expressionmeta,\, \exprs,\, \statementmeta,\, \env,\, #1,\, \lbls,\, \clbls,\, \handler,\, \cstrace,\, \cex,\, \econt,\, \scont)}
 \newcommand{\InstanceMethodA}{\mathrm{InstanceMethodA(\idmeta,\,\val,\,\strace,\,\handler,\,\cstrace,\,\cex,\,\econt)}}
-\noindent
+
 We use the application continuation $\ValueA{\acont}{\val}$, capturing a value and an application continuation, as application that adds a value to the list of values to eventually used by an application continuation that produces a configuration other than ApplicationConfiguration.\\
-\noindent
 We suffix the names of application continuations with ``$A$''.
 The different application continuations are shown in Figure~\ref{figure:acont}.
 \begin{figure}[Htp]
@@ -715,7 +713,7 @@ The different break continuations are shown in Figure~\ref{figure:breakcont}.
   \caption{Break Continuations}
   \label{figure:breakcont}
 \end{figure}
-\noindent
+
 The break continuation Break, \ref{breakcont:break}, captures a statement continuation and the environment corresponding to a target label or a break statement.\\
 The break continuation FinallyBreak, \ref{breakcont:finallybreak}, captures the statement body and the components necessary for the execution of an enclosing Finally statement.
 They are added when a try/finally statement is executed.
@@ -739,7 +737,7 @@ The different switch continuations are shown in Figure~\ref{figure:switchconts}.
   \caption{Switch Continuations}
   \label{figure:switchconts}
 \end{figure}
-\noindent
+
 The switch continuation SwitchContinue, \ref{switchcont:continue}, captures the statement body of a preceding switch case, targeted by some continue statement, and the components necessary for its execution.
 The switch continuation FinallyContinue, \ref{switchcont:finallycontinue}, captures the statement body and the components necessary for the execution of an enclosing Finally statement.
 They are added when a try/finally statement is executed.
@@ -1055,7 +1053,6 @@ A method lookup searches for an instance method in the given class given the nam
 
 Expressions are evaluated by dispatching according to the expression component, $\expressionmeta$, in EvalConfiguration, Section~\ref{subsubsec:evalconfig}, and the list of expression component, $\exprs$, in EvalListConfiguration, Section~\ref{subsubsec:evallistconfig}.
 
-\noindent
 The CESK-transition function for EvalListConfiguration is shown in Figure~\ref{figure:evallist}.
 The value corresponding to the evaluated expression is captured by the application continuation ValueA and eventually added to the list of values corresponding to the expressions.
 
@@ -1486,34 +1483,26 @@ The member $\membermeta$ can be a static or library field, a getter or a method 
 \item $\membermeta$ is a static or library field\\
 Let $\expressionmeta_{\membermeta}$ be $\membermeta$'s initializer expression.
 When $\membermeta$ is accessed for the first time during the program's execution, the evaluation of $\StaticGet{\membermeta}$ proceeds with evaluation of the initializer expression $\expressionmeta_{\membermeta}$.\\
-\noindent
 When $\expressionmeta$ is $\tt{null}$, the environment is extended with a binding to a fresh location that stores a $\tt{null}$ value for the field $\membermeta$, as shown in \eqref{eval:staticget-varnew-null}.\\
-\noindent
 When $\expressionmeta$ is an expression, this expression is evaluated as shown in \eqref{eval:staticget-varnew}.
 The expression will evaluate to some value $\val$ that will be applied to the corresponding continuations, as shown in \eqref{econtconf:staticget}: the environment is extended with a binding to a fresh location that stores the value $\val$ and the continuation $\econt$ is applied to the value $\val$.\\
-\noindent
 When there is already a binding for the member $\membermeta$ in the global environment $\env_{M}$, the continuation $\econt$ is applied to the stored value, as shown in \eqref{eval:staticget-var}.
 \item $\membermeta$ is a static getter\\
-\noindent
 When $\membermeta$ is a static getter, the body of the getter is executed, as shown in \eqref{eval:staticget-getter}.
 \item $\membermeta$ is a static method tear-off\\
-\noindent
 When $\membermeta$ is a method with formal parameters $\formals$ and body $\stmt$, a new $\funval{\formals}{\stmt}{\env_{empty}}$ is created and bound to the member in the global environment $\env^{M}$, as shown in \eqref{eval:staticget-tearoff}.
 The continuation $\econt$ is applied to this value.
 \end{itemize}
-\noindent
 Static and library variables are set with $\StaticSet{\membermeta}{\expressionmeta}$.
 The target member can either be a static or library field, or it can be a static setter. For both cases, the right-hand side expression is evaluated first, as shown in \eqref{eval:staticset}.
 \begin{itemize}
 \item $\membermeta$ is a static or library field\\
 The evaluation proceeds by extending the environment $\env^{M}$, when $\membermeta \notin \env^{M}$, as shown in \eqref{econtconf:staticset-var-new}.\\
-\noindent
 Otherwise, when $\membermeta \in \env^{M}$, the value stored at location $\env^{M}(\membermeta)$ is modified accordingly, as shown in \eqref{econtconf:staticset-var}.
 \item $\membermeta$ is a static setter\\
 The evaluation proceeds by executing the statement body of the setter. A statement continuation $\ExitSK{\econt}{\val}$ is added that applies the given expression continuation $\econt$ to the value of the right-hand side expression.
 The statement body is executed in an environment that has only the binding from the formal parameter of the static setter to the value of the right-hand side expression, as shown in \eqref{econtconf:staticset-setter}.
 \end{itemize}
-\noindent
 Otherwise, $\membermeta$ is a static or library setter with body $\stmt$ and formal parameter $\formal$.
 
 
@@ -1664,7 +1653,6 @@ A statement continuation, $\ExitSK{\econt}{\tt{null}}$ is added as next statemen
 Kernel allows access of a member as a property, which can be either getter access, which executes the getter, or method extraction, which converts a method into a closure, also known as tear-off.
 Property extraction is supported with $\PropertyGet{\expr}{\idmeta}$.
 The evaluation of this expression is shown in \eqref{eval:propertyget}.\\
-\noindent
 After the evaluation of the receiver expression to a value $\val$, the property $\idmeta$ is looked up in methods, getters and implicit getters for the value $\val$.
 Let $\membermeta$ be the instance member result of such successful lookup below and in \eqref{econtconf:propertyget-field}, \eqref{econtconf:propertyget-getter} and \eqref{econtconf:propertyget-tearoff}.
 The evaluation of the expression proceeds as follow:
@@ -1819,7 +1807,6 @@ When $\membermeta$ is a field the value stored at location $\val_0[\membermeta]$
 \label{subsubsec:super-property-get}
 
 Kernel allows access of a superclass member as a property, which can be either getter access, which executes the getter, or method extraction, which converts a method into a closure.
-\noindent
 Accessing a superclass member is accessed with the expression $\SuperPropertyGet{\idmeta}$ evaluated with the corresponding components: $\env$, $\strace$, $\handler$, $\cstrace$, $\cex$, $\econt$.
 Let $\val = \deref{(\env(\this))}$, $C = \superclass{\val}$ and $\membermeta$ the result of looking up $\idmeta$ in $C$.
 The evaluation of a super property extraction proceeds as follows:
