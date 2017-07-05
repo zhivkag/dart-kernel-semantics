@@ -316,35 +316,33 @@ The machine is defined by a single step transition function where each step of t
 \subsection{Notations}
 \label{subsec:notations}
 
-\[
-  \begin{array}{lcl}
-    [] &\text{---}& \text{empty list}\\
-    X :: list &\text{---}& \text{a meta-list that is constructed by adding element $X$ to the head}\\
-    && \text{of the meta-list $list$}
-  \end{array}
-\]
+\begin{align*}
+    [] &\text{ --- empty list}.\\
+    X :: list &\text{ --- a meta-list that is constructed by adding element $X$ to the head of the meta-list $list$}.
+\end{align*}
 
 
 \subsection{Store}
 \label{subsec:store-definition}
 
-The store, $s$, maps a location, $\loc$, to a value, $\val$.
+The store $s$ maps a location $\loc$ to a value $\val$.
 The store is a mutable map and should not be confused with a function.
-A global store is assumed and locations reachable from a given scope are defined by the current environment function.
-\[s : \dlocation \rightarrow \dval \]
+A global store is assumed and locations reachable in the current scope are defined by the current environment function
+\[
+    s : \dlocation \rightarrow \dval.
+\]
 
 
 \subsubsection{Dereferencing}
 \label{subsubsection:dereferecing}
 
 \newcommand{\deref}[1]{!#1}
-Function ``$\deref{}$'' is used to access a value stored in the store provided the corresponding location.
+Function ``$\deref{}$'' is used to access the value stored in the store at the given location.
 The location is stored in the environment, or in the list of field locations for object values.
 ``$\deref{}$'' has an implicit argument which is the store of CESK machine.
-
 \begin{align*}
-  \deref{} \in \dlocation &\rightarrow \dval \\
-  \deref{\loc} &=  \val, \text{ with $\val$ the value in store at location } \loc
+    &\deref{} \in \dlocation \rightarrow \dval,\\
+    &\deref{\loc} =  \val, \text{ with $\val$ the value in store at location } \loc.
 \end{align*}
 
 
@@ -364,7 +362,10 @@ It has an implicit argument which is the store of the CESK machine.
 \label{subsec:env-definition}
 
 The environment is a function that maps a variable to a location in the store.
-\[\env \in \denv = \dvardecl \rightarrow \dlocation\]
+\[
+    \env \in \denv = \dvardecl \rightarrow \dlocation.
+\]
+
 When an environment is needed to further execute the program, it is saved by the caller in the corresponding continuation.
 
 
@@ -373,14 +374,15 @@ When an environment is needed to further execute the program, it is saved by the
 
 Function ``$\extend$'' creates a new environment by extending the provided environment with new bindings for the variable declarations to fresh locations for each of the provided values.
 \begin{align*}
-  \extend \in \denv \times \mlist{\dvardecl} \times \mlist{\dval} &\rightarrow  \denv\\
-  \ext{\env}{\varmeta{s}}{\vals} &= \env'
+    &\extend \in \denv \times \mlist{\dvardecl} \times \mlist{\dval} \rightarrow  \denv,\\
+    &\ext{\env}{\varmeta{s}}{\vals} = \env',
 \end{align*}
-with
+
+\noindent where
 \[
     \env'(\varmeta) =\begin{cases}
-    \loc_i & \text{with }\deref{\loc_i} = \val_i\text{ if }\exists\varmeta_i \in \varmeta{s} \text{ s.t. } \varmeta_i = \varmeta\\
-    \env(\varmeta) &\text{otherwise}
+        \loc_i & \text{with }\deref{\loc_i} = \val_i\text{ if }\exists\varmeta_i \in \varmeta{s} \text{ s.t. } \varmeta_i = \varmeta,\\
+        \env(\varmeta) &\text{otherwise}.
     \end{cases}
 \]
 
@@ -645,6 +647,7 @@ For other types of statement configuration, the environment is ignored.
 
 We suffix the names of statement continuations with ``$SK$''.
 The different statement continuations are shown in Figure~\ref{figure:sconts}.
+
 \newcommand{\ExitSK}[1]{\mathrm{ExitSK}(\econt,\,#1)}
 \newcommand{\BlockSK}[2]{\mathrm{BlockSK}({#1},\,{#2},\,\lbls,\,\clbls,\,\handler,\,\cstrace,\,\cex,\,\econt,\,\scont)}
 \newcommand{\WhileSK}{\mathrm{WhileSK}(\expr,\,\stmt,\,\env,\,\lbls,\,\clbls,\,\handler,\,\cstrace,\,\cex,\,\econt,\,\scont)}
@@ -652,9 +655,7 @@ The different statement continuations are shown in Figure~\ref{figure:sconts}.
 \newcommand{\NewSK}[2]{\mathrm{NewSK}({#1},\,{#2})}
 \newcommand{\FinallySK}[1]{\mathrm{FinallySK}({#1},\,\env,\,\lbls,\,\clbls,\,\strace,\,\handler,\,\econt,\,\scont)}
 \newcommand{\RethrowSK}[3]{\mathrm{RethrowSK}({#1},\,{#2},\,{#3})}
-
 \newcommand{\ForSK}{\mathrm{ForSK}(\mathrm{\varmeta{s}},\, \expressionmeta,\, \exprs,\, \statementmeta,\, \env,\, \env',\, \lbls,\, \clbls,\, \handler,\, \cstrace,\, \cex,\, \econt,\, \scont)}
-
 \newcommand{\WhileCondSK}{\mathrm{WhileCondSK}(\expr,\,\stmt,\,\env,\,\lbls,\,\clbls,\,\handler,\,\cstrace,\,\cex,\,\econt,\,\scont)}
 \begin{figure}[Htp]
   \begin{eqfigure}
@@ -690,13 +691,13 @@ Application continuations, $\acont$, capture the application of a list of values
 \newcommand{\ConstructorA}[2]{\mathrm{ConstructorA}({#1},\,\strace,\,\handler,\,\cstrace,\,\cex,\,{#2})}
 \newcommand{\RedirectingA}[3]{\mathrm{RedirectingA}({#1},\,{#2},\,\strace,\,\handler,\,\cstrace,\,\cex,\,{#3})}
 \newcommand{\ForInitA}[1]{\mathrm{ForInitA}(\mathrm{\varmeta{s}},\, #1,\, \exprs,\, \statementmeta,\, \env,\, \lbls,\, \clbls,\, \handler,\, \cstrace,\, \cex,\, \econt,\, \scont)}
-%
 \newcommand{\ForUpdatesA}[2]{\mathrm{ForUpdatesA}(\mathrm{\varmeta{s}},\, #1,\, \exprs,\, \statementmeta,\, \env,\, #2,\, \lbls,\, \clbls,\, \handler,\, \cstrace,\, \cex,\, \econt,\, \scont)}
 \newcommand{\InstanceMethodA}{\mathrm{InstanceMethodA(\idmeta,\,\val,\,\strace,\,\handler,\,\cstrace,\,\cex,\,\econt)}}
 
 We use the application continuation $\ValueA{\acont}{\val}$, capturing a value and an application continuation, as application that adds a value to the list of values to eventually used by an application continuation that produces a configuration other than ApplicationConfiguration.
 We suffix the names of application continuations with ``$A$''.
 The different application continuations are shown in Figure~\ref{figure:acont}.
+
 \begin{figure}[Htp]
   \begin{eqfigure}
   \begin{align}
@@ -801,9 +802,10 @@ The different literal values are presented below:
 \[
   \begin{array}{lcl}
     \val \in \dlitval &=& \mathbf{int} + \mathbf{bool} + \mathbf{double}\\
-    && + \mathbf{List} + \mathbf{Map} + \mathbf{String} + \mathbf{Symbol} + \mathbf{Type}
+    && + \mathbf{List} + \mathbf{Map} + \mathbf{String} + \mathbf{Symbol} + \mathbf{Type}.
   \end{array}
 \]
+
 Literal values are special values that store the specific payload and an associated class.
 Each of the specific literal values contains predefined operators and/or methods, whose semantics we are not going to specify in this document.
 
@@ -813,8 +815,9 @@ Each of the specific literal values contains predefined operators and/or methods
 
 Object values have a $\tt{class}$ component and a $\tt{fields}$ component which is list of locations for each field, as shown below:
 \[
-    \dobjval : \dclass \times \mlist{\dlocation}
+    \dobjval : \dclass \times \mlist{\dlocation}.
 \]
+
 The $\tt{class}$ component captures the properties of the object, see Section~\eqref{subsec:class}.
 The object also stores a list of locations that represent the values of the fields for the given object.
 An object is mutated by modifying a field.
@@ -822,10 +825,9 @@ A field is modified by changing the value stored at the location for the said fi
 Access and modification of fields is enabled with implicit getters and setters defined in the associated class component.
 Each field has an associated implicit getter, as defined below.
 Let $\loc$ be the location of field with name $fName$ for the object value $\val_0$:
-
 \begin{align*}
   \getter \in \dobjval \times \mathbf{Name} &\rightarrow \dval\\
-  \getter(\val_0, fName) &= \val_1
+  \getter(\val_0, fName) &= \val_1,
 \end{align*}
 
 \noindent where $\val_1 = \deref{\loc}$.
@@ -834,9 +836,10 @@ Each non-final field has an associated implicit setter, as defined below.
 Let $\loc$ be the location of field $fName$ for the object value $\val_0$:
 \begin{align*}
   \setter \in \dobjval \times \mathbf{Name} \times \dval &\rightarrow \dval\\
-  \setter(\val_0, fName, \val_1) &= \val_1
+  \setter(\val_0, fName, \val_1) &= \val_1,
 \end{align*}
-where $\val_1$ is the value to be stored in $\loc$ after the invocation of the implicit setter.
+
+\noindent where $\val_1$ is the value to be stored in $\loc$ after the invocation of the implicit setter.
 This implies that invocation of implicit setter will modify the global store and  $\deref{\loc} = \val_1$ will hold after the transition.
 
 
