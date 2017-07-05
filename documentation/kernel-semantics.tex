@@ -1305,7 +1305,7 @@ Transitions of the CESK machine for basic literals are presented in Figure~\ref{
 \subsubsection{Variable assignment and lookup}
 \label{subsubsec:variable-assignment-and-lookup}
 
-A variable $\varmeta$ is accessed by reading the value stored at location $\env(\varmeta)$ in the store, \eqref{eval:varget}.\\
+A variable $\varmeta$ is accessed by reading the value stored at location $\env(\varmeta)$ in the store, \eqref{eval:varget}.
 Assigning a value to a variable $\varmeta$ will modify the store, more specifically the value stored at location  $\env(\varmeta)$.
 The evaluation of this expression proceeds by evaluating the right-hand side expression, as shown in \eqref{eval:varset} and setting the location $\env(\varmeta)$ in the store to the value this expression evaluates to, as shown in \eqref{econtconf:varset}.
 
@@ -1526,7 +1526,7 @@ The target member can either be a static or library field, or it can be a static
 
 \begin{itemize}
     \item $\membermeta$ is a static or library field\\
-        The evaluation proceeds by extending the environment $\env^{M}$, when $\membermeta \notin \env^{M}$, as shown in \eqref{econtconf:staticset-var-new}.\\
+        The evaluation proceeds by extending the environment $\env^{M}$, when $\membermeta \notin \env^{M}$, as shown in \eqref{econtconf:staticset-var-new}.
         Otherwise, when $\membermeta \in \env^{M}$, the value stored at location $\env^{M}(\membermeta)$ is modified accordingly, as shown in \eqref{econtconf:staticset-var}.
 
     \item $\membermeta$ is a static setter\\
@@ -2632,7 +2632,7 @@ If the initializer list contains at least two initializers, $Izs = Ininitalizer(
 Otherwise, there is only one initializer to execute in the initializer list, $li$:
 
 \begin{itemize}
-    \item When $li$ is field or local initializer, the transition is identical to the rule for non empty and non singleton initializer lists, described above.\\
+    \item When $li$ is field or local initializer, the transition is identical to the rule for non empty and non singleton initializer lists, described above.
 
     \item When the last initializer is a redirecting constructor, i.e. $li = RedirectingI(G, \exprs)$, the transition is as follows:
         \begin{align*}
