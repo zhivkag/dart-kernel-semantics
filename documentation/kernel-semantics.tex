@@ -1927,7 +1927,7 @@ After the evaluation of the argument expression to a value $\val$, depending on 
             {\evallistconf{\exprs}{\env}{st}{cex}{cst}{\acont'}}%
             {\acont' = \ConstructorA{Q}{\econt}}
         \end{multlined}
-        \label{eval:ctrinvocation}
+        \label{eval:new}
     \end{align}
     \caption{The CESK-transition function for EvalConfiguration: instance method and constructor invocation}
     \label{figure:instance-method-evalconfigs}
@@ -2329,7 +2329,7 @@ The execution of the different loop statements is defined below:
 Loops $\dowhile$, $\forin$, $\for$ can be desugared to while loops with transformations performed before interpreting the program.
 
 
-\subsection{Labels}
+\subsubsection{Labels}
 
 Kernel supports labelling statements, $\synt{L}: \stmt_{L}$, and breaking to L, $\bbreak \synt{L}$, which completes the execution of the labelled statement and proceeds to executing the rest of the program.
 To support breaking to a label, we add a labels component, $\lbls$, to statement configurations.
@@ -2337,7 +2337,7 @@ $\lbls$ represents a list of pairs mapping a labelled statement, $\synt{L}: \stm
 Executing a labelled statement inserts a new break label, $\lbl$ in the list of labels $\lbls$.
 
 
-\subsection{Switch}
+\subsubsection{Switch}
 
 Kernel supports dispatching control among a number of cases with $\switch$ statements.
 The target expression $\expr$ is evaluated and matched against the different case clauses of the switch statement.
@@ -2390,7 +2390,7 @@ Otherwise, the execution continues as follows:
 \end{align*}
 
 
-\subsection{Exceptions}
+\subsubsection{Exceptions}
 
 Kernel supports structured exception handling with $\synt{try/catch}$ and $\synt{try/finally}$ statements.
 Exceptions are thrown with $\throw$ and $\rethrow$ expressions.
@@ -2472,7 +2472,7 @@ $\synt{try/finally}$ statements execute their body with a new handler and additi
 \end{align*}
 
 
-\subsection{Break}
+\subsubsection{Break}
 
 $\bbreak \synt{L}$ statements break from an enclosing label $\synt{L}$ and execute the break continuation corresponding to the label in the list of labels $\lbls$.
 
@@ -2493,7 +2493,7 @@ $\bbreak \synt{L}$ statements break from an enclosing label $\synt{L}$ and execu
 \noindent where $\lbl = Label(L', \bcont) \in \lbls \text{ with } L' == \mathbf{L}$.
 
 
-\subsection{Continue}
+\subsubsection{Continue}
 
 $\continue \synt{L}$ statements continue to executing the statement of a preceding case clause, labelled with $\synt{L}$ and execute the continue continuation corresponding to the label in the list of labels $\clbls$.
 
@@ -2540,8 +2540,8 @@ Let $F$ be a function with a body $\stmt_{body}$ and a list of formal parameters
 \newcommand{\RedirectingInitializer}[2]{\mathrm{RedirectingInitializer}(#1,\,#2)}
 
 The expression $\new$ invokes a constructor to produce a new instance.
-The target constructor $\synt{Q}$ has a list of formal parameters, $\formals$, a list of initializers, $Izs$, and a statement body, $\stmt_{body}$.
-The invocation of a constructor $\synt{Q}$ with $\new \synt{Q}(\exprs)$ proceeds as follows:
+The target constructor $\synt{Q}$ has a list of formal parameters, $\formals$, a list of initializers, $\synt{Izs}$, and a statement body, $\stmt_{body}$.
+The invocation of a constructor $\synt{Q}$ proceeds by evaluating the argument expressions as shown in \eqref{eval:new}.
 
 \begin{align*}
     &\cesktrans%
@@ -2722,7 +2722,7 @@ Then the value stored at location $\loc' = (\deref{\loc})[f]$ in the store $S$ w
         \cesktranswheresplit%
             {\contconf{\InitK{Field(f, \expri{0}) :: Izs}{\loc}{\scont}}{\val}}%
             {\evalconf{\expri{1}}{\env}{st}{cex}{cst}{\econt}}%
-            {\text{where $\update{(\deref\loc)[f]}{\val}$, $Izs = Initializer(\expri{1}) :: Izs'$, $\econt' = \InitK{Izs}{\loc}{\env}$.}}
+            {\text{where $\update{(\deref\loc)[f]}{\val}$, $Izs = Initializer(\expri{1}) :: Izs'$, $\econt' = \InitK{Izs}{\loc}{\env}$}}
     \end{multlined}
 \end{align*}
 
