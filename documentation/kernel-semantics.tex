@@ -582,7 +582,7 @@ The different expression continuations are shown in Figure~\ref{figure:econts}.
 \newcommand{\IfCondK}[2]{\mathrm{IfConditionK}({#1},\,{#2},\,\env,\,\lbls,\,\clbls,\,\handler,\,\cstrace,\,\cex,\,\econt,\,\scont)}
 \newcommand{\SwitchK}[2]{\mathrm{SwitchK}({#1},\,\env,\,\lbls,\,{#2},\,\strace,\,\handler,\,\cstrace,\,\cex,\,\econt,\,\scont)}
 %
-\newcommand{\whilecondk}{\mathrm{WhileCondK}(\expr,\,\stmt,\,\env,\,\lbls,\,\clbls,\,\handler,\,\cstrace,\,\cex,\,\econt,\,\scont)}
+\newcommand{\WhileCondK}{\mathrm{WhileCondK}(\expr,\,\stmt,\,\env,\,\lbls,\,\clbls,\,\handler,\,\cstrace,\,\cex,\,\econt,\,\scont)}
 \newcommand{\InitializerK}[4]{\mathrm{InitializerK}({#1},\,{#2},\,{#3},\,\strace,\,\handler,\,\cstrace,\,\cex,\,{#4})}
 \newcommand{\InitK}[3]{\mathrm{InitiK}({#1},\,{#2},\,\strace,\,\handler,\,\cstrace,\,\cex,\,{#3})}
 \newcommand{\FinallyK}[1]{\mathrm{Finally}({#1},\,\env,\,\lbls,\,\clbls,\,\strace,\,\handler,\,\econt)}
@@ -641,6 +641,8 @@ The different statement continuations are shown in Figure~\ref{figure:sconts}.
 \newcommand{\RethrowSK}[3]{\mathrm{RethrowSK}({#1},\,{#2},\,{#3})}
 %
 \newcommand{\ForSK}{\mathrm{ForSK}(\mathrm{\varmeta{s}},\, \expressionmeta,\, \exprs,\, \statementmeta,\, \env,\, \env',\, \lbls,\, \clbls,\, \handler,\, \cstrace,\, \cex,\, \econt,\, \scont)}
+%
+\newcommand{\WhileCondSK}{\mathrm{WhileCondSK}(\expr,\,\stmt,\,\env,\,\lbls,\,\clbls,\,\handler,\,\cstrace,\,\cex,\,\econt,\,\scont)}
 \begin{figure}[Htp]
   \begin{align}
     &\ExitSK{\val} \label{scont:exit}\\
@@ -650,7 +652,8 @@ The different statement continuations are shown in Figure~\ref{figure:sconts}.
     &\NewSK{\econt}{\loc} \label{scont:new}\\
     &\FinallySK{\stmt} \label{scont:finally}\\
     &\RethrowSK{\val}{\strace}{\handler} \label{scont:rethrow}\\
-    &\ForSK \label{scont:for}
+    &\ForSK \label{scont:for}\\
+    &\WhileCondSK \label{scont:while}
   \end{align}
   \caption{Statement Continuations}
   \label{figure:sconts}
@@ -2037,14 +2040,14 @@ Similarly to Section~\ref{subsubsec:instance-method-invoc}, $\ExitSK{\val}$ is a
             \cesktranswheresplit*%
                 {\execconf{\DoStatement{\statementmeta}{\expressionmeta}}{\env}{\lbls}{\clbls}{\handler}{\cstrace}{\cex}{\econt}{\scont}}%
                 {\execconf{\statementmeta}{\env}{\lbls}{\clbls}{\handler}{\cstrace}{\cex}{\econt}{\scont'}}%
-                {\text{where $\scont' = \whilecondk$}}
+                {\text{where $\scont' = \WhileCondK$}}
         \end{multlined}
         \label{execconf:do}\\
         &\begin{multlined}
             \cesktranswheresplit*%
                 {\execconf{\WhileStatement{\expr}{\stmt}}{\env}{\lbls}{\clbls}{\handler}{\cstrace}{\cex}{\econt}{\scont}}%
                 {\evalconf{\expr}{\env}{\strace}{\cstrace}{\cex}{\econt'}}%
-                {\text{where $\econt', \scont' = \whilecondk$}}
+                {\text{where $\econt', \scont' = \WhileCondK$}}
         \end{multlined}
         \label{execconf:while}\\
         &\begin{multlined}
@@ -2119,6 +2122,18 @@ Similarly to Section~\ref{subsubsec:instance-method-invoc}, $\ExitSK{\val}$ is a
                 {\execconf{\stmti{1}}{\env}{\lbls}{\clbls}{\handler}{\cstrace}{\cex}{\econt}{\scont}}
        \end{multlined}
        \label{econtconf:if-false}\\
+       &\begin{multlined}
+              \cesktrans%
+                  {\contconf{\WhileCondK}{\false}}%
+                  {\scontconf{\scont}{\env}}
+       \end{multlined}
+       \label{econtconf:while-false}\\
+       &\begin{multlined}
+              \cesktranssplit%
+                  {\contconf{\WhileCondK}{\true}}%
+                  {\execconf{\stmt}{\env}{\lbls}{\clbls}{\handler}{\cstrace}{\cex}{\econt}{\scont'}}
+       \end{multlined}
+       \label{econtconf:while-true}
        \end{align}
        \caption{The CESK-transition function starting in ValuePassingConfiguration: statements}
 \end{figure}
@@ -2133,9 +2148,15 @@ Similarly to Section~\ref{subsubsec:instance-method-invoc}, $\ExitSK{\val}$ is a
     &\cesktrans%
       {\scontconf{\BlockSK{[]}{\env}}{ \_ }}%
       {\scontconf{\scont}{\env}},
-    \label{scontconf:block-empty}
+    \label{scontconf:block-empty}\\
+    &\begin{multlined}
+           \cesktranssplit%
+               {\scontconf{\WhileCondK}{\_}}%
+               {\evalconf{\expr}{\env}{\strace}{\cstrace}{\cex}{\econt'}}
+    \end{multlined}
+    \label{scontconf:while}
     \end{align}
-       \caption{The CESK-transition function starting in ForwardConfiguration: statements}
+    \caption{The CESK-transition function starting in ForwardConfiguration: statements}
 \end{figure}
 
 
@@ -2177,35 +2198,43 @@ The expression continuation component in the ExecConfiguration is the return exp
 This is the expression continuation that is applied to the value the return expression evaluates to.
 When the return expression is empty, the value $\tt{null}$ is applied to the return expression continuation component in the ExecConfiguration as shown in \eqref{execconf:return-empty}.
 
+\begin{figure}
+    \begin{align}
+        &\begin{multlined}
+            \cesktranswheresplit*%
+                {\acontconf{\ForInitA}{\vals}}%
+                {\evalconf{\expressionmeta}{\env'}{\strace}{\cstrace}{\cex}{\econt'}}%
+                {\parbox{\textwidth-2cm}{where $\env' = \extend(\env, \varmeta{s}, \vals)$,\\
+                $\econt' = \ForCondK$}}
+        \end{multlined}
+        \label{acontconf:forinit}
+    \end{align}
+    \caption{The CESK-transition function starting in ForwardConfiguration: statements}
+\end{figure}
+
 
 \subsubsection{Loops}
 
-\begin{align*}
-    \cesktransalign%
-        {\contconf{\econt'}{\false}}%
-        {\scontconf{\scont}{\env}}\\
-    \cesktransalign%
-        {\contconf{\econt'}{\true}}%
-        {\execconf{\stmt}{\env}{\lbls}{\clbls}{\handler}{\cstrace}{\cex}{\econt}{\scont'}}\\
-    \cesktransalign%
-        {\scontconf{\scont'}{\_}}%
-        {\evalconf{\expr}{\env}{\strace}{\cstrace}{\cex}{\econt'}}
-\end{align*}
-
-\noindent where $\econt', \scont' = \whilecondk$.
-
+In Dart Kernel there are $\dowhile$, $\forin$, $\for$ and $\while$ loop statements.
+The execution of the different loop statements is defined below:
+\begin{itemize}
+\item  $\while$\\
+The execution of  $\while$ statement loops proceeds with evaluation of the condition expression as shown in \eqref{execconf:while}.
+The expression continuation for the execution of the remainder of the statement dispatches on the value of the condition expression.
+The body of the while loop is executed when this value is identical to $\true$, as shown in \eqref{econtconf:while-true}.
+Otherwise, the execution proceeds with the next ForwardConfiguration as shown in \eqref{econtconf:while-false}.
+\item $\dowhile$\\
+The execution of do while loop statement is similar to while loop statements.
+First the statement body of the loop is executed as shown in \eqref{execconf:do}.
+We add while statement continuation as next statement continuation that will evaluate the condition expression accordingly, as shown in \eqref{scontconf:while}.
+\item $\forin$\\
+In Kernel, $\forin$ loops, will be desugared into while loops and their execution will proceed as the $\while$ loop rule shown in Figure~\ref{figure:exec}.
+\item $\for$\\
+The execution of $\for$ loops proceeds as shown in Figure~\ref{figure:exec}.
+\end{itemize}
 Loops $\dowhile$, $\forin$, $\for$ can be desugared to while loops with transformations performed before interpreting the program.
 
-The execution of $\dowhile$ loops proceeds as shown in Figure~\ref{figure:exec}.
-The execution of $\for$ loops proceeds as shown in Figure~\ref{figure:exec}.
-
 \begin{align*}
-    &\begin{multlined}
-        \cesktranswheresplit*%
-            {\acontconf{\ForInitA}{\vals}}%
-            {\evalconf{\expressionmeta}{\env'}{\strace}{\cstrace}{\cex}{\econt'}}%
-            {\parbox{\textwidth-2cm}{where $\env' = \extend(\env, \varmeta{s}, \vals)$,\\$\econt' = \ForCondK$}}
-    \end{multlined}\\
     &\cesktrans%
         {\contconf{\ForCondK}{\tt{false}}}%
         {\scontconf{\scont}{\env}}\\
@@ -2219,8 +2248,8 @@ The execution of $\for$ loops proceeds as shown in Figure~\ref{figure:exec}.
         \cesktranswheresplit*%
             {\scontconf{\ForSK}{\_}}%
             {\evallistconf{\exprs}{\env_{new}}{st}{cex}{cst}{\acont}}%
-            {\parbox{\textwidth-2cm}{where $\acont = \ForUpdatesA{\env_{new}}$,
-                \\$\env_{new} = \extend(\env, \varmeta{s}, \vals)$, $\vals = \{\val_i \mid \deref(\env'(\varmeta_i))\}$}}
+            {\parbox{\textwidth-2cm}{where $\acont = \ForUpdatesA{\env_{new}}$,\\
+                $\env_{new} = \extend(\env, \varmeta{s}, \vals)$, $\vals = \{\val_i \mid \deref(\env'(\varmeta_i))\}$}}
     \end{multlined}\\
     &\begin{multlined}
         \cesktranswheresplit*%
@@ -2229,8 +2258,6 @@ The execution of $\for$ loops proceeds as shown in Figure~\ref{figure:exec}.
             {\text{where $\econt' = \ForCondK$}}
     \end{multlined}
 \end{align*}
-
-In Kernel, $\forin$ loops, will be desugared into while loops and their execution will proceed as the $\while$ loop rule shown in Figure~\ref{figure:exec}.
 
 
 \subsection{Labels}
