@@ -688,9 +688,9 @@ Application continuations, $\acont$, capture the application of a list of values
 \newcommand{\SuperA}[3]{\mathrm{SuperA}({#1},\,{#2},\,\strace,\,\handler,\,\cstrace,\,\cex,\,{#3})}
 \newcommand{\ConstructorA}[2]{\mathrm{ConstructorA}({#1},\,\strace,\,\handler,\,\cstrace,\,\cex,\,{#2})}
 \newcommand{\RedirectingA}[3]{\mathrm{RedirectingA}({#1},\,{#2},\,\strace,\,\handler,\,\cstrace,\,\cex,\,{#3})}
-\newcommand{\ForInitA}{\mathrm{ForInitA}(\mathrm{\varmeta{s}},\, \expressionmeta,\, \exprs,\, \statementmeta,\, \env,\, \lbls,\, \clbls,\, \handler,\, \cstrace,\, \cex,\, \econt,\, \scont)}
-
-\newcommand{\ForUpdatesA}[1]{\mathrm{ForUpdatesA}(\mathrm{\varmeta{s}},\, \expressionmeta,\, \exprs,\, \statementmeta,\, \env,\, #1,\, \lbls,\, \clbls,\, \handler,\, \cstrace,\, \cex,\, \econt,\, \scont)}
+\newcommand{\ForInitA}[1]{\mathrm{ForInitA}(\mathrm{\varmeta{s}},\, #1,\, \exprs,\, \statementmeta,\, \env,\, \lbls,\, \clbls,\, \handler,\, \cstrace,\, \cex,\, \econt,\, \scont)}
+%
+\newcommand{\ForUpdatesA}[2]{\mathrm{ForUpdatesA}(\mathrm{\varmeta{s}},\, #1,\, \exprs,\, \statementmeta,\, \env,\, #2,\, \lbls,\, \clbls,\, \handler,\, \cstrace,\, \cex,\, \econt,\, \scont)}
 \newcommand{\InstanceMethodA}{\mathrm{InstanceMethodA(\idmeta,\,\val,\,\strace,\,\handler,\,\cstrace,\,\cex,\,\econt)}}
 
 We use the application continuation $\ValueA{\acont}{\val}$, capturing a value and an application continuation, as application that adds a value to the list of values to eventually used by an application continuation that produces a configuration other than ApplicationConfiguration.
@@ -701,8 +701,8 @@ The different application continuations are shown in Figure~\ref{figure:acont}.
   \begin{align}
     &\ValueA{\val}{\acont} \label{acont:value}\\
     &\StringConcatenationA \label{acont:stringconcat}\\
-    &\ForInitA \label{acont:forinit}\\
-    &\ForUpdatesA{\env'} \label{acont:forupdates}\\
+    &\ForInitA{\expressionmeta} \label{acont:forinit}\\
+    &\ForUpdatesA{\expressionmeta}{\env'} \label{acont:forupdates}\\
     &\SuperMethodA \label{acont:supermethod}\\
     &\DInstanceMethodA \label{acont:staticinv}\\
     &\FieldsA{\env}{Izs}{\loc}{\scont} \label{acont:fields}\\
@@ -1964,7 +1964,7 @@ After the evaluation of the argument expression to a value $\val$, depending on 
             {\evallistconf{\exprs}{\env}{st}{cex}{cst}{\acont'}}%
             {\acont' = \ConstructorA{Q}{\econt}}
         \end{multlined}
-        \label{eval:ctrinvocation}
+        \label{eval:new}
     \end{align}
     \caption{The CESK-transition function for EvalConfiguration: instance method and constructor invocation}
     \label{figure:instance-method-evalconfigs}
@@ -2145,7 +2145,7 @@ Similarly to Section~\ref{subsubsec:instance-method-invoc}, $\ExitSK{\val}$ is a
             \cesktranswheresplit*%
                 {\execconf{\ForStatement{\varmeta{s}}{\expressionmeta}{\exprs}{\statementmeta}}{\env}{\lbls}{\clbls}{\handler}{\cstrace}{\cex}{\econt}{\scont}}%
                 {\evallistconf{\exprs'}{\env}{\strace}{\cex}{\cstrace}{\acont}}%
-                {\parbox{\textwidth-2cm}{where $\acont = \ForInitA$,\\
+                {\parbox{\textwidth-2cm}{where $\acont = \ForInitA{\expressionmeta}$,\\
                 $\exprs' =$ initializer expressions for the list of variable declarations $\varmeta{s}$}}
         \end{multlined}
         \label{execconf:for}\\
@@ -2200,34 +2200,45 @@ Similarly to Section~\ref{subsubsec:instance-method-invoc}, $\ExitSK{\val}$ is a
 \begin{figure}
     \begin{eqfigure}
     \begin{align}
-       &\cesktrans%
-           {\contconf{\VarDeclK{\env}{\varmeta}{\scont}}{\val}}%
-           {\scontconf{\scont}{\ext{\env}{\varmeta}{\val}}}
+        &\cesktrans%
+            {\contconf{\VarDeclK{\env}{\varmeta}{\scont}}{\val}}%
+            {\scontconf{\scont}{\ext{\env}{\varmeta}{\val}}}
        \label{econtconf:vardecl}\\
-       &\begin{multlined}
+        &\begin{multlined}
            \cesktranssplit%
                 {\contconf{\IfCondK{\stmti{1}}{\stmti{2}}}{\true}}%
                 {\execconf{\stmti{1}}{\env}{\lbls}{\clbls}{\handler}{\cstrace}{\cex}{\econt}{\scont}}
-       \end{multlined}
-       \label{econtconf:if-true}\\
-       &\begin{multlined}
-           \cesktranssplit%
+        \end{multlined}
+        \label{econtconf:if-true}\\
+        &\begin{multlined}
+            \cesktranssplit%
                 {\contconf{\IfCondK{\stmti{1}}{\stmti{2}}}{\false}}%
                 {\execconf{\stmti{1}}{\env}{\lbls}{\clbls}{\handler}{\cstrace}{\cex}{\econt}{\scont}}
-       \end{multlined}
-       \label{econtconf:if-false}\\
-       &\begin{multlined}
+        \end{multlined}
+        \label{econtconf:if-false}\\
+        &\begin{multlined}
               \cesktrans%
                   {\contconf{\WhileCondK}{\false}}%
                   {\scontconf{\scont}{\env}}
-       \end{multlined}
-       \label{econtconf:while-false}\\
-       &\begin{multlined}
+        \end{multlined}
+        \label{econtconf:while-false}\\
+        &\begin{multlined}
               \cesktranssplit%
                   {\contconf{\WhileCondK}{\true}}%
                   {\execconf{\stmt}{\env}{\lbls}{\clbls}{\handler}{\cstrace}{\cex}{\econt}{\scont'}}
-       \end{multlined}
-       \label{econtconf:while-true}
+        \end{multlined}
+        \label{econtconf:while-true}\\
+        &\cesktrans%
+              {\contconf{\ForCondK}{\tt{false}}}%
+              {\scontconf{\scont}{\env}}
+        \label{econtconf:for-false}\\
+        &\begin{multlined}
+              \cesktranswheresplit*%
+                  {\contconf{\ForCondK}{\tt{true}}}%
+                  {\execconf{\scont}{\env'}{\lbls}{\clbls}{\handler}{\cstrace}{\cex}{\econt}{\scont'}}%
+                  {\text{where $\scont' = \ForSK$}}
+        \end{multlined}
+        \label{econtconf:for-true}
     \end{align}
     \caption{The CESK-transition function starting in ValuePassingConfiguration: statements}
     \end{eqfigure}
@@ -2236,22 +2247,30 @@ Similarly to Section~\ref{subsubsec:instance-method-invoc}, $\ExitSK{\val}$ is a
 \begin{figure}
     \begin{eqfigure}
     \begin{align}
-       &\begin{multlined}
-        \cesktranssplit%
-          {\scontconf{\BlockSK{\stmt :: \stmts}{\env}}{\env'}}
-          {\execconf{\stmt}{\env'}{\lbls}{\clbls}{\handler}{\cstrace}{\cex}{\econt}{\scont'}}
-    \end{multlined}
-    \label{scontconf:block}\\
-    &\cesktrans%
-      {\scontconf{\BlockSK{[]}{\env}}{ \_ }}%
-      {\scontconf{\scont}{\env}},
-    \label{scontconf:block-empty}\\
-    &\begin{multlined}
-           \cesktranssplit%
-               {\scontconf{\WhileCondK}{\_}}%
-               {\evalconf{\expr}{\env}{\strace}{\cstrace}{\cex}{\econt'}}
-    \end{multlined}
-    \label{scontconf:while}
+        &\begin{multlined}
+            \cesktranssplit%
+            {\scontconf{\BlockSK{\stmt :: \stmts}{\env}}{\env'}}
+            {\execconf{\stmt}{\env'}{\lbls}{\clbls}{\handler}{\cstrace}{\cex}{\econt}{\scont'}}
+        \end{multlined}
+        \label{scontconf:block}\\
+        &\cesktrans%
+            {\scontconf{\BlockSK{[]}{\env}}{ \_ }}%
+            {\scontconf{\scont}{\env}},
+        \label{scontconf:block-empty}\\
+        &\begin{multlined}
+            \cesktranssplit%
+                {\scontconf{\WhileCondK}{\_}}%
+                {\evalconf{\expr}{\env}{\strace}{\cstrace}{\cex}{\econt'}}
+        \end{multlined}
+        \label{scontconf:while}\\
+        &\begin{multlined}
+            \cesktranswheresplit*%
+                {\scontconf{\ForSK}{\_}}%
+                {\evallistconf{\exprs}{\env_{new}}{st}{cex}{cst}{\acont}}%
+                {\parbox{\textwidth-2cm}{where $\acont = \ForUpdatesA{\expressionmeta}{\env_{new}}$,\\
+                    $\env_{new} = \extend(\env, \varmeta{s}, \vals)$, $\vals = \{\val_i \mid \deref(\env'(\varmeta_i))\}$}}
+        \end{multlined}
+        \label{scontconf:for}
     \end{align}
     \caption{The CESK-transition function starting in ForwardConfiguration: statements}
     \end{eqfigure}
@@ -2301,14 +2320,36 @@ When the return expression is empty, the value $\tt{null}$ is applied to the ret
     \begin{align}
         &\begin{multlined}
             \cesktranswheresplit*%
-                {\acontconf{\ForInitA}{\vals}}%
+                {\acontconf{\ForInitA{\nnull}}{\vals}}%
+                {\execconf{\scont}{\env'}{\lbls}{\clbls}{\handler}{\cstrace}{\cex}{\econt}{\scont'}}%
+                {\parbox{\textwidth-2cm}{where $\env' = \extend(\env, \varmeta{s}, \vals)$,\\
+                $\scont' = \ForSK$}}
+        \end{multlined}
+        \label{acontconf:forinit-nullcond}\\
+        &\begin{multlined}
+            \cesktranswheresplit*%
+                {\acontconf{\ForInitA{\expressionmeta}}{\vals}}%
                 {\evalconf{\expressionmeta}{\env'}{\strace}{\cstrace}{\cex}{\econt'}}%
                 {\parbox{\textwidth-2cm}{where $\env' = \extend(\env, \varmeta{s}, \vals)$,\\
                 $\econt' = \ForCondK$}}
         \end{multlined}
-        \label{acontconf:forinit}
+        \label{acontconf:forinit}\\
+        &\begin{multlined}
+            \cesktranswheresplit*%
+                {\acontconf{\ForUpdatesA{\nnull}{\env'}}{\_}}%
+                {\evalconf{\expressionmeta}{\env'}{\strace}{\cstrace}{\cex}{\econt'}}%
+                {\text{where $\econt' = \ForCondK$}}
+        \end{multlined}
+        \label{acontconf:forupdate-nullcond}\\
+        &\begin{multlined}
+            \cesktranswheresplit*%
+                {\acontconf{\ForUpdatesA{\expressionmeta}{\env'}}{\_}}%
+                {\evalconf{\expressionmeta}{\env'}{\strace}{\cstrace}{\cex}{\econt'}}%
+                {\text{where $\econt' = \ForCondK$}}
+        \end{multlined}
+        \label{acontconf:forupdate}
     \end{align}
-    \caption{The CESK-transition function starting in ForwardConfiguration: statements}
+    \caption{The CESK-transition function starting in ApplicationConfiguration: statements}
     \end{eqfigure}
 \end{figure}
 
@@ -2324,49 +2365,25 @@ The execution of the different loop statements is defined below:
         The expression continuation for the execution of the remainder of the statement dispatches on the value of the condition expression.
         The body of the while loop is executed when this value is identical to $\true$, as shown in \eqref{econtconf:while-true}.
         Otherwise, the execution proceeds with the next ForwardConfiguration as shown in \eqref{econtconf:while-false}.
-
     \item $\dowhile$\\
         The execution of do while loop statement is similar to while loop statements.
         First the statement body of the loop is executed as shown in \eqref{execconf:do}.
         We add while statement continuation as next statement continuation that will evaluate the condition expression accordingly, as shown in \eqref{scontconf:while}.
-
     \item $\forin$\\
         In Kernel, $\forin$ loops, will be desugared into while loops and their execution will proceed as the $\while$ loop rule shown in Figure~\ref{figure:exec}.
-
     \item $\for$\\
-        The execution of $\for$ loops proceeds as shown in Figure~\ref{figure:exec}.
-
+        The execution of for loops starts with evaluation of the initializer expressions for the variable declarations in the for loop statement, as shown in \eqref{execconf:for}.
+        After the evaluation of the initializer, the application continuation is applied to extend the environment and evaluate a non null condition expression, as shown in \eqref{acontconf:forinit}.
+        When the condition expression is null, the execution of the statement proceeds to evaluation of the body of the loop, as shown in \eqref{acontconf:forinit-nullcond}.
+        After the execution of all the statements in the body of the loop, the execution proceeds to create a new environment with fresh locations for the variable declarations of the for loop.
+        That is the environment used to evaluate the update expressions, as shown in \eqref{scontconf:for}.
+        After the update step, the execution proceeds to evaluation of the condition, as in ~\eqref{acontconf:forupdate-nullcond} and \eqref{acontconf:forupdate}, depending whether there is a condition expression.
 \end{itemize}
 
 Loops $\dowhile$, $\forin$, $\for$ can be desugared to while loops with transformations performed before interpreting the program.
 
-\begin{align*}
-    &\cesktrans%
-        {\contconf{\ForCondK}{\tt{false}}}%
-        {\scontconf{\scont}{\env}}\\
-    &\begin{multlined}
-        \cesktranswheresplit*%
-            {\contconf{\ForCondK}{\tt{true}}}%
-            {\execconf{\scont}{\env'}{\lbls}{\clbls}{\handler}{\cstrace}{\cex}{\econt}{\scont'}}%
-            {\text{where $\scont' = \ForSK$}}
-    \end{multlined}\\
-    &\begin{multlined}
-        \cesktranswheresplit*%
-            {\scontconf{\ForSK}{\_}}%
-            {\evallistconf{\exprs}{\env_{new}}{st}{cex}{cst}{\acont}}%
-            {\parbox{\textwidth-2cm}{where $\acont = \ForUpdatesA{\env_{new}}$,\\
-                $\env_{new} = \extend(\env, \varmeta{s}, \vals)$, $\vals = \{\val_i \mid \deref(\env'(\varmeta_i))\}$}}
-    \end{multlined}\\
-    &\begin{multlined}
-        \cesktranswheresplit*%
-            {\acontconf{\ForUpdatesA{\env'}}{\_}}%
-            {\evalconf{\expressionmeta}{\env'}{\strace}{\cstrace}{\cex}{\econt'}}%
-            {\text{where $\econt' = \ForCondK$}}
-    \end{multlined}
-\end{align*}
 
-
-\subsection{Labels}
+\subsubsection{Labels}
 
 Kernel supports labelling statements, $\synt{L}: \stmt_{L}$, and breaking to L, $\bbreak \synt{L}$, which completes the execution of the labelled statement and proceeds to executing the rest of the program.
 To support breaking to a label, we add a labels component, $\lbls$, to statement configurations.
@@ -2374,7 +2391,7 @@ $\lbls$ represents a list of pairs mapping a labelled statement, $\synt{L}: \stm
 Executing a labelled statement inserts a new break label, $\lbl$ in the list of labels $\lbls$.
 
 
-\subsection{Switch}
+\subsubsection{Switch}
 
 Kernel supports dispatching control among a number of cases with $\switch$ statements.
 The target expression $\expr$ is evaluated and matched against the different case clauses of the switch statement.
@@ -2427,7 +2444,7 @@ Otherwise, the execution continues as follows:
 \end{align*}
 
 
-\subsection{Exceptions}
+\subsubsection{Exceptions}
 
 Kernel supports structured exception handling with $\synt{try/catch}$ and $\synt{try/finally}$ statements.
 Exceptions are thrown with $\throw$ and $\rethrow$ expressions.
@@ -2509,7 +2526,7 @@ $\synt{try/finally}$ statements execute their body with a new handler and additi
 \end{align*}
 
 
-\subsection{Break}
+\subsubsection{Break}
 
 $\bbreak \synt{L}$ statements break from an enclosing label $\synt{L}$ and execute the break continuation corresponding to the label in the list of labels $\lbls$.
 
@@ -2530,7 +2547,7 @@ $\bbreak \synt{L}$ statements break from an enclosing label $\synt{L}$ and execu
 \noindent where $\lbl = Label(L', \bcont) \in \lbls \text{ with } L' == \mathbf{L}$.
 
 
-\subsection{Continue}
+\subsubsection{Continue}
 
 $\continue \synt{L}$ statements continue to executing the statement of a preceding case clause, labelled with $\synt{L}$ and execute the continue continuation corresponding to the label in the list of labels $\clbls$.
 
@@ -2577,8 +2594,8 @@ Let $F$ be a function with a body $\stmt_{body}$ and a list of formal parameters
 \newcommand{\RedirectingInitializer}[2]{\mathrm{RedirectingInitializer}(#1,\,#2)}
 
 The expression $\new$ invokes a constructor to produce a new instance.
-The target constructor $\synt{Q}$ has a list of formal parameters, $\formals$, a list of initializers, $Izs$, and a statement body, $\stmt_{body}$.
-The invocation of a constructor $\synt{Q}$ with $\new \synt{Q}(\exprs)$ proceeds as follows:
+The target constructor $\synt{Q}$ has a list of formal parameters, $\formals$, a list of initializers, $\synt{Izs}$, and a statement body, $\stmt_{body}$.
+The invocation of a constructor $\synt{Q}$ proceeds by evaluating the argument expressions as shown in \eqref{eval:new}.
 
 \begin{align*}
     &\cesktrans%
@@ -2759,7 +2776,7 @@ Then the value stored at location $\loc' = (\deref{\loc})[f]$ in the store $S$ w
         \cesktranswheresplit%
             {\contconf{\InitK{Field(f, \expri{0}) :: Izs}{\loc}{\scont}}{\val}}%
             {\evalconf{\expri{1}}{\env}{st}{cex}{cst}{\econt}}%
-            {\text{where $\update{(\deref\loc)[f]}{\val}$, $Izs = Initializer(\expri{1}) :: Izs'$, $\econt' = \InitK{Izs}{\loc}{\env}$.}}
+            {\text{where $\update{(\deref\loc)[f]}{\val}$, $Izs = Initializer(\expri{1}) :: Izs'$, $\econt' = \InitK{Izs}{\loc}{\env}$}}
     \end{multlined}
 \end{align*}
 
