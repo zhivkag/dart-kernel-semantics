@@ -394,7 +394,7 @@ For definition of ``$\deref$'' see Section~\ref{subsubsection:dereferecing}.
 
 The state space of the CESK machine contains various kinds of configurations.
 Configurations contain different components and the transition step dispatches to the next configuration based on one of the components of the configuration.
-%
+
 % Named Configuration for CESK transitions
 \newcommand{\breakconf}[1]{\confsingle{#1}_{\mathrm{breakCont}}}
 \newcommand{\switchconf}[1]{\confsingle{#1}_{\mathrm{switchCont}}}
@@ -554,23 +554,23 @@ There are various kinds of configurations, but two more general types can be dis
 
 We suffix the names of expression continuations with ``$K$''.
 The different expression continuations are shown in Figure~\ref{figure:econts}.
-%
+
 \newcommand{\ExceptionHandlersRest}{\handler,\,\cstrace,\,\cex}
 \newcommand{\ExceptionHandlers}{\strace,\,\handler,\,\cstrace,\,\cex}
 % Continuations
 \newcommand{\VarSetK}[3]{\mathrm{VarSetK}({#1},\,{#2},\,{#3})}
 \newcommand{\ExpressionsK}[3]{\mathrm{ExpressionsK}({#1},\,{#2},\,\ExceptionHandlers,\,{#3})}
-%
+
 \newcommand{\NotK}[1]{\mathrm{NotK}({#1})}
 \newcommand{\AndK}[3]{\mathrm{AndK}({#1},\,{#2},\,\ExceptionHandlers,\,{#3})}
 \newcommand{\OrK}[3]{\mathrm{OrK}({#1},\,{#2},\,\ExceptionHandlers,\,{#3})}
 \newcommand{\ConditionalK}[4]{\mathrm{ConditionalK}({#1},\,{#2},\,{#3},\,\ExceptionHandlers,\,{#4})}
-%
+
 \newcommand{\LetK}[4]{\mathrm{LetK}({#1},\,{#2},\,{#3},\,\ExceptionHandlers,\,{#4})}
-%
+
 \newcommand{\IsExpressionK}{\mathrm{IsExpressionK}(\tt{T},\,\econt)}
 \newcommand{\AsExpressionK}{\mathrm{AsExpressionK}(\tt{T},\,\strace,\,\handler,\,\econt)}
-%
+
 \newcommand{\StaticGetK}{\mathrm{StaticGetK}(\membermeta,\,\econt)}
 \newcommand{\StaticSetK}{\mathrm{StaticSetK}(\membermeta,\,\econt)}
 \newcommand{\PropertyGetK}{\mathrm{PropertyGetK}(\idmeta,\,\ExceptionHandlers,\,\econt)}
@@ -580,20 +580,19 @@ The different expression continuations are shown in Figure~\ref{figure:econts}.
 \newcommand{\DirectPropertySetK}{\mathrm{DPropertySetK}(\membermeta,\,\expressionmeta_1,\,\env,\,\ExceptionHandlers,\,\econt)}
 \newcommand{\DPropertySetVK}{\mathrm{DPropertySetValueK}(\val_0,\,\membermeta,\,\ExceptionHandlers,\,\econt)}
 \newcommand{\SuperPropertySetK}{\mathrm{SuperPropertySetK}(\idmeta,\,\env,\,\ExceptionHandlers,\,\econt)}
-%
+
 \newcommand{\InstanceMethodK}{\mathrm{InstanceMethodK(\expressionsmeta,\,\idmeta,\,\env,\,\ExceptionHandlers,\,\econt)}}
 \newcommand{\DInstanceMethodK}{\mathrm{DInstanceMethodK}(\expressionsmeta,\,\membermeta,\,\env,\,\ExceptionHandlers,\,\econt)}
 \newcommand{\VarDeclK}[3]{\mathrm{VarDeclarationK}({#1},\,{#2},\,{#3})}
 \newcommand{\IfCondK}[2]{\mathrm{IfConditionK}({#1},\,{#2},\,\env,\,\lbls,\,\clbls,\,\handler,\,\cstrace,\,\cex,\,\econt,\,\scont)}
 \newcommand{\SwitchK}[2]{\mathrm{SwitchK}({#1},\,\env,\,\lbls,\,{#2},\,\strace,\,\handler,\,\cstrace,\,\cex,\,\econt,\,\scont)}
-%
+
 \newcommand{\WhileCondK}{\mathrm{WhileCondK}(\expr,\,\stmt,\,\env,\,\lbls,\,\clbls,\,\handler,\,\cstrace,\,\cex,\,\econt,\,\scont)}
 \newcommand{\InitializerK}[4]{\mathrm{InitializerK}({#1},\,{#2},\,{#3},\,\strace,\,\handler,\,\cstrace,\,\cex,\,{#4})}
 \newcommand{\InitK}[3]{\mathrm{InitiK}({#1},\,{#2},\,\strace,\,\handler,\,\cstrace,\,\cex,\,{#3})}
 \newcommand{\FinallyK}[1]{\mathrm{Finally}({#1},\,\env,\,\lbls,\,\clbls,\,\strace,\,\handler,\,\econt)}
 \newcommand{\FinallyReturnK}[1]{\mathrm{FinallyReturnK}({#1},\,\env,\,\lbls,\,\clbls,\,\strace,\,\handler,\,\econt)}
-%
-%
+
 \newcommand{\ForCondK}{\mathrm{ForCondK}(\mathrm{\varmeta{s}},\, \expressionmeta,\, \exprs,\, \statementmeta,\, \env,\, \env',\, \lbls,\, \clbls,\, \handler,\, \cstrace,\, \cex,\, \econt,\, \scont)}
 \newcommand{\ExpressionK}[2]{\mathrm{ExpressionK}({#1},\,{#2})}
 \begin{figure}[Htp]
@@ -644,9 +643,9 @@ The different statement continuations are shown in Figure~\ref{figure:sconts}.
 \newcommand{\NewSK}[2]{\mathrm{NewSK}({#1},\,{#2})}
 \newcommand{\FinallySK}[1]{\mathrm{FinallySK}({#1},\,\env,\,\lbls,\,\clbls,\,\strace,\,\handler,\,\econt,\,\scont)}
 \newcommand{\RethrowSK}[3]{\mathrm{RethrowSK}({#1},\,{#2},\,{#3})}
-%
+
 \newcommand{\ForSK}{\mathrm{ForSK}(\mathrm{\varmeta{s}},\, \expressionmeta,\, \exprs,\, \statementmeta,\, \env,\, \env',\, \lbls,\, \clbls,\, \handler,\, \cstrace,\, \cex,\, \econt,\, \scont)}
-%
+
 \newcommand{\WhileCondSK}{\mathrm{WhileCondSK}(\expr,\,\stmt,\,\env,\,\lbls,\,\clbls,\,\handler,\,\cstrace,\,\cex,\,\econt,\,\scont)}
 \begin{figure}[Htp]
   \begin{align}
@@ -680,7 +679,7 @@ Application continuations, $\acont$, capture the application of a list of values
 \newcommand{\ConstructorA}[2]{\mathrm{ConstructorA}({#1},\,\strace,\,\handler,\,\cstrace,\,\cex,\,{#2})}
 \newcommand{\RedirectingA}[3]{\mathrm{RedirectingA}({#1},\,{#2},\,\strace,\,\handler,\,\cstrace,\,\cex,\,{#3})}
 \newcommand{\ForInitA}{\mathrm{ForInitA}(\mathrm{\varmeta{s}},\, \expressionmeta,\, \exprs,\, \statementmeta,\, \env,\, \lbls,\, \clbls,\, \handler,\, \cstrace,\, \cex,\, \econt,\, \scont)}
-%
+
 \newcommand{\ForUpdatesA}[1]{\mathrm{ForUpdatesA}(\mathrm{\varmeta{s}},\, \expressionmeta,\, \exprs,\, \statementmeta,\, \env,\, #1,\, \lbls,\, \clbls,\, \handler,\, \cstrace,\, \cex,\, \econt,\, \scont)}
 \newcommand{\InstanceMethodA}{\mathrm{InstanceMethodA(\idmeta,\,\val,\,\strace,\,\handler,\,\cstrace,\,\cex,\,\econt)}}
 
@@ -733,7 +732,7 @@ They are added when a try/finally statement is executed.
 Switch continuations, $\switchcont$, capture the steps to be executed when a continue to a preceding switch case statement is executed.
 They capture the components needed for the execution of the case body statement.
 The different switch continuations are shown in Figure~\ref{figure:switchconts}.
-%
+
 \newcommand{\ContinueK}{\mathrm{SwitchContinueK}(\stmt,\,\env,\,\lbls,\,\clbls,\,\handler,\,\cstrace,\,\cex,\,\econt,\,\scont)}
 \newcommand{\FinallyContinue}[2]{\mathrm{FinallyContinue}({#1},\,\env,\,\lbls,\,\clbls,\,\strace,\,\handler,\,\cstrace,\,\cex,\,\econt,\,{#2})}
 
@@ -1002,34 +1001,31 @@ A method lookup searches for an instance method in the given class given the nam
 \label{subsec:stmt-syntax}
 
 % InvalidStatement
-%
 \newcommand{\ExpressionStatement}[1]{\{\, #1\, \}}
 \newcommand{\Block}[1]{#1\, \statementmeta*}
 \newcommand{\EmptyStatement}{\{\}}
-%
+
 % AssertStatement
-%
 \newcommand{\LabeledStatement}[2]{#1:\, #2}
 \newcommand{\BreakStatement}[1]{\tt{break}\, #1}
 \newcommand{\WhileStatement}[2]{\tt{while}\, (#1)\, #2}
 \newcommand{\DoStatement}[2]{\tt{do}\, #1\, \tt{while}\, (#2)}
 \newcommand{\ForStatement}[4]{\tt{for}\, (\,#1;\, #2;\, #3\,)\, #4}
 \newcommand{\ForInStatement}[3]{\tt{for}\,(#1\,\tt{in}\,#2)\,#3}
-%
+
 \newcommand{\SwitchStatement}[2]{\tt{switch}\,(#1)\,#2}
 \newcommand{\ContinueSwitchStatement}[1]{\tt{continue}\,#1}
 \newcommand{\IfStatement}[3]{\tt{if}\,(#1)\,#2\,\tt{else}\,#3}
 \newcommand{\ReturnStatement}[1]{\tt{return}\,#1}
-%
+
 \newcommand{\TryCatch}[2]{\tt{try}\,#1\,\tt{catch}\,#2}
 \newcommand{\TryFinally}[2]{\tt{try}\,#1\,\tt{catch}\,#2}
-%
+
 \newcommand{\Yield}[1]{\tt{yield}\,#1}
-%
+
 \newcommand{\VarDeclaration}[2]{\tt{var}\,#1=#2}
-%
+
 % FunctionDeclaration
-%
 \[
 \begin{array}{rl}
 
@@ -1206,9 +1202,10 @@ The value corresponding to the evaluated expression is captured by the applicati
     \caption{The CESK-transition function for EvalConfiguration: simple expressions}
     \label{figure:expressions-evalconfigs}
 \end{figure}
-%
+
 \newcommand{\true}{\tt{true}}
 \newcommand{\false}{\tt{false}}
+
 %%
 % Figure showing the CESK-transition function strating from ValuePassingConfiguration
 % for simple expressions
@@ -1380,6 +1377,7 @@ When the target expression evaluates to a value $\val$ such that ``$\val $ is $\
 Evaluation of type cast expression proceed to evaluation of the target expression to the corresponding value, as shown in \eqref{eval:as}.
 When the target expression evaluates to a value $\val$ such that ``$\val $ is $\tt{T}$" holds, the value $\val$ is applied to the expression continuation as shown in \eqref{econtconf:as-true}.
 Otherwise, the evaluation of the expression results with an error, as shown in \eqref{econtconf:as-false}.
+
 %%
 % Figure showing the CESK-transition function strating from EvalConfgiration for
 % static property extraction and assignment, and static invocation
@@ -1437,6 +1435,7 @@ Otherwise, the evaluation of the expression results with an error, as shown in \
     \caption{The CESK-transition function for EvalConfiguration: static variable extraction and assignment, and static method invocation}
     \label{table:static-evalconfigs}
 \end{figure}
+
 %%
 % Figure showing the CESK-transition function strating from ValuePassingConfiguration for
 % static property extraction and assignment, and static invocation
@@ -1469,6 +1468,7 @@ Otherwise, the evaluation of the expression results with an error, as shown in \
     \caption{The CESK-transition function for ValuePassingConfiguration: static variable extraction and assignment, and static method invocation}
     \label{table:static-evalconfigs}
 \end{figure}
+
 %%
 % Figure showing the CESK-transition function strating from ApplicationConfiguration.
 %%
@@ -1545,6 +1545,7 @@ The evaluation of a static invocation proceeds by evaluating the arguments of th
 After the evaluation of the actual arguments for the invocation, the corresponding application is applied to the resulting list of values, as shown in \eqref{acontconf:staticinvoc}.
 In \eqref{acontconf:staticinvoc}, we apply the application continuation by creating a new environment for the execution of the body of the method by binding its formal parameters to the locations of the values for the actual arguments.
 A statement continuation, $\ExitSK{\econt}{\tt{null}}$ is added as next statement continuation to ensure that the execution of the body of the method returns correctly, when a return statement is not executed after the execution of the last statement of the body.
+
 %%
 % Figure showing the CESK-transition function strating from
 % ValuePassingConfiguration for instance property extraction and assignment.
@@ -1611,6 +1612,7 @@ A statement continuation, $\ExitSK{\econt}{\tt{null}}$ is added as next statemen
     \caption{The CESK-transition function for EvalConfiguration: instance property extraction and assignment}
     \label{figure:instance-property-evalconfigs}
 \end{figure}
+
 %%
 % Figure showing the CESK-transition function strating from ValuePassingConfiguration for instance property extraction.
 %%
@@ -1930,9 +1932,7 @@ After the evaluation of the argument expression to a value $\val$, depending on 
     \caption{The CESK-transition function for EvalConfiguration: instance method and constructor invocation}
     \label{figure:instance-method-evalconfigs}
 \end{figure}
-%
-%
-%
+
 \begin{figure}[Htp]
     \begin{align}
     &\begin{multlined}
@@ -1953,9 +1953,7 @@ After the evaluation of the argument expression to a value $\val$, depending on 
     \caption{The CESK-transition function for ValuePassingConfiguration: instance method and constructor invocation}
     \label{figure:instance-method-evalconfigs}
 \end{figure}
-%
-%
-%
+
 \begin{figure}[Htp]
     \begin{align}
     &\begin{multlined}
@@ -1988,9 +1986,7 @@ After the evaluation of the argument expression to a value $\val$, depending on 
     \caption{The CESK-transition function for ApplicationConfigurations}
     \label{figure:instance-method-evalconfigs}
 \end{figure}
-%
-%
-%
+
 \begin{figure}[Htp]
     \begin{align}
     \cesktrans%
