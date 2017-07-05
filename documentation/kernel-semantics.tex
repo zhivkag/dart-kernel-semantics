@@ -2228,24 +2228,24 @@ When the return expression is empty, the value $\tt{null}$ is applied to the ret
 
 \subsubsection{Loops}
 
-In Dart Kernel there are  \textbf{do while}, \textbf{for in}, \textbf{for}  and \textbf{while} loop.
+In Dart Kernel there are $\dowhile$, $\forin$, $\for$ and $\while$ loop statements.
 The execution of the different loop statements is defined below:
 \begin{itemize}
-\item \textbf{while}\\
-The execution of while statement loops proceeds with evaluation of the condition expression as shown in \eqref{execconf:while}.
+\item  $\while$\\
+The execution of  $\while$ statement loops proceeds with evaluation of the condition expression as shown in \eqref{execconf:while}.
 The expression continuation for the execution of the remainder of the statement dispatches on the value of the condition expression.
 The body of the while loop is executed when this value is identical to $\true$, as shown in \eqref{econtconf:while-true}.
 Otherwise, the execution proceeds with the next ForwardConfiguration as shown in \eqref{econtconf:while-false}.
-\item \textbf{do while}\\
+\item $\dowhile$\\
 The execution of do while loop statement is similar to while loop statements.
 First the statement body of the loop is executed as shown in \eqref{execconf:do}.
 We add while statement continuation as next statement continuation that will evaluate the condition expression accordingly, as shown in \eqref{scontconf:while}.
-\item \textbf{for in}\\
-In Kernel, \textbf{for in} loops, will be desugared into while loops and their execution will proceed as the \textbf{while} loop rule shown in Figure~\ref{figure:exec}.
-\item \textbf{for}\\
-The execution of \textbf{for} loops proceeds as shown in Figure~\ref{figure:exec}.
+\item $\forin$\\
+In Kernel, $\forin$ loops, will be desugared into while loops and their execution will proceed as the $\while$ loop rule shown in Figure~\ref{figure:exec}.
+\item $\for$\\
+The execution of $\for$ loops proceeds as shown in Figure~\ref{figure:exec}.
 \end{itemize}
-Loops \textbf{do while}, \textbf{for in}, \textbf{for} can be desugared to while loops with transformations performed before interpreting the program.
+Loops $\dowhile$, $\forin$, $\for$ can be desugared to while loops with transformations performed before interpreting the program.
 
 \begin{align*}
     &\cesktrans%
