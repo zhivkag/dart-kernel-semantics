@@ -350,12 +350,9 @@ The location is stored in the environment, or in the list of field locations for
 \label{subsubsec:store-update}
 
 \newcommand{\update}[2]{{#1} := {#2}}
-Function ``$\update{\loc}{\val}$'' updates the store at location $\loc \in \dlocation$ with value $\val \in \dval$.
-It has an implicit argument which is the store of the CESK machine.
-\begin{align*}
-  \update{}{} \in \dlocation \times \dval &\rightarrow  \dval\\
-  \update{\loc}{\val} &= \val, \text{ with $\val$ the value in store at location $\loc$}
-\end{align*}
+Operator ``$\update{\loc}{\val}$'' updates the store at location $\loc \in \dlocation$ with value $\val \in \dval$.
+It has an implicit operand which is the store of the CESK machine.
+Upon execution the operator returns a value from domain $\dval$, s.\,t. $(\update{\loc}{\val}) = \val$, where $\val$ is the value in the store at location $\loc$.
 
 
 \subsection{Environment}
