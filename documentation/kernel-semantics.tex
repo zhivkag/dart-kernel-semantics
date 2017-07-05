@@ -1968,51 +1968,58 @@ Similarly to Section~\ref{subsubsec:instance-method-invoc}, $\ExitSK{\val}$ is a
        &\cesktrans%
            {\contconf{\VarDeclK{\env}{\varmeta}{\scont}}{\val}}%
            {\scontconf{\scont}{\ext{\env}{\varmeta}{\val}}}
-       \label{econtconf:vardecl}
-    \end{align}
+       \label{econtconf:vardecl}\\
+       &\begin{multlined}
+           \cesktranssplit%
+                {\contconf{\IfCondK{\stmti{1}}{\stmti{2}}}{\true}}%
+                {\execconf{\stmti{1}}{\env}{\lbls}{\clbls}{\handler}{\cstrace}{\cex}{\econt}{\scont}}
+       \end{multlined}
+       \label{econtconf:if-true}\\
+       &\begin{multlined}
+           \cesktranssplit%
+                {\contconf{\IfCondK{\stmti{1}}{\stmti{2}}}{\false}}%
+                {\execconf{\stmti{1}}{\env}{\lbls}{\clbls}{\handler}{\cstrace}{\cex}{\econt}{\scont}}
+       \end{multlined}
+       \label{econtconf:if-false}\\
+       \end{align}
        \caption{The CESK-transition function starting in ValuePassingConfiguration: statements}
+\end{figure}
+\begin{figure}
+    \begin{align}
+       &\begin{multlined}
+        \cesktranssplit%
+          {\scontconf{\BlockSK{\stmt :: \stmts}{\env}}{\env'}}
+          {\execconf{\stmt}{\env'}{\lbls}{\clbls}{\handler}{\cstrace}{\cex}{\econt}{\scont'}}
+    \end{multlined}
+    \label{scontconf:block}\\
+    &\cesktrans%
+      {\scontconf{\BlockSK{[]}{\env}}{ \_ }}%
+      {\scontconf{\scont}{\env}},
+    \label{scontconf:block-empty}
+    \end{align}
+       \caption{The CESK-transition function starting in ForwardConfiguration: statements}
 \end{figure}
 \subsubsection{Variable Declaration}
 Execution of a variable declaration statement proceeds by evaluating the right-hand side expression as shown in \eqref{execconf:vardecl}.
 After the evaluation of the initializer expression to a value $\val$, the corresponding environment is extended with a new binding to a location that stores the value $\val$, as shown in \eqref{econtconf:vardecl}.
 \subsubsection{Empty statement}
 \label{subsubsec:emtpy-stmt}
-
-
+Execution of empty statement proceeds to the next ForwardConfiguration, as shown in \eqref{execconf:empty}.
 \subsubsection{Expression statement}
 \label{expression-stmt}
-
+Execution of expression statement proceeds by evaluating the expression, as shown in \eqref{execconf:expresion}.
 \subsubsection{Block statements}
-  \begin{align*}
-    &\begin{multlined}
-        \cesktranssplit%
-          {\scontconf{\BlockSK{\stmt :: \stmts}{\env}}{\env'}}
-          {\execconf{\stmt}{\env'}{\lbls}{\clbls}{\handler}{\cstrace}{\cex}{\econt}{\scont'}}
-    \end{multlined}\\
-    &\cesktrans%
-      {\scontconf{\BlockSK{[]}{\env}}{ \_ }}%
-      {\scontconf{\scont}{\env}},
-  \end{align*}
-
-\noindent where $\scont' = \BlockSK{\stmts}{\env}$.
-
+Execution of block statements proceeds by executing each statement of the block with the environment function after the execution of the previous statement.
+The CESK-transition function for block statements is shown in \eqref{execconf:block}, \eqref{scontconf:block} and \eqref{scontconf:block-empty}.
 \subsubsection{If statement}
-
-\begin{align*}
-    \cesktransalign%
-        {\contconf{\econt'}{\true}}%
-        {\execconf{\stmti{1}}{\env}{\lbls}{\clbls}{\handler}{\cstrace}{\cex}{\econt}{\scont}}\\
-    \cesktransalign%
-        {\contconf{\econt'}{\false}}%
-        {\execconf{\stmti{2}}{\env}{\lbls}{\clbls}{\handler}{\cstrace}{\cex}{\econt}{\scont}}
-\end{align*}
-
-\noindent where $\econt' = \IfCondK{\stmti{1}}{\stmti{2}}$.
-
-
+Execution of conditional statements proceeds by evaluating the condition to a value, as shown in \eqref{execconf:if}.
+The expression continuation for the execution of the rest of the statement will dispatch on the value the condition expression evaluates to and produce a configuration for the execution of the next statement, as shown in \eqref{econtconf:if-true} and \eqref{econtconf:if-false}.
 \subsubsection{Return statement}
-
-
+Kernel supports return statements with or without an expression.
+In the first case, the execution proceeds with evaluation of the return expression, as shown in \eqref{execconf:return}.
+The expression continuation component in the ExecConfiguration is the return expression continuation.
+This is the expression continuation that is applied to the value the return expression evaluates to.\\
+When the return expression is empty, the value $\tt{null}$ is applied to the return expression continuation component in the ExecConfiguration as shown in \eqref{execconf:return-empty}.
 \subsubsection{Loops}
 
 \begin{align*}
