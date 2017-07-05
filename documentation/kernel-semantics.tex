@@ -17,6 +17,7 @@
 \usepackage{ifthen}
 \usepackage[fleqn]{mathtools}
 \usepackage{geometry}
+\usepackage{mdframed}
 
 
 \definecolor{shade}{gray}{0.75}
@@ -149,6 +150,9 @@
     bottom=2cm,%
     left=3cm,%
 }
+
+
+\newmdenv[linecolor=black,leftline=false,rightline=false]{eqfigure}
 
 
 \begin{document}
@@ -408,6 +412,7 @@ Configurations contain different components and the transition step dispatches t
 
 % Transition
 \begin{figure}[Htp]
+  \begin{eqfigure}
   \begin{align}
     &\evalconf{\expr}{\env}{st}{cex}{cst}{\econt} & :\quad & \text{EvalConfiguration} \label{config:eval}\\
     &\evallistconf{\exprs}{\env}{st}{cex}{cst}{\acont} & :\quad & \text{EvalListConfiguration} \label{config:evallist}\\
@@ -422,6 +427,7 @@ Configurations contain different components and the transition step dispatches t
     \label{config:switchcont}
   \end{align}
   \caption{States for the CESK machine}
+  \end{eqfigure}
 \end{figure}
 
 
@@ -596,6 +602,7 @@ The different expression continuations are shown in Figure~\ref{figure:econts}.
 \newcommand{\ForCondK}{\mathrm{ForCondK}(\mathrm{\varmeta{s}},\, \expressionmeta,\, \exprs,\, \statementmeta,\, \env,\, \env',\, \lbls,\, \clbls,\, \handler,\, \cstrace,\, \cex,\, \econt,\, \scont)}
 \newcommand{\ExpressionK}[2]{\mathrm{ExpressionK}({#1},\,{#2})}
 \begin{figure}[Htp]
+  \begin{eqfigure}
   \begin{align}
     &\VarSetK{\idmeta}{\ExceptionHandlers}{\econt} \label{econt:varset}\\
     &\ExpressionsK{\exprs}{\env}{\acont} \label{econt:expressions}\\
@@ -623,6 +630,7 @@ The different expression continuations are shown in Figure~\ref{figure:econts}.
   \end{align}
   \caption{Expression Continuations}
   \label{figure:econts}
+  \end{eqfigure}
 \end{figure}
 
 
@@ -648,6 +656,7 @@ The different statement continuations are shown in Figure~\ref{figure:sconts}.
 
 \newcommand{\WhileCondSK}{\mathrm{WhileCondSK}(\expr,\,\stmt,\,\env,\,\lbls,\,\clbls,\,\handler,\,\cstrace,\,\cex,\,\econt,\,\scont)}
 \begin{figure}[Htp]
+  \begin{eqfigure}
   \begin{align}
     &\ExitSK{\val} \label{scont:exit}\\
     &\BlockSK{\stmts}{\env} \label{scont:block}\\
@@ -661,6 +670,7 @@ The different statement continuations are shown in Figure~\ref{figure:sconts}.
   \end{align}
   \caption{Statement Continuations}
   \label{figure:sconts}
+  \end{eqfigure}
 \end{figure}
 
 
@@ -687,6 +697,7 @@ We use the application continuation $\ValueA{\acont}{\val}$, capturing a value a
 We suffix the names of application continuations with ``$A$''.
 The different application continuations are shown in Figure~\ref{figure:acont}.
 \begin{figure}[Htp]
+  \begin{eqfigure}
   \begin{align}
     &\ValueA{\val}{\acont} \label{acont:value}\\
     &\StringConcatenationA \label{acont:stringconcat}\\
@@ -701,6 +712,7 @@ The different application continuations are shown in Figure~\ref{figure:acont}.
   \end{align}
   \caption{Application Continuations}
   \label{figure:acont}
+  \end{eqfigure}
 \end{figure}
 
 
@@ -713,12 +725,14 @@ The different break continuations are shown in Figure~\ref{figure:breakcont}.
 \newcommand{\FinallyBreak}[2]{\mathrm{FinallyBreak}({#1},\,\env,\,\lbls,\,\clbls,\,\strace,\,\handler,\,\cstrace,\,\cex,\,\econt,\,{#2})}
 
 \begin{figure}[Htp]
+  \begin{eqfigure}
   \begin{align}
     &\Break{\env}{\scont} \label{breakcont:break} \\
     &\FinallyBreak{\stmt}{\scont} \label{breakcont:finallybreak}
   \end{align}
   \caption{Break Continuations}
   \label{figure:breakcont}
+  \end{eqfigure}
 \end{figure}
 
 The break continuation Break, \ref{breakcont:break}, captures a statement continuation and the environment corresponding to a target label or a break statement.
@@ -737,12 +751,14 @@ The different switch continuations are shown in Figure~\ref{figure:switchconts}.
 \newcommand{\FinallyContinue}[2]{\mathrm{FinallyContinue}({#1},\,\env,\,\lbls,\,\clbls,\,\strace,\,\handler,\,\cstrace,\,\cex,\,\econt,\,{#2})}
 
 \begin{figure}[Htp]
+  \begin{eqfigure}
   \begin{align}
     &\ContinueK \label{switchcont:continue} \\
     &\FinallyContinue{\stmt}{\scont} \label{switchcont:finallycontinue}
   \end{align}
   \caption{Switch Continuations}
   \label{figure:switchconts}
+  \end{eqfigure}
 \end{figure}
 
 The switch continuation SwitchContinue, \ref{switchcont:continue}, captures the statement body of a preceding switch case, targeted by some continue statement, and the components necessary for its execution.
@@ -758,12 +774,14 @@ The different exception handlers are shown in Figure~\ref{figure:handlers}.
 \newcommand{\CatchH}[1]{\mathrm{Catch}({#1},\,\env,\,\lbls,\,\clbls,\,\strace,\,\handler,\,\econt,\,\scont)}
 
 \begin{figure}[Htp]
+  \begin{eqfigure}
   \begin{align}
     &\ThrowH{\val}{\strace} \label{handle:throw} \\
     &\CatchH{cs} \label{handle:catch}
   \end{align}
   \caption{Exception handlers}
   \label{figure:handlers}
+  \end{eqfigure}
 \end{figure}
 
 
@@ -1069,6 +1087,7 @@ The CESK-transition function for EvalListConfiguration is shown in Figure~\ref{f
 The value corresponding to the evaluated expression is captured by the application continuation ValueA and eventually added to the list of values corresponding to the expressions.
 
 \begin{figure}[Htp]
+    \begin{eqfigure}
     \begin{align}
     &\begin{multlined}
         \cesktranswheresplit%
@@ -1083,8 +1102,9 @@ The value corresponding to the evaluated expression is captured by the applicati
         {\acontconf{\ValueA{\val}{\acont}}{\val s}}%
         {\acontconf{\acont}{\val :: \val s}}
     \end{align}
-  \caption{The CESK-transition function for EvalListConfiguration}\label{figure:evallist}
-  \label{subsec:eval-list-expressions}
+    \caption{The CESK-transition function for EvalListConfiguration}\label{figure:evallist}
+    \label{subsec:eval-list-expressions}
+    \end{eqfigure}
 \end{figure}
 
 %%
@@ -1092,6 +1112,7 @@ The value corresponding to the evaluated expression is captured by the applicati
 % expressions.
 %%
 \begin{figure}[Htp]
+    \begin{eqfigure}
     \begin{align}
         &\cesktranswhere%
             {\evalconf{\IntLiteral{\integermeta}}{\env}{\strace}{\cstrace}{\cex}{\econt}}%
@@ -1201,6 +1222,7 @@ The value corresponding to the evaluated expression is captured by the applicati
     \end{align}
     \caption{The CESK-transition function for EvalConfiguration: simple expressions}
     \label{figure:expressions-evalconfigs}
+    \end{eqfigure}
 \end{figure}
 
 \newcommand{\true}{\tt{true}}
@@ -1211,6 +1233,7 @@ The value corresponding to the evaluated expression is captured by the applicati
 % for simple expressions
 %%
 \begin{figure}[Htp]
+    \begin{eqfigure}
     \begin{align}
         &\begin{multlined}
         \cesktranssplit%
@@ -1289,6 +1312,7 @@ The value corresponding to the evaluated expression is captured by the applicati
     \end{align}
     \caption{The CESK-transition function for ValuePassingConfiguration: simple expressions}
     \label{figure:cont-config}
+    \end{eqfigure}
 \end{figure}
 
 
@@ -1383,6 +1407,7 @@ Otherwise, the evaluation of the expression results with an error, as shown in \
 % static property extraction and assignment, and static invocation
 %%
 \begin{figure}[Htp]
+    \begin{eqfigure}
     \begin{align}
         &\cesktranswhere%
             {\evalconf{\StaticGet{\membermeta}}{\env}{\strace}{\cstrace}{\cex}{\econt}}%
@@ -1434,6 +1459,7 @@ Otherwise, the evaluation of the expression results with an error, as shown in \
     \end{align}
     \caption{The CESK-transition function for EvalConfiguration: static variable extraction and assignment, and static method invocation}
     \label{table:static-evalconfigs}
+    \end{eqfigure}
 \end{figure}
 
 %%
@@ -1441,6 +1467,7 @@ Otherwise, the evaluation of the expression results with an error, as shown in \
 % static property extraction and assignment, and static invocation
 %%
 \begin{figure}[Htp]
+    \begin{eqfigure}
     \begin{align}
         &\cesktranswhere%
             {\contconf{\StaticGetK}{\val}}%
@@ -1467,12 +1494,14 @@ Otherwise, the evaluation of the expression results with an error, as shown in \
     \end{align}
     \caption{The CESK-transition function for ValuePassingConfiguration: static variable extraction and assignment, and static method invocation}
     \label{table:static-evalconfigs}
+    \end{eqfigure}
 \end{figure}
 
 %%
 % Figure showing the CESK-transition function strating from ApplicationConfiguration.
 %%
 \begin{figure}[Htp]
+    \begin{eqfigure}
     \begin{align}
        &\begin{multlined}
         \cesktrans%
@@ -1490,6 +1519,7 @@ Otherwise, the evaluation of the expression results with an error, as shown in \
     \end{align}
     \caption{The CESK-transition function for ApplicationConfiguration}
     \label{table:static-evalconfigs}
+    \end{eqfigure}
 \end{figure}
 
 
@@ -1551,6 +1581,7 @@ A statement continuation, $\ExitSK{\econt}{\tt{null}}$ is added as next statemen
 % ValuePassingConfiguration for instance property extraction and assignment.
 %%
 \begin{figure}[Htp]
+    \begin{eqfigure}
     \begin{align}
         &\begin{multlined}
         \cesktranswheresplit%
@@ -1611,12 +1642,14 @@ A statement continuation, $\ExitSK{\econt}{\tt{null}}$ is added as next statemen
     \end{align}
     \caption{The CESK-transition function for EvalConfiguration: instance property extraction and assignment}
     \label{figure:instance-property-evalconfigs}
+    \end{eqfigure}
 \end{figure}
 
 %%
 % Figure showing the CESK-transition function strating from ValuePassingConfiguration for instance property extraction.
 %%
 \begin{figure}[Htp]
+    \begin{eqfigure}
     \begin{align}
     &\begin{multlined}
     \cesktranswheresplit*%
@@ -1678,6 +1711,7 @@ A statement continuation, $\ExitSK{\econt}{\tt{null}}$ is added as next statemen
     \end{align}
     \caption{The CESK-transition function for ValuePassingConfiguration: instance property extraction}
     \label{figure:econtconf:instance-property-extraction}
+    \end{eqfigure}
 \end{figure}
 
 
@@ -1737,6 +1771,7 @@ The evaluation proceeds as follows:
 % ValuePassingConfiguration for instance property assignment.
 %%
 \begin{figure}[Htp]
+    \begin{eqfigure}
     \begin{align}
     &\begin{multlined}
         \cesktranswheresplit*%
@@ -1805,6 +1840,7 @@ The evaluation proceeds as follows:
     \end{align}
     \caption{The CESK-transition function for ValuePassingConfiguration: instance property assignment}
     \label{figure:instance-property-assignment-evalconfigs}
+    \end{eqfigure}
 \end{figure}
 
 
@@ -1899,6 +1935,7 @@ After the evaluation of the argument expression to a value $\val$, depending on 
 \end{itemize}
 
 \begin{figure}[Htp]
+    \begin{eqfigure}
     \begin{align}
         &\begin{multlined}
         \cesktranswheresplit%
@@ -1931,9 +1968,11 @@ After the evaluation of the argument expression to a value $\val$, depending on 
     \end{align}
     \caption{The CESK-transition function for EvalConfiguration: instance method and constructor invocation}
     \label{figure:instance-method-evalconfigs}
+    \end{eqfigure}
 \end{figure}
 
 \begin{figure}[Htp]
+    \begin{eqfigure}
     \begin{align}
     &\begin{multlined}
         \cesktranswheresplit*%
@@ -1952,9 +1991,11 @@ After the evaluation of the argument expression to a value $\val$, depending on 
     \end{align}
     \caption{The CESK-transition function for ValuePassingConfiguration: instance method and constructor invocation}
     \label{figure:instance-method-evalconfigs}
+    \end{eqfigure}
 \end{figure}
 
 \begin{figure}[Htp]
+    \begin{eqfigure}
     \begin{align}
     &\begin{multlined}
             \cesktranswheresplit*%
@@ -1985,9 +2026,11 @@ After the evaluation of the argument expression to a value $\val$, depending on 
     \end{align}
     \caption{The CESK-transition function for ApplicationConfigurations}
     \label{figure:instance-method-evalconfigs}
+    \end{eqfigure}
 \end{figure}
 
 \begin{figure}[Htp]
+    \begin{eqfigure}
     \begin{align}
     \cesktrans%
         {\scontconf{\ExitSK{\val}}{\env}}%
@@ -1995,6 +2038,7 @@ After the evaluation of the argument expression to a value $\val$, depending on 
     \end{align}
     \caption{The CESK-transition function for ForwardConfigurations}
     \label{figure:instance-method-evalconfigs}
+    \end{eqfigure}
 \end{figure}
 
 
@@ -2041,6 +2085,7 @@ Similarly to Section~\ref{subsubsec:instance-method-invoc}, $\ExitSK{\val}$ is a
 \label{subsec:stmt-exectution}
 
 \begin{figure}[Htp]
+    \begin{eqfigure}
     \begin{align}
         &\begin{multlined}
             \cesktranswheresplit*%
@@ -2149,8 +2194,11 @@ Similarly to Section~\ref{subsubsec:instance-method-invoc}, $\ExitSK{\val}$ is a
     \end{align}
     \caption{The CESK-transition function starting in ExecConfiguration}
     \label{figure:exec}
+    \end{eqfigure}
 \end{figure}
+
 \begin{figure}
+    \begin{eqfigure}
     \begin{align}
        &\cesktrans%
            {\contconf{\VarDeclK{\env}{\varmeta}{\scont}}{\val}}%
@@ -2180,10 +2228,13 @@ Similarly to Section~\ref{subsubsec:instance-method-invoc}, $\ExitSK{\val}$ is a
                   {\execconf{\stmt}{\env}{\lbls}{\clbls}{\handler}{\cstrace}{\cex}{\econt}{\scont'}}
        \end{multlined}
        \label{econtconf:while-true}
-       \end{align}
-       \caption{The CESK-transition function starting in ValuePassingConfiguration: statements}
+    \end{align}
+    \caption{The CESK-transition function starting in ValuePassingConfiguration: statements}
+    \end{eqfigure}
 \end{figure}
+
 \begin{figure}
+    \begin{eqfigure}
     \begin{align}
        &\begin{multlined}
         \cesktranssplit%
@@ -2203,6 +2254,7 @@ Similarly to Section~\ref{subsubsec:instance-method-invoc}, $\ExitSK{\val}$ is a
     \label{scontconf:while}
     \end{align}
     \caption{The CESK-transition function starting in ForwardConfiguration: statements}
+    \end{eqfigure}
 \end{figure}
 
 
@@ -2245,6 +2297,7 @@ This is the expression continuation that is applied to the value the return expr
 When the return expression is empty, the value $\tt{null}$ is applied to the return expression continuation component in the ExecConfiguration as shown in \eqref{execconf:return-empty}.
 
 \begin{figure}
+    \begin{eqfigure}
     \begin{align}
         &\begin{multlined}
             \cesktranswheresplit*%
@@ -2256,6 +2309,7 @@ When the return expression is empty, the value $\tt{null}$ is applied to the ret
         \label{acontconf:forinit}
     \end{align}
     \caption{The CESK-transition function starting in ForwardConfiguration: statements}
+    \end{eqfigure}
 \end{figure}
 
 
