@@ -28,11 +28,36 @@
 \input{danvy-millikin-LMCS.mac}
 
 
+% A bit nicer symbol: ∅
 \renewcommand{\emptyset}{\varnothing}
+
+
+% Meta-functions to be used in math mode.
 \DeclareMathOperator{\extend}{extend}
 \DeclareMathOperator{\concat}{concat}
 \DeclareMathOperator{\getter}{implicitGetter}
 \DeclareMathOperator{\setter}{implicitSetter}
+
+
+% Keywords and syntactic constructs of Dart Kernel to be used in math mode.
+\newcommand{\synt}[1]{\ensuremath{\text{\textbf{#1}}}}
+\DeclareMathOperator{\dowhile}{\synt{do~while}}
+\DeclareMathOperator{\while}{\synt{while}}
+\DeclareMathOperator{\forin}{\synt{for~in}}
+\DeclareMathOperator{\for}{\synt{for}}
+\DeclareMathOperator{\throw}{\synt{throw}}
+\DeclareMathOperator{\rethrow}{\synt{rethrow}}
+\DeclareMathOperator{\new}{\synt{new}}
+\DeclareMathOperator{\nnull}{\synt{null}}
+\DeclareMathOperator{\bbreak}{\synt{break}}
+\DeclareMathOperator{\switch}{\synt{switch}}
+\DeclareMathOperator{\continue}{\synt{continue}}
+\DeclareMathOperator{\return}{\synt{return}}
+\DeclareMathOperator{\case}{\synt{case}}
+\DeclareMathOperator{\default}{\synt{default}}
+\DeclareMathOperator{\try}{\synt{try}}
+\DeclareMathOperator{\catch}{\synt{catch}}
+\DeclareMathOperator{\finally}{\synt{finally}}
 
 
 %%
@@ -1046,12 +1071,12 @@ The value corresponding to the evaluated expression is captured by the applicati
             \label{eval:this}\\
         &\begin{multlined}
             \cesktranssplit%
-                {\evalconf{\textbf{throw } \expr}{\env}{\strace}{\cstrace}{\cex}{\econt}}%
-                {\evalconf{\expr}{\env}{\strace}{\cstrace}{\cex}{\ThrowH{(\textbf{throw } \expr) :: \strace}{\handler}}}
+                {\evalconf{\throw \expr}{\env}{\strace}{\cstrace}{\cex}{\econt}}%
+                {\evalconf{\expr}{\env}{\strace}{\cstrace}{\cex}{\ThrowH{(\throw \expr) :: \strace}{\handler}}}
         \end{multlined}
         \label{eval:throw}\\
         &\cesktrans%
-            {\evalconf{\textbf{rethrow}}{\env}{\strace}{inr(\val)}{\strace'}{\econt}}%
+            {\evalconf{\rethrow}{\env}{\strace}{inr(\val)}{\strace'}{\econt}}%
             {\throwconf{\handler}{\val}{\strace'}}
             \label{eval:rethrow}\\
         &\begin{multlined}
@@ -1715,7 +1740,7 @@ The $\update{\deref{(\env(\this))}[\membermeta]}{\val}$ modifies the value store
         \label{eval:superinstancemethod}\\
         &\begin{multlined}
             \cesktranswheresplit%
-            {\evalconf{\textbf{new Q}(\exprs)}{\env}{st}{cex}{cst}{\econt}}%
+            {\evalconf{\new \synt{Q}(\exprs)}{\env}{st}{cex}{cst}{\econt}}%
             {\evallistconf{\exprs}{\env}{st}{cex}{cst}{\acont'}}%
             {\acont' = \ConstructorA{Q}{\econt}}
         \end{multlined}
@@ -1863,7 +1888,7 @@ Similarly to Section~\ref{subsubsec:instance-method-invoc}, $\ExitSK{\val}$ is a
             {\evalconf{\expr}{\env}{\strace}{\cstrace}{\cex}{\econt}}\\
         &\cesktrans%
             {\execconf{\ReturnStatement{}}{\env}{\lbls}{\clbls}{\handler}{\cstrace}{\cex}{\econt}{\scont}}%
-            {\contconf{\econt}{\textbf{null}}}\\
+            {\contconf{\econt}{\nnull}}\\
         &\begin{multlined}
             \cesktranswheresplit*%
                 {\execconf{\DoStatement{\statementmeta}{\expressionmeta}}{\env}{\lbls}{\clbls}{\handler}{\cstrace}{\cex}{\econt}{\scont}}%
@@ -1990,10 +2015,10 @@ The corresponding initializer expression is first evaluated to a value $v$.
 
 \noindent where $\econt', \scont' = \whilecondk$.
 
-Loops \textbf{do while}, \textbf{for in}, \textbf{for} can be desugared to while loops with transformations performed before interpreting the program.
+Loops $\dowhile$, $\forin$, $\for$ can be desugared to while loops with transformations performed before interpreting the program.
 
-The execution of \textbf{do while} loops proceeds as shown in Figure~\ref{figure:exec}.
-The execution of \textbf{for} loops proceeds as shown in Figure~\ref{figure:exec}.
+The execution of $\dowhile$ loops proceeds as shown in Figure~\ref{figure:exec}.
+The execution of $\for$ loops proceeds as shown in Figure~\ref{figure:exec}.
 
 \begin{align*}
     &\begin{multlined}
@@ -2026,20 +2051,20 @@ The execution of \textbf{for} loops proceeds as shown in Figure~\ref{figure:exec
     \end{multlined}
 \end{align*}
 
-In Kernel, \textbf{for in} loops, will be desugared into while loops and their execution will proceed as the \textbf{while} loop rule shown in Figure~\ref{figure:exec}.
+In Kernel, $\forin$ loops, will be desugared into while loops and their execution will proceed as the $\while$ loop rule shown in Figure~\ref{figure:exec}.
 
 
 \subsection{Labels}
 
-Kernel supports labelling statements, \textbf{L: $\stmt_{L}$}, and breaking to L, \textbf{break L}, which completes the execution of the labelled statement and proceeds to executing the rest of the program.
+Kernel supports labelling statements, $\synt{L}: \stmt_{L}$, and breaking to L, $\bbreak \synt{L}$, which completes the execution of the labelled statement and proceeds to executing the rest of the program.
 To support breaking to a label, we add a labels component, $\lbls$, to statement configurations.
-$\lbls$ represents a list of pairs mapping a labelled statement, \textbf{L: $\stmt_L$}, to a break statement continuation, $\bcont$.
+$\lbls$ represents a list of pairs mapping a labelled statement, $\synt{L}: \stmt_L$, to a break statement continuation, $\bcont$.
 Executing a labelled statement inserts a new break label, $\lbl$ in the list of labels $\lbls$.
 
 
 \subsection{Switch}
 
-Kernel supports dispatching control among a number of cases with \textbf{switch} statements.
+Kernel supports dispatching control among a number of cases with $\switch$ statements.
 The target expression $\expr$ is evaluated and matched against the different case clauses of the switch statement.
 
 Case clauses can have multiple constant expressions and there is no implicit fall-through between cases.
@@ -2047,7 +2072,7 @@ Kernel supports continuing to execution of a preceding case clause with continue
 To support continue, we add an optional $\clbls$ list, similar to the label list, which is set in a switch statement and unset otherwise.
 
 If there is a matching case clause, its statement is executed with a new statement continuation that will throw when reached.
-The new statement continuation is necessary because implicit fall-through is not supported and an explicit break of the flow is required (with either of \textbf{continue, break, return, throw}).
+The new statement continuation is necessary because implicit fall-through is not supported and an explicit break of the flow is required (with either of $\continue$, $\bbreak$, $\return$, $\throw$).
 
 \begin{align*}
     &\begin{multlined}
@@ -2057,11 +2082,11 @@ The new statement continuation is necessary because implicit fall-through is not
     \end{multlined}
 \end{align*}
 
-\noindent where $\scase = \textbf{case } \expri{1}, \dots, \expri{i} \textbf{ : } \stmt \textrm{ and } \scase \textrm{ is a matching \textbf{case} clause}$.
+\noindent where $\scase = \case \expri{1}, \dots, \expri{i} \synt{ : } \stmt$ and $\scase$ is a matching $\case$ clause.
 
-A case clause is matching if is \textbf{default} or there is at least one of the constant expressions in the case clause identical to the target value of the switch.
+A case clause is matching if is $\default$ or there is at least one of the constant expressions in the case clause identical to the target value of the switch.
 
-If a non-matching \textbf{case} clause, $\scase$, is the target of a continue statement, it installs a new continue label, in order to support execution of its statement with the appropriate configuration.
+If a non-matching $\case$ clause, $\scase$, is the target of a continue statement, it installs a new continue label, in order to support execution of its statement with the appropriate configuration.
 
 \begin{align*}
     &\begin{multlined}
@@ -2091,10 +2116,10 @@ Otherwise, the execution continues as follows:
 
 \subsection{Exceptions}
 
-Kernel supports structured exception handling with \textbf{try/catch} and \textbf{try/finally} statements.
-Exceptions are thrown with \textbf{throw} and \textbf{rethrow} expressions.
+Kernel supports structured exception handling with $\synt{try/catch}$ and $\synt{try/finally}$ statements.
+Exceptions are thrown with $\throw$ and $\rethrow$ expressions.
 To support throwing exceptions, we add a handler, $\handler$, and a stacktrace, $\strace$, component to expression configurations (and correspondingly, to statement configurations).
-To support \textbf{rethrow}, we add an optional current error, $\cex$, and current stack trace, $\cstrace$, which are set when inside a catch block and unset otherwise.
+To support $\rethrow$, we add an optional current error, $\cex$, and current stack trace, $\cstrace$, which are set when inside a catch block and unset otherwise.
 
 \begin{align*}
     &\cesktrans%
@@ -2102,7 +2127,7 @@ To support \textbf{rethrow}, we add an optional current error, $\cex$, and curre
         {\throwconf{\handler}{\val}{\strace}}.
 \end{align*}
 
-\textbf{try/catch} handlers contain a list of on-catch handlers, environment, break labels, continue switch labels, exception handler, stacktrace, return continuation, and statement continuation.
+$\synt{try/catch}$ handlers contain a list of on-catch handlers, environment, break labels, continue switch labels, exception handler, stacktrace, return continuation, and statement continuation.
 The handlers are tried in order to see if they match against the type of the exception.
 If none match, the exception is rethrown.
 
@@ -2117,7 +2142,7 @@ If none match, the exception is rethrown.
         {\text{otherwise}}
 \end{align*}
 
-\noindent where $\econt' = \CatchH{(\textbf{on T catch (e, s) }\stmt) :: cs}$ is a catch continuation containing a non-empty list of on-catch handlers, and $\env' = \extend(\env, e :: s :: [], \val :: \strace' :: [])$.
+\noindent where $\econt' = \CatchH{(\synt{on T catch (e, s) }\stmt) :: cs}$ is a catch continuation containing a non-empty list of on-catch handlers, and $\env' = \extend(\env, e :: s :: [], \val :: \strace' :: [])$.
 
 When a catch handler with no on-catch handlers is reached, the exception is rethrown.
 
@@ -2127,7 +2152,7 @@ When a catch handler with no on-catch handlers is reached, the exception is reth
         {\throwconf{\handler}{\val}{\strace'}}
 \end{align*}
 
-\textbf{try/finally} handlers contain a statement, environment, break labels, continue switch labels, exception handler, stacktrace, and return continuation.
+$\synt{try/finally}$ handlers contain a statement, environment, break labels, continue switch labels, exception handler, stacktrace, and return continuation.
 Note that they do not contain a statement continuation because when control falls off the end of the finally statement the exception is rethrown.
 The statement is unconditionally executed:
 
@@ -2142,9 +2167,9 @@ The statement is unconditionally executed:
         {\throwconf{\handler}{\val}{\strace}}.
 \end{align*}
 
-\textbf{try/catch} statements execute their body with a new handler.
+$\synt{try/catch}$ statements execute their body with a new handler.
 
-\textbf{try/finally} statements execute their body with a new handler and additionally install new break and continue switch labels, a new return continuation, and a new statement continuation:
+$\synt{try/finally}$ statements execute their body with a new handler and additionally install new break and continue switch labels, a new return continuation, and a new statement continuation:
 
 \begin{align*}
     &\begin{multlined}
@@ -2173,7 +2198,7 @@ The statement is unconditionally executed:
 
 \subsection{Break}
 
-\textbf{break L} statements break from an enclosing label \textbf{L} and execute the break continuation corresponding to the label in the list of labels $\lbls$.
+$\bbreak \synt{L}$ statements break from an enclosing label $\synt{L}$ and execute the break continuation corresponding to the label in the list of labels $\lbls$.
 
 \begin{align*}
     &\cesktrans%
@@ -2193,7 +2218,8 @@ The statement is unconditionally executed:
 
 
 \subsection{Continue}
-\textbf{continue L} statements continue to executing the statement of a preceding case clause, labelled with \textbf{L} and execute the continue continuation corresponding to the label in the list of labels $\clbls$.
+
+$\continue \synt{L}$ statements continue to executing the statement of a preceding case clause, labelled with $\synt{L}$ and execute the continue continuation corresponding to the label in the list of labels $\clbls$.
 
 \begin{align*}
     &\begin{multlined}
@@ -2235,13 +2261,13 @@ Let $F$ be a function with a body $\stmt_{body}$ and a list of formal parameters
 \newcommand{\SuperInitializer}[2]{\mathrm{SuperInitializer}(#1,\,#2)}
 \newcommand{\RedirectingInitializer}[2]{\mathrm{RedirectingInitializer}(#1,\,#2)}
 
-The expression \textbf{new} invokes a constructor to produce a new instance.
-The target constructor \textbf{Q} has a list of formal parameters, $\formals$, a list of initializers, $Izs$, and a statement body, $\stmt_{body}$.
-The invocation of a constructor \textbf{Q} with \textbf{new Q}($\exprs$) proceeds as follows:
+The expression $\new$ invokes a constructor to produce a new instance.
+The target constructor $\synt{Q}$ has a list of formal parameters, $\formals$, a list of initializers, $Izs$, and a statement body, $\stmt_{body}$.
+The invocation of a constructor $\synt{Q}$ with $\new \synt{Q}(\exprs)$ proceeds as follows:
 
 \begin{align*}
     &\cesktrans%
-        {\acontconf{\ConstructorA{\textbf{Q}}{\econt}}{\val{s}}}%
+        {\acontconf{\ConstructorA{\synt{Q}}{\econt}}{\val{s}}}%
         {\contconf{\InitK{Q}{\env}{\scont}}{!\loc}},
 \end{align*}
 
@@ -2255,8 +2281,8 @@ The value $\val$ stores the class of the object and the fields, as a list of fre
     &\cesktrans{\scontconf{\NewSK{\econt}{\loc}}{\env}}{\contconf{\econt}{\deref{\loc}}}.
 \end{align*}
 
-Let $li = last(Izs)$ be the last initializer in the list of initializers, $Izs$, of constructor \textbf{Q}.
-When $li$ is a redirecting initializer to target constructor \textbf{G}, then execution of constructor \textbf{Q} proceeds immediately with execution of its initializer list, $Izs$.
+Let $li = last(Izs)$ be the last initializer in the list of initializers, $Izs$, of constructor $\synt{Q}$.
+When $li$ is a redirecting initializer to target constructor $\synt{G}$, then execution of constructor $\synt{Q}$ proceeds immediately with execution of its initializer list, $Izs$.
 
 \begin{align*}
     &\begin{multlined}
@@ -2281,8 +2307,8 @@ When $li$ is a redirecting initializer to target constructor \textbf{G}, then ex
     \end{multlined}
 \end{align*}
 
-Otherwise, \textbf{Q} is a non-redirecting generative constructor, and execution of \textbf{Q} proceeds with evaluation of field initializers in the immediately enclosing class.
-Let \textbf{Q} be a constructor with non empty initializer list, $Izs$ and a constructor body $\stmt_{body}$.
+Otherwise, $\synt{Q}$ is a non-redirecting generative constructor, and execution of $\synt{Q}$ proceeds with evaluation of field initializers in the immediately enclosing class.
+Let $\synt{Q}$ be a constructor with non empty initializer list, $Izs$ and a constructor body $\stmt_{body}$.
 
 \begin{align*}
     &\begin{multlined}
@@ -2290,7 +2316,7 @@ Let \textbf{Q} be a constructor with non empty initializer list, $Izs$ and a con
             {\contconf{\InitK{Q}{\env}{\scont}}{\val}}%
             {\evallistconf{\exprs}{\env}{\strace}{\cstrace}{\cex}{\acont}}%
             {\begin{aligned}
-                \text{where }   \env'  &= \ext{\env}{\text{\textbf{this}}}{\deref{\loc}},\\
+                \text{where }   \env'  &= \ext{\env}{\synt{this}}{\deref{\loc}},\\
                                 \exprs &= \text{initializer expressions for instance fields},\\
                                 \deref{\loc} &= \val,\\
                                 \acont &= \FieldsA{\env}{Izs}{\loc}{\scont'},\\
