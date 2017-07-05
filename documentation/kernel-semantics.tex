@@ -676,7 +676,7 @@ Application continuations, $\acont$, capture the application of a list of values
 \newcommand{\ForUpdatesA}[1]{\mathrm{ForUpdatesA}(\mathrm{\varmeta{s}},\, \expressionmeta,\, \exprs,\, \statementmeta,\, \env,\, #1,\, \lbls,\, \clbls,\, \handler,\, \cstrace,\, \cex,\, \econt,\, \scont)}
 \newcommand{\InstanceMethodA}{\mathrm{InstanceMethodA(\idmeta,\,\val,\,\strace,\,\handler,\,\cstrace,\,\cex,\,\econt)}}
 
-We use the application continuation $\ValueA{\acont}{\val}$, capturing a value and an application continuation, as application that adds a value to the list of values to eventually used by an application continuation that produces a configuration other than ApplicationConfiguration.\\
+We use the application continuation $\ValueA{\acont}{\val}$, capturing a value and an application continuation, as application that adds a value to the list of values to eventually used by an application continuation that produces a configuration other than ApplicationConfiguration.
 We suffix the names of application continuations with ``$A$''.
 The different application continuations are shown in Figure~\ref{figure:acont}.
 \begin{figure}[Htp]
@@ -714,7 +714,7 @@ The different break continuations are shown in Figure~\ref{figure:breakcont}.
   \label{figure:breakcont}
 \end{figure}
 
-The break continuation Break, \ref{breakcont:break}, captures a statement continuation and the environment corresponding to a target label or a break statement.\\
+The break continuation Break, \ref{breakcont:break}, captures a statement continuation and the environment corresponding to a target label or a break statement.
 The break continuation FinallyBreak, \ref{breakcont:finallybreak}, captures the statement body and the components necessary for the execution of an enclosing Finally statement.
 They are added when a try/finally statement is executed.
 
@@ -789,7 +789,7 @@ Object values have a $\tt{class}$ component and a $\tt{fields}$ component which 
 \[
     \dobjval : \dclass \times \mlist{\dlocation}
 \]
-The $\tt{class}$ component captures the properties of the object, see Section~\eqref{subsec:class}.\\
+The $\tt{class}$ component captures the properties of the object, see Section~\eqref{subsec:class}.
 The object also stores a list of locations that represent the values of the fields for the given object.
 An object is mutated by modifying a field.
 A field is modified by changing the value stored at the location for the said field in the list of locations for the given object.
@@ -1476,7 +1476,7 @@ Otherwise, the evaluation of the expression results with an error, as shown in \
 \label{subsubsec:static-and-library-fields}
 
 In order to remember initialization and assignment of library variables and static variables, we introduce a global environment $\env^{M}$.
-The environment $\env^{M}$ stores bindings for static and library fields to locations for all static and library fields previously accessed or set during the execution of the program.\\
+The environment $\env^{M}$ stores bindings for static and library fields to locations for all static and library fields previously accessed or set during the execution of the program.
 Static and library variables are accessed with $\StaticGet{\membermeta}$.
 The member $\membermeta$ can be a static or library field, a getter or a method tear-off.
 \begin{itemize}
@@ -1509,7 +1509,7 @@ Otherwise, $\membermeta$ is a static or library setter with body $\stmt$ and for
 \subsubsection{Static Invocation}
 
 Static invocation is supported with $\StaticInvocation{\{\membermeta\}}{\expressionsmeta}$ where $\membermeta$ is a function with statement body $\stmt$ and formal parameters $\formals$.
-The evaluation of a static invocation proceeds by evaluating the arguments of the call, as shown in \eqref{eval:staticinvoc}.\\
+The evaluation of a static invocation proceeds by evaluating the arguments of the call, as shown in \eqref{eval:staticinvoc}.
 After the evaluation of the actual arguments for the invocation, the corresponding application is applied to the resulting list of values, as shown in \eqref{acontconf:staticinvoc}.
 In \eqref{acontconf:staticinvoc}, we apply the application continuation by creating a new environment for the execution of the body of the method by binding its formal parameters to the locations of the values for the actual arguments.
 A statement continuation, $\ExitSK{\econt}{\tt{null}}$ is added as next statement continuation to ensure that the execution of the body of the method returns correctly, when a return statement is not executed after the execution of the last statement of the body.
@@ -1652,7 +1652,7 @@ A statement continuation, $\ExitSK{\econt}{\tt{null}}$ is added as next statemen
 
 Kernel allows access of a member as a property, which can be either getter access, which executes the getter, or method extraction, which converts a method into a closure, also known as tear-off.
 Property extraction is supported with $\PropertyGet{\expr}{\idmeta}$.
-The evaluation of this expression is shown in \eqref{eval:propertyget}.\\
+The evaluation of this expression is shown in \eqref{eval:propertyget}.
 After the evaluation of the receiver expression to a value $\val$, the property $\idmeta$ is looked up in methods, getters and implicit getters for the value $\val$.
 Let $\membermeta$ be the instance member result of such successful lookup below and in \eqref{econtconf:propertyget-field}, \eqref{econtconf:propertyget-getter} and \eqref{econtconf:propertyget-tearoff}.
 The evaluation of the expression proceeds as follow:
@@ -1768,7 +1768,7 @@ When $\membermeta$ is an instance field, the evaluation proceeds as shown in \eq
 \label{subsubsec:property-assignment}
 
 An assignment in Kernel results with the invocation of a setter.
-The evaluation of a property assignment proceeds as follows.\\
+The evaluation of a property assignment proceeds as follows.
 First, the left-hand side expression, i.e. the receiver expression, is evaluated as shown in \eqref{eval:propertyset}.
 Afterwards, the right-hand side expression is evaluated, as shown in \eqref{econtconf:propertyset-val}.
 After the evaluation of the receiver expression to a value $\val_0$ and the argument to value $\val_1$, the property $\idmeta$ is looked up in the properties for the value $\val_0$.
@@ -1827,7 +1827,7 @@ When $\membermeta$ is an instance field, the evaluation proceeds as shown in \eq
 \label{subsubsec:super-property-assignemnt}
 
 Kernel supports assignment of a super member with the expression $\SuperPropertySet{\idmeta}{\expressionmeta}$.
-Let $\val' = \deref{(\env(\this))}$, $C = \superclass{\val'}$ and $M$ the result of looking up $\idmeta$ in $C$.\\
+Let $\val' = \deref{(\env(\this))}$, $C = \superclass{\val'}$ and $M$ the result of looking up $\idmeta$ in $C$.
 The evaluation proceeds with evaluation of the right-hand side expression as shown in \eqref{eval:superpropertyset}.
 After the evaluation of the argument expression to a value $\val$, depending on $\membermeta$, the evaluation continues as follows:
 \begin{itemize}
@@ -1952,9 +1952,9 @@ The $\update{\deref{(\env(\this))}[\membermeta]}{\val}$ modifies the value store
 \subsubsection{Instance method invocation}
 \label{subsubsec:instance-method-invoc}
 
-Method invocation is supported with $\InstanceMethodInvocation{\expressionmeta}{\idmeta}{\expressionsmeta}$.\\
+Method invocation is supported with $\InstanceMethodInvocation{\expressionmeta}{\idmeta}{\expressionsmeta}$.
 The evaluation of instance method invocation proceeds with the evaluation of the left-hand side expression, i.e. the receiver expression as shown in \eqref{eval:instancemethod}.
-As shown in the CESK-transition \eqref{econtconf:instancemethod}, the argument expressions evaluate to a list of values.\\
+As shown in the CESK-transition \eqref{econtconf:instancemethod}, the argument expressions evaluate to a list of values.
 After the evaluation of the receiver expression to a value $\val$, we proceed with evaluation of the argument expressions.
 After the evaluation of the receiver expression to a value $\val$ and the argument expressions to $\vals$, the instance method $\idmeta$ is looked up in the instance methods for the value $\val$.
 Let $\membermeta$ be the result of such lookup with statement body $\stmt$ and formal parameters $\formals$.
@@ -1970,9 +1970,9 @@ When a $\tt{return}$ statement is missing in the statement body $\stmt$ of the i
 Direct method invocation allows invocation of instance method by providing directly the member method to be invoked and bypass the lookup step described in Section~\ref{subsubsec:instance-method-invoc} above.
 The evaluation of the direct instance method invocation proceeds with the evaluation of the left-hand side expression, i.e., the receiver expression as shown in \eqref{eval:dinstancemethod}.
 After the evaluation of the receiver expression to a value $\val$, the evaluation proceeds with the evaluation of the argument expressions as shown in \eqref{acontconf:dinstancemethod}.
-The argument expressions are evaluated to a list of values $\vals$.\\
+The argument expressions are evaluated to a list of values $\vals$.
 The evaluation of the expression continues with the execution of the statement body in the environment that binds $\tt{this}$ to a location that stores the value $\val$ and the formal parameters $\formals$ to fresh locations storing values from $\vals$ accordingly.
-The CESK-transition is shown in \eqref{acontconf:dinstancemethod}.\\
+The CESK-transition is shown in \eqref{acontconf:dinstancemethod}.
 Similar to Section~\ref{subsubsec:instance-method-invoc}, $\ExitSK{\tt{null}}$ is added as next statement continuation.
 
 
@@ -2174,7 +2174,7 @@ The expression continuation for the execution of the rest of the statement will 
 Kernel supports return statements with or without an expression.
 In the first case, the execution proceeds with evaluation of the return expression, as shown in \eqref{execconf:return}.
 The expression continuation component in the ExecConfiguration is the return expression continuation.
-This is the expression continuation that is applied to the value the return expression evaluates to.\\
+This is the expression continuation that is applied to the value the return expression evaluates to.
 When the return expression is empty, the value $\tt{null}$ is applied to the return expression continuation component in the ExecConfiguration as shown in \eqref{execconf:return-empty}.
 
 
@@ -2546,7 +2546,7 @@ If the initializer list contains at least two initializers, $Izs = Ininitalizer(
     \end{multlined}
 \end{align*}
 
-Otherwise, there is only one initializer to execute in the initializer list, $li$: \\
+Otherwise, there is only one initializer to execute in the initializer list, $li$:
 
 \begin{itemize}
 \item When $li$ is field or local initializer, the transition is identical to the rule for non empty and non singleton initializer lists, described above.\\
