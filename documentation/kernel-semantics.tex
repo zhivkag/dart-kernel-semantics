@@ -28,13 +28,38 @@
 \input{danvy-millikin-LMCS.mac}
 
 
+% A bit nicer symbol: ∅
 \renewcommand{\emptyset}{\varnothing}
+
+
+% Meta-functions to be used in math mode.
 \DeclareMathOperator{\extend}{extend}
 \DeclareMathOperator{\concat}{concat}
 \DeclareMathOperator{\getter}{implicitGetter}
 \DeclareMathOperator{\setter}{implicitSetter}
 \DeclareMathOperator{\lookup}{lookup}
 \DeclareMathOperator{\methodLookup}{methodLookup}
+
+% Keywords and syntactic constructs of Dart Kernel to be used in math mode.
+\newcommand{\synt}[1]{\ensuremath{\text{\textbf{#1}}}}
+\DeclareMathOperator{\dowhile}{\synt{do~while}}
+\DeclareMathOperator{\while}{\synt{while}}
+\DeclareMathOperator{\forin}{\synt{for~in}}
+\DeclareMathOperator{\for}{\synt{for}}
+\DeclareMathOperator{\throw}{\synt{throw}}
+\DeclareMathOperator{\rethrow}{\synt{rethrow}}
+\DeclareMathOperator{\new}{\synt{new}}
+\DeclareMathOperator{\nnull}{\synt{null}}
+\DeclareMathOperator{\bbreak}{\synt{break}}
+\DeclareMathOperator{\switch}{\synt{switch}}
+\DeclareMathOperator{\continue}{\synt{continue}}
+\DeclareMathOperator{\return}{\synt{return}}
+\DeclareMathOperator{\case}{\synt{case}}
+\DeclareMathOperator{\default}{\synt{default}}
+\DeclareMathOperator{\try}{\synt{try}}
+\DeclareMathOperator{\catch}{\synt{catch}}
+\DeclareMathOperator{\finally}{\synt{finally}}
+
 
 %%
 % Commands to typeset transitions of CESK machine.
@@ -134,6 +159,7 @@
 The small-step operational semantics of Dart Kernel is given by an abstract machine in the style of the CESK machine.
 The machine is defined by a single step transition function where each step of the machine starts in a configuration and deterministically gives the next configuration.
 
+
 \section{Definitions}
 \label{sec:definitions}
 
@@ -151,8 +177,11 @@ The machine is defined by a single step transition function where each step of t
 \item ``$\mlist{\mathbf{X}}$'' denotes the domain of meta-lists of elements from domain ``$\mathbf{X}$''.
 Note that the word ``List'' here is not in bold, so that it isn't confused with the domain $\mathbf{List}$ of Dart objects.
 \end{itemize}
+
+
 \subsection{Domains}
 \label{subsec:domains}
+
 % Variables
 \newcommand{\expr}{\ensuremath{\mathit{E}}}
 \newcommand{\expri}[1]{\expr_\ensuremath{\mathit{#1}}}
@@ -223,60 +252,61 @@ Note that the word ``List'' here is not in bold, so that it isn't confused with 
 \[
   \begin{array}{ccll}
     \expr, \expri{i}
-    & : & \dexpr & \textrm{syntactic domain of expressions}\\
+    & : & \dexpr & \text{syntactic domain of expressions}\\
     \exprs
     & : & \mlist{\dexpr}\\[2mm]
 
     \stmt, \stmti{i}
-    & : & \dstmt & \textrm{syntactic domain of statements}\\
+    & : & \dstmt & \text{syntactic domain of statements}\\
     \stmts
-    & : & \mlist{\dstmt}  & \textrm{}\\[2mm]
+    & : & \mlist{\dstmt}  & \text{}\\[2mm]
 
     \econt
-    & : & \decont & \textrm{domain of expression continuations}\\
+    & : & \decont & \text{domain of expression continuations}\\
     \acont
-    & : & \dacont & \textrm{domain of application continuations}\\
+    & : & \dacont & \text{domain of application continuations}\\
     \scont
-    & : & \dscont & \textrm{domain of statement continuations}\\
+    & : & \dscont & \text{domain of statement continuations}\\
     \bcont
-    & : & \dbcont & \textrm{domain of break continuations}\\
+    & : & \dbcont & \text{domain of break continuations}\\
     \switchcont
-    & : & \dswitchcont & \textrm{domain of switch continuations}\\[2mm]
+    & : & \dswitchcont & \text{domain of switch continuations}\\[2mm]
 
-    \lbl & : & \dlbl & \textrm{domain of labels}\\
+    \lbl & : & \dlbl & \text{domain of labels}\\
     \lbls & : & \mlist{\dlbl} \\
-    \clbl & : & \dclbl & \textrm{domain of switch labels}\\
+    \clbl & : & \dclbl & \text{domain of switch labels}\\
     \clbls & : & \mlist{\dclbl} \\[2mm]
 
     \handler
-    & : & \dhandler & \textrm{syntactic domain of exception handlers} \\
+    & : & \dhandler & \text{syntactic domain of exception handlers} \\
     \strace
-    & : & \mlist{\dexpr} & \textrm{domain of stack traces}\\
+    & : & \mlist{\dexpr} & \text{domain of stack traces}\\
     \cex
-    & : &  \emptyset + \dval & \textrm{domain of current expetion values}\\
+    & : &  \emptyset + \dval & \text{domain of current expetion values}\\
     \cstrace
-    & : & \emptyset + \mlist{\dexpr} & \textrm{domain of current exception stack traces}\\[2mm]
+    & : & \emptyset + \mlist{\dexpr} & \text{domain of current exception stack traces}\\[2mm]
 
     \varmeta
-    & : & \dvardecl & \textrm{domain of variable declarations}\\
+    & : & \dvardecl & \text{domain of variable declarations}\\
     \loc
-    & : & \dlocation & \textrm{domain of store locations}\\
+    & : & \dlocation & \text{domain of store locations}\\
     \val
-    & : & \dval & \textrm{domain of values}\\
+    & : & \dval & \text{domain of values}\\
     \vals
     & : & \mlist{\dval}\\
     \env
-    & : & \denv & \textrm{domain of environments}\\[2mm]
+    & : & \denv & \text{domain of environments}\\[2mm]
   \end{array}
 \]
 
 \[
   \begin{array}{ccll}
     \formal, \formali{i} & : & \dvardecl\\
-    \formals & : & \dformals = \mlist{\dvardecl} &\textrm{ domain of formals}\\
+    \formals & : & \dformals = \mlist{\dvardecl} &\text{ domain of formals}\\
 
   \end{array}
 \]
+
 
 \subsection{Notations}
 \label{subsec:notations}
@@ -289,14 +319,19 @@ Note that the word ``List'' here is not in bold, so that it isn't confused with 
   \end{array}
 \]
 
+
 \subsection{Store}
 \label{subsec:store-definition}
+
 The store, $s$, maps a location, $\loc$, to a value, $\val$.
 The store is a mutable map and should not be confused with a function.
 A global store is assumed and locations reachable from a given scope are defined by the current environment function.
 \[s : \dlocation \rightarrow \dval \]
+
+
 \subsubsection{Dereferencing}
 \label{subsubsection:dereferecing}
+
 \newcommand{\deref}[1]{!#1}
 Function ``$\deref{}$'' is used to access a value stored in the store provided the corresponding location.
 The location is stored in the environment, or in the list of field locations for object values.
@@ -304,22 +339,29 @@ The location is stored in the environment, or in the list of field locations for
 
 \begin{align*}
   \deref{} \in \dlocation &\rightarrow \dval \\
-  \deref{\loc} &=  \val, \textrm{ with $\val$ the value in store at location } \loc
+  \deref{\loc} &=  \val, \text{ with $\val$ the value in store at location } \loc
 \end{align*}
+
+
 \subsubsection{Update}
 \label{subsubsec:store-update}
+
 \newcommand{\update}[2]{{#1} := {#2}}
 Function ``$\update{\loc}{\val}$'' updates the store at location $\loc \in \dlocation$ with value $\val \in \dval$.
 It has an implicit argument which is the store of the CESK machine.
 \begin{align*}
   \update{}{} \in \dlocation \times \dval &\rightarrow  \dval\\
-  \update{\loc}{\val} &= \val, \textrm{ with $\val$ the value in store at location $\loc$}
+  \update{\loc}{\val} &= \val, \text{ with $\val$ the value in store at location $\loc$}
 \end{align*}
+
+
 \subsection{Environment}
 \label{subsec:env-definition}
+
 The environment is a function that maps a variable to a location in the store.
 \[\env \in \denv = \dvardecl \rightarrow \dlocation\]
 When an environment is needed to further execute the program, it is saved by the caller in the corresponding continuation.
+
 
 \subsubsection{Extend}
 \label{subsubsec:extend-env}
@@ -332,19 +374,24 @@ Function ``$\extend$'' creates a new environment by extending the provided envir
 with
 \[
     \env'(\varmeta) =\begin{cases}
-    \loc_i & \textrm{with }\deref{\loc_i} = \val_i\textrm{ if }\exists\varmeta_i \in \varmeta{s} \textrm{ s.t. } \varmeta_i = \varmeta\\
-    \env(\varmeta) &\textrm{otherwise}
+    \loc_i & \text{with }\deref{\loc_i} = \val_i\text{ if }\exists\varmeta_i \in \varmeta{s} \text{ s.t. } \varmeta_i = \varmeta\\
+    \env(\varmeta) &\text{otherwise}
     \end{cases}
 \]
 
 For simpler notation, we allow ``$\extend$'' to be called with singleton lists as $\ext{\env}{\varmeta}{\val}$, which we consider equivalent to $\ext{\env}{\varmeta :: []}{\val :: []}$.
+
+
 \subsubsection{Variable lookup}
 \label{subsubsec:variable-lookup}
+
 A variable lookup consists of looking up the location of a variable from the environment with $\loc = \env(\varmeta)$ and reading the stored value $v$ with $\deref{\loc} = \deref{\env(\varmeta)}$ from the store.
 For definition of ``$\deref$'' see Section~\ref{subsubsection:dereferecing}.
 
+
 \subsection{Configurations}
 \label{subsec:cesk-configs}
+
 The state space of the CESK machine contains various kinds of configurations.
 Configurations contain different components and the transition step dispatches to the next configuration based on one of the components of the configuration.
 %
@@ -377,6 +424,7 @@ Configurations contain different components and the transition step dispatches t
   \caption{States for the CESK machine}
 \end{figure}
 
+
 \subsubsection{EvalConfiguration}
 \label{subsubsec:evalconfig}
 
@@ -392,11 +440,14 @@ Note that for other invocations, we first evaluate the receiver for instance inv
 \item EvalConfiguration, otherwise.
 \end{itemize}
 
+
 \subsubsection{EvalListConfigruation}
 \label{subsubsec:evallistconfig}
+
 The configuration EvalListConfiguration is shown in Figure~\ref{config:evallist}.
 The transition step for this configuration dispatches on the expression list, $\exprs$.
 With one step of the CESK-transition function, from EvalListConfifuration the next configuration is either EvalConfiguration, when $\exprs \neq []$, or ApplicationConfiguration, otherwise.
+
 
 \subsubsection{ExecConfiguration}
 \label{subsubsec:execconfig}
@@ -405,6 +456,7 @@ The configuration ExecConfiguration is shown in Figure~\ref{config:exec}.
 The transition step dispatches on the statement, $\stmt$.
 The next configuration is either EvalConfiguration or ExecConfiguration.
 
+
 \subsubsection{ValuePassingConfiguration}
 \label{suubsubsec:valuepassingconfig}
 
@@ -412,12 +464,15 @@ The configuration ValuePassingConfiguration is shown in Figure~\ref{config:econt
 The transition step applies the expression continuation component to its value component.
 The expression continuation produces the next configuration.
 
+
 \subsubsection{ApplicationConfiguration}
 \label{subsubsec:applicationconfig}
 
 The configuration ApplicationConfiguration is shown in Figure~\ref{config:acont}.
 The transition step applies the application continuation component to its list of values component.
 The application continuation produces the next configuration.
+
+
 \subsubsection{ForwardConfiguration}
 \label{subsubsec:forwardconfig}
 
@@ -425,8 +480,10 @@ The configuration ForwardConfiguration is shown in Figure~\ref{config:scont}.
 The transition step applies the statement continuation component to its environment component.
 The statement continuation produces the next configuration.
 
+
 \subsubsection{ThrowCongfiguration}
 \label{subsubsec:throwconfig}
+
 The configuration ThrowConfiguration is shown in Figure~\ref{config:throw}.
 The transition step applies the exception handler.
 The next configuration is:
@@ -434,16 +491,24 @@ The next configuration is:
 \item ThrowConfiguration, when the exception is not handled by the first catch clause of a catch handler.
 \item ExecConfiguration, for the statement body of the matching catch or the finally statement, when no catch clauses are present.
 \end{itemize}
+
+
 \subsubsection{BreakConfiguration}
 \label{subsubsec:breakconfig}
+
 The configuration BreakConfiguration is shown in Figure~\ref{config:bcont}.
 The transition step applies the break continuation component.
 The next configuration is ForwardConfiguration.
+
+
 \subsubsection{SwitchConfiguration}
 \label{subsubsec:switchconfig}
+
 The configuration SwitchConfiguration is shown in Figure~\ref{config:switchcont}.
 The transition step applies the switch continuation component.
 The next configuration is ExecConfiguration.
+
+
 \subsection{Continuations}
 \label{subsec:continuations-definition}
 
@@ -465,6 +530,8 @@ The next configuration is ExecConfiguration.
 Continuations represent the instructions for execution of statements or evaluation of expressions.
 They capture the information needed to resume the execution of the program.
 There are various types of continuations depending on the state for evaluation of an expression or execution of a statement.
+
+
 \subsubsection{Expression continuations}
 \label{subsubsec:expression-continuations}
 
@@ -554,6 +621,7 @@ The different expression continuations are shown in Figure~\ref{figure:econts}.
   \label{figure:econts}
 \end{figure}
 
+
 \subsubsection{Statement continuations}
 \label{subsubsec:statement-continuations}
 
@@ -591,6 +659,7 @@ The different statement continuations are shown in Figure~\ref{figure:sconts}.
   \caption{Statement Continuations}
   \label{figure:sconts}
 \end{figure}
+
 
 \subsubsection{Application continuation}
 \label{subsubsec:application-continuation}
@@ -632,6 +701,7 @@ The different application continuations are shown in Figure~\ref{figure:acont}.
   \label{figure:acont}
 \end{figure}
 
+
 \subsubsection{Break continuations}
 \label{subsubsec:break-continuations}
 
@@ -652,6 +722,8 @@ The different break continuations are shown in Figure~\ref{figure:breakcont}.
 The break continuation Break, \ref{breakcont:break}, captures a statement continuation and the environment corresponding to a target label or a break statement.\\
 The break continuation FinallyBreak, \ref{breakcont:finallybreak}, captures the statement body and the components necessary for the execution of an enclosing Finally statement.
 They are added when a try/finally statement is executed.
+
+
 \subsubsection{Switch continuations}
 \label{subsubsec:switch-continuations}
 
@@ -674,8 +746,11 @@ The different switch continuations are shown in Figure~\ref{figure:switchconts}.
 The switch continuation SwitchContinue, \ref{switchcont:continue}, captures the statement body of a preceding switch case, targeted by some continue statement, and the components necessary for its execution.
 The switch continuation FinallyContinue, \ref{switchcont:finallycontinue}, captures the statement body and the components necessary for the execution of an enclosing Finally statement.
 They are added when a try/finally statement is executed.
+
+
 \subsubsection{Exception handlers}
 \label{subsubsec:exception-handlers}
+
 The different exception handlers are shown in Figure~\ref{figure:handlers}.
 \newcommand{\ThrowH}[2]{\mathrm{ThrowK}({#1},\,{#2})}
 \newcommand{\CatchH}[1]{\mathrm{Catch}({#1},\,\env,\,\lbls,\,\clbls,\,\strace,\,\handler,\,\econt,\,\scont)}
@@ -689,13 +764,17 @@ The different exception handlers are shown in Figure~\ref{figure:handlers}.
   \label{figure:handlers}
 \end{figure}
 
+
 \section{Values}
 \label{sec:values}
+
 The values supported by Dart Kernel are $\tt{literal}$ values (Section~\ref{subsec:literal-values}) and $\tt{object}$ values (Section~\ref{subsec:object-values}).
 Values are irreducible terms, i.e, results of evaluation of expressions.
 
+
 \subsection{Literal values}
 \label{subsubsec:literal-values}
+
 Literal values are special values that store the specific payload and an associated class.
 The different literal values are presented below:
 \[
@@ -706,8 +785,11 @@ The different literal values are presented below:
 \]
 Literal values are special values that store the specific payload and an associated class.
 Each of the specific literal values contains predefined operators and/or methods, whose semantics we are not going to specify in this document.
+
+
 \subsection{Object values}
 \label{subsec:object-values}
+
 Object values have a $\tt{class}$ component and a $\tt{fields}$ component which is list of locations for each field, as shown below:
 \[
     \dobjval : \dclass \times \mlist{\dlocation}
@@ -735,9 +817,12 @@ Let $\loc$ be the location of field $fName$ for the object value $\val_0$:
 \end{align*}
 where $\val_1$ is the value to be stored in $\loc$ after the invocation of the implicit setter.
 This implies that invocation of implicit setter will modify the global store and  $\deref{\loc} = \val_1$ will hold after the transition.
+
+
 \subsection{Class}
 \label{subsec:class}
-A $\tt{class} \in \dclass$ captures the different properties for a defined class in Dart Kernel. 
+
+A $\tt{class} \in \dclass$ captures the different properties for a defined class in Dart Kernel.
 \begin{align}
 \notag
 \dclass &\in \tt{superclass} \times \tt{interfaces} \times \tt{fieldGetters}\\\notag
@@ -761,31 +846,44 @@ The $\tt{getters}$ and $\tt{setters}$ components capture the getters and the set
 \item $\tt{methods}$\\
 The $\tt{methods}$ component captures the methods for the given class and all its superclasses recursively.
 \end{itemize}
+
+
 \subsubsection{Property Lookup}
 \label{subsubsec:property-lookup}
+
 A property lookup searches for an instance method, a getter or a field with the given property name. If none of the following is found, an error is returned.
 \begin{align*}
     \lookup \in \dclass \times \mathbf{Name} &\rightarrow \mathbf{Member}\\
     \lookup(\idmeta) &= \membermeta
 \end{align*}
 where $\membermeta$ is an instance method, when $\idmeta$ is a method name, a getter when $\idmeta$ is a getter name or an implicit getter when $\idmeta$ is a field name.
+
+
 \subsubsection{Method Lookup}
 \label{subsubsec:method-lookup}
+
 A method lookup searches for an instance method in the given class given the name of the method.
 \begin{align*}
     \methodLookup \in \dclass \times \mathbf{Name} &\rightarrow \mathbf{Member}\\
     \methodLookup(\idmeta) &= \membermeta
 \end{align*}
+
+
 \subsection{Function values}
 \label{subsec:function-values}
+
 \[
     \dfunval : \dformals \times \dstmt \times \denv
 \]
+
+
 \section{Abstract Syntax}
 \label{sec:abstract-syntax}
 
+
 \subsubsection{Expressions}
 \label{sec:expr-syntax}
+
 
 % Syntax
 \newcommand{\VariableGet}[1]{#1}
@@ -887,8 +985,11 @@ A method lookup searches for an instance method in the given class given the nam
   & \Let{\variablemeta}{\expressionmeta_0}{\expressionmeta_1} \\
 \end{array}
 \]
+
+
 \subsection{Statements}
 \label{subsec:stmt-syntax}
+
 % InvalidStatement
 %
 \newcommand{\ExpressionStatement}[1]{\{\, #1\, \}}
@@ -944,10 +1045,14 @@ A method lookup searches for an instance method in the given class given the nam
 \end{array}
 \]
 
+
 \section{Semantics}
 \label{sec:semantics}
+
+
 \subsection{Expression evaluation}
 \label{subsec:expr-evaluation}
+
 \newcommand{\this}{\tt{this}}
 \newcommand{\superclass}[1]{superclass({#1})}
 
@@ -1073,12 +1178,12 @@ The value corresponding to the evaluated expression is captured by the applicati
             \label{eval:this}\\
         &\begin{multlined}
             \cesktranssplit%
-                {\evalconf{\textbf{throw } \expr}{\env}{\strace}{\cstrace}{\cex}{\econt}}%
-                {\evalconf{\expr}{\env}{\strace}{\cstrace}{\cex}{\ThrowH{(\textbf{throw } \expr) :: \strace}{\handler}}}
+                {\evalconf{\throw \expr}{\env}{\strace}{\cstrace}{\cex}{\econt}}%
+                {\evalconf{\expr}{\env}{\strace}{\cstrace}{\cex}{\ThrowH{(\throw \expr) :: \strace}{\handler}}}
         \end{multlined}
         \label{eval:throw}\\
         &\cesktrans%
-            {\evalconf{\textbf{rethrow}}{\env}{\strace}{inr(\val)}{\strace'}{\econt}}%
+            {\evalconf{\rethrow}{\env}{\strace}{inr(\val)}{\strace'}{\econt}}%
             {\throwconf{\handler}{\val}{\strace'}}
             \label{eval:rethrow}\\
         &\begin{multlined}
@@ -1157,7 +1262,7 @@ The value corresponding to the evaluated expression is captured by the applicati
         &\cesktranswhere%
             {\contconf{\IsExpressionK}{\val}}%
             {\contconf{\econt}{\true}}%
-            {\text{if $\val \textrm{ is } \tt{T}$}}
+            {\text{if $\val \text{ is } \tt{T}$}}
         \label{econtconf:is-true}\\
         &\cesktranswhere%
             {\contconf{\IsExpressionK}{\val}}%
@@ -1167,31 +1272,37 @@ The value corresponding to the evaluated expression is captured by the applicati
         &\cesktranswhere%
             {\contconf{\AsExpressionK}{\val}}%
             {\contconf{\econt}{\val}}%
-            {\text{if $\val \textrm{ is } \tt{T}$}}
+            {\text{if $\val \text{ is } \tt{T}$}}
         \label{econtconf:as-true}\\
         &\cesktranswhere%
             {\contconf{\AsExpressionK}{\val}}%
             {\throwconf{\handler}{\AsExpression{\expressionmeta}{\tt{T}} :: \strace}{\tt{CastError}}}%
-            {\text{if $\val \textrm{ is not } \tt{T}$}}
+            {\text{if $\val \text{ is not } \tt{T}$}}
         \label{econtconf:as-false}
     \end{align}
     \caption{The CESK-transition function for ValuePassingConfiguration: simple expressions}
     \label{figure:cont-config}
 \end{figure}
+
+
 \subsubsection{Basic literal evaluation}
 \label{subsubsec:basic-literal-eval}
 
 Kernel literals are evaluated to a value $\val \in \dlitval$ in one step.
 Transitions of the CESK machine for basic literals are presented in Figure~\ref{figure:expressions-evalconfigs}, rules \eqref{eval:int} - \eqref{eval:string}.
 
+
 \subsubsection{Variable assignment and lookup}
 \label{subsubsec:variable-assignment-and-lookup}
+
 A variable $\varmeta$ is accessed by reading the value stored at location $\env(\varmeta)$ in the store, \eqref{eval:varget}.\\[2mm]
 Assigning a value to a variable $\varmeta$ will modify the store, more specifically the value stored at location  $\env(\varmeta)$.
 The evaluation of this expression proceeds by evaluating the right-hand side expression, as shown in \eqref{eval:varset} and setting the location $\env(\varmeta)$ in the store to the value this expression evaluates to, as shown in \eqref{econtconf:varset}.
 
+
 \subsubsection{Boolean expressions}
 \label{subsubsec:bool-expressions}
+
 The CESK-transition function for boolean expressions is show in Figure~\ref{figure:expressions-evalconfigs}, rules \eqref{eval:not} - \eqref{eval:cond}.
 \begin{itemize}
 \item Not expression\\
@@ -1212,12 +1323,18 @@ We dispatch on the value the expression evaluates to.
 If the expression evaluates to $\true$, the next configuration evaluates the first expression and is produced with the CESK-transition \eqref{econtconf:cond-true}.
 Otherwise, the next configuration evaluates the second expression and is produced with the transition \eqref{econtconf:cond-false}.
 \end{itemize}
+
+
 \subsubsection{Let}
+
 Let expressions in Kernel introduce a new variable, initialized to some value with an initializer expression, for the evaluation of the right-hand side let expression.
 Let expressions are evaluated by first evaluating the initializer expression for the fresh variable as shown in the CESK-transition \eqref{eval:let}.
 It proceeds by extending the environment for the evaluation of the right-hand side let expression and producing the next configuration for evaluation of the later with the CESK-transition \eqref{econtconf:let}.
+
+
 \subsubsection{String Concatenation}
 \label{subsubsec:string-concatenation}
+
 The function $\concat$ concatenates the strings from the given meta-list into a single value.
 \begin{align*}
   \concat : \mlist{\dstring} &\rightarrow \dstring\\
@@ -1225,17 +1342,26 @@ The function $\concat$ concatenates the strings from the given meta-list into a 
 \end{align*}
 The evaluation of concatenation expression proceeds by evaluating the target expressions in the specified order, as shown with the CESK-transition \eqref{eval:concat}.
 Once all expressions have been evaluated the corresponding application is applied, as shown in \eqref{acontconf:concat}, which results with an expression continuation application to the resulting $\dstring$.
+
+
 \subsubsection{This}
+
 For the evaluation of $\this$ expression we add a special variable declaration, $\this$.
 In the body of instance methods or constructors, there is a binding in the corresponding environment from $\this$ variable declaration to a location that stores the corresponding value.
 Evaluation of $\this$ expression resolves to that value in one step, as shown in \eqref{eval:this}.
+
+
 \subsubsection{Type test}
 \label{subsubsec:type-test}
+
 Type test expressions evaluate to a boolean literal value, in more than one step.
 The evaluation of this kind of expression proceeds by evaluating the target expression, as in CESK-transition \eqref{eval:is}.
 When the target expression evaluates to a value $\val$ such that ``$\val $ is $\tt{T}$" holds, the value $true$ is applied to the expression continuation, $\econt$, as shown in \eqref{econtconf:is-true}, otherwise $\false$ is applied to $\econt$, as in \eqref{econtconf:is-false}.
+
+
 \subsubsection{Type cast}
 \label{subsubsec:type-cast}
+
 Evaluation of type cast expression proceed to evaluation of the target expression to the corresponding value, as shown in \eqref{eval:as}.
 When the target expression evaluates to a value $\val$ such that ``$\val $ is $\tt{T}$" holds, the value $\val$ is applied to the expression continuation as shown in \eqref{econtconf:as-true}.
 Otherwise, the evaluation of the expression results with an error, as shown in \eqref{econtconf:as-false}.
@@ -1351,6 +1477,7 @@ Otherwise, the evaluation of the expression results with an error, as shown in \
     \label{table:static-evalconfigs}
 \end{figure}
 
+
 \subsubsection{Static and library fields}
 \label{subsubsec:static-and-library-fields}
 
@@ -1392,7 +1519,9 @@ The statement body is executed in an environment that has only the binding from 
 \noindent
 Otherwise, $\membermeta$ is a static or library setter with body $\stmt$ and formal parameter $\formal$.
 
+
 \subsubsection{Static Invocation}
+
 Static invocation is supported with $\StaticInvocation{\{\membermeta\}}{\expressionsmeta}$ where $\membermeta$ is a function with statement body $\stmt$ and formal parameters $\formals$.
 The evaluation of a static invocation proceeds by evaluating the arguments of the call, as shown in \eqref{eval:staticinvoc}.\\
 After the evaluation of the actual arguments for the invocation, the corresponding application is applied to the resulting list of values, as shown in \eqref{acontconf:staticinvoc}.
@@ -1489,7 +1618,7 @@ A statement continuation, $\ExitSK{\econt}{\tt{null}}$ is added as next statemen
     &\begin{multlined}
         \cesktranswheresplit%
         {\contconf{\PropertyGetK}{\val}}%
-        {\contconf{\econt}{\textrm{\membermeta}(\val)}}%
+        {\contconf{\econt}{\text{\membermeta}(\val)}}%
         {\parbox{10cm}{if $\membermeta$ is an implicit getter for field $\idmeta$\\
         where $\env = \ext{\env_{empty}}{\mathbf{this}}{\val}$\\
         $\scont = \emptyset$}}
@@ -1498,7 +1627,7 @@ A statement continuation, $\ExitSK{\econt}{\tt{null}}$ is added as next statemen
     &\begin{multlined}
         \cesktranswheresplit*%
         {\contconf{\PropertyGetK}{\val}}%
-        {\throwconf{\handler}{(\tt{throw}\text{ NoSuchMethod}) :: \strace}{\textrm{NoSuchMethod}}}%
+        {\throwconf{\handler}{(\tt{throw}\text{ NoSuchMethod}) :: \strace}{\text{NoSuchMethod}}}%
         {\parbox{10cm}{if lookup of name $\idmeta$ was unsuccessful in class of value $\val$}}
     \end{multlined}
     \label{econtconf:propertyget-nosuchmethod}\\
@@ -1530,10 +1659,11 @@ A statement continuation, $\ExitSK{\econt}{\tt{null}}$ is added as next statemen
     \caption{The CESK-transition function for ValuePassingConfiguration: instance property extraction}
     \label{figure:econtconf:instance-property-extraction}
 \end{figure}
-%
-%
+
+
 \subsubsection{Property extraction}
 \label{subsubsec:property-extraction}
+
 Kernel allows access of a member as a property, which can be either getter access, which executes the getter, or method extraction, which converts a method into a closure, also known as tear-off.
 Property extraction is supported with $\PropertyGet{\expr}{\idmeta}$.
 The evaluation of this expression is shown in \eqref{eval:propertyget}.\\
@@ -1555,10 +1685,11 @@ Application of implicit getter on some instance value returns the value stored i
 Afterwards the continuation expression is applied to the value, as shown in \eqref{econtconf:propertyget-field}.
 \end{itemize}
 If the lookup fails, a "NoSuchMethod" will be thrown, as shown in \eqref{econtconf:propertyget-nosuchmethod}.
-%
-%
+
+
 \subsubsection{Direct property extraction}
 \label{subsubsec:direct-property-extraction}
+
 In Kernel a property can be accessed without lookup, by direct reference to the member $\membermeta$.
 This implies that the lookup step above is bypassed.
 Similar to Section~\ref{subsubsec:property-extraction}, this expression can be either getter access, which executes the getter, or method extraction, which converts a method into a closure, also known as tear-off.
@@ -1646,8 +1777,11 @@ When $\membermeta$ is an instance field, the evaluation proceeds as shown in \eq
     \caption{The CESK-transition function for ValuePassingConfiguration: instance property assignment}
     \label{figure:instance-property-assignment-evalconfigs}
 \end{figure}
+
+
 \subsubsection{Property assignment}
 \label{subsubsec:property-assignment}
+
 An assignment in Kernel results with the invocation of a setter.
 The evaluation of a property assignment proceeds as follows.\\
 First, the left-hand side expression, i.e. the receiver expression, is evaluated as shown in \eqref{eval:propertyset}.
@@ -1666,8 +1800,11 @@ When the lookup results with a field, the implicit setter for the field is invok
 The $\{\membermeta\}(\val_0, \val_1)$ is the implicit setter for the field $\membermeta$ which is a function in the domain $\dval \times \dval \rightarrow \dval$.
 The value returned by the implicit function is $\val_1$.
 \end{itemize}
+
+
 \subsubsection{Direct property assignment}
 \label{subsubsec:direct-property-assignment}
+
 In Kernel a property can be set without lookup, by direct reference to the member of the instance.
 This implies that the lookup step described in \ref{subsubsec:property-assignment} above is bypassed.
 The evaluation of direct property assignment proceeds by evaluating the right-hand side expression, i.e. the receiver expression as shown in \eqref{eval:dpropertyset}.
@@ -1679,8 +1816,11 @@ When $\membermeta$ is an instance setter with body $\stmt$ and formal parameter 
 \item $\membermeta$ is a field\\
 When $\membermeta$ is a field the value stored at location $\val_0[\membermeta]$ is modified to store value the argument expression evaluates to, $\val_1$, as shown in \eqref{econtconf:dpropertyset-field}.
 \end{itemize}
+
+
 \subsubsection{Super property get}
 \label{subsubsec:super-property-get}
+
 Kernel allows access of a superclass member as a property, which can be either getter access, which executes the getter, or method extraction, which converts a method into a closure.
 \noindent
 Accessing a superclass member is accessed with the expression $\SuperPropertyGet{\idmeta}$ evaluated with the corresponding components: $\env$, $\strace$, $\handler$, $\cstrace$, $\cex$, $\econt$.
@@ -1698,8 +1838,10 @@ The CESK-transition is shown in \eqref{eval:superpropertyget-getter}.
 When $\membermeta$ is an instance field, the evaluation proceeds as shown in \eqref{eval:superpropertyget-field}.
 \end{itemize}
 
+
 \subsubsection{Super property assignment}
 \label{subsubsec:super-property-assignemnt}
+
 Kernel supports assignment of a super member with the expression $\SuperPropertySet{\idmeta}{\expressionmeta}$.
 Let $\val' = \deref{(\env(\this))}$, $C = \superclass{\val'}$ and $M$ the result of looking up $\idmeta$ in $C$.\\
 The evaluation proceeds with evaluation of the right-hand side expression as shown in \eqref{eval:superpropertyset}.
@@ -1742,7 +1884,7 @@ The $\update{\deref{(\env(\this))}[\membermeta]}{\val}$ modifies the value store
         \label{eval:superinstancemethod}\\
         &\begin{multlined}
             \cesktranswheresplit%
-            {\evalconf{\textbf{new Q}(\exprs)}{\env}{st}{cex}{cst}{\econt}}%
+            {\evalconf{\new \synt{Q}(\exprs)}{\env}{st}{cex}{cst}{\econt}}%
             {\evallistconf{\exprs}{\env}{st}{cex}{cst}{\acont'}}%
             {\acont' = \ConstructorA{Q}{\econt}}
         \end{multlined}
@@ -1821,8 +1963,11 @@ The $\update{\deref{(\env(\this))}[\membermeta]}{\val}$ modifies the value store
     \caption{The CESK-transition function for ForwardConfigurations}
     \label{figure:instance-method-evalconfigs}
 \end{figure}
+
+
 \subsubsection{Instance method invocation}
 \label{subsubsec:instance-method-invoc}
+
 Method invocation is supported with $\InstanceMethodInvocation{\expressionmeta}{\idmeta}{\expressionsmeta}$.\\
 The evaluation of instance method invocation proceeds with the evaluation of the left-hand side expression, i.e. the receiver expression as shown in \eqref{eval:instancemethod}.
 As shown in the CESK-transition \eqref{econtconf:instancemethod}, the argument expressions evaluate to a list of values.\\
@@ -1833,8 +1978,11 @@ The body $\stmt$ is then executed with an environment binding $\tt{this}$ to a l
 The CESK-transition is shown in \eqref{acontconf:instancemethod}.
 We add $\ExitSK{\tt{null}}$ as next statement continuation.
 When a $\tt{return}$ statement is missing in the statement body $\stmt$ of the instance method $\membermeta$, the statement continuation $\ExitSK{\val}$ ensures that the execution will proceed to the corresponding expression continuation, in this case with $\val = \tt{null}$.
+
+
 \subsubsection{Direct instance method invocation}
 \label{subsubsec:direct-instance-method-invoc}
+
 Direct method invocation allows invocation of instance method by providing directly the member method to be invoked and bypass the lookup step described in Section~\ref{subsubsec:instance-method-invoc} above.
 The evaluation of the direct instance method invocation proceeds with the evaluation of the left-hand side expression, i.e., the receiver expression as shown in \eqref{eval:dinstancemethod}.
 After the evaluation of the receiver expression to a value $\val$, the evaluation proceeds with the evaluation of the argument expressions as shown in \eqref{acontconf:dinstancemethod}.
@@ -1842,8 +1990,11 @@ The argument expressions are evaluated to a list of values $\vals$.\\
 The evaluation of the expression continues with the execution of the statement body in the environment that binds $\tt{this}$ to a location that stores the value $\val$ and the formal parameters $\formals$ to fresh locations storing values from $\vals$ accordingly.
 The CESK-transition is shown in \eqref{acontconf:dinstancemethod}.\\
 Similar to Section~\ref{subsubsec:instance-method-invoc}, $\ExitSK{\tt{null}}$ is added as next statement continuation.
+
+
 \subsubsection{Super method invocation}
 \label{subsubsec:super-method-invocation}
+
 Super method invocation is supported with $\SuperMethodInvocation{\idmeta}{\expressionsmeta}$.
 We first evaluate the argument expressions, as shown in the CESK-transition \eqref{eval:superinstancemethod}.
 After the evaluation of the argument expressions to list of values $\vals$ for the super method invocation, the evaluation continues with lookup for $\idmeta$ in the members of the value bound to $\tt{this}$ in the current environment.
@@ -1896,7 +2047,7 @@ Similarly to Section~\ref{subsubsec:instance-method-invoc}, $\ExitSK{\val}$ is a
         \label{execconf:return}\\
         &\cesktrans%
             {\execconf{\ReturnStatement{}}{\env}{\lbls}{\clbls}{\handler}{\cstrace}{\cex}{\econt}{\scont}}%
-            {\contconf{\econt}{\textbf{null}}}
+            {\contconf{\econt}{\nnull}}
         \label{execconf:return-empty}\\
         &\begin{multlined}
             \cesktranswheresplit*%
@@ -2020,27 +2171,46 @@ Similarly to Section~\ref{subsubsec:instance-method-invoc}, $\ExitSK{\val}$ is a
     \end{align}
     \caption{The CESK-transition function starting in ForwardConfiguration: statements}
 \end{figure}
+
+
 \subsubsection{Variable Declaration}
+
 Execution of a variable declaration statement proceeds by evaluating the right-hand side expression as shown in \eqref{execconf:vardecl}.
 After the evaluation of the initializer expression to a value $\val$, the corresponding environment is extended with a new binding to a location that stores the value $\val$, as shown in \eqref{econtconf:vardecl}.
+
+
 \subsubsection{Empty statement}
 \label{subsubsec:emtpy-stmt}
+
 Execution of empty statement proceeds to the next ForwardConfiguration, as shown in \eqref{execconf:empty}.
+
+
 \subsubsection{Expression statement}
 \label{expression-stmt}
+
 Execution of expression statement proceeds by evaluating the expression, as shown in \eqref{execconf:expresion}.
+
+
 \subsubsection{Block statements}
+
 Execution of block statements proceeds by executing each statement of the block with the environment function after the execution of the previous statement.
 The CESK-transition function for block statements is shown in \eqref{execconf:block}, \eqref{scontconf:block} and \eqref{scontconf:block-empty}.
+
+
 \subsubsection{If statement}
+
 Execution of conditional statements proceeds by evaluating the condition to a value, as shown in \eqref{execconf:if}.
 The expression continuation for the execution of the rest of the statement will dispatch on the value the condition expression evaluates to and produce a configuration for the execution of the next statement, as shown in \eqref{econtconf:if-true} and \eqref{econtconf:if-false}.
+
+
 \subsubsection{Return statement}
+
 Kernel supports return statements with or without an expression.
 In the first case, the execution proceeds with evaluation of the return expression, as shown in \eqref{execconf:return}.
 The expression continuation component in the ExecConfiguration is the return expression continuation.
 This is the expression continuation that is applied to the value the return expression evaluates to.\\
 When the return expression is empty, the value $\tt{null}$ is applied to the return expression continuation component in the ExecConfiguration as shown in \eqref{execconf:return-empty}.
+
 \begin{figure}
     \begin{align}
         &\begin{multlined}
@@ -2055,7 +2225,9 @@ When the return expression is empty, the value $\tt{null}$ is applied to the ret
     \caption{The CESK-transition function starting in ForwardConfiguration: statements}
 \end{figure}
 
+
 \subsubsection{Loops}
+
 In Dart Kernel there are  \textbf{do while}, \textbf{for in}, \textbf{for}  and \textbf{while} loop.
 The execution of the different loop statements is defined below:
 \begin{itemize}
@@ -2100,17 +2272,18 @@ Loops \textbf{do while}, \textbf{for in}, \textbf{for} can be desugared to while
     \end{multlined}
 \end{align*}
 
+
 \subsection{Labels}
 
-Kernel supports labelling statements, \textbf{L: $\stmt_{L}$}, and breaking to L, \textbf{break L}, which completes the execution of the labelled statement and proceeds to executing the rest of the program.
+Kernel supports labelling statements, $\synt{L}: \stmt_{L}$, and breaking to L, $\bbreak \synt{L}$, which completes the execution of the labelled statement and proceeds to executing the rest of the program.
 To support breaking to a label, we add a labels component, $\lbls$, to statement configurations.
-$\lbls$ represents a list of pairs mapping a labelled statement, \textbf{L: $\stmt_L$}, to a break statement continuation, $\bcont$.
+$\lbls$ represents a list of pairs mapping a labelled statement, $\synt{L}: \stmt_L$, to a break statement continuation, $\bcont$.
 Executing a labelled statement inserts a new break label, $\lbl$ in the list of labels $\lbls$.
 
 
 \subsection{Switch}
 
-Kernel supports dispatching control among a number of cases with \textbf{switch} statements.
+Kernel supports dispatching control among a number of cases with $\switch$ statements.
 The target expression $\expr$ is evaluated and matched against the different case clauses of the switch statement.
 
 Case clauses can have multiple constant expressions and there is no implicit fall-through between cases.
@@ -2118,7 +2291,7 @@ Kernel supports continuing to execution of a preceding case clause with continue
 To support continue, we add an optional $\clbls$ list, similar to the label list, which is set in a switch statement and unset otherwise.
 
 If there is a matching case clause, its statement is executed with a new statement continuation that will throw when reached.
-The new statement continuation is necessary because implicit fall-through is not supported and an explicit break of the flow is required (with either of \textbf{continue, break, return, throw}).
+The new statement continuation is necessary because implicit fall-through is not supported and an explicit break of the flow is required (with either of $\continue$, $\bbreak$, $\return$, $\throw$).
 
 \begin{align*}
     &\begin{multlined}
@@ -2128,11 +2301,11 @@ The new statement continuation is necessary because implicit fall-through is not
     \end{multlined}
 \end{align*}
 
-\noindent where $\scase = \textbf{case } \expri{1}, \dots, \expri{i} \textbf{ : } \stmt \textrm{ and } \scase \textrm{ is a matching \textbf{case} clause}$.
+\noindent where $\scase = \case \expri{1}, \dots, \expri{i} \synt{ : } \stmt$ and $\scase$ is a matching $\case$ clause.
 
-A case clause is matching if is \textbf{default} or there is at least one of the constant expressions in the case clause identical to the target value of the switch.
+A case clause is matching if is $\default$ or there is at least one of the constant expressions in the case clause identical to the target value of the switch.
 
-If a non-matching \textbf{case} clause, $\scase$, is the target of a continue statement, it installs a new continue label, in order to support execution of its statement with the appropriate configuration.
+If a non-matching $\case$ clause, $\scase$, is the target of a continue statement, it installs a new continue label, in order to support execution of its statement with the appropriate configuration.
 
 \begin{align*}
     &\begin{multlined}
@@ -2160,12 +2333,13 @@ Otherwise, the execution continues as follows:
         {\scontconf{\scont}{\env}}.
 \end{align*}
 
+
 \subsection{Exceptions}
 
-Kernel supports structured exception handling with \textbf{try/catch} and \textbf{try/finally} statements.
-Exceptions are thrown with \textbf{throw} and \textbf{rethrow} expressions.
+Kernel supports structured exception handling with $\synt{try/catch}$ and $\synt{try/finally}$ statements.
+Exceptions are thrown with $\throw$ and $\rethrow$ expressions.
 To support throwing exceptions, we add a handler, $\handler$, and a stacktrace, $\strace$, component to expression configurations (and correspondingly, to statement configurations).
-To support \textbf{rethrow}, we add an optional current error, $\cex$, and current stack trace, $\cstrace$, which are set when inside a catch block and unset otherwise.
+To support $\rethrow$, we add an optional current error, $\cex$, and current stack trace, $\cstrace$, which are set when inside a catch block and unset otherwise.
 
 \begin{align*}
     &\cesktrans%
@@ -2173,7 +2347,7 @@ To support \textbf{rethrow}, we add an optional current error, $\cex$, and curre
         {\throwconf{\handler}{\val}{\strace}}.
 \end{align*}
 
-\textbf{try/catch} handlers contain a list of on-catch handlers, environment, break labels, continue switch labels, exception handler, stacktrace, return continuation, and statement continuation.
+$\synt{try/catch}$ handlers contain a list of on-catch handlers, environment, break labels, continue switch labels, exception handler, stacktrace, return continuation, and statement continuation.
 The handlers are tried in order to see if they match against the type of the exception.
 If none match, the exception is rethrown.
 
@@ -2188,7 +2362,7 @@ If none match, the exception is rethrown.
         {\text{otherwise}}
 \end{align*}
 
-\noindent where $\econt' = \CatchH{(\textbf{on T catch (e, s) }\stmt) :: cs}$ is a catch continuation containing a non-empty list of on-catch handlers, and $\env' = \extend(\env, e :: s :: [], \val :: \strace' :: [])$.
+\noindent where $\econt' = \CatchH{(\synt{on T catch (e, s) }\stmt) :: cs}$ is a catch continuation containing a non-empty list of on-catch handlers, and $\env' = \extend(\env, e :: s :: [], \val :: \strace' :: [])$.
 
 When a catch handler with no on-catch handlers is reached, the exception is rethrown.
 
@@ -2198,7 +2372,7 @@ When a catch handler with no on-catch handlers is reached, the exception is reth
         {\throwconf{\handler}{\val}{\strace'}}
 \end{align*}
 
-\textbf{try/finally} handlers contain a statement, environment, break labels, continue switch labels, exception handler, stacktrace, and return continuation.
+$\synt{try/finally}$ handlers contain a statement, environment, break labels, continue switch labels, exception handler, stacktrace, and return continuation.
 Note that they do not contain a statement continuation because when control falls off the end of the finally statement the exception is rethrown.
 The statement is unconditionally executed:
 
@@ -2213,9 +2387,9 @@ The statement is unconditionally executed:
         {\throwconf{\handler}{\val}{\strace}}.
 \end{align*}
 
-\textbf{try/catch} statements execute their body with a new handler.
+$\synt{try/catch}$ statements execute their body with a new handler.
 
-\textbf{try/finally} statements execute their body with a new handler and additionally install new break and continue switch labels, a new return continuation, and a new statement continuation:
+$\synt{try/finally}$ statements execute their body with a new handler and additionally install new break and continue switch labels, a new return continuation, and a new statement continuation:
 
 \begin{align*}
     &\begin{multlined}
@@ -2244,7 +2418,7 @@ The statement is unconditionally executed:
 
 \subsection{Break}
 
-\textbf{break L} statements break from an enclosing label \textbf{L} and execute the break continuation corresponding to the label in the list of labels $\lbls$.
+$\bbreak \synt{L}$ statements break from an enclosing label $\synt{L}$ and execute the break continuation corresponding to the label in the list of labels $\lbls$.
 
 \begin{align*}
     &\cesktrans%
@@ -2260,11 +2434,12 @@ The statement is unconditionally executed:
         {\breakconf{\bcont}},
 \end{align*}
 
-\noindent where $\lbl = Label(L', \bcont) \in \lbls \textrm{ with } L' == \mathbf{L}$.
+\noindent where $\lbl = Label(L', \bcont) \in \lbls \text{ with } L' == \mathbf{L}$.
 
 
 \subsection{Continue}
-\textbf{continue L} statements continue to executing the statement of a preceding case clause, labelled with \textbf{L} and execute the continue continuation corresponding to the label in the list of labels $\clbls$.
+
+$\continue \synt{L}$ statements continue to executing the statement of a preceding case clause, labelled with $\synt{L}$ and execute the continue continuation corresponding to the label in the list of labels $\clbls$.
 
 \begin{align*}
     &\begin{multlined}
@@ -2282,10 +2457,12 @@ The statement is unconditionally executed:
         {\switchconf{\switchcont}},
 \end{align*}
 
-\noindent where $\clbl = \continuel{L'}{\switchcont} \in \clbls \textrm{ with } L' == \mathbf{L}$.
+\noindent where $\clbl = \continuel{L'}{\switchcont} \in \clbls \text{ with } L' == \mathbf{L}$.
 
 
 \subsection{Closures}
+
+
 \subsubsection{Function expressions}
 
 Kernel supports encapsulating an executable unit of code with function expressions.
@@ -2306,13 +2483,13 @@ Let $F$ be a function with a body $\stmt_{body}$ and a list of formal parameters
 \newcommand{\SuperInitializer}[2]{\mathrm{SuperInitializer}(#1,\,#2)}
 \newcommand{\RedirectingInitializer}[2]{\mathrm{RedirectingInitializer}(#1,\,#2)}
 
-The expression \textbf{new} invokes a constructor to produce a new instance.
-The target constructor \textbf{Q} has a list of formal parameters, $\formals$, a list of initializers, $Izs$, and a statement body, $\stmt_{body}$.
-The invocation of a constructor \textbf{Q} with \textbf{new Q}($\exprs$) proceeds as follows:
+The expression $\new$ invokes a constructor to produce a new instance.
+The target constructor $\synt{Q}$ has a list of formal parameters, $\formals$, a list of initializers, $Izs$, and a statement body, $\stmt_{body}$.
+The invocation of a constructor $\synt{Q}$ with $\new \synt{Q}(\exprs)$ proceeds as follows:
 
 \begin{align*}
     &\cesktrans%
-        {\acontconf{\ConstructorA{\textbf{Q}}{\econt}}{\val{s}}}%
+        {\acontconf{\ConstructorA{\synt{Q}}{\econt}}{\val{s}}}%
         {\contconf{\InitK{Q}{\env}{\scont}}{!\loc}},
 \end{align*}
 
@@ -2326,8 +2503,8 @@ The value $\val$ stores the class of the object and the fields, as a list of fre
     &\cesktrans{\scontconf{\NewSK{\econt}{\loc}}{\env}}{\contconf{\econt}{\deref{\loc}}}.
 \end{align*}
 
-Let $li = last(Izs)$ be the last initializer in the list of initializers, $Izs$, of constructor \textbf{Q}.
-When $li$ is a redirecting initializer to target constructor \textbf{G}, then execution of constructor \textbf{Q} proceeds immediately with execution of its initializer list, $Izs$.
+Let $li = last(Izs)$ be the last initializer in the list of initializers, $Izs$, of constructor $\synt{Q}$.
+When $li$ is a redirecting initializer to target constructor $\synt{G}$, then execution of constructor $\synt{Q}$ proceeds immediately with execution of its initializer list, $Izs$.
 
 \begin{align*}
     &\begin{multlined}
@@ -2352,8 +2529,8 @@ When $li$ is a redirecting initializer to target constructor \textbf{G}, then ex
     \end{multlined}
 \end{align*}
 
-Otherwise, \textbf{Q} is a non-redirecting generative constructor, and execution of \textbf{Q} proceeds with evaluation of field initializers in the immediately enclosing class.
-Let \textbf{Q} be a constructor with non empty initializer list, $Izs$ and a constructor body $\stmt_{body}$.
+Otherwise, $\synt{Q}$ is a non-redirecting generative constructor, and execution of $\synt{Q}$ proceeds with evaluation of field initializers in the immediately enclosing class.
+Let $\synt{Q}$ be a constructor with non empty initializer list, $Izs$ and a constructor body $\stmt_{body}$.
 
 \begin{align*}
     &\begin{multlined}
@@ -2361,7 +2538,7 @@ Let \textbf{Q} be a constructor with non empty initializer list, $Izs$ and a con
             {\contconf{\InitK{Q}{\env}{\scont}}{\val}}%
             {\evallistconf{\exprs}{\env}{\strace}{\cstrace}{\cex}{\acont}}%
             {\begin{aligned}
-                \text{where }   \env'  &= \ext{\env}{\text{\textbf{this}}}{\deref{\loc}},\\
+                \text{where }   \env'  &= \ext{\env}{\synt{this}}{\deref{\loc}},\\
                                 \exprs &= \text{initializer expressions for instance fields},\\
                                 \deref{\loc} &= \val,\\
                                 \acont &= \FieldsA{\env}{Izs}{\loc}{\scont'},\\
