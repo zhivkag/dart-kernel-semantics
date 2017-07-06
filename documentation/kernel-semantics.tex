@@ -940,6 +940,7 @@ A method lookup searches for an instance method in the given class given the nam
 %% StaticInvocation
 \newcommand{\StaticInvocation}[2]{#1(#2)}
 %% ConstructorInvocation
+\newcommand{\New}[2]{\new\, #1\,(#2)}
 
 \newcommand{\Not}[1]{!#1}
 \newcommand{\AndExpression}[2]{#1\,\&\&\,#2}
@@ -999,6 +1000,7 @@ A method lookup searches for an instance method in the given class given the nam
   & \AndExpression{\expressionmeta_0}{\expressionmeta_1} \\
   & \OrExpression{\expressionmeta_0}{\expressionmeta_1} \\
   & \ConditionalExpression{\expressionmeta_0}{\expressionmeta_1}{\expressionmeta_2} \\
+  & \New{\synt{Q}}{\expressionmeta*} \\
   & \IsExpression{\expressionmeta}{\typemeta} \\
   & \AsExpression{\expressionmeta}{\typemeta} \\
   & \ThisExpression \\
@@ -2386,7 +2388,8 @@ Loops $\dowhile$, $\forin$, $\for$ can be desugared to while loops with transfor
 
 \subsubsection{Labels}
 
-Kernel supports labelling statements, $\synt{L}: \stmt_{L}$, and breaking to L, $\bbreak \synt{L}$, which completes the execution of the labelled statement and proceeds to executing the rest of the program.
+Kernel supports labelling statements, $\synt{L}: \stmt_{L}$, and breaking to L, $\bbreak \synt{L}$.
+$\bbreak \synt{L}$ completes the execution of the labelled statement and proceeds to executing the rest of the program.
 To support breaking to a label, we add a labels component, $\lbls$, to statement configurations.
 $\lbls$ represents a list of pairs mapping a labelled statement, $\synt{L}: \stmt_L$, to a break statement continuation, $\bcont$.
 Executing a labelled statement inserts a new break label, $\lbl$ in the list of labels $\lbls$.
@@ -2398,10 +2401,11 @@ Kernel supports dispatching control among a number of cases with $\switch$ state
 The target expression $\expr$ is evaluated and matched against the different case clauses of the switch statement.
 
 Case clauses can have multiple constant expressions and there is no implicit fall-through between cases.
-Kernel supports continuing to execution of a preceding case clause with continue statements where the target of the continue statement is a preceding case clause, e.g, continue C with C = case $\expri{1..i}$: $\stmt$.
+Kernel supports continuing to execution of a preceding case clause with continue statements where the target of the continue statement is a preceding case clause, e.g, $\continue \synt{C}$ with $\synt{C}$ = case $\expri{1..i}$: $\stmt$.
 To support continue, we add an optional $\clbls$ list, similar to the label list, which is set in a switch statement and unset otherwise.
 
-If there is a matching case clause, its statement is executed with a new statement continuation that will throw when reached.
+If there is a matching case clause, its statement is executed.
+A new statement continuation is added as next statement continuation that will throw when reached.
 The new statement continuation is necessary because implicit fall-through is not supported and an explicit break of the flow is required (with either of $\continue$, $\bbreak$, $\return$, $\throw$).
 
 \begin{align*}
@@ -2416,8 +2420,8 @@ The new statement continuation is necessary because implicit fall-through is not
 
 A case clause is matching if is $\default$ or there is at least one of the constant expressions in the case clause identical to the target value of the switch.
 
-If a non-matching $\case$ clause, $\scase$, is the target of a continue statement, it installs a new continue label, in order to support execution of its statement with the appropriate configuration.
-
+If a non-matching $\case$ clause, $\scase$, is the target of a continue statement, it installs a new continue label.
+A new continue label is installed to support execution of its statement with the appropriate configuration if a continue to this clause is encountered.
 \begin{align*}
     &\begin{multlined}
         \cesktranssplit
@@ -2577,7 +2581,7 @@ $\continue \synt{L}$ statements continue to executing the statement of a precedi
 \subsubsection{Function expressions}
 
 Kernel supports encapsulating an executable unit of code with function expressions.
-To support function expressions we introduce $fv = \funval{\stmt_{body}}{\formals}{\env} \in \dfunval$ as a value that has the function statement body, $\stmt_{body} \in \dstmt$, its list of formal parameters, $\formals \in \dformals$, and the environment, $\env \in \denv$ in scope of the function expression.
+To support function expressions we introduce $fv = \funval{\formals}{\stmt_{body}}{\env} \in \dfunval$ as a value that has the function statement body, $\stmt_{body} \in \dstmt$, its list of formal parameters, $\formals \in \dformals$, and the environment, $\env \in \denv$ in scope of the function expression.
 This ensures that there are no free variables in the body of $fv$.
 $fv \in \dfunval$ has only one method, $call$.
 
@@ -2597,6 +2601,7 @@ Let $F$ be a function with a body $\stmt_{body}$ and a list of formal parameters
 The expression $\new$ invokes a constructor to produce a new instance.
 The target constructor $\synt{Q}$ has a list of formal parameters, $\formals$, a list of initializers, $\synt{Izs}$, and a statement body, $\stmt_{body}$.
 The invocation of a constructor $\synt{Q}$ proceeds by evaluating the argument expressions as shown in \eqref{eval:new}.
+After the evaluation of the argument expressions for the invocation, a fresh instance is allocated by creating an object value (see Section~\ref{subsec:object-values}).
 
 \begin{align*}
     &\cesktrans%
