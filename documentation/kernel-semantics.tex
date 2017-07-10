@@ -408,7 +408,7 @@ Configurations contain different components and the transition step dispatches t
 \newcommand{\throwconf}[3]{\conftriple{#1}{#2}{#3}_{\mathrm{throw}}}
 \newcommand{\evallistconf}[6]{\langle{#1},\,{#2},\,{#3},\handler,\,{#4},\,{#5},\,{#6}\rangle_{\mathrm{evalList}}}
 \newcommand{\evalconf}[6]{\langle{#1},\,{#2},\,{#3},\handler,\,{#4},\,{#5},\,{#6}\rangle_{\mathrm{eval}}}
-\newcommand{\execconf}[9]{\langle{#1},\,{#2},\,{#3},\,{#4},\,\strace,\,{#5},\,{#6},\,{#7},\,{#8},\,{#9}\rangle_{\mathrm{exec}}}
+\newcommand{\execconf}[9]{\langle{#1},\,{#2},\,{#3},\,{#4},\,{#5},\,{#6},\,{#7},\,{#8},\,{#9}\rangle_{\mathrm{exec}}}
 
 % Transition
 \begin{figure}[Htp]
@@ -416,7 +416,7 @@ Configurations contain different components and the transition step dispatches t
   \begin{align}
     &\evalconf{\expr}{\env}{st}{cex}{cst}{\econt} & :\quad & \text{EvalConfiguration} \label{config:eval}\\
     &\evallistconf{\exprs}{\env}{st}{cex}{cst}{\acont} & :\quad & \text{EvalListConfiguration} \label{config:evallist}\\
-    &\execconf{\stmt}{\env}{\lbls}{\clbls}{\handler}{\cex}{\cstrace}{\econt}{\scont}  & :\quad & \text{ExecConfiguration} \label{config:exec}\\
+    &\execconf{\stmt}{\env}{\lbls}{\clbls}{\strace}{\handler}{\cex,\,\cstrace}{\econt}{\scont}  & :\quad & \text{ExecConfiguration} \label{config:exec}\\
     &\contconf{\econt}{\val} & :\quad & \text{ValuePassingConfiguration} \label{config:econt}\\
     &\acontconf{\acont}{\vals} & :\quad & \text{ApplicationConfiguration} \label{config:acont}\\
     &\scontconf{\scont}{\env} & :\quad & \text{ForwardConfiguration} \label{config:scont}\\
@@ -1434,7 +1434,7 @@ Otherwise, the evaluation of the expression results with an error, as shown in \
         &\begin{multlined}
             \cesktranswheresplit%
                 {\evalconf{\StaticGet{\membermeta}}{\env}{\strace}{\cstrace}{\cex}{\econt}}%
-                {\execconf{\stmt}{\env_{empty}}{[]}{[]}{\handler}{\cstrace}{\cex}{\econt}{\emptyset}}%
+                {\execconf{\stmt}{\env_{empty}}{[]}{[]}{\strace}{\handler}{\strace}{\handler}{\cex,\,\cstrace}{\econt}{\emptyset}}%
                 {\text{where $\membermeta$ is a getter with body $\stmt$}}
         \end{multlined}
         \label{eval:staticget-getter}\\
@@ -1490,7 +1490,7 @@ Otherwise, the evaluation of the expression results with an error, as shown in \
         &\begin{multlined}
         \cesktranswheresplit%
             {\contconf{\StaticSetK}{\val}}%
-            {\execconf{\stmt}{\env}{[]}{[]}{\handler}{\cstrace}{\cex}{\econt}{\scont}}%
+            {\execconf{\stmt}{\env}{[]}{[]}{\strace}{\handler}{\cex,\,\cstrace}{\econt}{\scont}}%
             {\text{$\scont = \ExitSK{\val}$, $\env = \ext{\env_{empty}}{\formal}{\val}$}}
         \end{multlined}
         \label{econtconf:staticset-setter}
@@ -1515,7 +1515,7 @@ Otherwise, the evaluation of the expression results with an error, as shown in \
         &\begin{multlined}
         \cesktranswheresplit*%
             {\acontconf{\StaticInvA{\formals}{\stmt}{\strace}{\econt}}{\val{s}}}%
-            {\execconf{\stmt}{\env'}{[]}{[]}{\handler}{\cstrace}{\cex}{\econt}{\scont}}%
+            {\execconf{\stmt}{\env'}{[]}{[]}{\strace}{\handler}{\cex,\,\cstrace}{\econt}{\scont}}%
             {\parbox{10cm}{where $\scont = \ExitSK{\tt{null}}$,\\ $\env' = \ext{\env_{empty}}{\formals}{\val{s}}$}}
         \end{multlined}
         \label{acontconf:staticinvoc}
@@ -1622,9 +1622,9 @@ A statement continuation, $\ExitSK{\econt}{\tt{null}}$ is added as next statemen
         \end{multlined}
         \label{eval:superpropertyget-tearoff}\\
         &\begin{multlined}
-        \cesktranswheresplit%
+        \cesktranswheresplit*%
             {\evalconf{\SuperPropertyGet{\idmeta}}{\env}{\strace}{\cstrace}{\cex}{\econt}}%
-            {\execconf{\stmt}{\env'}{\lbls}{\clbls}{\handler}{\cstrace}{\cex}{\econt}{\scont}}%
+            {\execconf{\stmt}{\env'}{\lbls}{\clbls}{\SuperPropertyGet{\idmeta} :: \strace}{\handler}{\cex,\,\cstrace}{\econt}{\scont}}%
             {\parbox{10cm}{where $\env' = \ext{\env_{empty}}{\this}{\deref{(\env(\this))}}$,\\ $\scont = \emptyset$, $\membermeta = \superclass{\deref{\env(\this)}}.lookup(\idmeta)$,\\ $\membermeta$ is a getter method with body $\stmt$}}
         \end{multlined}
         \label{eval:superpropertyget-getter}\\
@@ -1665,7 +1665,7 @@ A statement continuation, $\ExitSK{\econt}{\tt{null}}$ is added as next statemen
     &\begin{multlined}
         \cesktranswheresplit*%
         {\contconf{\PropertyGetK}{\val}}%
-        {\execconf{\stmt}{\env}{[]}{[]}{\handler}{\cstrace}{\cex}{\econt}{\scont}}%
+        {\execconf{\stmt}{\env}{[]}{[]}{\strace}{\handler}{\cex,\,\cstrace}{\econt}{\scont}}%
         {\parbox{10cm}{if $\membermeta$ is a getter with body $\stmt$\\
         where $\env = \ext{\env_{empty}}{\mathbf{this}}{\val}$\\
         $\scont = \emptyset$}}
@@ -1698,7 +1698,7 @@ A statement continuation, $\ExitSK{\econt}{\tt{null}}$ is added as next statemen
     &\begin{multlined}
         \cesktranswheresplit*%
             {\contconf{\DPropertyGetK}{\val}}%
-            {\execconf{\stmt}{\env}{[]}{[]}{\handler}{\cstrace}{\cex}{\econt}{\scont}}%
+            {\execconf{\stmt}{\env}{[]}{[]}{\strace}{\handler}{\cex,\,\cstrace}{\econt}{\scont}}%
             {\parbox{10cm}{if $\membermeta$ is getter with statement body $\stmt$ \\
             where $\env = \ext{\env_{empty}}{\mathbf{this}}{\val}$ \\
             $\scont = \emptyset$}}
@@ -1786,7 +1786,7 @@ The evaluation proceeds as follows:
     &\begin{multlined}
         \cesktranswheresplit*%
         {\contconf{\PropertySetVK}{\val_1}}%
-        {\execconf{\stmt}{\env}{\lbls}{\clbls}{\handler}{\cstrace}{\cex}{\econt}{\scont}}%
+        {\execconf{\stmt}{\env}{\lbls}{\clbls}{\strace}{\handler}{\cex,\,\cstrace}{\econt}{\scont}}%
         {\parbox{10cm}{if \membermeta is setter with statement body $\stmt$ and formal parameter $\formal$\\
         where $\env = \ext{\env_{empty}}{\mathbf{this} :: \formal :: []}{\val_0 :: \val_1 :: []}$\\
         $\scont = \ExitSK{\val_1}$}}
@@ -1810,7 +1810,7 @@ The evaluation proceeds as follows:
     &\begin{multlined}
         \cesktranswheresplit*%
         {\contconf{\DPropertySetVK}{\val_1}}
-        {\execconf{\stmt}{\env}{\lbls}{\clbls}{\handler}{\cstrace}{\cex}{\econt}{\scont}}
+        {\execconf{\stmt}{\env}{\lbls}{\clbls}{\strace}{\handler}{\cex,\,\cstrace}{\econt}{\scont}}
         {\parbox{10cm}{if $\membermeta$ is a setter with body $\stmt$ and formal parameter $\formal$
         where $\env = \ext{\env_{empty}}{\mathbf{this} :: \formal :: []}{\val_0 :: \val_1 :: []}$\\
         $\scont = \emptyset$\\}}
@@ -1826,7 +1826,7 @@ The evaluation proceeds as follows:
     &\begin{multlined}
         \cesktranswheresplit*%
         {\contconf{\SuperPropertySetK}{\val}}
-        {\execconf{\stmt}{\env'}{\lbls}{\clbls}{\handler}{\cstrace}{\cex}{\econt}{\scont}}
+        {\execconf{\stmt}{\env'}{\lbls}{\clbls}{\strace}{\handler}{\cex,\,\cstrace}{\econt}{\scont}}
         {\parbox{10cm}{if $\membermeta$ is a setter method with body $\stmt$ and formal $\formal$\\
         where $\env' =  \ext{\env_{empty}}{\this :: \formal :: []}{\deref{(\env(\this))} :: \val :: []}$,\\
         $\scont = \emptyset$}}
@@ -2003,7 +2003,7 @@ After the evaluation of the argument expression to a value $\val$, depending on 
     &\begin{multlined}
             \cesktranswheresplit*%
             {\contconf{\InstanceMethodA}{\val{s}}}%
-            {\execconf{\stmt}{\env}{[]}{[]}{\handler}{\cstrace}{\cex}{\econt}{\scont}}%
+            {\execconf{\stmt}{\env}{[]}{[]}{\strace}{\handler}{\cex,\,\cstrace}{\econt}{\scont}}%
             {\parbox{10cm}{where $\membermeta = class(\val).lookup(\idmeta)$ is an instance method with body $\stmt$ and formals $\formals$\\
             $\scont = \ExitSK{\tt{null}}$\\
             $\env = \ext{\env_{empty}}{\this :: \formals}{\val :: \val{s}}$}}
@@ -2012,7 +2012,7 @@ After the evaluation of the argument expression to a value $\val$, depending on 
     &\begin{multlined}
             \cesktranswheresplit*%
             {\contconf{\DInstanceMethodA}{\val{s}}}%
-            {\execconf{\stmt}{\env}{[]}{[]}{\handler}{\cstrace}{\cex}{\econt}{\scont}}%
+            {\execconf{\stmt}{\env}{[]}{[]}{\strace}{\handler}{\cex,\,\cstrace}{\econt}{\scont}}%
             {\parbox{10cm}{where $\stmt$ is the statement body and $\formals$ are the formal parameters of the instace method $\membermeta$\\
             $\scont = \ExitSK{\tt{null}}$,\\
             $\env = \ext{\env_{empty}}{\this :: \formals}{\val :: \val{s}}$}}
@@ -2021,7 +2021,7 @@ After the evaluation of the argument expression to a value $\val$, depending on 
     &\begin{multlined}
         \cesktranswheresplit*%
         {\contconf{\SuperMethodA}{\val{s}}}%
-        {\execconf{\stmt}{\env'}{[]}{[]}{\handler}{\cstrace}{\cex}{\econt}{\scont}}%
+        {\execconf{\stmt}{\env'}{[]}{[]}{\strace}{\handler}{\cex,\,\cstrace}{\econt}{\scont}}%
         {\parbox{10cm}{where $\scont = \ExitSK{\tt{null}}$,\\
         $\env' = \ext{\env_{empty}}{\this :: \formals}{\deref{(\env(\this))} :: \val{s}}$    }}
     \end{multlined}
@@ -2096,61 +2096,61 @@ Similarly to Section~\ref{subsubsec:instance-method-invoc}, $\ExitSK{\val}$ is a
     \begin{align}
         &\begin{multlined}
             \cesktranswheresplit*%
-                {\execconf{\VarDeclaration{\varmeta}{\expr}}{\env}{\lbls}{\clbls}{\handler}{\cstrace}{\cex}{\econt}{\scont}}%
+                {\execconf{\VarDeclaration{\varmeta}{\expr}}{\env}{\lbls}{\clbls}{\strace}{\handler}{\cex,\,\cstrace}{\econt}{\scont}}%
                 {\evalconf{\expr}{\env}{\strace}{\cstrace}{\cex}{\econt'}}%
                 {\text{where $\econt' = \VarDeclK{\env}{\varmeta}{\scont}$}}
         \end{multlined}
         \label{execconf:vardecl}\\
         &\cesktrans%
-            {\execconf{\EmptyStatement}{\env}{\lbls}{\clbls}{\handler}{\cstrace}{\cex}{\econt}{\scont}}%
+            {\execconf{\EmptyStatement}{\env}{\lbls}{\clbls}{\strace}{\handler}{\cex,\,\cstrace}{\econt}{\scont}}%
             {\scontconf{\scont}{\env}}
         \label{execconf:empty}\\
         &\begin{multlined}
             \cesktranswheresplit%
-                {\execconf{\ExpressionStatement{\expressionmeta}}{\env}{\lbls}{\clbls}{\handler}{\cstrace}{\cex}{\econt}{\scont}}%
+                {\execconf{\ExpressionStatement{\expressionmeta}}{\env}{\lbls}{\clbls}{\strace}{\handler}{\cex,\,\cstrace}{\econt}{\scont}}%
                 {\evalconf{\expr}{\env}{\strace}{\cstrace}{\cex}{\econt'}}%
                 {\text{where $\econt' = \ExpressionK{\scont}{\env}$}}
         \end{multlined}
         \label{execconf:expresion}\\
         &\begin{multlined}
             \cesktranswheresplit*%
-                {\execconf{\Block{\stmt_1}}{\env}{\lbls}{\clbls}{\handler}{\cstrace}{\cex}{\econt}{\scont}}%
-                {\execconf{\stmt_1}{\env}{\lbls}{\clbls}{\handler}{\cstrace}{\cex}{\econt}{\scont'}}%
+                {\execconf{\Block{\stmt_1}}{\env}{\lbls}{\clbls}{\strace}{\handler}{\cex,\,\cstrace}{\econt}{\scont}}%
+                {\execconf{\stmt_1}{\env}{\lbls}{\clbls}{\strace}{\handler}{\cex,\,\cstrace}{\econt}{\scont'}}%
                 {\text{where $\scont' = \BlockSK{\stmt*}{\env}$}}
         \end{multlined}
         \label{execconf:block}\\
         &\begin{multlined}
             \cesktranswheresplit*%
-                {\execconf{\IfStatement{\expr}{\stmti{1}}{\stmti{2}}}{\env}{\lbls}{\clbls}{\handler}{\cstrace}{\cex}{\econt}{\scont}}%
+                {\execconf{\IfStatement{\expr}{\stmti{1}}{\stmti{2}}}{\env}{\lbls}{\clbls}{\strace}{\handler}{\cex,\,\cstrace}{\econt}{\scont}}%
                 {\evalconf{\expr}{\env}{\strace}{\cstrace}{\cex}{\econt'}}%
                 {\text{where $\econt' = \IfCondK{\stmti{1}}{\stmti{2}}$}}
         \end{multlined}
         \label{execconf:if}\\
         &\cesktrans%
-            {\execconf{\ReturnStatement{\expr}}{\env}{\lbls}{\clbls}{\handler}{\cstrace}{\cex}{\econt}{\scont}}%
+            {\execconf{\ReturnStatement{\expr}}{\env}{\lbls}{\clbls}{\strace}{\handler}{\cex,\,\cstrace}{\econt}{\scont}}%
             {\evalconf{\expr}{\env}{\strace}{\cstrace}{\cex}{\econt}}
         \label{execconf:return}\\
         &\cesktrans%
-            {\execconf{\ReturnStatement{}}{\env}{\lbls}{\clbls}{\handler}{\cstrace}{\cex}{\econt}{\scont}}%
+            {\execconf{\ReturnStatement{}}{\env}{\lbls}{\clbls}{\strace}{\handler}{\cex,\,\cstrace}{\econt}{\scont}}%
             {\contconf{\econt}{\nnull}}
         \label{execconf:return-empty}\\
         &\begin{multlined}
             \cesktranswheresplit*%
-                {\execconf{\DoStatement{\statementmeta}{\expressionmeta}}{\env}{\lbls}{\clbls}{\handler}{\cstrace}{\cex}{\econt}{\scont}}%
-                {\execconf{\statementmeta}{\env}{\lbls}{\clbls}{\handler}{\cstrace}{\cex}{\econt}{\scont'}}%
+                {\execconf{\DoStatement{\statementmeta}{\expressionmeta}}{\env}{\lbls}{\clbls}{\strace}{\handler}{\cex,\,\cstrace}{\econt}{\scont}}%
+                {\execconf{\statementmeta}{\env}{\lbls}{\clbls}{\strace}{\handler}{\cex,\,\cstrace}{\econt}{\scont'}}%
                 {\text{where $\scont' = \WhileCondK$}}
         \end{multlined}
         \label{execconf:do}\\
         &\begin{multlined}
             \cesktranswheresplit*%
-                {\execconf{\WhileStatement{\expr}{\stmt}}{\env}{\lbls}{\clbls}{\handler}{\cstrace}{\cex}{\econt}{\scont}}%
+                {\execconf{\WhileStatement{\expr}{\stmt}}{\env}{\lbls}{\clbls}{\strace}{\handler}{\cex,\,\cstrace}{\econt}{\scont}}%
                 {\evalconf{\expr}{\env}{\strace}{\cstrace}{\cex}{\econt'}}%
                 {\text{where $\econt', \scont' = \WhileCondK$}}
         \end{multlined}
         \label{execconf:while}\\
         &\begin{multlined}
             \cesktranswheresplit*%
-                {\execconf{\ForStatement{\varmeta{s}}{\expressionmeta}{\exprs}{\statementmeta}}{\env}{\lbls}{\clbls}{\handler}{\cstrace}{\cex}{\econt}{\scont}}%
+                {\execconf{\ForStatement{\varmeta{s}}{\expressionmeta}{\exprs}{\statementmeta}}{\env}{\lbls}{\clbls}{\strace}{\handler}{\cex,\,\cstrace}{\econt}{\scont}}%
                 {\evallistconf{\exprs'}{\env}{\strace}{\cex}{\cstrace}{\acont}}%
                 {\parbox{\textwidth-2cm}{where $\acont = \ForInitA{\expressionmeta}$,\\
                 $\exprs' =$ initializer expressions for the list of variable declarations $\varmeta{s}$}}
@@ -2158,42 +2158,42 @@ Similarly to Section~\ref{subsubsec:instance-method-invoc}, $\ExitSK{\val}$ is a
         \label{execconf:for}\\
         &\begin{multlined}
             \cesktranswheresplit*%
-                {\execconf{\LabeledStatement{L}{\stmt_{L}}}{\env}{\lbls}{\clbls}{\handler}{\cstrace}{\cex}{\econt}{\scont}}%
-                {\execconf{\stmt_{L}}{\env}{\lbl :: \lbls}{\clbls}{\handler}{\cstrace}{\cex}{\econt}{\scont}}%
+                {\execconf{\LabeledStatement{L}{\stmt_{L}}}{\env}{\lbls}{\clbls}{\strace}{\handler}{\cex,\,\cstrace}{\econt}{\scont}}%
+                {\execconf{\stmt_{L}}{\env}{\lbl :: \lbls}{\clbls}{\strace}{\handler}{\cex,\,\cstrace}{\econt}{\scont}}%
                 {\text{where $\lbl = \mathrm{Label}(L, \bcont)$, $\bcont = \mathrm{Break}(\env, \scont)$}}
         \end{multlined}
         \label{execconf:labeled}\\
         &\begin{multlined}
             \cesktranswheresplit*%
-                {\execconf{\SwitchStatement{\expr}{\scases}}{\env}{\lbls}{\clbls}{\handler}{\cstrace}{\cex}{\econt}{\scont}}%
+                {\execconf{\SwitchStatement{\expr}{\scases}}{\env}{\lbls}{\clbls}{\strace}{\handler}{\cex,\,\cstrace}{\econt}{\scont}}%
                 {\evalconf{\expr}{\env}{\strace}{\cstrace}{\cex}{\econt'}}%
                 {\text{where $\econt' = \SwitchK{\scases}{\clbls}$}}
         \end{multlined}
         \label{execconf:switch}\\
         &\begin{multlined}
             \cesktranswheresplit*%
-                {\execconf{\TryCatch{\stmt}{cs}}{\env}{\lbls}{\clbls}{\handler}{\cex}{\cstrace}{\econt}{\scont}}%
-                {\execconf{\stmt}{\env}{\lbls}{\clbls}{\handler'}{\cex}{\cstrace}{\econt}{\scont}}%
+                {\execconf{\TryCatch{\stmt}{cs}}{\env}{\lbls}{\clbls}{\strace}{\handler}{\cex,\,\cstrace}{\econt}{\scont}}%
+                {\execconf{\stmt}{\env}{\lbls}{\clbls}{\strace}{\handler'}{\cex,\,\cstrace}{\econt}{\scont}}%
                 {\text{where $\handler' = \CatchH{cs}$}}
         \end{multlined}
         \label{execconf:try}\\
         &\begin{multlined}
             \cesktranswheresplit%
-                {\execconf{\BreakStatement{L}}{\env}{\lbls}{\clbls}{\handler}{\cex}{\cstrace}{\econt}{\scont}}%
+                {\execconf{\BreakStatement{L}}{\env}{\lbls}{\clbls}{\strace}{\handler}{\cex,\,\cstrace}{\econt}{\scont}}%
                 {\breakconf{\bcont}}%
                 {\text{where $\lbl = Label(L', \bcont) \in \lbls \text{ with } L' == \mathbf{L}$}}
         \end{multlined}
         \label{execconf:break}\\
         &\begin{multlined}
             \cesktranswheresplit%
-                {\execconf{\ContinueSwitchStatement{\stmt}}{\env}{\lbls}{\clbls}{\handler}{\cex}{\cstrace}{\econt}{\scont}}%
+                {\execconf{\ContinueSwitchStatement{\stmt}}{\env}{\lbls}{\clbls}{\strace}{\handler}{\cex,\,\cstrace}{\econt}{\scont}}%
                 {\switchconf{\switchcont}}%
                 {\text{where $\clbl = \continuel{\stmt'}{\switchcont} \in \clbls \text{ with } \stmt' == \stmt$}}
         \end{multlined}
         \label{execconf:continue}\\
         &\begin{multlined}
             \cesktranswheresplit*%
-                {\execconf{fun(\formals) \stmt_{body}}{\env}{\lbls}{\clbls}{\handler}{\cstrace}{\cex}{\econt}{\scont}}%
+                {\execconf{fun(\formals) \stmt_{body}}{\env}{\lbls}{\clbls}{\strace}{\handler}{\cstrace,\,\cex}{\econt}{\scont}}%
                 {\contconf{\econt}{\funval{\stmt_{body}}{\formals}{\env'}}}%
                 {\text{where $\env' = \ext{\env}{fun}{\funval{\stmt_{body}}{\formals}{\env'}}$}}
         \end{multlined}
@@ -2214,13 +2214,13 @@ Similarly to Section~\ref{subsubsec:instance-method-invoc}, $\ExitSK{\val}$ is a
         &\begin{multlined}
            \cesktranssplit%
                 {\contconf{\IfCondK{\stmti{1}}{\stmti{2}}}{\true}}%
-                {\execconf{\stmti{1}}{\env}{\lbls}{\clbls}{\handler}{\cstrace}{\cex}{\econt}{\scont}}
+                {\execconf{\stmti{1}}{\env}{\lbls}{\clbls}{\strace}{\handler}{\cstrace,\,\cex}{\econt}{\scont}}
         \end{multlined}
         \label{econtconf:if-true}\\
         &\begin{multlined}
             \cesktranssplit%
                 {\contconf{\IfCondK{\stmti{1}}{\stmti{2}}}{\false}}%
-                {\execconf{\stmti{1}}{\env}{\lbls}{\clbls}{\handler}{\cstrace}{\cex}{\econt}{\scont}}
+                {\execconf{\stmti{1}}{\env}{\lbls}{\clbls}{\strace}{\handler}{\cstrace,\,\cex}{\econt}{\scont}}
         \end{multlined}
         \label{econtconf:if-false}\\
         &\begin{multlined}
@@ -2232,7 +2232,7 @@ Similarly to Section~\ref{subsubsec:instance-method-invoc}, $\ExitSK{\val}$ is a
         &\begin{multlined}
               \cesktranssplit%
                   {\contconf{\WhileCondK}{\true}}%
-                  {\execconf{\stmt}{\env}{\lbls}{\clbls}{\handler}{\cstrace}{\cex}{\econt}{\scont'}}
+                  {\execconf{\stmt}{\env}{\lbls}{\clbls}{\strace}{\handler}{\cstrace,\,\cex}{\econt}{\scont'}}
         \end{multlined}
         \label{econtconf:while-true}\\
         &\cesktrans%
@@ -2242,7 +2242,7 @@ Similarly to Section~\ref{subsubsec:instance-method-invoc}, $\ExitSK{\val}$ is a
         &\begin{multlined}
               \cesktranswheresplit*%
                   {\contconf{\ForCondK}{\tt{true}}}%
-                  {\execconf{\scont}{\env'}{\lbls}{\clbls}{\handler}{\cstrace}{\cex}{\econt}{\scont'}}%
+                  {\execconf{\scont}{\env'}{\lbls}{\clbls}{\strace}{\handler}{\cstrace,\,\cex}{\econt}{\scont'}}%
                   {\text{where $\scont' = \ForSK$}}
         \end{multlined}
         \label{econtconf:for-true}
@@ -2257,7 +2257,7 @@ Similarly to Section~\ref{subsubsec:instance-method-invoc}, $\ExitSK{\val}$ is a
         &\begin{multlined}
             \cesktranssplit%
             {\scontconf{\BlockSK{\stmt :: \stmts}{\env}}{\env'}}
-            {\execconf{\stmt}{\env'}{\lbls}{\clbls}{\handler}{\cstrace}{\cex}{\econt}{\scont'}}
+            {\execconf{\stmt}{\env'}{\lbls}{\clbls}{\strace}{\handler}{\cstrace,\,\cex}{\econt}{\scont'}}
         \end{multlined}
         \label{scontconf:block}\\
         &\cesktrans%
@@ -2328,7 +2328,7 @@ When the return expression is empty, the value $\tt{null}$ is applied to the ret
         &\begin{multlined}
             \cesktranswheresplit*%
                 {\acontconf{\ForInitA{\nnull}}{\vals}}%
-                {\execconf{\scont}{\env'}{\lbls}{\clbls}{\handler}{\cstrace}{\cex}{\econt}{\scont'}}%
+                {\execconf{\scont}{\env'}{\lbls}{\clbls}{\strace}{\handler}{\cex,\,\cstrace}{\econt}{\scont'}}%
                 {\parbox{\textwidth-2cm}{where $\env' = \extend(\env, \varmeta{s}, \vals)$,\\
                 $\scont' = \ForSK$}}
         \end{multlined}
@@ -2416,7 +2416,7 @@ The new statement continuation is necessary because implicit fall-through is not
     &\begin{multlined}
         \cesktranssplit%
             {\contconf{\SwitchK{\scase :: \scases}{\clbls}}{\val}}%
-            {\execconf{\stmt}{\env}{\lbls}{\clbls}{\handler}{\cstrace}{\cex}{\econt}{\ExitSK{\tt{null}}}},
+            {\execconf{\stmt}{\env}{\lbls}{\clbls}{\strace}{\handler}{\cex,\,\cstrace}{\econt}{\ExitSK{\tt{null}}}},
     \end{multlined}
 \end{align*}
 
@@ -2513,7 +2513,7 @@ $\synt{try/finally}$ statements execute their body with a new handler and additi
 \begin{align*}
     &\begin{multlined}
         \cesktranssplit
-            {\execconf{\TryFinally{\stmti{0}}{\stmti{1}}}{\env}{\lbls}{\clbls}{\handler}{\cex}{\cstrace}{\econt}{\scont}}%
+            {\execconf{\TryFinally{\stmti{0}}{\stmti{1}}}{\env}{\lbls}{\clbls}{\strace}{\handler}{\cex,\,\cstrace}{\econt}{\scont}}%
             {\execconf{\stmti{0}}{\env}{\lbls'}{\clbls'}{\handler'}{\cex}{\cstrace}{\econt'}{\scont'}}
     \end{multlined}
 \end{align*}
@@ -2546,7 +2546,7 @@ $\bbreak \synt{L}$ statements break from an enclosing label $\synt{L}$ and execu
     &\begin{multlined}
         \cesktranssplit%
             {\breakconf{\FinallyBreak{\stmt}{\bcont}}}%
-            {\execconf{\stmt}{\env}{\lbls}{\clbls}{\handler}{\cex}{\cstrace}{\econt}{\mathrm{BreakSK}(\bcont)}},
+            {\execconf{\stmt}{\env}{\lbls}{\clbls}{\strace}{\handler}{\cex,\,\cstrace}{\econt}{\mathrm{BreakSK}(\bcont)}},
     \end{multlined}\\
     &\cesktrans%
         {\scontconf{\mathrm{BreakSK}(\bcont)}{\env}}%
@@ -2564,12 +2564,12 @@ $\continue \synt{L}$ statements continue to executing the statement of a precedi
     &\begin{multlined}
         \cesktranssplit%
             {\switchconf{\ContinueK}}%
-            {\execconf{\stmt}{\env}{\lbls}{\clbls}{\handler}{\cex}{\cstrace}{\econt}{\scont}},
+            {\execconf{\stmt}{\env}{\lbls}{\clbls}{\strace}{\handler}{\cex,\,\cstrace}{\econt}{\scont}},
     \end{multlined}\\
     &\begin{multlined}
         \cesktranssplit%
             {\switchconf{\FinallyContinue{\stmt}{\switchcont}}}%
-            {\execconf{\stmt}{\env}{\lbls}{\clbls}{\handler}{\cex}{\cstrace}{\econt}{\mathrm{SwitchContinueSK}(\switchcont)}},
+            {\execconf{\stmt}{\env}{\lbls}{\clbls}{\strace}{\handler}{\cex,\,\cstrace}{\econt}{\mathrm{SwitchContinueSK}(\switchcont)}},
     \end{multlined}\\
     &\cesktrans%
         {\scontconf{\mathrm{SwitchContinueSK}(\switchcont)}{\env}}%
@@ -2675,7 +2675,7 @@ To support this, we add a new statement continuation, $BodySK$, that has the con
 \begin{align*}
     &\cesktrans%
         {\scontconf{\BodySK{\stmt}{\env}{\scont}}{\_}}%
-        {\execconf{\stmt}{\env}{[]}{[]}{\handler}{\cex}{\cstrace}{\econt}{\scont}}.
+        {\execconf{\stmt}{\env}{[]}{[]}{\strace}{\handler}{\cex,\,\cstrace}{\econt}{\scont}}.
 \end{align*}
 
 After the evaluation of the initializer expressions, the locations for each field in the object value are updated accordingly.
