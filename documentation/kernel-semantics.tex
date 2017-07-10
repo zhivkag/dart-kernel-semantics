@@ -2049,13 +2049,17 @@ After the evaluation of the argument expression to a value $\val$, depending on 
 \label{subsubsec:instance-method-invoc}
 
 Method invocation is supported with $\InstanceMethodInvocation{\expressionmeta}{\idmeta}{\expressionsmeta}$.
+
 The evaluation of instance method invocation proceeds with the evaluation of the left-hand side expression, i.e. the receiver expression as shown in \eqref{eval:instancemethod}.
 As shown in the CESK-transition \eqref{econtconf:instancemethod}, the argument expressions evaluate to a list of values.
 After the evaluation of the receiver expression to a value $\val$, we proceed with evaluation of the argument expressions.
+
 After the evaluation of the receiver expression to a value $\val$ and the argument expressions to $\vals$, the instance method $\idmeta$ is looked up in the instance methods for the value $\val$.
 Let $\membermeta$ be the result of such lookup with statement body $\stmt$ and formal parameters $\formals$.
+
 The body $\stmt$ is then executed with an environment binding $\tt{this}$ to a location storing the instance value $\val$ and the formal parameters to fresh locations each storing the values in $\vals$.
 The CESK-transition is shown in \eqref{acontconf:instancemethod}.
+
 We add $\ExitSK{\tt{null}}$ as next statement continuation.
 When a $\tt{return}$ statement is missing in the statement body $\stmt$ of the instance method $\membermeta$, the statement continuation $\ExitSK{\val}$ ensures that the execution will proceed to the corresponding expression continuation, in this case with $\val = \tt{null}$.
 
@@ -2788,6 +2792,15 @@ Then the value stored at location $\loc' = (\deref{\loc})[f]$ in the store $S$ w
 
 
 \subsection{Yield}
+
+Kernel supports suspending the execution of the body of a function with native yield statements.
+Functions containing yield statements in the body are marked with $SyncStar$, $AsyncStar$ or $SyncYielding$.
+\subsubsection{Yield in Sync*}
+\label{subsubsec:yeld-in-syncstar}
+\subsubsection{Yield in Async*}
+\label{subsubsec:yield-in-asyncstar}
+\subsubsection{Yield in SyncYielding}
+\label{subsubsec:yield-in-syncyelding}
 
 
 \end{document}
