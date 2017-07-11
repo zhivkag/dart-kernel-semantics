@@ -1549,6 +1549,15 @@ Instance method, getter or setter invocation proceed by evaluation of the receiv
 For the other invocations, $\this$ is not bound.
 
 The evaluation of the invocation proceeds by evaluating the actual argument list and binding the values to the formal parameters of the function.
+Kernel supports positional, positional optional and named arguments.
+
+We construct a modified list for the evaluation of the actual argument by adding all the arguments needed, including non-provided optional and named arguments to the list of expressions.
+Note that the default values for the optional parameters are constants, hence their evaluation does not have side effects.
+Required parameters will not be added to the list of expressions when they are not provided.
+This is an implementation detail that allows us to ignore the distinction between provided or missing positional, optional and named arguments.
+After the evaluation of the argument expressions, and before binding the actual arguments to the formal parameters necessary checks ensure the actual arguments are valid or throw a dynamic error accordingly.
+% todo: Specify what *valid* means and what error is thrown when arguments are not *valid*
+
 The statement body is then executed with the appropriate bindings.
 The specific CESK-transitions for the different invocations are described in the appropriate sections below.
 
