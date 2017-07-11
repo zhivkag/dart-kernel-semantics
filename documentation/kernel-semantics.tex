@@ -1539,6 +1539,12 @@ $fv \in \dfunval$ has only one property, $call$.
     \end{eqfigure}
 \end{figure}
 
+
+\subsubsection{Function invocation}
+\label{subsubsec:function-invoc}
+
+Function invocation occurs when a function expression (\ref{subsubsec:function-expressions}), instance method (\ref{subsubsec:instance-method-invoc}, \ref{subsubsec:direct-instance-method-invoc}, \ref{subsubsec:super-method-invoc}), a getter(\ref{subsubsec:property-extraction}), a setter (\ref{subsubsec:property-assignment}) or a constructor is invoked with new or with super and redirecting initializer (\ref{subsubsec:new-instance}).
+
 \subsubsection{Static and library fields}
 \label{subsubsec:static-and-library-fields}
 
@@ -1582,10 +1588,6 @@ The target member can either be a static or library field, or it can be a static
     \item Otherwise, $\membermeta$ is a static or library setter with body $\stmt$ and formal parameter $\formal$.
 
 \end{itemize}
-
-\subsubsection{Function invocation}
-\label{subsubsec:function-invoc}
-
 
 
 \subsubsection{Static Invocation}
@@ -2095,7 +2097,7 @@ Similar to Section~\ref{subsubsec:instance-method-invoc}, $\ExitSK{\tt{null}}$ i
 
 
 \subsubsection{Super method invocation}
-\label{subsubsec:super-method-invocation}
+\label{subsubsec:super-method-invoc}
 
 Super method invocation is supported with $\SuperMethodInvocation{\idmeta}{\expressionsmeta}$.
 We first evaluate the argument expressions, as shown in the CESK-transition \eqref{eval:superinstancemethod}.
@@ -2104,6 +2106,202 @@ Let $\val = \deref{(\env(\this))}$, $C = \superclass{\val}$ and $M$ the result o
 Let $\stmt$ be the statement body and $\formals$ the formal parameters for $\membermeta$.
 The statement $\stmt$ is executed in an environment binding $\formals$ to the locations containing the values in $\vals$ and $\tt{this}$ binding to location containing the same value bound to $\tt{this}$ in the current environment.
 Similarly to Section~\ref{subsubsec:instance-method-invoc}, $\ExitSK{\val}$ is added as next statement continuation.
+
+
+\subsubsection{New instance creation}
+\label{subsubsec:new-instance}
+
+\newcommand{\Initializer}[1]{\mathrm{Initializer}(#1)}
+\newcommand{\SuperInitializer}[2]{\mathrm{SuperInitializer}(#1,\,#2)}
+\newcommand{\RedirectingInitializer}[2]{\mathrm{RedirectingInitializer}(#1,\,#2)}
+
+The expression $\new$ invokes a constructor to produce a new instance.
+The target constructor $\synt{Q}$ has a list of formal parameters, $\formals$, a list of initializers, $\synt{Izs}$, and a statement body, $\stmt_{body}$.
+The invocation of a constructor $\synt{Q}$ proceeds by evaluating the argument expressions as shown in \eqref{eval:new}.
+After the evaluation of the argument expressions for the invocation, a fresh instance is allocated by creating an object value (see Section~\ref{subsec:object-values}).
+
+\begin{align*}
+    &\cesktrans%
+        {\acontconf{\ConstructorA{\synt{Q}}{\strace}{\econt}}{\val{s}}}%
+        {\contconf{\InitK{Q}{\env}{\scont}}{!\loc}},
+\end{align*}
+
+\noindent where $\loc$ is the location of the newly allocated instance, $\val \in \dobjval$, in the store.
+The value $\val$ stores the class of the object and the fields, as a list of freshly allocated locations for each field of the new instance.
+
+\begin{align*}
+    &\deref{\loc} = \objval \in \dobjval, fields \in \mlist{\dlocation},\\
+    &\env' = \extend(\env_{empty}, \formals, \val{s}),\\
+    &\scont = \NewSK{\econt}{\loc},\\
+    &\cesktrans{\scontconf{\NewSK{\econt}{\loc}}{\env}}{\contconf{\econt}{\deref{\loc}}}.
+\end{align*}
+
+Let $li = last(Izs)$ be the last initializer in the list of initializers, $Izs$, of constructor $\synt{Q}$.
+When $li$ is a redirecting initializer to target constructor $\synt{G}$, then execution of constructor $\synt{Q}$ proceeds immediately with execution of its initializer list, $Izs$.
+
+\begin{align*}
+    &\begin{multlined}
+        \cesktranswheresplit%
+            {\contconf{\InitK{Q}{\env}{\scont}}{\val}}%
+            {\evallistconf{\exprs}{\env}{\strace}{\cstrace}{\cex}{\acont}}%
+            {\parbox{\textwidth-2cm}{if $Izs = RedirectingI(G, \exprs) :: []$,\\
+                where $\acont = \RedirectingA{G}{\loc}{\scont}$, $\deref{\loc} = \val$,}}
+    \end{multlined}\\
+    &\begin{multlined}
+        \cesktranswheresplit%
+            {\contconf{\InitK{Q}{\env}{\scont}}{\val}}%
+            {\evalconf{\expr}{\env}{st}{cex}{cst}{\econt'}}%
+            {\parbox{\textwidth-2cm}{otherwise, where $fi = Initializer(\expr)$, first initializer in $Izs$,\\
+                $\econt' = \InitializerK{Izs}{\loc}{\env}{\scont}, \deref{\loc} = \val$,}}
+    \end{multlined}\\
+    &\begin{multlined}
+        \cesktranswheresplit*%
+            {\acontconf{\RedirectingA{G}{\loc}{\scont}}{\val{s}}}%
+            {\contconf{\InitK{G}{\env'}{\scont}}{\deref{\loc}}}%
+            {\text{where $\env' = \extend(\env_{empty}, \formals, \val{s})$}}.
+    \end{multlined}
+\end{align*}
+
+Otherwise, $\synt{Q}$ is a non-redirecting generative constructor, and execution of $\synt{Q}$ proceeds with evaluation of field initializers in the immediately enclosing class.
+Let $\synt{Q}$ be a constructor with non empty initializer list, $Izs$ and a constructor body $\stmt_{body}$.
+
+\begin{align*}
+    &\begin{multlined}
+        \cesktranswheresplit%
+            {\contconf{\InitK{Q}{\env}{\scont}}{\val}}%
+            {\evallistconf{\exprs}{\env}{\strace}{\cstrace}{\cex}{\acont}}%
+            {\begin{aligned}
+                \text{where }   \env'  &= \ext{\env}{\synt{this}}{\deref{\loc}},\\
+                                \exprs &= \text{initializer expressions for instance fields},\\
+                                \deref{\loc} &= \val,\\
+                                \acont &= \FieldsA{\env}{Izs}{\loc}{\scont'},\\
+                                \scont' &= \BodySK{\stmt_{body}}{\env'}{\scont}.
+            \end{aligned}}
+    \end{multlined}
+\end{align*}
+
+
+To further initialize the new instance, the body of the constructor will be executed.
+In Kernel the body of a constructor is executed after the execution of the initializer list and its super constructor.
+To support this, we add a new statement continuation, $BodySK$, that has the constructor body statement, the environment, the error handlers and stacktraces, and the next statement continuation.
+
+\begin{align*}
+    &\cesktrans%
+        {\scontconf{\BodySK{\stmt}{\env}{\scont}}{\_}}%
+        {\execconf{\stmt}{\env}{[]}{[]}{\strace}{\handler}{\cex,\,\cstrace}{\econt}{\scont}}.
+\end{align*}
+
+After the evaluation of the initializer expressions, the locations for each field in the object value are updated accordingly.
+An update of field $f_i$, stored at location $\loc' = (\deref{\loc})[f_i]$ with value $\val_i$ is expressed as $\update{(\deref{\loc})[f_i]}{\val_{i}}$, so the following holds $\deref{\loc'} = \deref{\deref{\loc[f_i]}} = \val_{i}$ after the update.
+
+Let $Fs$ be the list of fields for value $\deref{\loc}$ for the class immediately enclosing the current constructor below.
+
+If the initializer list is empty, $Izs = []$, the next statement continuation is executed.
+
+\begin{align*}
+    &\begin{multlined}
+        \cesktranswheresplit%
+            {\acontconf{\FieldsA{\env}{Izs}{\loc}{\scont}}{\val{s}}}%
+            {\scontconf{\scont}{\env}}%
+            {\text{where $\deref{\deref\loc[f_i]} = \val_{i}, \forall f_i \in Fs, \forall \val_i \in \val{s}$}}.
+    \end{multlined}
+\end{align*}
+
+In Kernel, a super initializer or a redirecting initializer, when present, will appear last in the initializer list.
+If the initializer list contains at least two initializers, $Izs = Ininitalizer(E) :: Izs', Izs' \neq []$, we can assume that the next initializer to execute is a local or a field initializer.
+
+\begin{align*}
+    &\begin{multlined}
+        \cesktranswheresplit%
+            {\acontconf{\FieldsA{\env}{Izs}{\loc}{\scont}}{\val{s}}}%
+            {\evalconf{\expr}{\env}{st}{cex}{cst}{\econt'}}
+            {\text{where $\deref{\deref{\loc[f_i]}} = \val_{i}$, $\forall f_i \in Fs, \forall \val_i \in \val{s}$, $\econt' = \InitK{Izs}{\loc}{\env}$}}.
+    \end{multlined}
+\end{align*}
+
+Otherwise, there is only one initializer to execute in the initializer list, $li$:
+
+\begin{itemize}
+    \item When $li$ is field or local initializer, the transition is identical to the rule for non empty and non singleton initializer lists, described above.
+
+    \item When the last initializer is a redirecting constructor, i.e. $li = RedirectingI(G, \exprs)$, the transition is as follows:
+        \begin{align*}
+            \cesktranswheresplit%
+                {\acontconf{\FieldsA{\env}{li::[]}{\loc}{\scont}}{\val{s}}}%
+                {\evallistconf{\exprs}{\env}{\strace}{\cstrace}{\cex}{\acont}}%
+                {\text{where $\deref{\deref{\loc[f_i]}} = \val_{i}$, $\forall f_i \in Fs$, $\forall \val_i \in \val{s}$, $\acont = \RedirectingA{G}{\loc}{\scont}$}}.
+        \end{align*}
+
+    \item Otherwise, the last initializer is a super initializer, $li = Super(G, \exprs)$:
+        \begin{align*}
+            \cesktranswheresplit%
+                {\acontconf{\FieldsA{\env}{li::[]}{\loc}{\scont}}{\val{s}}}%
+                {\evallistconf{\exprs}{\env}{\strace}{\cstrace}{\cex}{\acont}}%
+                {\text{where $\deref{\deref{\loc[f_i]}} = \val_{i}$, $\forall f_i \in Fs$, $\forall \val_i \in \val{s}$, $\acont = \SuperA{G}{\loc}{\scont}$}}.
+        \end{align*}
+
+\end{itemize}
+
+The transitions for the initializer continuation are described below.
+Besides redirecting and super initializers, in Kernel we also have field and local initializers, both containing an expression to evaluate, denoted as $Initializer(\expr) : LocalI(\variablemeta, \expr) + FieldI(f, \expr)$.
+Local initializers are special initializers in Kernel and they extend the environment for the execution of the initializer list.
+The transition steps for initializer continuation are as follows:
+
+\begin{align*}
+    &\begin{multlined}
+        \cesktranswheresplit%
+            {\contconf{\InitK{Local(\variablemeta, \expr) :: []}{\loc}{\scont}}{\val}}%
+            {\scontconf{\scont}{\env'}}%
+            {\text{where $\env' = \ext{\env}{\variablemeta}{\val}$}},
+    \end{multlined}\\
+    &\begin{multlined}
+        \cesktranswheresplit*%
+            {\contconf{\InitK{Local(\variablemeta, \expr) :: li :: []}{\loc}{\scont}}{\val}}%
+            {\evallistconf{\exprs}{\env'}{\strace}{\cstrace}{\cex}{\acont}}%
+            {\begin{aligned}
+                \text{where }   \env' &= \ext{\env}{\variablemeta}{\val},\\
+                                \acont &= \SuperA{G}{\loc}{\scont}, \text{ if } li = Super(G, \exprs),\\
+                                \acont &= \RedirectingA{G}{\loc}{\scont}, \text{ if } li = Redirecting(G, \exprs).\\
+            \end{aligned}}
+    \end{multlined}\\
+    &\begin{multlined}
+        \cesktranswheresplit%
+            {\contconf{\InitK{Local(\variablemeta, \expri{0}) :: Izs}{\loc}{\scont}}{\val}}%
+            {\evalconf{\expri{1}}{\env'}{st}{cex}{cst}{\econt'}}%
+            {\parbox{\textwidth-2cm}{where $\env' = \ext{\env}{\variablemeta}{\val}$, $Izs = Initializer(\expri{1}) :: Izs'$,\\
+                $\econt' = \InitK{Izs}{\loc}{\env'}$}}
+    \end{multlined}
+\end{align*}
+
+Note that when a local initializer is last in the initializer list, the environment resulted after the transition is discarded.
+However, the corresponding expression has to be executed, because of side effects.
+Field initializers further initialize fields of the fresh instance.
+Let $Field(f, \expr)$ be a field initializer.
+Then the value stored at location $\loc' = (\deref{\loc})[f]$ in the store $S$ will be modified, where $\loc$ is the location of the previously allocated fresh instance for the object currently being initialized.
+
+\begin{align*}
+    &\begin{multlined}
+        \cesktranswheresplit%
+            {\contconf{\InitK{Field(f, \expr) :: []}{\loc}{\scont}}{\val}}%
+            {\scontconf{\scont}{\env'}}%
+            {\text{where $\update{(\deref{\loc})[f]}{\val}$,}}
+    \end{multlined}\\
+    &\begin{multlined}
+        \cesktranswheresplit*%
+            {\contconf{\InitK{Field(f, \expr) :: li :: []}{\loc}{\scont}}{\val}}%
+            {\evallistconf{\exprs}{\env}{\strace}{\cstrace}{\cex}{\acont}}%
+            {\parbox{\textwidth-2cm}{%
+                where $\update{(\deref{\loc})[f]}{\val}$,\\
+                $\acont = \SuperA{G}{\loc}{\scont}, \text{ if } li = Super(G, \exprs)$,\\
+                $\acont = \RedirectingA{G}{\loc}{\scont}, \text{ if } li = Redirecting(G, \exprs)$,}}
+    \end{multlined}\\
+    &\begin{multlined}
+        \cesktranswheresplit%
+            {\contconf{\InitK{Field(f, \expri{0}) :: Izs}{\loc}{\scont}}{\val}}%
+            {\evalconf{\expri{1}}{\env}{st}{cex}{cst}{\econt}}%
+            {\text{where $\update{(\deref\loc)[f]}{\val}$, $Izs = Initializer(\expri{1}) :: Izs'$, $\econt' = \InitK{Izs}{\loc}{\env}$}}
+    \end{multlined}
+\end{align*}
 
 
 \subsection{Statement execution}
@@ -2596,205 +2794,11 @@ $\continue \synt{L}$ statements continue to executing the statement of a precedi
 
 \noindent where $\clbl = \continuel{L'}{\switchcont} \in \clbls \text{ with } L' == \mathbf{L}$.
 
+
 \subsubsection{Function declaration}
 
 Kernel supports local function declaration, where a final variable stores a function value.
 Let $F$ be a function with a body $\stmt_{body}$ and a list of formal parameters, $\formals$, and let $fun \in \dvardecl$ be the corresponding final variable declaration.
-
-
-\subsection{New instance creation}
-
-\newcommand{\Initializer}[1]{\mathrm{Initializer}(#1)}
-\newcommand{\SuperInitializer}[2]{\mathrm{SuperInitializer}(#1,\,#2)}
-\newcommand{\RedirectingInitializer}[2]{\mathrm{RedirectingInitializer}(#1,\,#2)}
-
-The expression $\new$ invokes a constructor to produce a new instance.
-The target constructor $\synt{Q}$ has a list of formal parameters, $\formals$, a list of initializers, $\synt{Izs}$, and a statement body, $\stmt_{body}$.
-The invocation of a constructor $\synt{Q}$ proceeds by evaluating the argument expressions as shown in \eqref{eval:new}.
-After the evaluation of the argument expressions for the invocation, a fresh instance is allocated by creating an object value (see Section~\ref{subsec:object-values}).
-
-\begin{align*}
-    &\cesktrans%
-        {\acontconf{\ConstructorA{\synt{Q}}{\strace}{\econt}}{\val{s}}}%
-        {\contconf{\InitK{Q}{\env}{\scont}}{!\loc}},
-\end{align*}
-
-\noindent where $\loc$ is the location of the newly allocated instance, $\val \in \dobjval$, in the store.
-The value $\val$ stores the class of the object and the fields, as a list of freshly allocated locations for each field of the new instance.
-
-\begin{align*}
-    &\deref{\loc} = \objval \in \dobjval, fields \in \mlist{\dlocation},\\
-    &\env' = \extend(\env_{empty}, \formals, \val{s}),\\
-    &\scont = \NewSK{\econt}{\loc},\\
-    &\cesktrans{\scontconf{\NewSK{\econt}{\loc}}{\env}}{\contconf{\econt}{\deref{\loc}}}.
-\end{align*}
-
-Let $li = last(Izs)$ be the last initializer in the list of initializers, $Izs$, of constructor $\synt{Q}$.
-When $li$ is a redirecting initializer to target constructor $\synt{G}$, then execution of constructor $\synt{Q}$ proceeds immediately with execution of its initializer list, $Izs$.
-
-\begin{align*}
-    &\begin{multlined}
-        \cesktranswheresplit%
-            {\contconf{\InitK{Q}{\env}{\scont}}{\val}}%
-            {\evallistconf{\exprs}{\env}{\strace}{\cstrace}{\cex}{\acont}}%
-            {\parbox{\textwidth-2cm}{if $Izs = RedirectingI(G, \exprs) :: []$,\\
-                where $\acont = \RedirectingA{G}{\loc}{\scont}$, $\deref{\loc} = \val$,}}
-    \end{multlined}\\
-    &\begin{multlined}
-        \cesktranswheresplit%
-            {\contconf{\InitK{Q}{\env}{\scont}}{\val}}%
-            {\evalconf{\expr}{\env}{st}{cex}{cst}{\econt'}}%
-            {\parbox{\textwidth-2cm}{otherwise, where $fi = Initializer(\expr)$, first initializer in $Izs$,\\
-                $\econt' = \InitializerK{Izs}{\loc}{\env}{\scont}, \deref{\loc} = \val$,}}
-    \end{multlined}\\
-    &\begin{multlined}
-        \cesktranswheresplit*%
-            {\acontconf{\RedirectingA{G}{\loc}{\scont}}{\val{s}}}%
-            {\contconf{\InitK{G}{\env'}{\scont}}{\deref{\loc}}}%
-            {\text{where $\env' = \extend(\env_{empty}, \formals, \val{s})$}}.
-    \end{multlined}
-\end{align*}
-
-Otherwise, $\synt{Q}$ is a non-redirecting generative constructor, and execution of $\synt{Q}$ proceeds with evaluation of field initializers in the immediately enclosing class.
-Let $\synt{Q}$ be a constructor with non empty initializer list, $Izs$ and a constructor body $\stmt_{body}$.
-
-\begin{align*}
-    &\begin{multlined}
-        \cesktranswheresplit%
-            {\contconf{\InitK{Q}{\env}{\scont}}{\val}}%
-            {\evallistconf{\exprs}{\env}{\strace}{\cstrace}{\cex}{\acont}}%
-            {\begin{aligned}
-                \text{where }   \env'  &= \ext{\env}{\synt{this}}{\deref{\loc}},\\
-                                \exprs &= \text{initializer expressions for instance fields},\\
-                                \deref{\loc} &= \val,\\
-                                \acont &= \FieldsA{\env}{Izs}{\loc}{\scont'},\\
-                                \scont' &= \BodySK{\stmt_{body}}{\env'}{\scont}.
-            \end{aligned}}
-    \end{multlined}
-\end{align*}
-
-
-To further initialize the new instance, the body of the constructor will be executed.
-In Kernel the body of a constructor is executed after the execution of the initializer list and its super constructor.
-To support this, we add a new statement continuation, $BodySK$, that has the constructor body statement, the environment, the error handlers and stacktraces, and the next statement continuation.
-
-\begin{align*}
-    &\cesktrans%
-        {\scontconf{\BodySK{\stmt}{\env}{\scont}}{\_}}%
-        {\execconf{\stmt}{\env}{[]}{[]}{\strace}{\handler}{\cex,\,\cstrace}{\econt}{\scont}}.
-\end{align*}
-
-After the evaluation of the initializer expressions, the locations for each field in the object value are updated accordingly.
-An update of field $f_i$, stored at location $\loc' = (\deref{\loc})[f_i]$ with value $\val_i$ is expressed as $\update{(\deref{\loc})[f_i]}{\val_{i}}$, so the following holds $\deref{\loc'} = \deref{\deref{\loc[f_i]}} = \val_{i}$ after the update.
-
-Let $Fs$ be the list of fields for value $\deref{\loc}$ for the class immediately enclosing the current constructor below.
-
-If the initializer list is empty, $Izs = []$, the next statement continuation is executed.
-
-\begin{align*}
-    &\begin{multlined}
-        \cesktranswheresplit%
-            {\acontconf{\FieldsA{\env}{Izs}{\loc}{\scont}}{\val{s}}}%
-            {\scontconf{\scont}{\env}}%
-            {\text{where $\deref{\deref\loc[f_i]} = \val_{i}, \forall f_i \in Fs, \forall \val_i \in \val{s}$}}.
-    \end{multlined}
-\end{align*}
-
-In Kernel, a super initializer or a redirecting initializer, when present, will appear last in the initializer list.
-If the initializer list contains at least two initializers, $Izs = Ininitalizer(E) :: Izs', Izs' \neq []$, we can assume that the next initializer to execute is a local or a field initializer.
-
-\begin{align*}
-    &\begin{multlined}
-        \cesktranswheresplit%
-            {\acontconf{\FieldsA{\env}{Izs}{\loc}{\scont}}{\val{s}}}%
-            {\evalconf{\expr}{\env}{st}{cex}{cst}{\econt'}}
-            {\text{where $\deref{\deref{\loc[f_i]}} = \val_{i}$, $\forall f_i \in Fs, \forall \val_i \in \val{s}$, $\econt' = \InitK{Izs}{\loc}{\env}$}}.
-    \end{multlined}
-\end{align*}
-
-Otherwise, there is only one initializer to execute in the initializer list, $li$:
-
-\begin{itemize}
-    \item When $li$ is field or local initializer, the transition is identical to the rule for non empty and non singleton initializer lists, described above.
-
-    \item When the last initializer is a redirecting constructor, i.e. $li = RedirectingI(G, \exprs)$, the transition is as follows:
-        \begin{align*}
-            \cesktranswheresplit%
-                {\acontconf{\FieldsA{\env}{li::[]}{\loc}{\scont}}{\val{s}}}%
-                {\evallistconf{\exprs}{\env}{\strace}{\cstrace}{\cex}{\acont}}%
-                {\text{where $\deref{\deref{\loc[f_i]}} = \val_{i}$, $\forall f_i \in Fs$, $\forall \val_i \in \val{s}$, $\acont = \RedirectingA{G}{\loc}{\scont}$}}.
-        \end{align*}
-
-    \item Otherwise, the last initializer is a super initializer, $li = Super(G, \exprs)$:
-        \begin{align*}
-            \cesktranswheresplit%
-                {\acontconf{\FieldsA{\env}{li::[]}{\loc}{\scont}}{\val{s}}}%
-                {\evallistconf{\exprs}{\env}{\strace}{\cstrace}{\cex}{\acont}}%
-                {\text{where $\deref{\deref{\loc[f_i]}} = \val_{i}$, $\forall f_i \in Fs$, $\forall \val_i \in \val{s}$, $\acont = \SuperA{G}{\loc}{\scont}$}}.
-        \end{align*}
-
-\end{itemize}
-
-The transitions for the initializer continuation are described below.
-Besides redirecting and super initializers, in Kernel we also have field and local initializers, both containing an expression to evaluate, denoted as $Initializer(\expr) : LocalI(\variablemeta, \expr) + FieldI(f, \expr)$.
-Local initializers are special initializers in Kernel and they extend the environment for the execution of the initializer list.
-The transition steps for initializer continuation are as follows:
-
-\begin{align*}
-    &\begin{multlined}
-        \cesktranswheresplit%
-            {\contconf{\InitK{Local(\variablemeta, \expr) :: []}{\loc}{\scont}}{\val}}%
-            {\scontconf{\scont}{\env'}}%
-            {\text{where $\env' = \ext{\env}{\variablemeta}{\val}$}},
-    \end{multlined}\\
-    &\begin{multlined}
-        \cesktranswheresplit*%
-            {\contconf{\InitK{Local(\variablemeta, \expr) :: li :: []}{\loc}{\scont}}{\val}}%
-            {\evallistconf{\exprs}{\env'}{\strace}{\cstrace}{\cex}{\acont}}%
-            {\begin{aligned}
-                \text{where }   \env' &= \ext{\env}{\variablemeta}{\val},\\
-                                \acont &= \SuperA{G}{\loc}{\scont}, \text{ if } li = Super(G, \exprs),\\
-                                \acont &= \RedirectingA{G}{\loc}{\scont}, \text{ if } li = Redirecting(G, \exprs).\\
-            \end{aligned}}
-    \end{multlined}\\
-    &\begin{multlined}
-        \cesktranswheresplit%
-            {\contconf{\InitK{Local(\variablemeta, \expri{0}) :: Izs}{\loc}{\scont}}{\val}}%
-            {\evalconf{\expri{1}}{\env'}{st}{cex}{cst}{\econt'}}%
-            {\parbox{\textwidth-2cm}{where $\env' = \ext{\env}{\variablemeta}{\val}$, $Izs = Initializer(\expri{1}) :: Izs'$,\\
-                $\econt' = \InitK{Izs}{\loc}{\env'}$}}
-    \end{multlined}
-\end{align*}
-
-Note that when a local initializer is last in the initializer list, the environment resulted after the transition is discarded.
-However, the corresponding expression has to be executed, because of side effects.
-Field initializers further initialize fields of the fresh instance.
-Let $Field(f, \expr)$ be a field initializer.
-Then the value stored at location $\loc' = (\deref{\loc})[f]$ in the store $S$ will be modified, where $\loc$ is the location of the previously allocated fresh instance for the object currently being initialized.
-
-\begin{align*}
-    &\begin{multlined}
-        \cesktranswheresplit%
-            {\contconf{\InitK{Field(f, \expr) :: []}{\loc}{\scont}}{\val}}%
-            {\scontconf{\scont}{\env'}}%
-            {\text{where $\update{(\deref{\loc})[f]}{\val}$,}}
-    \end{multlined}\\
-    &\begin{multlined}
-        \cesktranswheresplit*%
-            {\contconf{\InitK{Field(f, \expr) :: li :: []}{\loc}{\scont}}{\val}}%
-            {\evallistconf{\exprs}{\env}{\strace}{\cstrace}{\cex}{\acont}}%
-            {\parbox{\textwidth-2cm}{%
-                where $\update{(\deref{\loc})[f]}{\val}$,\\
-                $\acont = \SuperA{G}{\loc}{\scont}, \text{ if } li = Super(G, \exprs)$,\\
-                $\acont = \RedirectingA{G}{\loc}{\scont}, \text{ if } li = Redirecting(G, \exprs)$,}}
-    \end{multlined}\\
-    &\begin{multlined}
-        \cesktranswheresplit%
-            {\contconf{\InitK{Field(f, \expri{0}) :: Izs}{\loc}{\scont}}{\val}}%
-            {\evalconf{\expri{1}}{\env}{st}{cex}{cst}{\econt}}%
-            {\text{where $\update{(\deref\loc)[f]}{\val}$, $Izs = Initializer(\expri{1}) :: Izs'$, $\econt' = \InitK{Izs}{\loc}{\env}$}}
-    \end{multlined}
-\end{align*}
 
 
 \subsection{Yield}
