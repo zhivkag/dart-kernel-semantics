@@ -1545,6 +1545,14 @@ $fv \in \dfunval$ has only one property, $call$.
 
 Function invocation occurs when a function expression (\ref{subsubsec:function-expressions}), instance method (\ref{subsubsec:instance-method-invoc}, \ref{subsubsec:direct-instance-method-invoc}, \ref{subsubsec:super-method-invoc}), a getter(\ref{subsubsec:property-extraction}), a setter (\ref{subsubsec:property-assignment}) or a constructor is invoked with new or with super and redirecting initializer (\ref{subsubsec:new-instance}).
 
+Instance method, getter or setter invocation proceed by evaluation of the receiver expression and binding its value to $\this$.
+For the other invocations, $\this$ is not bound.
+
+The evaluation of the invocation proceeds by evaluating the actual argument list and binding the values to the formal parameters of the function.
+The statement body is then executed with the appropriate bindings.
+The specific CESK-transitions for the different invocations are described in the appropriate sections below.
+
+
 \subsubsection{Static and library fields}
 \label{subsubsec:static-and-library-fields}
 
