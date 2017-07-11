@@ -587,8 +587,8 @@ The different expression continuations are shown in Figure~\ref{figure:econts}.
 \newcommand{\DPropertySetVK}{\mathrm{DPropertySetValueK}(\val_0,\,\membermeta,\,\ExceptionHandlers,\,\econt)}
 \newcommand{\SuperPropertySetK}{\mathrm{SuperPropertySetK}(\idmeta,\,\env,\,\ExceptionHandlers,\,\econt)}
 
-\newcommand{\InstanceMethodK}{\mathrm{InstanceMethodK(\expressionsmeta,\,\idmeta,\,\env,\,\ExceptionHandlers,\,\econt)}}
-\newcommand{\DInstanceMethodK}{\mathrm{DInstanceMethodK}(\expressionsmeta,\,\membermeta,\,\env,\,\ExceptionHandlers,\,\econt)}
+\newcommand{\InstanceMethodK}[1]{\mathrm{InstanceMethodK(\expressionsmeta,\,\idmeta,\,\env,\,#1,\,\ExceptionHandlersRest,\,\econt)}}
+\newcommand{\DInstanceMethodK}[1]{\mathrm{DInstanceMethodK}(\expressionsmeta,\,\membermeta,\,\env,\,#1,\,\ExceptionHandlersRest,\,\econt)}
 \newcommand{\VarDeclK}[3]{\mathrm{VarDeclarationK}({#1},\,{#2},\,{#3})}
 \newcommand{\IfCondK}[2]{\mathrm{IfConditionK}({#1},\,{#2},\,\env,\,\lbls,\,\clbls,\,\handler,\,\cstrace,\,\cex,\,\econt,\,\scont)}
 \newcommand{\SwitchK}[2]{\mathrm{SwitchK}({#1},\,\env,\,\lbls,\,{#2},\,\strace,\,\handler,\,\cstrace,\,\cex,\,\econt,\,\scont)}
@@ -621,8 +621,8 @@ The different expression continuations are shown in Figure~\ref{figure:econts}.
     &\DPropertyGetK \label{econt:dproperty-set}\\
     &\DPropertySetVK \label{econt:dproperty-set-v}\\
     &\SuperPropertySetK \label{econt:super-property-set}\\
-    &\InstanceMethodK \label{econt:instance-method}\\
-    &\DInstanceMethodK \label{econt:dinstance-method}\\
+    &\InstanceMethodK{\strace} \label{econt:instance-method}\\
+    &\DInstanceMethodK{\strace} \label{econt:dinstance-method}\\
     &\VarDeclK{\idmeta}{\env}{\scont} \label{econt:var-decl}\\
     &\IfCondK{\expressionmeta_1}{\expressionmeta_2} \label{econt:if-cond}\\
     &\ForCondK \label{econt:for-cond}\\
@@ -680,12 +680,12 @@ Application continuations, $\acont$, capture the application of a list of values
 
 \newcommand{\ValueA}[2]{\mathrm{ValueA}({#1},\,{#2})}
 \newcommand{\StringConcatenationA}{\mathrm{StringConcatenationA(\econt)}}
-\newcommand{\SuperMethodA}{\mathrm{SuperMethodA}(\idmeta,\,\env,\,\ExceptionHandlers,\,\econt)}
+\newcommand{\SuperMethodA}[1]{\mathrm{SuperMethodA}(\idmeta,\,\env,\,#1,\,\ExceptionHandlersRest,\,\econt)}
 \newcommand{\StaticInvA}[4]{\mathrm{StaticInvocationA}({#1},\,{#2},\,{#3},\,\ExceptionHandlersRest,\,{#4})}
 \newcommand{\DInstanceMethodA}{\mathrm{DInstanceMethodA}(\membermeta,\,\val,\,\ExceptionHandlers,\,\econt)}
 \newcommand{\FieldsA}[4]{\mathrm{FieldsA}({#1},\,{#2},\,{#3},\,\strace,\,\handler,\,\cstrace,\,\cex,\,{#4})}
 \newcommand{\SuperA}[3]{\mathrm{SuperA}({#1},\,{#2},\,\strace,\,\handler,\,\cstrace,\,\cex,\,{#3})}
-\newcommand{\ConstructorA}[2]{\mathrm{ConstructorA}({#1},\,\strace,\,\handler,\,\cstrace,\,\cex,\,{#2})}
+\newcommand{\ConstructorA}[3]{\mathrm{ConstructorA}({#1},\,{#2},\,\handler,\,\cstrace,\,\cex,\,{#3})}
 \newcommand{\RedirectingA}[3]{\mathrm{RedirectingA}({#1},\,{#2},\,\strace,\,\handler,\,\cstrace,\,\cex,\,{#3})}
 \newcommand{\ForInitA}[1]{\mathrm{ForInitA}(\mathrm{\varmeta{s}},\, #1,\, \exprs,\, \statementmeta,\, \env,\, \lbls,\, \clbls,\, \handler,\, \cstrace,\, \cex,\, \econt,\, \scont)}
 \newcommand{\ForUpdatesA}[2]{\mathrm{ForUpdatesA}(\mathrm{\varmeta{s}},\, #1,\, \exprs,\, \statementmeta,\, \env,\, #2,\, \lbls,\, \clbls,\, \handler,\, \cstrace,\, \cex,\, \econt,\, \scont)}
@@ -702,10 +702,10 @@ The different application continuations are shown in Figure~\ref{figure:acont}.
     &\StringConcatenationA \label{acont:stringconcat}\\
     &\ForInitA{\expressionmeta} \label{acont:forinit}\\
     &\ForUpdatesA{\expressionmeta}{\env'} \label{acont:forupdates}\\
-    &\SuperMethodA \label{acont:supermethod}\\
+    &\SuperMethodA{\strace} \label{acont:supermethod}\\
     &\DInstanceMethodA \label{acont:staticinv}\\
     &\FieldsA{\env}{Izs}{\loc}{\scont} \label{acont:fields}\\
-    &\ConstructorA{Q}{\econt} \label{acont:constructor}\\
+    &\ConstructorA{Q}{\strace}{\econt} \label{acont:constructor}\\
     &\SuperA{Q}{\loc}{\scont} \label{acont:super}\\
     &\RedirectingA{Q}{\loc}{\scont} \label{acont:redirecting}
   \end{align}
@@ -1434,7 +1434,7 @@ Otherwise, the evaluation of the expression results with an error, as shown in \
         &\begin{multlined}
             \cesktranswheresplit%
                 {\evalconf{\StaticGet{\membermeta}}{\env}{\strace}{\cstrace}{\cex}{\econt}}%
-                {\execconf{\stmt}{\env_{empty}}{[]}{[]}{\strace}{\handler}{\strace}{\handler}{\cex,\,\cstrace}{\econt}{\emptyset}}%
+                {\execconf{\stmt}{\env_{empty}}{[]}{[]}{\StaticGet{\membermeta} ::\strace}{\handler}{\cex,\,\cstrace}{\econt}{\emptyset}}%
                 {\text{where $\membermeta$ is a getter with body $\stmt$}}
         \end{multlined}
         \label{eval:staticget-getter}\\
@@ -1665,7 +1665,7 @@ A statement continuation, $\ExitSK{\econt}{\tt{null}}$ is added as next statemen
     &\begin{multlined}
         \cesktranswheresplit*%
         {\contconf{\PropertyGetK}{\val}}%
-        {\execconf{\stmt}{\env}{[]}{[]}{\strace}{\handler}{\cex,\,\cstrace}{\econt}{\scont}}%
+        {\execconf{\stmt}{\env}{[]}{[]}{\PropertyGet{\val}{\idmeta} :: \strace}{\handler}{\cex,\,\cstrace}{\econt}{\scont}}%
         {\parbox{10cm}{if $\membermeta$ is a getter with body $\stmt$\\
         where $\env = \ext{\env_{empty}}{\mathbf{this}}{\val}$\\
         $\scont = \emptyset$}}
@@ -1683,7 +1683,7 @@ A statement continuation, $\ExitSK{\econt}{\tt{null}}$ is added as next statemen
     &\begin{multlined}
         \cesktranswheresplit*%
         {\contconf{\PropertyGetK}{\val}}%
-        {\throwconf{\handler}{(\tt{throw}\text{ NoSuchMethod}) :: \strace}{\text{NoSuchMethod}}}%
+        {\throwconf{\handler}{(\tt{throw}\text{ NoSuchMethod($\PropertyGet{\val}{\idmeta}$)}) :: \strace}{\text{NoSuchMethod}}}%
         {\parbox{10cm}{if lookup of name $\idmeta$ was unsuccessful in class of value $\val$}}
     \end{multlined}
     \label{econtconf:propertyget-nosuchmethod}\\
@@ -1698,7 +1698,7 @@ A statement continuation, $\ExitSK{\econt}{\tt{null}}$ is added as next statemen
     &\begin{multlined}
         \cesktranswheresplit*%
             {\contconf{\DPropertyGetK}{\val}}%
-            {\execconf{\stmt}{\env}{[]}{[]}{\strace}{\handler}{\cex,\,\cstrace}{\econt}{\scont}}%
+            {\execconf{\stmt}{\env}{[]}{[]}{\DirectPropertyGet{\val}{\membermeta} :: \strace}{\handler}{\cex,\,\cstrace}{\econt}{\scont}}%
             {\parbox{10cm}{if $\membermeta$ is getter with statement body $\stmt$ \\
             where $\env = \ext{\env_{empty}}{\mathbf{this}}{\val}$ \\
             $\scont = \emptyset$}}
@@ -1786,7 +1786,7 @@ The evaluation proceeds as follows:
     &\begin{multlined}
         \cesktranswheresplit*%
         {\contconf{\PropertySetVK}{\val_1}}%
-        {\execconf{\stmt}{\env}{\lbls}{\clbls}{\strace}{\handler}{\cex,\,\cstrace}{\econt}{\scont}}%
+        {\execconf{\stmt}{\env}{\lbls}{\clbls}{(\PropertySet{\val_0}{\idmeta}{\val_1}) :: \strace}{\handler}{\cex,\,\cstrace}{\econt}{\scont}}%
         {\parbox{10cm}{if \membermeta is setter with statement body $\stmt$ and formal parameter $\formal$\\
         where $\env = \ext{\env_{empty}}{\mathbf{this} :: \formal :: []}{\val_0 :: \val_1 :: []}$\\
         $\scont = \ExitSK{\val_1}$}}
@@ -1810,7 +1810,7 @@ The evaluation proceeds as follows:
     &\begin{multlined}
         \cesktranswheresplit*%
         {\contconf{\DPropertySetVK}{\val_1}}
-        {\execconf{\stmt}{\env}{\lbls}{\clbls}{\strace}{\handler}{\cex,\,\cstrace}{\econt}{\scont}}
+        {\execconf{\stmt}{\env}{\lbls}{\clbls}{(\DirectPropertySet{\val_0}{\membermeta}{\val_1}) :: \strace}{\handler}{\cex,\,\cstrace}{\econt}{\scont}}
         {\parbox{10cm}{if $\membermeta$ is a setter with body $\stmt$ and formal parameter $\formal$
         where $\env = \ext{\env_{empty}}{\mathbf{this} :: \formal :: []}{\val_0 :: \val_1 :: []}$\\
         $\scont = \emptyset$\\}}
@@ -1826,7 +1826,7 @@ The evaluation proceeds as follows:
     &\begin{multlined}
         \cesktranswheresplit*%
         {\contconf{\SuperPropertySetK}{\val}}
-        {\execconf{\stmt}{\env'}{\lbls}{\clbls}{\strace}{\handler}{\cex,\,\cstrace}{\econt}{\scont}}
+        {\execconf{\stmt}{\env'}{\lbls}{\clbls}{(\SuperPropertySet{\idmeta}{\val}) :: \strace}{\handler}{\cex,\,\cstrace}{\econt}{\scont}}
         {\parbox{10cm}{if $\membermeta$ is a setter method with body $\stmt$ and formal $\formal$\\
         where $\env' =  \ext{\env_{empty}}{\this :: \formal :: []}{\deref{(\env(\this))} :: \val :: []}$,\\
         $\scont = \emptyset$}}
@@ -1944,28 +1944,28 @@ After the evaluation of the argument expression to a value $\val$, depending on 
         \cesktranswheresplit%
             {\evalconf{\InstanceMethodInvocation{\expressionmeta}{\idmeta}{\expressionsmeta}}{\env}{\strace}{\cstrace}{\cex}{\econt}}%
             {\evalconf{\expressionmeta}{\env}{\strace}{\cstrace}{\cex}{\econt'}}%
-            {\econt' = \InstanceMethodK}
+            {\econt' = \InstanceMethodK{\InstanceMethodInvocation{\expressionmeta}{\idmeta}{\expressionsmeta} :: \strace}}
         \end{multlined}
         \label{eval:instancemethod}\\
         &\begin{multlined}
             \cesktranswheresplit%
             {\evalconf{\DInstanceMethodInvocation{\expressionmeta}{\membermeta}{\expressionsmeta}}{\env}{\strace}{\cstrace}{\cex}{\econt}}%
             {\evalconf{\expressionmeta}{\env}{\strace}{\cstrace}{\cex}{\econt'}}%
-            {\econt' = \DInstanceMethodK}
+            {\econt' = \DInstanceMethodK{\DInstanceMethodInvocation{\expressionmeta}{\membermeta}{\expressionsmeta} :: \strace}}
         \end{multlined}
         \label{eval:dinstancemethod}\\
         &\begin{multlined}
             \cesktranswheresplit%
             {\evalconf{\SuperMethodInvocation{\idmeta}{\expressionsmeta}}{\env}{\strace}{\cstrace}{\cex}{\econt}}%
             {\evallistconf{\expressionsmeta}{\env}{\strace}{\cstrace}{\cex}{\acont}}%
-            {\acont = \SuperMethodA}
+            {\acont = \SuperMethodA{\SuperMethodInvocation{\idmeta}{\expressionsmeta} :: \strace}}
         \end{multlined}
         \label{eval:superinstancemethod}\\
         &\begin{multlined}
             \cesktranswheresplit%
             {\evalconf{\new \synt{Q}(\exprs)}{\env}{st}{cex}{cst}{\econt}}%
             {\evallistconf{\exprs}{\env}{st}{cex}{cst}{\acont'}}%
-            {\acont' = \ConstructorA{Q}{\econt}}
+            {\acont' = \ConstructorA{\synt{Q}}{\new \synt{Q}(\exprs) :: \strace}{\econt}}
         \end{multlined}
         \label{eval:new}
     \end{align}
@@ -1979,14 +1979,14 @@ After the evaluation of the argument expression to a value $\val$, depending on 
     \begin{align}
     &\begin{multlined}
         \cesktranswheresplit*%
-        {\contconf{\InstanceMethodK}{\val}}%
+        {\contconf{\InstanceMethodK{\strace}}{\val}}%
         {\evallistconf{\expressionsmeta}{\env}{\strace}{\cstrace}{\cex}{\acont'}}%
         {\text{where $\acont' = \InstanceMethodA$}}
     \end{multlined}
     \label{econtconf:instancemethod}\\
     &\begin{multlined}
         \cesktranswheresplit*%
-        {\contconf{\DInstanceMethodK}{\val}}%
+        {\contconf{\DInstanceMethodK{\strace}}{\val}}%
         {\evallistconf{\expressionsmeta}{\env}{\strace}{\cstrace}{\cex}{\acont'}}%
         {\text{where $\acont' = \DInstanceMethodA$}}
     \end{multlined}
@@ -2020,7 +2020,7 @@ After the evaluation of the argument expression to a value $\val$, depending on 
     \label{acontconf:dinstancemethod}\\
     &\begin{multlined}
         \cesktranswheresplit*%
-        {\contconf{\SuperMethodA}{\val{s}}}%
+        {\contconf{\SuperMethodA{\strace}}{\val{s}}}%
         {\execconf{\stmt}{\env'}{[]}{[]}{\strace}{\handler}{\cex,\,\cstrace}{\econt}{\scont}}%
         {\parbox{10cm}{where $\scont = \ExitSK{\tt{null}}$,\\
         $\env' = \ext{\env_{empty}}{\this :: \formals}{\deref{(\env(\this))} :: \val{s}}$    }}
@@ -2609,7 +2609,7 @@ After the evaluation of the argument expressions for the invocation, a fresh ins
 
 \begin{align*}
     &\cesktrans%
-        {\acontconf{\ConstructorA{\synt{Q}}{\econt}}{\val{s}}}%
+        {\acontconf{\ConstructorA{\synt{Q}}{\strace}{\econt}}{\val{s}}}%
         {\contconf{\InitK{Q}{\env}{\scont}}{!\loc}},
 \end{align*}
 
