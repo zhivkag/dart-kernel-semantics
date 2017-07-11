@@ -900,7 +900,7 @@ A method lookup searches for an instance method in the given class given the nam
 
 \subsection{Function values}
 \label{subsec:function-values}
-
+% todo: add async marker, type parameters, return type to FunctionValue
 \[
     \dfunval : \dformals \times \dstmt \times \denv
 \]
@@ -1045,6 +1045,7 @@ A method lookup searches for an instance method in the given class given the nam
 \newcommand{\Yield}[1]{\tt{yield}\,#1}
 
 \newcommand{\VarDeclaration}[2]{\tt{var}\,#1=#2}
+\newcommand{\FunctionDeclaration}[5]{#1\,#2(\,#3\,)\,#4\,#5}
 
 % FunctionDeclaration
 \[
@@ -1069,6 +1070,8 @@ A method lookup searches for an instance method in the given class given the nam
   & \TryFinally{\statementmeta_1}{\statementmeta_2} \\
   & \Yield{\expressionmeta} \\
   & \VarDeclaration{\idmeta}{\expressionmeta} \\
+  % todo: Add sync*/async/async* marker and type parameters
+  & \FunctionDeclaration{\typemeta}{\idmeta}{\formals}{}{\stmt} \\
 
 \end{array}
 \]
@@ -1405,6 +1408,17 @@ Evaluation of type cast expression proceed to evaluation of the target expressio
 When the target expression evaluates to a value $\val$ such that ``$\val $ is $\tt{T}$" holds, the value $\val$ is applied to the expression continuation as shown in \eqref{econtconf:as-true}.
 Otherwise, the evaluation of the expression results with an error, as shown in \eqref{econtconf:as-false}.
 
+
+\subsubsection{Function expressions}
+\label{subsubsec:function-expressions}
+
+Kernel supports encapsulating an executable unit of code with function expressions.
+To support function expressions we introduce $fv = \funval{\formals}{\stmt_{body}}{\env} \in \dfunval$ as a value that has the function statement body, $\stmt_{body} \in \dstmt$, its list of formal parameters, $\formals \in \dformals$, and the environment, $\env \in \denv$ in scope of the function expression.
+This ensures that there are no free variables in the body of $fv$.
+
+$fv \in \dfunval$ has only one property, $call$.
+
+
 %%
 % Figure showing the CESK-transition function starting from EvalConfgiration for
 % static property extraction and assignment, and static invocation
@@ -1568,6 +1582,10 @@ The target member can either be a static or library field, or it can be a static
     \item Otherwise, $\membermeta$ is a static or library setter with body $\stmt$ and formal parameter $\formal$.
 
 \end{itemize}
+
+\subsubsection{Function invocation}
+\label{subsubsec:function-invoc}
+
 
 
 \subsubsection{Static Invocation}
@@ -2577,18 +2595,6 @@ $\continue \synt{L}$ statements continue to executing the statement of a precedi
 \end{align*}
 
 \noindent where $\clbl = \continuel{L'}{\switchcont} \in \clbls \text{ with } L' == \mathbf{L}$.
-
-
-\subsection{Closures}
-
-
-\subsubsection{Function expressions}
-
-Kernel supports encapsulating an executable unit of code with function expressions.
-To support function expressions we introduce $fv = \funval{\formals}{\stmt_{body}}{\env} \in \dfunval$ as a value that has the function statement body, $\stmt_{body} \in \dstmt$, its list of formal parameters, $\formals \in \dformals$, and the environment, $\env \in \denv$ in scope of the function expression.
-This ensures that there are no free variables in the body of $fv$.
-$fv \in \dfunval$ has only one method, $call$.
-
 
 \subsubsection{Function declaration}
 
