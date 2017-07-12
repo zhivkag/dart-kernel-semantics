@@ -593,9 +593,10 @@ The different expression continuations are shown in Figure~\ref{figure:econts}.
 \newcommand{\IfCondK}[2]{\mathrm{IfConditionK}({#1},\,{#2},\,\env,\,\lbls,\,\clbls,\,\handler,\,\cstrace,\,\cex,\,\econt,\,\scont)}
 \newcommand{\SwitchK}[2]{\mathrm{SwitchK}({#1},\,\env,\,\lbls,\,{#2},\,\strace,\,\handler,\,\cstrace,\,\cex,\,\econt,\,\scont)}
 
-\newcommand{\WhileCondK}{\mathrm{WhileCondK}(\expr,\,\stmt,\,\env,\,\lbls,\,\clbls,\,\handler,\,\cstrace,\,\cex,\,\econt,\,\scont)}
+\newcommand{\WhileCondK}{\mathrm{WhileCondK}(\expr,\,\stmt,\,\env,\,\lbls,\,\clbls,\,\strace,\,\handler,\,\cstrace,\,\cex,\,\econt,\,\scont)}
 \newcommand{\InitializerK}[4]{\mathrm{InitializerK}({#1},\,{#2},\,{#3},\,\strace,\,\handler,\,\cstrace,\,\cex,\,{#4})}
-\newcommand{\InitK}[3]{\mathrm{InitiK}({#1},\,{#2},\,\strace,\,\handler,\,\cstrace,\,\cex,\,{#3})}
+\newcommand{\InitK}[3]{\mathrm{InitK}({#1},\,{#2},\,\strace,\,\handler,\,\cstrace,\,\cex,\,{#3})}
+\newcommand{\InitializerListK}[4]{\mathrm{InitializerListK}({#1},\,{#2},\,{#3},\,\strace,\,\handler,\,\cstrace,\,\cex,\,{#4})}
 \newcommand{\FinallyK}[1]{\mathrm{Finally}({#1},\,\env,\,\lbls,\,\clbls,\,\strace,\,\handler,\,\econt)}
 \newcommand{\FinallyReturnK}[1]{\mathrm{FinallyReturnK}({#1},\,\env,\,\lbls,\,\clbls,\,\strace,\,\handler,\,\econt)}
 
@@ -2140,7 +2141,7 @@ After the evaluation of the argument expressions for the invocation, a fresh ins
 \begin{align*}
     &\cesktrans%
         {\acontconf{\ConstructorA{\synt{Q}}{\strace}{\econt}}{\val{s}}}%
-        {\contconf{\InitK{Q}{\env}{\scont}}{!\loc}},
+        {\contconf{\InitK{\synt{Q}}{\env'}{\scont}}{!\loc}},
 \end{align*}
 
 \noindent where $\loc$ is the location of the newly allocated instance, $\val \in \dobjval$, in the store.
@@ -2159,14 +2160,14 @@ When $li$ is a redirecting initializer to target constructor $\synt{G}$, then ex
 \begin{align*}
     &\begin{multlined}
         \cesktranswheresplit%
-            {\contconf{\InitK{Q}{\env}{\scont}}{\val}}%
+            {\contconf{\InitK{\synt{Q}}{\env}{\scont}}{\val}}%
             {\evallistconf{\exprs}{\env}{\strace}{\cstrace}{\cex}{\acont}}%
             {\parbox{\textwidth-2cm}{if $Izs = RedirectingI(G, \exprs) :: []$,\\
                 where $\acont = \RedirectingA{G}{\loc}{\scont}$, $\deref{\loc} = \val$,}}
     \end{multlined}\\
     &\begin{multlined}
         \cesktranswheresplit%
-            {\contconf{\InitK{Q}{\env}{\scont}}{\val}}%
+            {\contconf{\InitK{\synt{Q}}{\env}{\scont}}{\val}}%
             {\evalconf{\expr}{\env}{st}{cex}{cst}{\econt'}}%
             {\parbox{\textwidth-2cm}{otherwise, where $fi = Initializer(\expr)$, first initializer in $Izs$,\\
                 $\econt' = \InitializerK{Izs}{\loc}{\env}{\scont}, \deref{\loc} = \val$,}}
@@ -2174,7 +2175,7 @@ When $li$ is a redirecting initializer to target constructor $\synt{G}$, then ex
     &\begin{multlined}
         \cesktranswheresplit*%
             {\acontconf{\RedirectingA{G}{\loc}{\scont}}{\val{s}}}%
-            {\contconf{\InitK{G}{\env'}{\scont}}{\deref{\loc}}}%
+            {\contconf{\InitK{\synt{G}}{\env'}{\scont}}{\deref{\loc}}}%
             {\text{where $\env' = \extend(\env_{empty}, \formals, \val{s})$}}.
     \end{multlined}
 \end{align*}
@@ -2185,7 +2186,7 @@ Let $\synt{Q}$ be a constructor with non empty initializer list, $Izs$ and a con
 \begin{align*}
     &\begin{multlined}
         \cesktranswheresplit%
-            {\contconf{\InitK{Q}{\env}{\scont}}{\val}}%
+            {\contconf{\InitK{\synt{Q}}{\env}{\scont}}{\val}}%
             {\evallistconf{\exprs}{\env}{\strace}{\cstrace}{\cex}{\acont}}%
             {\begin{aligned}
                 \text{where }   \env'  &= \ext{\env}{\synt{this}}{\deref{\loc}},\\
@@ -2232,7 +2233,7 @@ If the initializer list contains at least two initializers, $Izs = Ininitalizer(
         \cesktranswheresplit%
             {\acontconf{\FieldsA{\env}{Izs}{\loc}{\scont}}{\val{s}}}%
             {\evalconf{\expr}{\env}{st}{cex}{cst}{\econt'}}
-            {\text{where $\deref{\deref{\loc[f_i]}} = \val_{i}$, $\forall f_i \in Fs, \forall \val_i \in \val{s}$, $\econt' = \InitK{Izs}{\loc}{\env}$}}.
+            {\text{where $\deref{\deref{\loc[f_i]}} = \val_{i}$, $\forall f_i \in Fs, \forall \val_i \in \val{s}$, $\econt' = \InitializerListK{Izs}{\loc}{\env}{\scont}$}}.
     \end{multlined}
 \end{align*}
 
@@ -2267,13 +2268,13 @@ The transition steps for initializer continuation are as follows:
 \begin{align*}
     &\begin{multlined}
         \cesktranswheresplit%
-            {\contconf{\InitK{Local(\variablemeta, \expr) :: []}{\loc}{\scont}}{\val}}%
+            {\contconf{\InitializerListK{Local(\variablemeta, \expr) :: []}{\env}{\loc}{\scont}}{\val}}%
             {\scontconf{\scont}{\env'}}%
             {\text{where $\env' = \ext{\env}{\variablemeta}{\val}$}},
     \end{multlined}\\
     &\begin{multlined}
         \cesktranswheresplit*%
-            {\contconf{\InitK{Local(\variablemeta, \expr) :: li :: []}{\loc}{\scont}}{\val}}%
+            {\contconf{\InitializerListK{Local(\variablemeta, \expr) :: li :: []}{\env}{\loc}{\scont}}{\val}}%
             {\evallistconf{\exprs}{\env'}{\strace}{\cstrace}{\cex}{\acont}}%
             {\begin{aligned}
                 \text{where }   \env' &= \ext{\env}{\variablemeta}{\val},\\
@@ -2283,10 +2284,10 @@ The transition steps for initializer continuation are as follows:
     \end{multlined}\\
     &\begin{multlined}
         \cesktranswheresplit%
-            {\contconf{\InitK{Local(\variablemeta, \expri{0}) :: Izs}{\loc}{\scont}}{\val}}%
+            {\contconf{\InitializerListK{Local(\variablemeta, \expri{0}) :: Izs}{\env}{\loc}{\scont}}{\val}}%
             {\evalconf{\expri{1}}{\env'}{st}{cex}{cst}{\econt'}}%
             {\parbox{\textwidth-2cm}{where $\env' = \ext{\env}{\variablemeta}{\val}$, $Izs = Initializer(\expri{1}) :: Izs'$,\\
-                $\econt' = \InitK{Izs}{\loc}{\env'}$}}
+                $\econt' = \InitializerListK{Izs}{\env'}{\loc}{\scont}$}}
     \end{multlined}
 \end{align*}
 
@@ -2299,13 +2300,13 @@ Then the value stored at location $\loc' = (\deref{\loc})[f]$ in the store $S$ w
 \begin{align*}
     &\begin{multlined}
         \cesktranswheresplit%
-            {\contconf{\InitK{Field(f, \expr) :: []}{\loc}{\scont}}{\val}}%
+            {\contconf{\InitK{Field(f, \expr) :: []}{\env}{\loc}{\scont}}{\val}}%
             {\scontconf{\scont}{\env'}}%
             {\text{where $\update{(\deref{\loc})[f]}{\val}$,}}
     \end{multlined}\\
     &\begin{multlined}
         \cesktranswheresplit*%
-            {\contconf{\InitK{Field(f, \expr) :: li :: []}{\loc}{\scont}}{\val}}%
+            {\contconf{\InitK{Field(f, \expr) :: li :: []}{\env}{\loc}{\scont}}{\val}}%
             {\evallistconf{\exprs}{\env}{\strace}{\cstrace}{\cex}{\acont}}%
             {\parbox{\textwidth-2cm}{%
                 where $\update{(\deref{\loc})[f]}{\val}$,\\
@@ -2314,9 +2315,9 @@ Then the value stored at location $\loc' = (\deref{\loc})[f]$ in the store $S$ w
     \end{multlined}\\
     &\begin{multlined}
         \cesktranswheresplit%
-            {\contconf{\InitK{Field(f, \expri{0}) :: Izs}{\loc}{\scont}}{\val}}%
+            {\contconf{\InitializerListK{Field(f, \expri{0}) :: Izs}{\env}{\loc}{\scont}}{\val}}%
             {\evalconf{\expri{1}}{\env}{st}{cex}{cst}{\econt}}%
-            {\text{where $\update{(\deref\loc)[f]}{\val}$, $Izs = Initializer(\expri{1}) :: Izs'$, $\econt' = \InitK{Izs}{\loc}{\env}$}}
+            {\text{where $\update{(\deref\loc)[f]}{\val}$, $Izs = Initializer(\expri{1}) :: Izs'$, $\econt' = \InitializerListK{Izs}{\env}{\loc}{\scont}$}}
     \end{multlined}
 \end{align*}
 
@@ -2463,9 +2464,10 @@ Then the value stored at location $\loc' = (\deref{\loc})[f]$ in the store $S$ w
         \end{multlined}
         \label{econtconf:while-false}\\
         &\begin{multlined}
-              \cesktranssplit%
+              \cesktranswheresplit*%
                   {\contconf{\WhileCondK}{\true}}%
                   {\execconf{\stmt}{\env}{\lbls}{\clbls}{\strace}{\handler}{\cstrace,\,\cex}{\econt}{\scont'}}
+                  {\text{where $\scont' = \WhileCondK$}}
         \end{multlined}
         \label{econtconf:while-true}\\
         &\cesktrans%
@@ -2759,7 +2761,7 @@ $\synt{try/finally}$ statements execute their body with a new handler and additi
 &\scont' = \FinallySK{\stmti{1}},\\
 &\begin{multlined}
     \lbls' = \lbrace \mathrm{Label}(L, \bcont') \mid \mathrm{Label}(L, \bcont) \in \lbls\rbrace,\\
-    \bcont = \FinallyBreak{\stmti{1}}{\bcont},
+    \bcont' = \FinallyBreak{\stmti{1}}{\bcont},
 \end{multlined}\\
 &\begin{multlined}
     \clbls' =  \lbrace \continuel{C}{\switchcont'} \mid  \continuel{C}{\switchcont} \in \clbls\rbrace,\\
