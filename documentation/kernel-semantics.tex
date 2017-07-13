@@ -564,44 +564,44 @@ The different expression continuations are shown in Figure~\ref{figure:econts}.
 \newcommand{\ExceptionHandlersRest}{\handler,\,\cstrace,\,\cex}
 \newcommand{\ExceptionHandlers}{\strace,\,\handler,\,\cstrace,\,\cex}
 % Continuations
-\newcommand{\VarSetK}[3]{\mathrm{VarSetK}({#1},\,{#2},\,{#3})}
-\newcommand{\ExpressionsK}[3]{\mathrm{ExpressionsK}({#1},\,{#2},\,\ExceptionHandlers,\,{#3})}
+\newcommand{\VarSetK}[3]{\mathrm{VarSetEK}({#1},\,{#2},\,{#3})}
+\newcommand{\ExpressionsK}[3]{\mathrm{ExpressionsEK}({#1},\,{#2},\,\ExceptionHandlers,\,{#3})}
 
-\newcommand{\NotK}[1]{\mathrm{NotK}({#1})}
-\newcommand{\AndK}[3]{\mathrm{AndK}({#1},\,{#2},\,\ExceptionHandlers,\,{#3})}
-\newcommand{\OrK}[3]{\mathrm{OrK}({#1},\,{#2},\,\ExceptionHandlers,\,{#3})}
-\newcommand{\ConditionalK}[4]{\mathrm{ConditionalK}({#1},\,{#2},\,{#3},\,\ExceptionHandlers,\,{#4})}
+\newcommand{\NotK}[1]{\mathrm{NotEK}({#1})}
+\newcommand{\AndK}[3]{\mathrm{AndEK}({#1},\,{#2},\,\ExceptionHandlers,\,{#3})}
+\newcommand{\OrK}[3]{\mathrm{OrEK}({#1},\,{#2},\,\ExceptionHandlers,\,{#3})}
+\newcommand{\ConditionalK}[4]{\mathrm{ConditionalEK}({#1},\,{#2},\,{#3},\,\ExceptionHandlers,\,{#4})}
 
-\newcommand{\LetK}[4]{\mathrm{LetK}({#1},\,{#2},\,{#3},\,\ExceptionHandlers,\,{#4})}
+\newcommand{\LetK}[4]{\mathrm{LetEK}({#1},\,{#2},\,{#3},\,\ExceptionHandlers,\,{#4})}
 
-\newcommand{\IsExpressionK}{\mathrm{IsExpressionK}(\tt{T},\,\econt)}
-\newcommand{\AsExpressionK}{\mathrm{AsExpressionK}(\tt{T},\,\strace,\,\handler,\,\econt)}
+\newcommand{\IsExpressionK}{\mathrm{IsExpressionEK}(\tt{T},\,\econt)}
+\newcommand{\AsExpressionK}{\mathrm{AsExpressionEK}(\tt{T},\,\strace,\,\handler,\,\econt)}
 
-\newcommand{\StaticGetK}{\mathrm{StaticGetK}(\membermeta,\,\econt)}
-\newcommand{\StaticSetK}{\mathrm{StaticSetK}(\membermeta,\,\econt)}
-\newcommand{\PropertyGetK}{\mathrm{PropertyGetK}(\idmeta,\,\ExceptionHandlers,\,\econt)}
-\newcommand{\PropertySetK}{\mathrm{PropertySetK}(\idmeta,\,\expressionmeta_1,\,\env,\,\ExceptionHandlers,\,\econt)}
-\newcommand{\PropertySetVK}{\mathrm{PropertySetValueK}(\val_0,\,\idmeta,\,\ExceptionHandlers,\,\econt)}
-\newcommand{\DPropertyGetK}{\mathrm{DPropertyGetK}(\membermeta,\,\ExceptionHandlers,\,\econt)}
-\newcommand{\DirectPropertySetK}{\mathrm{DPropertySetK}(\membermeta,\,\expressionmeta_1,\,\env,\,\ExceptionHandlers,\,\econt)}
-\newcommand{\DPropertySetVK}{\mathrm{DPropertySetValueK}(\val_0,\,\membermeta,\,\ExceptionHandlers,\,\econt)}
-\newcommand{\SuperPropertySetK}{\mathrm{SuperPropertySetK}(\idmeta,\,\env,\,\ExceptionHandlers,\,\econt)}
+\newcommand{\StaticGetK}{\mathrm{StaticGetEK}(\membermeta,\,\econt)}
+\newcommand{\StaticSetK}{\mathrm{StaticSetEK}(\membermeta,\,\econt)}
+\newcommand{\PropertyGetK}{\mathrm{PropertyGetEK}(\idmeta,\,\ExceptionHandlers,\,\econt)}
+\newcommand{\PropertySetK}{\mathrm{PropertySetEK}(\idmeta,\,\expressionmeta_1,\,\env,\,\ExceptionHandlers,\,\econt)}
+\newcommand{\PropertySetVK}{\mathrm{PropertySetValueEK}(\val_0,\,\idmeta,\,\ExceptionHandlers,\,\econt)}
+\newcommand{\DPropertyGetK}{\mathrm{DPropertyGetEK}(\membermeta,\,\ExceptionHandlers,\,\econt)}
+\newcommand{\DirectPropertySetK}{\mathrm{DPropertySetEK}(\membermeta,\,\expressionmeta_1,\,\env,\,\ExceptionHandlers,\,\econt)}
+\newcommand{\DPropertySetVK}{\mathrm{DPropertySetValueEK}(\val_0,\,\membermeta,\,\ExceptionHandlers,\,\econt)}
+\newcommand{\SuperPropertySetK}{\mathrm{SuperPropertySetEK}(\idmeta,\,\env,\,\ExceptionHandlers,\,\econt)}
 
 \newcommand{\InstanceMethodK}[1]{\mathrm{InstanceMethodK(\expressionsmeta,\,\idmeta,\,\env,\,#1,\,\ExceptionHandlersRest,\,\econt)}}
-\newcommand{\DInstanceMethodK}[1]{\mathrm{DInstanceMethodK}(\expressionsmeta,\,\membermeta,\,\env,\,#1,\,\ExceptionHandlersRest,\,\econt)}
-\newcommand{\VarDeclK}[3]{\mathrm{VarDeclarationK}({#1},\,{#2},\,{#3})}
-\newcommand{\IfCondK}[2]{\mathrm{IfConditionK}({#1},\,{#2},\,\env,\,\lbls,\,\clbls,\,\handler,\,\cstrace,\,\cex,\,\econt,\,\scont)}
-\newcommand{\SwitchK}[2]{\mathrm{SwitchK}({#1},\,\env,\,\lbls,\,{#2},\,\strace,\,\handler,\,\cstrace,\,\cex,\,\econt,\,\scont)}
+\newcommand{\DInstanceMethodK}[1]{\mathrm{DInstanceMethodEK}(\expressionsmeta,\,\membermeta,\,\env,\,#1,\,\ExceptionHandlersRest,\,\econt)}
+\newcommand{\VarDeclK}[3]{\mathrm{VarDeclarationEK}({#1},\,{#2},\,{#3})}
+\newcommand{\IfCondK}[2]{\mathrm{IfConditionEK}({#1},\,{#2},\,\env,\,\lbls,\,\clbls,\,\handler,\,\cstrace,\,\cex,\,\econt,\,\scont)}
+\newcommand{\SwitchK}[2]{\mathrm{SwitchEK}({#1},\,\env,\,\lbls,\,{#2},\,\strace,\,\handler,\,\cstrace,\,\cex,\,\econt,\,\scont)}
 
-\newcommand{\WhileCondK}{\mathrm{WhileCondK}(\expr,\,\stmt,\,\env,\,\lbls,\,\clbls,\,\strace,\,\handler,\,\cstrace,\,\cex,\,\econt,\,\scont)}
-\newcommand{\InitializerK}[4]{\mathrm{InitializerK}({#1},\,{#2},\,{#3},\,\strace,\,\handler,\,\cstrace,\,\cex,\,{#4})}
-\newcommand{\InitK}[3]{\mathrm{InitK}({#1},\,{#2},\,\strace,\,\handler,\,\cstrace,\,\cex,\,{#3})}
-\newcommand{\InitializerListK}[4]{\mathrm{InitializerListK}({#1},\,{#2},\,{#3},\,\strace,\,\handler,\,\cstrace,\,\cex,\,{#4})}
-\newcommand{\FinallyK}[1]{\mathrm{Finally}({#1},\,\env,\,\lbls,\,\clbls,\,\strace,\,\handler,\,\econt)}
-\newcommand{\FinallyReturnK}[1]{\mathrm{FinallyReturnK}({#1},\,\env,\,\lbls,\,\clbls,\,\strace,\,\handler,\,\econt)}
+\newcommand{\WhileCondK}{\mathrm{WhileCondEK}(\expr,\,\stmt,\,\env,\,\lbls,\,\clbls,\,\strace,\,\handler,\,\cstrace,\,\cex,\,\econt,\,\scont)}
+\newcommand{\InitializerK}[4]{\mathrm{InitializerEK}({#1},\,{#2},\,{#3},\,\strace,\,\handler,\,\cstrace,\,\cex,\,{#4})}
+\newcommand{\InitK}[3]{\mathrm{InitEK}({#1},\,{#2},\,\strace,\,\handler,\,\cstrace,\,\cex,\,{#3})}
+\newcommand{\InitializerListK}[4]{\mathrm{InitializerListEK}({#1},\,{#2},\,{#3},\,\strace,\,\handler,\,\cstrace,\,\cex,\,{#4})}
+\newcommand{\FinallyK}[1]{\mathrm{FinallyEK}({#1},\,\env,\,\lbls,\,\clbls,\,\strace,\,\handler,\,\econt)}
+\newcommand{\FinallyReturnK}[1]{\mathrm{FinallyReturnEK}({#1},\,\env,\,\lbls,\,\clbls,\,\strace,\,\handler,\,\econt)}
 
-\newcommand{\ForCondK}{\mathrm{ForCondK}(\mathrm{\varmeta{s}},\, \expressionmeta,\, \exprs,\, \statementmeta,\, \env,\, \env',\, \lbls,\, \clbls,\, \handler,\, \cstrace,\, \cex,\, \econt,\, \scont)}
-\newcommand{\ExpressionK}[2]{\mathrm{ExpressionK}({#1},\,{#2})}
+\newcommand{\ForCondK}{\mathrm{ForConditionEK}(\mathrm{\varmeta{s}},\, \expressionmeta,\, \exprs,\, \statementmeta,\, \env,\, \env',\, \lbls,\, \clbls,\, \handler,\, \cstrace,\, \cex,\, \econt,\, \scont)}
+\newcommand{\ExpressionK}[2]{\mathrm{ExpressionEK}({#1},\,{#2})}
 \begin{figure}[Htp]
   \begin{eqfigure}
   \begin{align}
