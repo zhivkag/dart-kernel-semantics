@@ -19,6 +19,7 @@
 \usepackage{geometry}
 \usepackage{mdframed}
 \usepackage[textsize=tiny]{todonotes}
+\usepackage{mathrsfs}
 
 \definecolor{shade}{gray}{0.75}
 \newcommand{\shadethis}[1]{\colorbox{shade}%
@@ -185,7 +186,7 @@ Still, this paper aims to be as accessible as possible, so most concepts that ar
 
 \subsubsection{Abstract Syntax}
 
-The abstract syntax of \kernel{} is slightly unusual in that it does not correspond to a concrete, textual syntax.
+The abstract syntax of \kernel{} is slightly unusual in that it does not have a tree structure or relate to any concrete, textual syntax.
 It is instead a description of the data structures used by the \textsc{Dart} compliation toolchain, which are represented as directed acyclic graph.
 The semantics depends heavily on the use of ``pointer'' equality between nodes in the syntax graph, which is more fine-grained than structural equality.
 For example, a single \kernel{} program may have several syntax nodes that each define and initialize a variable with the same name and value, even in the same scope.
@@ -200,28 +201,44 @@ Some states of the machine have no outgoing transitions, corresponding to undefi
 
 \subsubsection{CESK Machine}
 
-The abstract machine is presented as a CESK machine. \todo{dmitryas: add citation for CESK machine}
-Most configurations of the CESK machine carry an environment, which maps variable declarations in the present scope to their current assignments, a store, which models the mutable object store in which all objects in a Dart program live, and a continuation, which captures the work to be done after the current operation is complete, i.e. a chain of call frames above the current frame.
-In this way state of the CESK machine mimics states of the Dart VM at a very abstract level.
-
-\section{Definitions}
-\label{sec:definitions}
+The abstract machine is presented in the style of a CESK machine. \todo{dmitryas: add citation for CESK machine}
+The state space of the CESK machine is grouped into several configurations, most of which carry an environment, which maps variable declarations in the present scope to their current assignments, a store, which models the mutable object store in which all objects in a \textsc{Dart} program live, and a continuation, which captures the work to be done after the current operation is complete, i.e. a chain of call frames above the current frame.
+In this way states of the cesk machine mimic states of the \textsc{Dart} virtual machine at a very abstract level.
 
 \subsection{Conventions}
 \label{subsec:conventions}
 
 \begin{itemize}
-    \item Symbols ``:'' and ``$\in$'' are used interchangeably.
-    \item Names of variables are italicized.
-    \item Names of variables of syntactic domains start with an upper case letter.
-    \item Names of domains are written in bold (e.g. ``$\mathbf{X}$'').
-    \item Names of continuation kinds are written in normal text (e.g. VarSetK).
-    \item Names of meta-functions start with lower case letter (e.g. $\extend$).
+    \item The symbols ``:'' (type-of) and ``$\in$'' (element-of) are used interchangeably.
+    \item The names of variables are italicized.
+    \item The names of variables within a domain start with an upper case letter.
+    \item The names of domains (meta-types defined in this paper) are written in bold (e.g. ``$\mathbf{Expr}$'').
+    \item The names of the different kinds of continuations are written in normal text (e.g. VarSetK).
+    \item The names of meta-functions start with lower case letter (e.g. $\extend$).
     \item ``$\mlist{\mathbf{X}}$'' denotes the domain of meta-lists of elements from domain ``$\mathbf{X}$''.
         Note that the word ``List'' here is not in bold, so that it isn't confused with the domain $\mathbf{List}$ of Dart objects.
+        \todo{sjindel: Why is this a domain?}
 \end{itemize}
 \todo{dmitryas: Explain notation for Kernel syntactic constructs like "on T catch (e, s)".}
 
+\subsection{Notations}
+\label{subsec:notations}
+
+\begin{align*}
+    [] &\text{ --- empty list}.\\
+    X :: \textit{list} &\text{ --- a meta-list that is constructed by adding element $X$ to the head of the meta-list \textit{list}}.
+\end{align*}
+
+\section{Syntax}
+\label{sec:definitions}
+
+\subsection{Locations}
+\newcommand{\dlocation}{\mathbf{Location}}
+\newcommand{\loc}{\ensuremath{\alpha}}
+
+The object store is indexed by elements $\loc$ from the domain $\dlocation$.
+This domain is countably infinite, and we assume that we can generate fresh values from the domain within the abstract machine.
+It could be represented by natural numbers, for example, but arithmetic on locations is not meaningful.
 
 \subsection{Domains}
 \label{subsec:domains}
@@ -236,9 +253,9 @@ In this way state of the CESK machine mimics states of the Dart VM at a very abs
 \newcommand{\stmts}{\stmt\ensuremath{\mathit{s}}}
 
 \newcommand{\handler}{\ensuremath{\mathit{H}}}
-\newcommand{\strace}{\ensuremath{st}}
-\newcommand{\cstrace}{\ensuremath{c}\strace}
-\newcommand{\cex}{\ensuremath{cex}}
+\newcommand{\strace}{\ensuremath{\textit{st}}}
+\newcommand{\cstrace}{\ensuremath{\textit{cst}}}
+\newcommand{\cex}{\ensuremath{\textit{cex}}}
 
 \newcommand{\scase}{\mathit{SC}}
 \newcommand{\scases}{\scase\ensuremath{\mathit{s}}}
@@ -247,18 +264,17 @@ In this way state of the CESK machine mimics states of the Dart VM at a very abs
 
 \newcommand{\vals}{\ensuremath{vs}}
 \newcommand{\env}{\ensuremath{\rho}}
-\newcommand{\loc}{\ensuremath{\alpha}}
 
-\newcommand{\lbl}{\ensuremath{lbl}}
-\newcommand{\lbls}{\ensuremath{lbls}}
-\newcommand{\clbl}{\ensuremath{clbl}}
-\newcommand{\clbls}{\ensuremath{clbls}}
+\newcommand{\lbl}{\ensuremath{\textit{lbl}}}
+\newcommand{\lbls}{\ensuremath{\textit{lbls}}}
+\newcommand{\clbl}{\ensuremath{\textit{clbl}}}
+\newcommand{\clbls}{\ensuremath{\textit{clbls}}}
 
 \newcommand{\econt}{\cont_\ensuremath{E}}
 \newcommand{\acont}{\cont_\ensuremath{A}}
 \newcommand{\scont}{\cont_\ensuremath{S}}
 \newcommand{\bcont}{\cont_\ensuremath{B}}
-\newcommand{\switchcont}{\cont_{\ensuremath{switch}}}
+\newcommand{\switchcont}{\cont_{\ensuremath{\textit{switch}}}}
 
 \newcommand{\funval}[3]{\mathrm{FunctionValue}({#1},\,{#2},\,{#3})}
 \newcommand{\objval}{\mathrm{ObjectValue}(class, fields)}
@@ -282,7 +298,6 @@ In this way state of the CESK machine mimics states of the Dart VM at a very abs
 \newcommand{\dclbl}{\mathbf{SwitchLabel}}
 
 \newcommand{\denv}{\mathbf{Env}}
-\newcommand{\dlocation}{\mathbf{Location}}
 
 \newcommand{\dval}{\mathbf{Value}}
 \newcommand{\dvardecl}{\mathbf{VariableDeclaration}}
@@ -326,7 +341,7 @@ In this way state of the CESK machine mimics states of the Dart VM at a very abs
     \strace
     & : & \mlist{\dexpr} & \text{domain of stack traces}\\
     \cex
-    & : &  \emptyset + \dval & \text{domain of current expetion values}\\
+    & : &  \emptyset + \dval & \text{domain of current exception values}\\
     \cstrace
     & : & \emptyset + \mlist{\dexpr} & \text{domain of current exception stack traces}\\
 
@@ -365,16 +380,6 @@ In this way state of the CESK machine mimics states of the Dart VM at a very abs
 % Metavariables for statements
 \newcommand{\statementmeta}{\ensuremath{\mathit{\stmt}}}
 \newcommand{\labelmeta}{\ensuremath{\mathit{\tt{L}}}}
-
-
-\subsection{Notations}
-\label{subsec:notations}
-
-\begin{align*}
-    [] &\text{ --- empty list}.\\
-    X :: list &\text{ --- a meta-list that is constructed by adding element $X$ to the head of the meta-list $list$}.
-\end{align*}
-
 
 \subsection{Store}
 \label{subsec:store-definition}
@@ -447,14 +452,14 @@ A variable lookup consists of looking up the location of a variable from the env
 For definition of ``$\deref$'' see Section~\ref{subsubsection:dereferecing}.
 
 
-\section{Values}
+\subsection{Values}
 \label{sec:values}
 
 The values supported by Dart Kernel are $\tt{literal}$ values (Section~\ref{subsec:literal-values}) and $\tt{object}$ values (Section~\ref{subsec:object-values}).
 Values are irreducible terms, i.e, results of evaluation of expressions.
 
 
-\subsection{Literal values}
+\subsubsection{Literal values}
 \label{subsubsec:literal-values}
 
 Literal values are special values that store the specific payload and an associated class.
@@ -470,7 +475,7 @@ Literal values are special values that store the specific payload and an associa
 Each of the specific literal values contains predefined operators and/or methods, whose semantics we are not going to specify in this document.
 
 
-\subsection{Object values}
+\subsubsection{Object values}
 \label{subsec:object-values}
 
 Object values have a $\tt{class}$ component and a $\tt{fields}$ component which is list of locations for each field, as shown below:
@@ -503,7 +508,7 @@ Let $\loc$ be the location of field $fName$ for the object value $\val_0$:
 This implies that invocation of implicit setter will modify the global store and  $\deref{\loc} = \val_1$ will hold after the transition.
 
 
-\subsection{Class}
+\subsubsection{Class}
 \label{subsec:class}
 
 A $\tt{class} \in \dclass$ captures the different properties for a defined class in Dart Kernel.
@@ -561,7 +566,7 @@ A method lookup searches for an instance method in the given class given the nam
 \end{align*}
 
 
-\subsection{Function values}
+\subsubsection{Function values}
 \label{subsec:function-values}
 \todo{add async marker, type parameters, return type to FunctionValue}
 \[
@@ -569,11 +574,7 @@ A method lookup searches for an instance method in the given class given the nam
 \]
 
 
-\section{Abstract Syntax}
-\label{sec:abstract-syntax}
-
-
-\subsubsection{Expressions}
+\subsection{Expressions}
 \label{sec:expr-syntax}
 
 
