@@ -18,7 +18,7 @@
 \usepackage[fleqn]{mathtools}
 \usepackage{geometry}
 \usepackage{mdframed}
-
+\usepackage[textsize=tiny]{todonotes}
 
 \definecolor{shade}{gray}{0.75}
 \newcommand{\shadethis}[1]{\colorbox{shade}%
@@ -177,8 +177,8 @@ This paper documents the syntax and operational semantics of \textsc{Dart Kernel
 \section{Forward}
 
 \subsection{Audience}
-This paper is targeted toward compiler and framework authors and academics.
-The reader should have a proficient understanding of basic concepts in programming language design and implementation, such abstract syntax, intermediate representations and operational semantics.
+This paper is intended for compiler and framework authors and academics.
+The reader should have a proficient understanding of basic concepts in programming language design and implementation, such as abstract syntax, intermediate representations and operational semantics.
 Still, this paper aims to be as accessible as possible, so most concepts that are not familiar to an advanced \textsc{Dart} programmer will be explained in sufficient detail to understand the formalizations here.
 
 \subsection{Formalization Style}
@@ -194,10 +194,15 @@ Presenting the abstract syntax in this manner not only models the \kernel{} impl
 
 \subsubsection{Small-step Operational Semantics}
 
+The operational semantics of \kernel{} are given in ``small-step'' style, where each rule of the semantics corresponds to a simple transition from one state of an abstract machine to another.
+The rules are not nested or recursive, and only specify one possible outgoing transition from any state.
+Some states of the machine have no outgoing transitions, corresponding to undefined operations like out-of-bounds vector access.
+
 \subsubsection{CESK Machine}
 
-%% The small-step operational semantics of Dart Kernel is given by an abstract machine in the style of the CESK machine. % TODO(dmitryas): Put \cite{cesk} here when we have bibliography.
-%% The machine is defined by a single step transition function where each step of the machine starts in a configuration and deterministically gives the next configuration.
+The abstract machine is presented as a CESK machine. \todo{dmitryas: add citation for CESK machine}
+Most configurations of the CESK machine carry an environment, which maps variable declarations in the present scope to their current assignments, a store, which models the mutable object store in which all objects in a Dart program live, and a continuation, which captures the work to be done after the current operation is complete, i.e. a chain of call frames above the current frame.
+In this way state of the CESK machine mimics states of the Dart VM at a very abstract level.
 
 \section{Definitions}
 \label{sec:definitions}
