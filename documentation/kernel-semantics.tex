@@ -18,7 +18,7 @@
 \usepackage[fleqn]{mathtools}
 \usepackage{geometry}
 \usepackage{mdframed}
-
+\usepackage[textsize=tiny]{todonotes}
 
 \definecolor{shade}{gray}{0.75}
 \newcommand{\shadethis}[1]{\colorbox{shade}%
@@ -28,6 +28,8 @@
 % Macros used below have been contributed in part by Olivier Danvy and Kevin Millikin
 \input{danvy-millikin-LMCS.mac}
 
+% Shorthard for ``Dart Kernel'' in small caps
+\newcommand{\kernel}{\textsc{Dart Kernel}}
 
 % A bit nicer symbol: ∅
 \renewcommand{\emptyset}{\varnothing}
@@ -175,20 +177,32 @@ This paper documents the syntax and operational semantics of \textsc{Dart Kernel
 \section{Forward}
 
 \subsection{Audience}
-
-This paper is targeted toward compiler authors, framework authors and academics.
-The reader should have a proficient understanding of basic concepts in programming language design and implementation, such abstract syntax, intermediate representations and operational semantics.
-Still, this paper aims to be as accessible as possible, so most concepts that are not familiar to an average \textsc{Dart} programmer will be explained in sufficient detail to understand the formalizations here.
-
-\subsection{Dart Kernel}
-The small-step operational
-semantics of Dart Kernel is given by an abstract machine in the style of the
-CESK machine. % TODO(dmitryas): Put \cite{cesk} here when we have bibliography.
-The machine is defined by a single step transition function where each step of
-the machine starts in a configuration and deterministically gives the next
-configuration.
+This paper is intended for compiler and framework authors and academics.
+The reader should have a proficient understanding of basic concepts in programming language design and implementation, such as abstract syntax, intermediate representations and operational semantics.
+Still, this paper aims to be as accessible as possible, so most concepts that are not familiar to an advanced \textsc{Dart} programmer will be explained in sufficient detail to understand the formalizations here.
 
 \subsection{Formalization Style}
+
+\subsubsection{Abstract Syntax}
+
+The abstract syntax of \kernel{} is slightly unusual in that it does not correspond to a concrete, textual syntax.
+It is instead a description of the data structures used by the \textsc{Dart} compliation toolchain, which are represented as directed acyclic graph.
+The semantics depends heavily on the use of ``pointer'' equality between nodes in the syntax graph, which is more fine-grained than structural equality.
+For example, a single \kernel{} program may have several syntax nodes that each define and initialize a variable with the same name and value, even in the same scope.
+A later assignment to the variable will disambiguate between these declarations by referring to the specific variable declaration node by pointer identity.
+Presenting the abstract syntax in this manner not only models the \kernel{} implementation more accurately, but allows us to ignore complications with variable renaming, shadowing and $\alpha$-conversion.
+
+\subsubsection{Small-step Operational Semantics}
+
+The operational semantics of \kernel{} are given in ``small-step'' style, where each rule of the semantics corresponds to a simple transition from one state of an abstract machine to another.
+The rules are not nested or recursive, and only specify one possible outgoing transition from any state.
+Some states of the machine have no outgoing transitions, corresponding to undefined operations like out-of-bounds vector access.
+
+\subsubsection{CESK Machine}
+
+The abstract machine is presented as a CESK machine. \todo{dmitryas: add citation for CESK machine}
+Most configurations of the CESK machine carry an environment, which maps variable declarations in the present scope to their current assignments, a store, which models the mutable object store in which all objects in a Dart program live, and a continuation, which captures the work to be done after the current operation is complete, i.e. a chain of call frames above the current frame.
+In this way state of the CESK machine mimics states of the Dart VM at a very abstract level.
 
 \section{Definitions}
 \label{sec:definitions}
@@ -206,7 +220,7 @@ configuration.
     \item ``$\mlist{\mathbf{X}}$'' denotes the domain of meta-lists of elements from domain ``$\mathbf{X}$''.
         Note that the word ``List'' here is not in bold, so that it isn't confused with the domain $\mathbf{List}$ of Dart objects.
 \end{itemize}
-% TODO(dmitryas): Explain notation for Kernel syntactic constructs like "on T catch (e, s)".
+\todo{dmitryas: Explain notation for Kernel syntactic constructs like "on T catch (e, s)".}
 
 
 \subsection{Domains}
@@ -337,6 +351,21 @@ configuration.
   \end{array}
 \]
 
+% Metavariables
+\newcommand{\expressionmeta}{\ensuremath{\mathit{E}}}
+\newcommand{\expressionsmeta}{\expressionmeta{s}}
+\newcommand{\variablemeta}{\ensuremath{\mathit{X}}}
+\newcommand{\boolmeta}{\ensuremath{\mathit{B}}}
+\newcommand{\integermeta}{\ensuremath{\mathit{I}}}
+\newcommand{\doublemeta}{\ensuremath{\mathit{D}}}
+\newcommand{\stringmeta}{\ensuremath{\mathit{S}}}
+\newcommand{\idmeta}{\ensuremath{\mathit{X}}}
+\newcommand{\membermeta}{\ensuremath{\mathit{M}}}
+\newcommand{\typemeta}{\ensuremath{\mathit{T}}}
+% Metavariables for statements
+\newcommand{\statementmeta}{\ensuremath{\mathit{\stmt}}}
+\newcommand{\labelmeta}{\ensuremath{\mathit{\tt{L}}}}
+
 
 \subsection{Notations}
 \label{subsec:notations}
@@ -418,6 +447,299 @@ A variable lookup consists of looking up the location of a variable from the env
 For definition of ``$\deref$'' see Section~\ref{subsubsection:dereferecing}.
 
 
+\section{Values}
+\label{sec:values}
+
+The values supported by Dart Kernel are $\tt{literal}$ values (Section~\ref{subsec:literal-values}) and $\tt{object}$ values (Section~\ref{subsec:object-values}).
+Values are irreducible terms, i.e, results of evaluation of expressions.
+
+
+\subsection{Literal values}
+\label{subsubsec:literal-values}
+
+Literal values are special values that store the specific payload and an associated class.
+The different literal values are presented below:
+\[
+  \begin{array}{lcl}
+    \val \in \dlitval &=& \mathbf{int} + \mathbf{bool} + \mathbf{double}\\
+    && + \mathbf{List} + \mathbf{Map} + \mathbf{String} + \mathbf{Symbol} + \mathbf{Type}.
+  \end{array}
+\]
+
+Literal values are special values that store the specific payload and an associated class.
+Each of the specific literal values contains predefined operators and/or methods, whose semantics we are not going to specify in this document.
+
+
+\subsection{Object values}
+\label{subsec:object-values}
+
+Object values have a $\tt{class}$ component and a $\tt{fields}$ component which is list of locations for each field, as shown below:
+\[
+    \dobjval : \dclass \times \mlist{\dlocation}.
+\]
+
+The $\tt{class}$ component captures the properties of the object, see Section~\eqref{subsec:class}.
+The object also stores a list of locations that represent the values of the fields for the given object.
+An object is mutated by modifying a field.
+A field is modified by changing the value stored at the location for the said field in the list of locations for the given object.
+Access and modification of fields is enabled with implicit getters and setters defined in the associated class component.
+Each field has an associated implicit getter, as defined below.
+Let $\loc$ be the location of field with name $fName$ for the object value $\val_0$:
+\begin{align*}
+  \getter \in \dobjval \times \mathbf{Name} &\rightarrow \dval\\
+  \getter(\val_0, fName) &= \val_1,
+\end{align*}
+
+\noindent where $\val_1 = \deref{\loc}$.
+
+Each non-final field has an associated implicit setter, as defined below.
+Let $\loc$ be the location of field $fName$ for the object value $\val_0$:
+\begin{align*}
+  \setter \in \dobjval \times \mathbf{Name} \times \dval &\rightarrow \dval\\
+  \setter(\val_0, fName, \val_1) &= \val_1,
+\end{align*}
+
+\noindent where $\val_1$ is the value to be stored in $\loc$ after the invocation of the implicit setter.
+This implies that invocation of implicit setter will modify the global store and  $\deref{\loc} = \val_1$ will hold after the transition.
+
+
+\subsection{Class}
+\label{subsec:class}
+
+A $\tt{class} \in \dclass$ captures the different properties for a defined class in Dart Kernel.
+
+\begin{align}
+\notag
+\dclass &\in \tt{superclass} \times \tt{interfaces} \times \tt{fieldGetters}\\\notag
+&\times \tt{fieldSetters} \times \tt{getters} \times \tt{setters} \times \tt{methods}
+\end{align}
+
+The different components of $\tt{class}$ capture the following properties:
+
+\begin{itemize}
+    \item $\tt{superclass}$\\
+        The class component captures the immediate superclass and we allow access to it in the different continuations in various steps defined below.
+
+    \item $\tt{interfaces}$\\
+        % TBD
+
+    \item $\tt{fieldGetters}$, $\tt{fieldSetters}$\\
+        The $\tt{fieldGetters}$ and $\tt{fieldSetters}$ components capture the functions allowing access to field members of the current class and the superclasses recursively.
+        The layout of the field members starts with the first field of the superclass highest in the class hierarchy and is continuous.
+        We create implicit getters for all instance fields and setters for all non-final instance fields.
+        For definition of implicit getters and setters see Section~\ref{subsec:object-values}.\\
+        To enable proper direct field member access, we create implicit getters and setters bound to the members also, not only the names.
+        Using only the identifier of the member for lookup of a direct member access is problematic because of possible overwrite of a member.
+
+    \item $\tt{getters}$, $\tt{setters}$\\
+        The $\tt{getters}$ and $\tt{setters}$ components capture the getters and the setters for the given class and all its superclasses recursively.
+
+    \item $\tt{methods}$\\
+        The $\tt{methods}$ component captures the methods for the given class and all its superclasses recursively.
+
+\end{itemize}
+
+
+\subsubsection{Property Lookup}
+\label{subsubsec:property-lookup}
+
+A property lookup searches for an instance method, a getter or a field with the given property name. If none of the following is found, an error is returned.
+\begin{align*}
+    \lookup \in \dclass \times \mathbf{Name} &\rightarrow \mathbf{Member}\\
+    \lookup(\idmeta) &= \membermeta
+\end{align*}
+where $\membermeta$ is an instance method, when $\idmeta$ is a method name, a getter when $\idmeta$ is a getter name or an implicit getter when $\idmeta$ is a field name.
+
+
+\subsubsection{Method Lookup}
+\label{subsubsec:method-lookup}
+
+A method lookup searches for an instance method in the given class given the name of the method.
+\begin{align*}
+    \methodLookup \in \dclass \times \mathbf{Name} &\rightarrow \mathbf{Member}\\
+    \methodLookup(\idmeta) &= \membermeta
+\end{align*}
+
+
+\subsection{Function values}
+\label{subsec:function-values}
+\todo{add async marker, type parameters, return type to FunctionValue}
+\[
+    \dfunval : \dformals \times \dstmt \times \denv
+\]
+
+
+\section{Abstract Syntax}
+\label{sec:abstract-syntax}
+
+
+\subsubsection{Expressions}
+\label{sec:expr-syntax}
+
+
+% Syntax
+\newcommand{\VariableGet}[1]{#1}
+\newcommand{\VariableSet}[2]{#1=#2}
+
+\todo{kmillikin: Names should not ignore the library.}
+\newcommand{\PropertyGet}[2]{#1.#2}
+\newcommand{\PropertySet}[3]{#1.#2=#3}
+
+\newcommand{\DirectPropertyGet}[2]{#1.\{#2\}}
+\newcommand{\DirectPropertySet}[3]{#1.\{#2\}=#3}
+
+\newcommand{\SuperPropertyGet}[1]{\tt{super}.#1}
+\newcommand{\SuperPropertySet}[2]{\tt{super}.#1=#2}
+
+\newcommand{\StaticGet}[1]{#1}
+\newcommand{\StaticSet}[2]{#1=#2}
+
+%% MethodInvocation
+\newcommand{\InstanceMethodInvocation}[3]{#1.#2(#3)}
+%% DirectMethodInvocation
+\newcommand{\DInstanceMethodInvocation}[3]{#1.\{#2\}(#3)}
+%% SuperMethodInvocation
+\newcommand{\SuperMethodInvocation}[2]{\tt{super}.#1(#2)}
+%% StaticInvocation
+\newcommand{\StaticInvocation}[2]{#1(#2)}
+%% ConstructorInvocation
+\newcommand{\New}[2]{\new\, #1\,(#2)}
+
+\newcommand{\Not}[1]{!#1}
+\newcommand{\AndExpression}[2]{#1\,\&\&\,#2}
+\newcommand{\OrExpression}[2]{#1\,||\,#2}
+\newcommand{\ConditionalExpression}[3]{#1\,?\,#2\,:\,#3}
+
+%% StringConcatenation
+\newcommand{\StringConcatenation}[1]{\tt{Concat}\,#1}
+
+\newcommand{\IsExpression}[2]{#1\,\tt{is}\,#2}
+\newcommand{\AsExpression}[2]{#1\,\tt{as}\,#2}
+
+%% SymbolLiteral
+%% TypeLiteral
+
+\newcommand{\ThisExpression}{\tt{this}}
+\newcommand{\Rethrow}{\tt{rethrow}}
+\newcommand{\Throw}[1]{\tt{throw}\,#1}
+
+%% ListLiteral
+%% MapLiteral
+
+\newcommand{\AwaitExpression}[1]{\tt{await\,#1}}
+
+%% FunctionExpression
+
+\newcommand{\StringLiteral}[1]{#1}
+\newcommand{\IntLiteral}[1]{#1}
+\newcommand{\DoubleLiteral}[1]{#1}
+\newcommand{\BoolLiteral}[1]{#1}
+\newcommand{\NullLiteral}{\tt{null}}
+\newcommand{\Let}[3]{\tt{let}\,#1=#2\,\tt{in}\,#3}
+
+%% LoadLibrary
+%% CheckLibraryIsLoaded
+%% VectorCreation
+%% VectorGet
+%% VectorSet
+%% VectorCopy
+%% ClosureCreation
+%% TypeInstantiation
+
+\[
+\begin{array}{rl}
+  \expressionmeta \in \mathit{Expression} ::=
+  & \VariableGet{\variablemeta} \\
+  & \VariableSet{\variablemeta}{\expressionmeta} \\
+  & \PropertyGet{\expressionmeta}{\idmeta} \\
+  & \PropertySet{\expressionmeta_0}{\idmeta}{\expressionmeta_1} \\
+  & \DirectPropertyGet{\expressionmeta}{\membermeta} \\
+  & \DirectPropertySet{\expressionmeta_0}{\membermeta}{\expressionmeta_1} \\
+  & \SuperPropertyGet{\idmeta} \\
+  & \SuperPropertySet{\idmeta}{\expressionmeta} \\
+  & \StaticGet{\membermeta} \\
+  & \StaticSet{\membermeta}{\expressionmeta} \\
+  & \Not{\expressionmeta} \\
+  & \AndExpression{\expressionmeta_0}{\expressionmeta_1} \\
+  & \OrExpression{\expressionmeta_0}{\expressionmeta_1} \\
+  & \ConditionalExpression{\expressionmeta_0}{\expressionmeta_1}{\expressionmeta_2} \\
+  & \New{\synt{Q}}{\expressionmeta*} \\
+  & \IsExpression{\expressionmeta}{\typemeta} \\
+  & \AsExpression{\expressionmeta}{\typemeta} \\
+  & \ThisExpression \\
+  & \Rethrow \\
+  & \Throw{\expressionmeta} \\
+  & \AwaitExpression{\expressionmeta} \\
+  & \StringLiteral{\stringmeta} \\
+  & \IntLiteral{\integermeta} \\
+  & \DoubleLiteral{\doublemeta} \\
+  & \BoolLiteral{\tt{true}} \\
+  & \BoolLiteral{\tt{false}} \\
+  & \NullLiteral \\
+  & \Let{\variablemeta}{\expressionmeta_0}{\expressionmeta_1} \\
+\end{array}
+\]
+
+
+\subsection{Statements}
+\label{subsec:stmt-syntax}
+
+% InvalidStatement
+\newcommand{\ExpressionStatement}[1]{\{\, #1\, \}}
+\newcommand{\Block}[1]{#1\, \statementmeta*}
+\newcommand{\EmptyStatement}{\{\}}
+
+% AssertStatement
+\newcommand{\LabeledStatement}[2]{#1:\, #2}
+\newcommand{\BreakStatement}[1]{\tt{break}\, #1}
+\newcommand{\WhileStatement}[2]{\tt{while}\, (#1)\, #2}
+\newcommand{\DoStatement}[2]{\tt{do}\, #1\, \tt{while}\, (#2)}
+\newcommand{\ForStatement}[4]{\tt{for}\, (\,#1;\, #2;\, #3\,)\, #4}
+\newcommand{\ForInStatement}[3]{\tt{for}\,(#1\,\tt{in}\,#2)\,#3}
+
+\newcommand{\SwitchStatement}[2]{\tt{switch}\,(#1)\,#2}
+\newcommand{\ContinueSwitchStatement}[1]{\tt{continue}\,#1}
+\newcommand{\IfStatement}[3]{\tt{if}\,(#1)\,#2\,\tt{else}\,#3}
+\newcommand{\ReturnStatement}[1]{\tt{return}\,#1}
+
+\newcommand{\TryCatch}[2]{\tt{try}\,#1\,\tt{catch}\,#2}
+\newcommand{\TryFinally}[2]{\tt{try}\,#1\,\tt{catch}\,#2}
+
+\newcommand{\Yield}[1]{\tt{yield}\,#1}
+
+\newcommand{\VarDeclaration}[2]{\tt{var}\,#1=#2}
+\newcommand{\FunctionDeclaration}[5]{#1\,#2(\,#3\,)\,#4\,#5}
+
+% FunctionDeclaration
+\[
+\begin{array}{rl}
+
+  \statementmeta \in \mathit{Statements} ::=
+  & \ExpressionStatement{\expressionmeta} \\
+  & \Block{\statementmeta} \\
+  & \EmptyStatement \\
+  & \LabeledStatement{\labelmeta}{\statementmeta} \\
+  & \BreakStatement{\labelmeta} \\
+  & \WhileStatement{\expressionmeta}{\statementmeta} \\
+  & \DoStatement{\statementmeta}{\expressionmeta} \\
+  & \ForStatement{??}{\expressionmeta}{??}{\statementmeta} \\
+  & \ForInStatement{\idmeta}{\expressionmeta}{\statementmeta} \\
+  & \SwitchStatement{\expressionmeta}{\tt{SCs}} \\
+  & \ContinueSwitchStatement{\statementmeta} \\
+  & \IfStatement{\expressionmeta}{\statementmeta_1}{\statementmeta_2} \\
+  & \ReturnStatement{\expressionmeta} \\
+  & \ReturnStatement{} \\
+  & \TryCatch{\statementmeta}{\tt{CCs}} \\
+  & \TryFinally{\statementmeta_1}{\statementmeta_2} \\
+  & \Yield{\expressionmeta} \\
+  & \VarDeclaration{\idmeta}{\expressionmeta} \\
+  & \FunctionDeclaration{\typemeta}{\idmeta}{\formals}{}{\stmt} \\
+
+\end{array}
+\]
+  \todo{Add sync*/async/async* marker and type parameters}
+
+\section{Abstract Machine}
 \subsection{Configurations}
 \label{subsec:cesk-configs}
 
@@ -544,21 +866,6 @@ The next configuration is ExecConfiguration.
 
 \subsection{Continuations}
 \label{subsec:continuations-definition}
-
-% Metavariables
-\newcommand{\expressionmeta}{\ensuremath{\mathit{E}}}
-\newcommand{\expressionsmeta}{\expressionmeta{s}}
-\newcommand{\variablemeta}{\ensuremath{\mathit{X}}}
-\newcommand{\boolmeta}{\ensuremath{\mathit{B}}}
-\newcommand{\integermeta}{\ensuremath{\mathit{I}}}
-\newcommand{\doublemeta}{\ensuremath{\mathit{D}}}
-\newcommand{\stringmeta}{\ensuremath{\mathit{S}}}
-\newcommand{\idmeta}{\ensuremath{\mathit{X}}}
-\newcommand{\membermeta}{\ensuremath{\mathit{M}}}
-\newcommand{\typemeta}{\ensuremath{\mathit{T}}}
-% Metavariables for statements
-\newcommand{\statementmeta}{\ensuremath{\mathit{\stmt}}}
-\newcommand{\labelmeta}{\ensuremath{\mathit{\tt{L}}}}
 
 Continuations represent the instructions for execution of statements or evaluation of expressions.
 They capture the information needed to resume the execution of the program.
@@ -808,300 +1115,6 @@ The different exception handlers are shown in Figure~\ref{figure:handlers}.
   \label{figure:handlers}
   \end{eqfigure}
 \end{figure}
-
-
-\section{Values}
-\label{sec:values}
-
-The values supported by Dart Kernel are $\tt{literal}$ values (Section~\ref{subsec:literal-values}) and $\tt{object}$ values (Section~\ref{subsec:object-values}).
-Values are irreducible terms, i.e, results of evaluation of expressions.
-
-
-\subsection{Literal values}
-\label{subsubsec:literal-values}
-
-Literal values are special values that store the specific payload and an associated class.
-The different literal values are presented below:
-\[
-  \begin{array}{lcl}
-    \val \in \dlitval &=& \mathbf{int} + \mathbf{bool} + \mathbf{double}\\
-    && + \mathbf{List} + \mathbf{Map} + \mathbf{String} + \mathbf{Symbol} + \mathbf{Type}.
-  \end{array}
-\]
-
-Literal values are special values that store the specific payload and an associated class.
-Each of the specific literal values contains predefined operators and/or methods, whose semantics we are not going to specify in this document.
-
-
-\subsection{Object values}
-\label{subsec:object-values}
-
-Object values have a $\tt{class}$ component and a $\tt{fields}$ component which is list of locations for each field, as shown below:
-\[
-    \dobjval : \dclass \times \mlist{\dlocation}.
-\]
-
-The $\tt{class}$ component captures the properties of the object, see Section~\eqref{subsec:class}.
-The object also stores a list of locations that represent the values of the fields for the given object.
-An object is mutated by modifying a field.
-A field is modified by changing the value stored at the location for the said field in the list of locations for the given object.
-Access and modification of fields is enabled with implicit getters and setters defined in the associated class component.
-Each field has an associated implicit getter, as defined below.
-Let $\loc$ be the location of field with name $fName$ for the object value $\val_0$:
-\begin{align*}
-  \getter \in \dobjval \times \mathbf{Name} &\rightarrow \dval\\
-  \getter(\val_0, fName) &= \val_1,
-\end{align*}
-
-\noindent where $\val_1 = \deref{\loc}$.
-
-Each non-final field has an associated implicit setter, as defined below.
-Let $\loc$ be the location of field $fName$ for the object value $\val_0$:
-\begin{align*}
-  \setter \in \dobjval \times \mathbf{Name} \times \dval &\rightarrow \dval\\
-  \setter(\val_0, fName, \val_1) &= \val_1,
-\end{align*}
-
-\noindent where $\val_1$ is the value to be stored in $\loc$ after the invocation of the implicit setter.
-This implies that invocation of implicit setter will modify the global store and  $\deref{\loc} = \val_1$ will hold after the transition.
-
-
-\subsection{Class}
-\label{subsec:class}
-
-A $\tt{class} \in \dclass$ captures the different properties for a defined class in Dart Kernel.
-
-\begin{align}
-\notag
-\dclass &\in \tt{superclass} \times \tt{interfaces} \times \tt{fieldGetters}\\\notag
-&\times \tt{fieldSetters} \times \tt{getters} \times \tt{setters} \times \tt{methods}
-\end{align}
-
-The different components of $\tt{class}$ capture the following properties:
-
-\begin{itemize}
-    \item $\tt{superclass}$\\
-        The class component captures the immediate superclass and we allow access to it in the different continuations in various steps defined below.
-
-    \item $\tt{interfaces}$\\
-        % TBD
-
-    \item $\tt{fieldGetters}$, $\tt{fieldSetters}$\\
-        The $\tt{fieldGetters}$ and $\tt{fieldSetters}$ components capture the functions allowing access to field members of the current class and the superclasses recursively.
-        The layout of the field members starts with the first field of the superclass highest in the class hierarchy and is continuous.
-        We create implicit getters for all instance fields and setters for all non-final instance fields.
-        For definition of implicit getters and setters see Section~\ref{subsec:object-values}.\\
-        To enable proper direct field member access, we create implicit getters and setters bound to the members also, not only the names.
-        Using only the identifier of the member for lookup of a direct member access is problematic because of possible overwrite of a member.
-
-    \item $\tt{getters}$, $\tt{setters}$\\
-        The $\tt{getters}$ and $\tt{setters}$ components capture the getters and the setters for the given class and all its superclasses recursively.
-
-    \item $\tt{methods}$\\
-        The $\tt{methods}$ component captures the methods for the given class and all its superclasses recursively.
-
-\end{itemize}
-
-
-\subsubsection{Property Lookup}
-\label{subsubsec:property-lookup}
-
-A property lookup searches for an instance method, a getter or a field with the given property name. If none of the following is found, an error is returned.
-\begin{align*}
-    \lookup \in \dclass \times \mathbf{Name} &\rightarrow \mathbf{Member}\\
-    \lookup(\idmeta) &= \membermeta
-\end{align*}
-where $\membermeta$ is an instance method, when $\idmeta$ is a method name, a getter when $\idmeta$ is a getter name or an implicit getter when $\idmeta$ is a field name.
-
-
-\subsubsection{Method Lookup}
-\label{subsubsec:method-lookup}
-
-A method lookup searches for an instance method in the given class given the name of the method.
-\begin{align*}
-    \methodLookup \in \dclass \times \mathbf{Name} &\rightarrow \mathbf{Member}\\
-    \methodLookup(\idmeta) &= \membermeta
-\end{align*}
-
-
-\subsection{Function values}
-\label{subsec:function-values}
-% todo: add async marker, type parameters, return type to FunctionValue
-\[
-    \dfunval : \dformals \times \dstmt \times \denv
-\]
-
-
-\section{Abstract Syntax}
-\label{sec:abstract-syntax}
-
-
-\subsubsection{Expressions}
-\label{sec:expr-syntax}
-
-
-% Syntax
-\newcommand{\VariableGet}[1]{#1}
-\newcommand{\VariableSet}[2]{#1=#2}
-
-% TODO(kmillikin): Names should not ignore the library.
-\newcommand{\PropertyGet}[2]{#1.#2}
-\newcommand{\PropertySet}[3]{#1.#2=#3}
-
-\newcommand{\DirectPropertyGet}[2]{#1.\{#2\}}
-\newcommand{\DirectPropertySet}[3]{#1.\{#2\}=#3}
-
-\newcommand{\SuperPropertyGet}[1]{\tt{super}.#1}
-\newcommand{\SuperPropertySet}[2]{\tt{super}.#1=#2}
-
-\newcommand{\StaticGet}[1]{#1}
-\newcommand{\StaticSet}[2]{#1=#2}
-
-%% MethodInvocation
-\newcommand{\InstanceMethodInvocation}[3]{#1.#2(#3)}
-%% DirectMethodInvocation
-\newcommand{\DInstanceMethodInvocation}[3]{#1.\{#2\}(#3)}
-%% SuperMethodInvocation
-\newcommand{\SuperMethodInvocation}[2]{\tt{super}.#1(#2)}
-%% StaticInvocation
-\newcommand{\StaticInvocation}[2]{#1(#2)}
-%% ConstructorInvocation
-\newcommand{\New}[2]{\new\, #1\,(#2)}
-
-\newcommand{\Not}[1]{!#1}
-\newcommand{\AndExpression}[2]{#1\,\&\&\,#2}
-\newcommand{\OrExpression}[2]{#1\,||\,#2}
-\newcommand{\ConditionalExpression}[3]{#1\,?\,#2\,:\,#3}
-
-%% StringConcatenation
-\newcommand{\StringConcatenation}[1]{\tt{Concat}\,#1}
-
-\newcommand{\IsExpression}[2]{#1\,\tt{is}\,#2}
-\newcommand{\AsExpression}[2]{#1\,\tt{as}\,#2}
-
-%% SymbolLiteral
-%% TypeLiteral
-
-\newcommand{\ThisExpression}{\tt{this}}
-\newcommand{\Rethrow}{\tt{rethrow}}
-\newcommand{\Throw}[1]{\tt{throw}\,#1}
-
-%% ListLiteral
-%% MapLiteral
-
-\newcommand{\AwaitExpression}[1]{\tt{await\,#1}}
-
-%% FunctionExpression
-
-\newcommand{\StringLiteral}[1]{#1}
-\newcommand{\IntLiteral}[1]{#1}
-\newcommand{\DoubleLiteral}[1]{#1}
-\newcommand{\BoolLiteral}[1]{#1}
-\newcommand{\NullLiteral}{\tt{null}}
-\newcommand{\Let}[3]{\tt{let}\,#1=#2\,\tt{in}\,#3}
-
-%% LoadLibrary
-%% CheckLibraryIsLoaded
-%% VectorCreation
-%% VectorGet
-%% VectorSet
-%% VectorCopy
-%% ClosureCreation
-%% TypeInstantiation
-
-\[
-\begin{array}{rl}
-  \expressionmeta \in \mathit{Expression} ::=
-  & \VariableGet{\variablemeta} \\
-  & \VariableSet{\variablemeta}{\expressionmeta} \\
-  & \PropertyGet{\expressionmeta}{\idmeta} \\
-  & \PropertySet{\expressionmeta_0}{\idmeta}{\expressionmeta_1} \\
-  & \DirectPropertyGet{\expressionmeta}{\membermeta} \\
-  & \DirectPropertySet{\expressionmeta_0}{\membermeta}{\expressionmeta_1} \\
-  & \SuperPropertyGet{\idmeta} \\
-  & \SuperPropertySet{\idmeta}{\expressionmeta} \\
-  & \StaticGet{\membermeta} \\
-  & \StaticSet{\membermeta}{\expressionmeta} \\
-  & \Not{\expressionmeta} \\
-  & \AndExpression{\expressionmeta_0}{\expressionmeta_1} \\
-  & \OrExpression{\expressionmeta_0}{\expressionmeta_1} \\
-  & \ConditionalExpression{\expressionmeta_0}{\expressionmeta_1}{\expressionmeta_2} \\
-  & \New{\synt{Q}}{\expressionmeta*} \\
-  & \IsExpression{\expressionmeta}{\typemeta} \\
-  & \AsExpression{\expressionmeta}{\typemeta} \\
-  & \ThisExpression \\
-  & \Rethrow \\
-  & \Throw{\expressionmeta} \\
-  & \AwaitExpression{\expressionmeta} \\
-  & \StringLiteral{\stringmeta} \\
-  & \IntLiteral{\integermeta} \\
-  & \DoubleLiteral{\doublemeta} \\
-  & \BoolLiteral{\tt{true}} \\
-  & \BoolLiteral{\tt{false}} \\
-  & \NullLiteral \\
-  & \Let{\variablemeta}{\expressionmeta_0}{\expressionmeta_1} \\
-\end{array}
-\]
-
-
-\subsection{Statements}
-\label{subsec:stmt-syntax}
-
-% InvalidStatement
-\newcommand{\ExpressionStatement}[1]{\{\, #1\, \}}
-\newcommand{\Block}[1]{#1\, \statementmeta*}
-\newcommand{\EmptyStatement}{\{\}}
-
-% AssertStatement
-\newcommand{\LabeledStatement}[2]{#1:\, #2}
-\newcommand{\BreakStatement}[1]{\tt{break}\, #1}
-\newcommand{\WhileStatement}[2]{\tt{while}\, (#1)\, #2}
-\newcommand{\DoStatement}[2]{\tt{do}\, #1\, \tt{while}\, (#2)}
-\newcommand{\ForStatement}[4]{\tt{for}\, (\,#1;\, #2;\, #3\,)\, #4}
-\newcommand{\ForInStatement}[3]{\tt{for}\,(#1\,\tt{in}\,#2)\,#3}
-
-\newcommand{\SwitchStatement}[2]{\tt{switch}\,(#1)\,#2}
-\newcommand{\ContinueSwitchStatement}[1]{\tt{continue}\,#1}
-\newcommand{\IfStatement}[3]{\tt{if}\,(#1)\,#2\,\tt{else}\,#3}
-\newcommand{\ReturnStatement}[1]{\tt{return}\,#1}
-
-\newcommand{\TryCatch}[2]{\tt{try}\,#1\,\tt{catch}\,#2}
-\newcommand{\TryFinally}[2]{\tt{try}\,#1\,\tt{catch}\,#2}
-
-\newcommand{\Yield}[1]{\tt{yield}\,#1}
-
-\newcommand{\VarDeclaration}[2]{\tt{var}\,#1=#2}
-\newcommand{\FunctionDeclaration}[5]{#1\,#2(\,#3\,)\,#4\,#5}
-
-% FunctionDeclaration
-\[
-\begin{array}{rl}
-
-  \statementmeta \in \mathit{Statements} ::=
-  & \ExpressionStatement{\expressionmeta} \\
-  & \Block{\statementmeta} \\
-  & \EmptyStatement \\
-  & \LabeledStatement{\labelmeta}{\statementmeta} \\
-  & \BreakStatement{\labelmeta} \\
-  & \WhileStatement{\expressionmeta}{\statementmeta} \\
-  & \DoStatement{\statementmeta}{\expressionmeta} \\
-  & \ForStatement{??}{\expressionmeta}{??}{\statementmeta} \\
-  & \ForInStatement{\idmeta}{\expressionmeta}{\statementmeta} \\
-  & \SwitchStatement{\expressionmeta}{\tt{SCs}} \\
-  & \ContinueSwitchStatement{\statementmeta} \\
-  & \IfStatement{\expressionmeta}{\statementmeta_1}{\statementmeta_2} \\
-  & \ReturnStatement{\expressionmeta} \\
-  & \ReturnStatement{} \\
-  & \TryCatch{\statementmeta}{\tt{CCs}} \\
-  & \TryFinally{\statementmeta_1}{\statementmeta_2} \\
-  & \Yield{\expressionmeta} \\
-  & \VarDeclaration{\idmeta}{\expressionmeta} \\
-  % todo: Add sync*/async/async* marker and type parameters
-  & \FunctionDeclaration{\typemeta}{\idmeta}{\formals}{}{\stmt} \\
-
-\end{array}
-\]
-
 
 \section{Semantics}
 \label{sec:semantics}
@@ -1582,7 +1595,7 @@ Note that the default values for the optional parameters are constants, hence th
 Required parameters will not be added to the list of expressions when they are not provided.
 This is an implementation detail that allows us to ignore the distinction between provided or missing positional, optional and named arguments.
 After the evaluation of the argument expressions, and before binding the actual arguments to the formal parameters necessary checks ensure the actual arguments are valid or throw a dynamic error accordingly.
-% todo: Specify what *valid* means and what error is thrown when arguments are not *valid*
+\todo{Specify what *valid* means and what error is thrown when arguments are not *valid*}
 
 The statement body is then executed with the appropriate bindings.
 The specific CESK-transitions for the different invocations are described in the appropriate sections below.
@@ -1987,8 +2000,8 @@ Let $\val' = \deref{(\env(\this))}$, $C = \superclass{\val'}$ and $M$ the result
 The evaluation proceeds with evaluation of the right-hand side expression as shown in \eqref{eval:superpropertyset}.
 After the evaluation of the argument expression to a value $\val$, depending on $\membermeta$, the evaluation continues as follows:
 
+\todo{regroup all property extraction together since text is similar}
 \begin{itemize}
-    % todo: regroup all property extraction together since text is similar
     \item $\membermeta$ is an instance setter\\
         When $\membermeta$ is an invocation of a setter with body $\stmt$ and formal parameter $\formal$, the evaluation proceeds by executing the body in the environment which binds $\tt{this}$ to a location that contains $\deref{(\env(\this))}$ and the formal parameter $\formal$ to a location that contains $\val$.
         This is shown in the CESK-transition \eqref{econtconf:superpropertyset-setter}.
