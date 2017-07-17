@@ -351,6 +351,21 @@ In this way state of the CESK machine mimics states of the Dart VM at a very abs
   \end{array}
 \]
 
+% Metavariables
+\newcommand{\expressionmeta}{\ensuremath{\mathit{E}}}
+\newcommand{\expressionsmeta}{\expressionmeta{s}}
+\newcommand{\variablemeta}{\ensuremath{\mathit{X}}}
+\newcommand{\boolmeta}{\ensuremath{\mathit{B}}}
+\newcommand{\integermeta}{\ensuremath{\mathit{I}}}
+\newcommand{\doublemeta}{\ensuremath{\mathit{D}}}
+\newcommand{\stringmeta}{\ensuremath{\mathit{S}}}
+\newcommand{\idmeta}{\ensuremath{\mathit{X}}}
+\newcommand{\membermeta}{\ensuremath{\mathit{M}}}
+\newcommand{\typemeta}{\ensuremath{\mathit{T}}}
+% Metavariables for statements
+\newcommand{\statementmeta}{\ensuremath{\mathit{\stmt}}}
+\newcommand{\labelmeta}{\ensuremath{\mathit{\tt{L}}}}
+
 
 \subsection{Notations}
 \label{subsec:notations}
@@ -430,398 +445,6 @@ For simpler notation, we allow ``$\extend$'' to be called with singleton lists a
 
 A variable lookup consists of looking up the location of a variable from the environment with $\loc = \env(\varmeta)$ and reading the stored value $v$ with $\deref{\loc} = \deref{\env(\varmeta)}$ from the store.
 For definition of ``$\deref$'' see Section~\ref{subsubsection:dereferecing}.
-
-
-\subsection{Configurations}
-\label{subsec:cesk-configs}
-
-The state space of the CESK machine contains various kinds of configurations.
-Configurations contain different components and the transition step dispatches to the next configuration based on one of the components of the configuration.
-
-% Named Configuration for CESK transitions
-\newcommand{\breakconf}[1]{\confsingle{#1}_{\mathrm{breakCont}}}
-\newcommand{\switchconf}[1]{\confsingle{#1}_{\mathrm{switchCont}}}
-\newcommand{\contconf}[2]{\confpair{#1}{#2}_{\mathrm{cont}}}
-\newcommand{\scontconf}[2]{\confpair{#1}{#2}_{\mathrm{scont}}}
-\newcommand{\acontconf}[2]{\confpair{#1}{#2}_{\mathrm{acont}}}
-\newcommand{\throwconf}[3]{\conftriple{#1}{#2}{#3}_{\mathrm{throw}}}
-\newcommand{\evallistconf}[6]{\langle{#1},\,{#2},\,{#3},\handler,\,{#4},\,{#5},\,{#6}\rangle_{\mathrm{evalList}}}
-\newcommand{\evalconf}[6]{\langle{#1},\,{#2},\,{#3},\handler,\,{#4},\,{#5},\,{#6}\rangle_{\mathrm{eval}}}
-\newcommand{\execconf}[9]{\langle{#1},\,{#2},\,{#3},\,{#4},\,{#5},\,{#6},\,{#7},\,{#8},\,{#9}\rangle_{\mathrm{exec}}}
-
-% Transition
-\begin{figure}[Htp]
-  \begin{eqfigure}
-  \begin{align}
-    &\evalconf{\expr}{\env}{st}{cex}{cst}{\econt} & :\quad & \text{EvalConfiguration} \label{config:eval}\\
-    &\evallistconf{\exprs}{\env}{st}{cex}{cst}{\acont} & :\quad & \text{EvalListConfiguration} \label{config:evallist}\\
-    &\execconf{\stmt}{\env}{\lbls}{\clbls}{\strace}{\handler}{\cex,\,\cstrace}{\econt}{\scont}  & :\quad & \text{ExecConfiguration} \label{config:exec}\\
-    &\contconf{\econt}{\val} & :\quad & \text{ValuePassingConfiguration} \label{config:econt}\\
-    &\acontconf{\acont}{\vals} & :\quad & \text{ApplicationConfiguration} \label{config:acont}\\
-    &\scontconf{\scont}{\env} & :\quad & \text{ForwardConfiguration} \label{config:scont}\\
-    &\throwconf{\handler}{\val}{\strace} & :\quad & \text{ThrowConfiguration} \label{config:throw}\\
-    &\breakconf{\bcont} & :\quad & \text{BreakConfiguration} \label{config:bcont}\\
-    &\switchconf{\switchcont} & :\quad &
-    \text{SwitchConfiguration}
-    \label{config:switchcont}
-  \end{align}
-  \caption{States for the CESK machine}
-  \end{eqfigure}
-\end{figure}
-
-
-\subsubsection{EvalConfiguration}
-\label{subsubsec:evalconfig}
-
-The configuration EvalConfiguration is shown in \ref{config:eval}.
-The transition step for this configuration dispatches on the expression component, $\expr$.
-With one transition step of the CESK-transition function, from the EvalConfiguration the next configuration can be one of the following:
-
-\begin{itemize}
-    \item ValuePassingConfiguration, when the current expression evaluates to a value in one step.
-    \item ExecConfiguration, when the current expression results with an invocation, i.e. execution of statement body of a getter.
-        Note that for other invocations, we first evaluate the receiver for instance invocations, or the arguments for static or constructor invocations.
-    \item EvalListConfiguration, when the current expression implies evaluation of a list of expressions.
-    \item ThrowConfiguration, when the current expression throws, i.e. is a throw expression.
-    \item EvalConfiguration, otherwise.
-\end{itemize}
-
-
-\subsubsection{EvalListConfigruation}
-\label{subsubsec:evallistconfig}
-
-The configuration EvalListConfiguration is shown in Figure~\ref{config:evallist}.
-The transition step for this configuration dispatches on the expression list, $\exprs$.
-With one step of the CESK-transition function, from EvalListConfifuration the next configuration is either EvalConfiguration, when $\exprs \neq []$, or ApplicationConfiguration, otherwise.
-
-
-\subsubsection{ExecConfiguration}
-\label{subsubsec:execconfig}
-
-The configuration ExecConfiguration is shown in Figure~\ref{config:exec}.
-The transition step dispatches on the statement, $\stmt$.
-The next configuration is either EvalConfiguration or ExecConfiguration.
-
-
-\subsubsection{ValuePassingConfiguration}
-\label{suubsubsec:valuepassingconfig}
-
-The configuration ValuePassingConfiguration is shown in Figure~\ref{config:econt}.
-The transition step applies the expression continuation component to its value component.
-The expression continuation produces the next configuration.
-
-
-\subsubsection{ApplicationConfiguration}
-\label{subsubsec:applicationconfig}
-
-The configuration ApplicationConfiguration is shown in Figure~\ref{config:acont}.
-The transition step applies the application continuation component to its list of values component.
-The application continuation produces the next configuration.
-
-
-\subsubsection{ForwardConfiguration}
-\label{subsubsec:forwardconfig}
-
-The configuration ForwardConfiguration is shown in Figure~\ref{config:scont}.
-The transition step applies the statement continuation component to its environment component.
-The statement continuation produces the next configuration.
-
-
-\subsubsection{ThrowCongfiguration}
-\label{subsubsec:throwconfig}
-
-The configuration ThrowConfiguration is shown in Figure~\ref{config:throw}.
-The transition step applies the exception handler.
-The next configuration is:
-
-\begin{itemize}
-    \item ThrowConfiguration, when the exception is not handled by the first catch clause of a catch handler.
-    \item ExecConfiguration, for the statement body of the matching catch or the finally statement, when no catch clauses are present.
-\end{itemize}
-
-
-\subsubsection{BreakConfiguration}
-\label{subsubsec:breakconfig}
-
-The configuration BreakConfiguration is shown in Figure~\ref{config:bcont}.
-The transition step applies the break continuation component.
-The next configuration is ForwardConfiguration.
-
-
-\subsubsection{SwitchConfiguration}
-\label{subsubsec:switchconfig}
-
-The configuration SwitchConfiguration is shown in Figure~\ref{config:switchcont}.
-The transition step applies the switch continuation component.
-The next configuration is ExecConfiguration.
-
-
-\subsection{Continuations}
-\label{subsec:continuations-definition}
-
-% Metavariables
-\newcommand{\expressionmeta}{\ensuremath{\mathit{E}}}
-\newcommand{\expressionsmeta}{\expressionmeta{s}}
-\newcommand{\variablemeta}{\ensuremath{\mathit{X}}}
-\newcommand{\boolmeta}{\ensuremath{\mathit{B}}}
-\newcommand{\integermeta}{\ensuremath{\mathit{I}}}
-\newcommand{\doublemeta}{\ensuremath{\mathit{D}}}
-\newcommand{\stringmeta}{\ensuremath{\mathit{S}}}
-\newcommand{\idmeta}{\ensuremath{\mathit{X}}}
-\newcommand{\membermeta}{\ensuremath{\mathit{M}}}
-\newcommand{\typemeta}{\ensuremath{\mathit{T}}}
-% Metavariables for statements
-\newcommand{\statementmeta}{\ensuremath{\mathit{\stmt}}}
-\newcommand{\labelmeta}{\ensuremath{\mathit{\tt{L}}}}
-
-Continuations represent the instructions for execution of statements or evaluation of expressions.
-They capture the information needed to resume the execution of the program.
-There are various types of continuations depending on the state for evaluation of an expression or execution of a statement.
-
-
-\subsubsection{Expression continuations}
-\label{subsubsec:expression-continuations}
-
-Expression continuations, $\econt$, capture the steps after the evaluation of a given expression.
-They accept a value and produce the next configuration.
-
-There are various kinds of configurations, but two more general types can be distinguished:
-
-\begin{itemize}
-    \item Continuations with holes, i.e. expressions to be evaluated\\
-        Expression continuations with expressions will produce EvalConfiguration for evaluation of the next expression.
-        Note that some continuation will not evaluate the captured expression, when this is not necessary (e.g., \eqref{eval:and}).
-
-    \item Continuations without holes\\
-        Continuations without holes dispatch on the provided value and produce the next configuration, a ValuePassingConfiguration.
-
-\end{itemize}
-
-We suffix the names of expression continuations with ``$K$''.
-The different expression continuations are shown in Figure~\ref{figure:econts}.
-
-\newcommand{\ExceptionHandlersRest}{\handler,\,\cstrace,\,\cex}
-\newcommand{\ExceptionHandlers}{\strace,\,\handler,\,\cstrace,\,\cex}
-% Continuations
-\newcommand{\VarSetK}[4]{\mathrm{VarSetEK}({#1},\,{#2},\,{#3},\,{#4})}
-\newcommand{\ExpressionsK}[3]{\mathrm{ExpressionsEK}({#1},\,{#2},\,\ExceptionHandlers,\,{#3})}
-
-\newcommand{\NotK}[1]{\mathrm{NotEK}({#1})}
-\newcommand{\AndK}[3]{\mathrm{AndEK}({#1},\,{#2},\,\ExceptionHandlers,\,{#3})}
-\newcommand{\OrK}[3]{\mathrm{OrEK}({#1},\,{#2},\,\ExceptionHandlers,\,{#3})}
-\newcommand{\ConditionalK}[4]{\mathrm{ConditionalEK}({#1},\,{#2},\,{#3},\,\ExceptionHandlers,\,{#4})}
-
-\newcommand{\LetK}[4]{\mathrm{LetEK}({#1},\,{#2},\,{#3},\,\ExceptionHandlers,\,{#4})}
-
-\newcommand{\IsExpressionK}{\mathrm{IsExpressionEK}(\tt{T},\,\econt)}
-\newcommand{\AsExpressionK}{\mathrm{AsExpressionEK}(\tt{T},\,\strace,\,\handler,\,\econt)}
-
-\newcommand{\StaticGetK}{\mathrm{StaticGetEK}(\membermeta,\,\econt)}
-\newcommand{\StaticSetK}{\mathrm{StaticSetEK}(\membermeta,\,\econt)}
-\newcommand{\PropertyGetK}{\mathrm{PropertyGetEK}(\idmeta,\,\ExceptionHandlers,\,\econt)}
-\newcommand{\PropertySetK}{\mathrm{PropertySetEK}(\idmeta,\,\expressionmeta_1,\,\env,\,\ExceptionHandlers,\,\econt)}
-\newcommand{\PropertySetVK}{\mathrm{PropertySetValueEK}(\val_0,\,\idmeta,\,\ExceptionHandlers,\,\econt)}
-\newcommand{\DPropertyGetK}{\mathrm{DPropertyGetEK}(\membermeta,\,\ExceptionHandlers,\,\econt)}
-\newcommand{\DirectPropertySetK}{\mathrm{DPropertySetEK}(\membermeta,\,\expressionmeta_1,\,\env,\,\ExceptionHandlers,\,\econt)}
-\newcommand{\DPropertySetVK}{\mathrm{DPropertySetValueEK}(\val_0,\,\membermeta,\,\ExceptionHandlers,\,\econt)}
-\newcommand{\SuperPropertySetK}{\mathrm{SuperPropertySetEK}(\idmeta,\,\env,\,\ExceptionHandlers,\,\econt)}
-
-\newcommand{\InstanceMethodK}[1]{\mathrm{InstanceMethodK(\expressionsmeta,\,\idmeta,\,\env,\,#1,\,\ExceptionHandlersRest,\,\econt)}}
-\newcommand{\DInstanceMethodK}[1]{\mathrm{DInstanceMethodEK}(\expressionsmeta,\,\membermeta,\,\env,\,#1,\,\ExceptionHandlersRest,\,\econt)}
-\newcommand{\VarDeclK}[3]{\mathrm{VarDeclarationEK}({#1},\,{#2},\,{#3})}
-\newcommand{\IfCondK}[2]{\mathrm{IfConditionEK}({#1},\,{#2},\,\env,\,\lbls,\,\clbls,\,\handler,\,\cstrace,\,\cex,\,\econt,\,\scont)}
-\newcommand{\SwitchK}[2]{\mathrm{SwitchEK}({#1},\,\env,\,\lbls,\,{#2},\,\strace,\,\handler,\,\cstrace,\,\cex,\,\econt,\,\scont)}
-
-\newcommand{\WhileCondK}{\mathrm{WhileCondEK}(\expr,\,\stmt,\,\env,\,\lbls,\,\clbls,\,\strace,\,\handler,\,\cstrace,\,\cex,\,\econt,\,\scont)}
-\newcommand{\InitializerK}[4]{\mathrm{InitializerEK}({#1},\,{#2},\,{#3},\,\strace,\,\handler,\,\cstrace,\,\cex,\,{#4})}
-\newcommand{\InitK}[3]{\mathrm{InitEK}({#1},\,{#2},\,\strace,\,\handler,\,\cstrace,\,\cex,\,{#3})}
-\newcommand{\InitializerListK}[4]{\mathrm{InitializerListEK}({#1},\,{#2},\,{#3},\,\strace,\,\handler,\,\cstrace,\,\cex,\,{#4})}
-\newcommand{\FinallyK}[1]{\mathrm{FinallyEK}({#1},\,\env,\,\lbls,\,\clbls,\,\strace,\,\handler,\,\econt)}
-\newcommand{\FinallyReturnK}[1]{\mathrm{FinallyReturnEK}({#1},\,\env,\,\lbls,\,\clbls,\,\strace,\,\handler,\,\econt)}
-
-\newcommand{\ForCondK}{\mathrm{ForConditionEK}(\mathrm{\varmeta{s}},\, \expressionmeta,\, \exprs,\, \statementmeta,\, \env,\, \env',\, \lbls,\, \clbls,\, \handler,\, \cstrace,\, \cex,\, \econt,\, \scont)}
-\newcommand{\ExpressionK}[2]{\mathrm{ExpressionEK}({#1},\,{#2})}
-\begin{figure}[Htp]
-  \begin{eqfigure}
-  \begin{align}
-    &\VarSetK{\idmeta}{\env}{\ExceptionHandlers}{\econt} \label{econt:varset}\\
-    &\ExpressionsK{\exprs}{\env}{\acont} \label{econt:expressions}\\
-    &\NotK{\econt} \label{econt:not}\\
-    &\AndK{\expressionmeta}{\ExceptionHandlers}{\econt} \label{econt:and}\\
-    &\OrK{\expressionmeta}{\ExceptionHandlers}{\econt} \label{econt:or}\\
-    &\ConditionalK{\expressionmeta_1}{\expressionmeta_2}{\ExceptionHandlers}{\econt} \label{econt:cond}\\
-    &\LetK{\idmeta}{\expressionmeta}{\ExceptionHandlers}{\econt} \label{econt:let}\\
-    &\IsExpressionK \label{econt:is}\\
-    &\AsExpressionK \label{econt:as}\\
-    &\StaticGetK \label{econt:static-get}\\
-    &\StaticSetK \label{econt:static-set}\\
-    &\DPropertyGetK \label{econt:dproperty-get}\\
-    &\PropertySetK \label{econt:property-set}\\
-    &\PropertySetVK \label{econt:property-set}\\
-    &\DPropertyGetK \label{econt:dproperty-set}\\
-    &\DPropertySetVK \label{econt:dproperty-set-v}\\
-    &\SuperPropertySetK \label{econt:super-property-set}\\
-    &\InstanceMethodK{\strace} \label{econt:instance-method}\\
-    &\DInstanceMethodK{\strace} \label{econt:dinstance-method}\\
-    &\VarDeclK{\idmeta}{\env}{\scont} \label{econt:var-decl}\\
-    &\IfCondK{\expressionmeta_1}{\expressionmeta_2} \label{econt:if-cond}\\
-    &\ForCondK \label{econt:for-cond}\\
-    &\ExpressionK{\scont}{\env} \label{econt:expression}
-  \end{align}
-  \caption{Expression Continuations}
-  \label{figure:econts}
-  \end{eqfigure}
-\end{figure}
-
-
-\subsubsection{Statement continuations}
-\label{subsubsec:statement-continuations}
-
-Statement continuations, $\scont$, capture the steps after execution of a statement.
-They accept an environment and produce the next configuration.
-Statements in a block expressions can extend the environment function and this is visible to the subsequent statements in the same block.
-For other types of statement configuration, the environment is ignored.
-
-We suffix the names of statement continuations with ``$SK$''.
-The different statement continuations are shown in Figure~\ref{figure:sconts}.
-
-\newcommand{\ExitSK}[1]{\mathrm{ExitSK}(\econt,\,#1)}
-\newcommand{\BlockSK}[2]{\mathrm{BlockSK}({#1},\,{#2},\,\lbls,\,\clbls,\,\handler,\,\cstrace,\,\cex,\,\econt,\,\scont)}
-\newcommand{\WhileSK}{\mathrm{WhileSK}(\expr,\,\stmt,\,\env,\,\lbls,\,\clbls,\,\handler,\,\cstrace,\,\cex,\,\econt,\,\scont)}
-\newcommand{\BodySK}[3]{\mathrm{BodySK}({#1},\,{#2},\,\strace,\,\handler,\,\cstrace,\,\cex,\,{#3})}
-\newcommand{\NewSK}[2]{\mathrm{NewSK}({#1},\,{#2})}
-\newcommand{\FinallySK}[1]{\mathrm{FinallySK}({#1},\,\env,\,\lbls,\,\clbls,\,\strace,\,\handler,\,\econt,\,\scont)}
-\newcommand{\RethrowSK}[3]{\mathrm{RethrowSK}({#1},\,{#2},\,{#3})}
-\newcommand{\ForSK}{\mathrm{ForSK}(\mathrm{\varmeta{s}},\, \expressionmeta,\, \exprs,\, \statementmeta,\, \env,\, \env',\, \lbls,\, \clbls,\, \handler,\, \cstrace,\, \cex,\, \econt,\, \scont)}
-\newcommand{\WhileCondSK}{\mathrm{WhileCondSK}(\expr,\,\stmt,\,\env,\,\lbls,\,\clbls,\,\handler,\,\cstrace,\,\cex,\,\econt,\,\scont)}
-\begin{figure}[Htp]
-  \begin{eqfigure}
-  \begin{align}
-    &\ExitSK{\val} \label{scont:exit}\\
-    &\BlockSK{\stmts}{\env} \label{scont:block}\\
-    &\WhileSK \label{scont:while}\\
-    &\BodySK{\stmt}{\env}{\scont} \label{scont:body}\\
-    &\NewSK{\econt}{\loc} \label{scont:new}\\
-    &\FinallySK{\stmt} \label{scont:finally}\\
-    &\RethrowSK{\val}{\strace}{\handler} \label{scont:rethrow}\\
-    &\ForSK \label{scont:for}\\
-    &\WhileCondSK \label{scont:while}
-  \end{align}
-  \caption{Statement Continuations}
-  \label{figure:sconts}
-  \end{eqfigure}
-\end{figure}
-
-
-\subsubsection{Application continuation}
-\label{subsubsec:application-continuation}
-
-Application continuations, $\acont$, capture the application of a list of values resulting from the evaluation of list of expressions.
-
-\newcommand{\ValueA}[2]{\mathrm{ValueA}({#1},\,{#2})}
-\newcommand{\StringConcatenationA}{\mathrm{StringConcatenationA(\econt)}}
-\newcommand{\SuperMethodA}[1]{\mathrm{SuperMethodA}(\idmeta,\,\env,\,#1,\,\ExceptionHandlersRest,\,\econt)}
-\newcommand{\StaticInvA}[4]{\mathrm{StaticInvocationA}({#1},\,{#2},\,{#3},\,\ExceptionHandlersRest,\,{#4})}
-\newcommand{\DInstanceMethodA}{\mathrm{DInstanceMethodA}(\membermeta,\,\val,\,\ExceptionHandlers,\,\econt)}
-\newcommand{\FieldsA}[4]{\mathrm{FieldsA}({#1},\,{#2},\,{#3},\,\strace,\,\handler,\,\cstrace,\,\cex,\,{#4})}
-\newcommand{\SuperA}[3]{\mathrm{SuperA}({#1},\,{#2},\,\strace,\,\handler,\,\cstrace,\,\cex,\,{#3})}
-\newcommand{\ConstructorA}[3]{\mathrm{ConstructorA}({#1},\,{#2},\,\handler,\,\cstrace,\,\cex,\,{#3})}
-\newcommand{\RedirectingA}[3]{\mathrm{RedirectingA}({#1},\,{#2},\,\strace,\,\handler,\,\cstrace,\,\cex,\,{#3})}
-\newcommand{\ForInitA}[1]{\mathrm{ForInitA}(\mathrm{\varmeta{s}},\, #1,\, \exprs,\, \statementmeta,\, \env,\, \lbls,\, \clbls,\, \handler,\, \cstrace,\, \cex,\, \econt,\, \scont)}
-\newcommand{\ForUpdatesA}[2]{\mathrm{ForUpdatesA}(\mathrm{\varmeta{s}},\, #1,\, \exprs,\, \statementmeta,\, \env,\, #2,\, \lbls,\, \clbls,\, \handler,\, \cstrace,\, \cex,\, \econt,\, \scont)}
-\newcommand{\InstanceMethodA}{\mathrm{InstanceMethodA(\idmeta,\,\val,\,\strace,\,\handler,\,\cstrace,\,\cex,\,\econt)}}
-
-We use the application continuation $\ValueA{\acont}{\val}$, capturing a value and an application continuation, as application that adds a value to the list of values to eventually used by an application continuation that produces a configuration other than ApplicationConfiguration.
-We suffix the names of application continuations with ``$A$''.
-The different application continuations are shown in Figure~\ref{figure:acont}.
-
-\begin{figure}[Htp]
-  \begin{eqfigure}
-  \begin{align}
-    &\ValueA{\val}{\acont} \label{acont:value}\\
-    &\StringConcatenationA \label{acont:stringconcat}\\
-    &\ForInitA{\expressionmeta} \label{acont:forinit}\\
-    &\ForUpdatesA{\expressionmeta}{\env'} \label{acont:forupdates}\\
-    &\SuperMethodA{\strace} \label{acont:supermethod}\\
-    &\DInstanceMethodA \label{acont:staticinv}\\
-    &\FieldsA{\env}{Izs}{\loc}{\scont} \label{acont:fields}\\
-    &\ConstructorA{Q}{\strace}{\econt} \label{acont:constructor}\\
-    &\SuperA{Q}{\loc}{\scont} \label{acont:super}\\
-    &\RedirectingA{Q}{\loc}{\scont} \label{acont:redirecting}
-  \end{align}
-  \caption{Application Continuations}
-  \label{figure:acont}
-  \end{eqfigure}
-\end{figure}
-
-
-\subsubsection{Break continuations}
-\label{subsubsec:break-continuations}
-
-Break continuations, $\bcont$, capture the steps to be executed when a break to a given label is encountered.
-The different break continuations are shown in Figure~\ref{figure:breakcont}.
-\newcommand{\Break}[2]{\mathrm{Break}(#1,\,#2)}
-\newcommand{\FinallyBreak}[2]{\mathrm{FinallyBreak}({#1},\,\env,\,\lbls,\,\clbls,\,\strace,\,\handler,\,\cstrace,\,\cex,\,\econt,\,{#2})}
-
-\begin{figure}[Htp]
-  \begin{eqfigure}
-  \begin{align}
-    &\Break{\env}{\scont} \label{breakcont:break} \\
-    &\FinallyBreak{\stmt}{\scont} \label{breakcont:finallybreak}
-  \end{align}
-  \caption{Break Continuations}
-  \label{figure:breakcont}
-  \end{eqfigure}
-\end{figure}
-
-The break continuation Break, \ref{breakcont:break}, captures a statement continuation and the environment corresponding to a target label or a break statement.
-The break continuation FinallyBreak, \ref{breakcont:finallybreak}, captures the statement body and the components necessary for the execution of an enclosing Finally statement.
-They are added when a try/finally statement is executed.
-
-
-\subsubsection{Switch continuations}
-\label{subsubsec:switch-continuations}
-
-Switch continuations, $\switchcont$, capture the steps to be executed when a continue to a preceding switch case statement is executed.
-They capture the components needed for the execution of the case body statement.
-The different switch continuations are shown in Figure~\ref{figure:switchconts}.
-
-\newcommand{\ContinueK}{\mathrm{SwitchContinueK}(\stmt,\,\env,\,\lbls,\,\clbls,\,\handler,\,\cstrace,\,\cex,\,\econt,\,\scont)}
-\newcommand{\FinallyContinue}[2]{\mathrm{FinallyContinue}({#1},\,\env,\,\lbls,\,\clbls,\,\strace,\,\handler,\,\cstrace,\,\cex,\,\econt,\,{#2})}
-
-\begin{figure}[Htp]
-  \begin{eqfigure}
-  \begin{align}
-    &\ContinueK \label{switchcont:continue} \\
-    &\FinallyContinue{\stmt}{\scont} \label{switchcont:finallycontinue}
-  \end{align}
-  \caption{Switch Continuations}
-  \label{figure:switchconts}
-  \end{eqfigure}
-\end{figure}
-
-The switch continuation SwitchContinue, \ref{switchcont:continue}, captures the statement body of a preceding switch case, targeted by some continue statement, and the components necessary for its execution.
-The switch continuation FinallyContinue, \ref{switchcont:finallycontinue}, captures the statement body and the components necessary for the execution of an enclosing Finally statement.
-They are added when a try/finally statement is executed.
-
-
-\subsubsection{Exception handlers}
-\label{subsubsec:exception-handlers}
-
-The different exception handlers are shown in Figure~\ref{figure:handlers}.
-\newcommand{\ThrowH}[2]{\mathrm{ThrowK}({#1},\,{#2})}
-\newcommand{\CatchH}[1]{\mathrm{Catch}({#1},\,\env,\,\lbls,\,\clbls,\,\strace,\,\handler,\,\econt,\,\scont)}
-
-\begin{figure}[Htp]
-  \begin{eqfigure}
-  \begin{align}
-    &\ThrowH{\val}{\strace} \label{handle:throw} \\
-    &\CatchH{cs} \label{handle:catch}
-  \end{align}
-  \caption{Exception handlers}
-  \label{figure:handlers}
-  \end{eqfigure}
-\end{figure}
 
 
 \section{Values}
@@ -1116,6 +739,382 @@ A method lookup searches for an instance method in the given class given the nam
 \]
   \todo{Add sync*/async/async* marker and type parameters}
 
+\section{Abstract Machine}
+\subsection{Configurations}
+\label{subsec:cesk-configs}
+
+The state space of the CESK machine contains various kinds of configurations.
+Configurations contain different components and the transition step dispatches to the next configuration based on one of the components of the configuration.
+
+% Named Configuration for CESK transitions
+\newcommand{\breakconf}[1]{\confsingle{#1}_{\mathrm{breakCont}}}
+\newcommand{\switchconf}[1]{\confsingle{#1}_{\mathrm{switchCont}}}
+\newcommand{\contconf}[2]{\confpair{#1}{#2}_{\mathrm{cont}}}
+\newcommand{\scontconf}[2]{\confpair{#1}{#2}_{\mathrm{scont}}}
+\newcommand{\acontconf}[2]{\confpair{#1}{#2}_{\mathrm{acont}}}
+\newcommand{\throwconf}[3]{\conftriple{#1}{#2}{#3}_{\mathrm{throw}}}
+\newcommand{\evallistconf}[6]{\langle{#1},\,{#2},\,{#3},\handler,\,{#4},\,{#5},\,{#6}\rangle_{\mathrm{evalList}}}
+\newcommand{\evalconf}[6]{\langle{#1},\,{#2},\,{#3},\handler,\,{#4},\,{#5},\,{#6}\rangle_{\mathrm{eval}}}
+\newcommand{\execconf}[9]{\langle{#1},\,{#2},\,{#3},\,{#4},\,{#5},\,{#6},\,{#7},\,{#8},\,{#9}\rangle_{\mathrm{exec}}}
+
+% Transition
+\begin{figure}[Htp]
+  \begin{eqfigure}
+  \begin{align}
+    &\evalconf{\expr}{\env}{st}{cex}{cst}{\econt} & :\quad & \text{EvalConfiguration} \label{config:eval}\\
+    &\evallistconf{\exprs}{\env}{st}{cex}{cst}{\acont} & :\quad & \text{EvalListConfiguration} \label{config:evallist}\\
+    &\execconf{\stmt}{\env}{\lbls}{\clbls}{\strace}{\handler}{\cex,\,\cstrace}{\econt}{\scont}  & :\quad & \text{ExecConfiguration} \label{config:exec}\\
+    &\contconf{\econt}{\val} & :\quad & \text{ValuePassingConfiguration} \label{config:econt}\\
+    &\acontconf{\acont}{\vals} & :\quad & \text{ApplicationConfiguration} \label{config:acont}\\
+    &\scontconf{\scont}{\env} & :\quad & \text{ForwardConfiguration} \label{config:scont}\\
+    &\throwconf{\handler}{\val}{\strace} & :\quad & \text{ThrowConfiguration} \label{config:throw}\\
+    &\breakconf{\bcont} & :\quad & \text{BreakConfiguration} \label{config:bcont}\\
+    &\switchconf{\switchcont} & :\quad &
+    \text{SwitchConfiguration}
+    \label{config:switchcont}
+  \end{align}
+  \caption{States for the CESK machine}
+  \end{eqfigure}
+\end{figure}
+
+
+\subsubsection{EvalConfiguration}
+\label{subsubsec:evalconfig}
+
+The configuration EvalConfiguration is shown in \ref{config:eval}.
+The transition step for this configuration dispatches on the expression component, $\expr$.
+With one transition step of the CESK-transition function, from the EvalConfiguration the next configuration can be one of the following:
+
+\begin{itemize}
+    \item ValuePassingConfiguration, when the current expression evaluates to a value in one step.
+    \item ExecConfiguration, when the current expression results with an invocation, i.e. execution of statement body of a getter.
+        Note that for other invocations, we first evaluate the receiver for instance invocations, or the arguments for static or constructor invocations.
+    \item EvalListConfiguration, when the current expression implies evaluation of a list of expressions.
+    \item ThrowConfiguration, when the current expression throws, i.e. is a throw expression.
+    \item EvalConfiguration, otherwise.
+\end{itemize}
+
+
+\subsubsection{EvalListConfigruation}
+\label{subsubsec:evallistconfig}
+
+The configuration EvalListConfiguration is shown in Figure~\ref{config:evallist}.
+The transition step for this configuration dispatches on the expression list, $\exprs$.
+With one step of the CESK-transition function, from EvalListConfifuration the next configuration is either EvalConfiguration, when $\exprs \neq []$, or ApplicationConfiguration, otherwise.
+
+
+\subsubsection{ExecConfiguration}
+\label{subsubsec:execconfig}
+
+The configuration ExecConfiguration is shown in Figure~\ref{config:exec}.
+The transition step dispatches on the statement, $\stmt$.
+The next configuration is either EvalConfiguration or ExecConfiguration.
+
+
+\subsubsection{ValuePassingConfiguration}
+\label{suubsubsec:valuepassingconfig}
+
+The configuration ValuePassingConfiguration is shown in Figure~\ref{config:econt}.
+The transition step applies the expression continuation component to its value component.
+The expression continuation produces the next configuration.
+
+
+\subsubsection{ApplicationConfiguration}
+\label{subsubsec:applicationconfig}
+
+The configuration ApplicationConfiguration is shown in Figure~\ref{config:acont}.
+The transition step applies the application continuation component to its list of values component.
+The application continuation produces the next configuration.
+
+
+\subsubsection{ForwardConfiguration}
+\label{subsubsec:forwardconfig}
+
+The configuration ForwardConfiguration is shown in Figure~\ref{config:scont}.
+The transition step applies the statement continuation component to its environment component.
+The statement continuation produces the next configuration.
+
+
+\subsubsection{ThrowCongfiguration}
+\label{subsubsec:throwconfig}
+
+The configuration ThrowConfiguration is shown in Figure~\ref{config:throw}.
+The transition step applies the exception handler.
+The next configuration is:
+
+\begin{itemize}
+    \item ThrowConfiguration, when the exception is not handled by the first catch clause of a catch handler.
+    \item ExecConfiguration, for the statement body of the matching catch or the finally statement, when no catch clauses are present.
+\end{itemize}
+
+
+\subsubsection{BreakConfiguration}
+\label{subsubsec:breakconfig}
+
+The configuration BreakConfiguration is shown in Figure~\ref{config:bcont}.
+The transition step applies the break continuation component.
+The next configuration is ForwardConfiguration.
+
+
+\subsubsection{SwitchConfiguration}
+\label{subsubsec:switchconfig}
+
+The configuration SwitchConfiguration is shown in Figure~\ref{config:switchcont}.
+The transition step applies the switch continuation component.
+The next configuration is ExecConfiguration.
+
+
+\subsection{Continuations}
+\label{subsec:continuations-definition}
+
+Continuations represent the instructions for execution of statements or evaluation of expressions.
+They capture the information needed to resume the execution of the program.
+There are various types of continuations depending on the state for evaluation of an expression or execution of a statement.
+
+
+\subsubsection{Expression continuations}
+\label{subsubsec:expression-continuations}
+
+Expression continuations, $\econt$, capture the steps after the evaluation of a given expression.
+They accept a value and produce the next configuration.
+
+There are various kinds of configurations, but two more general types can be distinguished:
+
+\begin{itemize}
+    \item Continuations with holes, i.e. expressions to be evaluated\\
+        Expression continuations with expressions will produce EvalConfiguration for evaluation of the next expression.
+        Note that some continuation will not evaluate the captured expression, when this is not necessary (e.g., \eqref{eval:and}).
+
+    \item Continuations without holes\\
+        Continuations without holes dispatch on the provided value and produce the next configuration, a ValuePassingConfiguration.
+
+\end{itemize}
+
+We suffix the names of expression continuations with ``$K$''.
+The different expression continuations are shown in Figure~\ref{figure:econts}.
+
+\newcommand{\ExceptionHandlersRest}{\handler,\,\cstrace,\,\cex}
+\newcommand{\ExceptionHandlers}{\strace,\,\handler,\,\cstrace,\,\cex}
+% Continuations
+\newcommand{\VarSetK}[4]{\mathrm{VarSetEK}({#1},\,{#2},\,{#3},\,{#4})}
+\newcommand{\ExpressionsK}[3]{\mathrm{ExpressionsEK}({#1},\,{#2},\,\ExceptionHandlers,\,{#3})}
+
+\newcommand{\NotK}[1]{\mathrm{NotEK}({#1})}
+\newcommand{\AndK}[3]{\mathrm{AndEK}({#1},\,{#2},\,\ExceptionHandlers,\,{#3})}
+\newcommand{\OrK}[3]{\mathrm{OrEK}({#1},\,{#2},\,\ExceptionHandlers,\,{#3})}
+\newcommand{\ConditionalK}[4]{\mathrm{ConditionalEK}({#1},\,{#2},\,{#3},\,\ExceptionHandlers,\,{#4})}
+
+\newcommand{\LetK}[4]{\mathrm{LetEK}({#1},\,{#2},\,{#3},\,\ExceptionHandlers,\,{#4})}
+
+\newcommand{\IsExpressionK}{\mathrm{IsExpressionEK}(\tt{T},\,\econt)}
+\newcommand{\AsExpressionK}{\mathrm{AsExpressionEK}(\tt{T},\,\strace,\,\handler,\,\econt)}
+
+\newcommand{\StaticGetK}{\mathrm{StaticGetEK}(\membermeta,\,\econt)}
+\newcommand{\StaticSetK}{\mathrm{StaticSetEK}(\membermeta,\,\econt)}
+\newcommand{\PropertyGetK}{\mathrm{PropertyGetEK}(\idmeta,\,\ExceptionHandlers,\,\econt)}
+\newcommand{\PropertySetK}{\mathrm{PropertySetEK}(\idmeta,\,\expressionmeta_1,\,\env,\,\ExceptionHandlers,\,\econt)}
+\newcommand{\PropertySetVK}{\mathrm{PropertySetValueEK}(\val_0,\,\idmeta,\,\ExceptionHandlers,\,\econt)}
+\newcommand{\DPropertyGetK}{\mathrm{DPropertyGetEK}(\membermeta,\,\ExceptionHandlers,\,\econt)}
+\newcommand{\DirectPropertySetK}{\mathrm{DPropertySetEK}(\membermeta,\,\expressionmeta_1,\,\env,\,\ExceptionHandlers,\,\econt)}
+\newcommand{\DPropertySetVK}{\mathrm{DPropertySetValueEK}(\val_0,\,\membermeta,\,\ExceptionHandlers,\,\econt)}
+\newcommand{\SuperPropertySetK}{\mathrm{SuperPropertySetEK}(\idmeta,\,\env,\,\ExceptionHandlers,\,\econt)}
+
+\newcommand{\InstanceMethodK}[1]{\mathrm{InstanceMethodK(\expressionsmeta,\,\idmeta,\,\env,\,#1,\,\ExceptionHandlersRest,\,\econt)}}
+\newcommand{\DInstanceMethodK}[1]{\mathrm{DInstanceMethodEK}(\expressionsmeta,\,\membermeta,\,\env,\,#1,\,\ExceptionHandlersRest,\,\econt)}
+\newcommand{\VarDeclK}[3]{\mathrm{VarDeclarationEK}({#1},\,{#2},\,{#3})}
+\newcommand{\IfCondK}[2]{\mathrm{IfConditionEK}({#1},\,{#2},\,\env,\,\lbls,\,\clbls,\,\handler,\,\cstrace,\,\cex,\,\econt,\,\scont)}
+\newcommand{\SwitchK}[2]{\mathrm{SwitchEK}({#1},\,\env,\,\lbls,\,{#2},\,\strace,\,\handler,\,\cstrace,\,\cex,\,\econt,\,\scont)}
+
+\newcommand{\WhileCondK}{\mathrm{WhileCondEK}(\expr,\,\stmt,\,\env,\,\lbls,\,\clbls,\,\strace,\,\handler,\,\cstrace,\,\cex,\,\econt,\,\scont)}
+\newcommand{\InitializerK}[4]{\mathrm{InitializerEK}({#1},\,{#2},\,{#3},\,\strace,\,\handler,\,\cstrace,\,\cex,\,{#4})}
+\newcommand{\InitK}[3]{\mathrm{InitEK}({#1},\,{#2},\,\strace,\,\handler,\,\cstrace,\,\cex,\,{#3})}
+\newcommand{\InitializerListK}[4]{\mathrm{InitializerListEK}({#1},\,{#2},\,{#3},\,\strace,\,\handler,\,\cstrace,\,\cex,\,{#4})}
+\newcommand{\FinallyK}[1]{\mathrm{FinallyEK}({#1},\,\env,\,\lbls,\,\clbls,\,\strace,\,\handler,\,\econt)}
+\newcommand{\FinallyReturnK}[1]{\mathrm{FinallyReturnEK}({#1},\,\env,\,\lbls,\,\clbls,\,\strace,\,\handler,\,\econt)}
+
+\newcommand{\ForCondK}{\mathrm{ForConditionEK}(\mathrm{\varmeta{s}},\, \expressionmeta,\, \exprs,\, \statementmeta,\, \env,\, \env',\, \lbls,\, \clbls,\, \handler,\, \cstrace,\, \cex,\, \econt,\, \scont)}
+\newcommand{\ExpressionK}[2]{\mathrm{ExpressionEK}({#1},\,{#2})}
+\begin{figure}[Htp]
+  \begin{eqfigure}
+  \begin{align}
+    &\VarSetK{\idmeta}{\env}{\ExceptionHandlers}{\econt} \label{econt:varset}\\
+    &\ExpressionsK{\exprs}{\env}{\acont} \label{econt:expressions}\\
+    &\NotK{\econt} \label{econt:not}\\
+    &\AndK{\expressionmeta}{\ExceptionHandlers}{\econt} \label{econt:and}\\
+    &\OrK{\expressionmeta}{\ExceptionHandlers}{\econt} \label{econt:or}\\
+    &\ConditionalK{\expressionmeta_1}{\expressionmeta_2}{\ExceptionHandlers}{\econt} \label{econt:cond}\\
+    &\LetK{\idmeta}{\expressionmeta}{\ExceptionHandlers}{\econt} \label{econt:let}\\
+    &\IsExpressionK \label{econt:is}\\
+    &\AsExpressionK \label{econt:as}\\
+    &\StaticGetK \label{econt:static-get}\\
+    &\StaticSetK \label{econt:static-set}\\
+    &\DPropertyGetK \label{econt:dproperty-get}\\
+    &\PropertySetK \label{econt:property-set}\\
+    &\PropertySetVK \label{econt:property-set}\\
+    &\DPropertyGetK \label{econt:dproperty-set}\\
+    &\DPropertySetVK \label{econt:dproperty-set-v}\\
+    &\SuperPropertySetK \label{econt:super-property-set}\\
+    &\InstanceMethodK{\strace} \label{econt:instance-method}\\
+    &\DInstanceMethodK{\strace} \label{econt:dinstance-method}\\
+    &\VarDeclK{\idmeta}{\env}{\scont} \label{econt:var-decl}\\
+    &\IfCondK{\expressionmeta_1}{\expressionmeta_2} \label{econt:if-cond}\\
+    &\ForCondK \label{econt:for-cond}\\
+    &\ExpressionK{\scont}{\env} \label{econt:expression}
+  \end{align}
+  \caption{Expression Continuations}
+  \label{figure:econts}
+  \end{eqfigure}
+\end{figure}
+
+
+\subsubsection{Statement continuations}
+\label{subsubsec:statement-continuations}
+
+Statement continuations, $\scont$, capture the steps after execution of a statement.
+They accept an environment and produce the next configuration.
+Statements in a block expressions can extend the environment function and this is visible to the subsequent statements in the same block.
+For other types of statement configuration, the environment is ignored.
+
+We suffix the names of statement continuations with ``$SK$''.
+The different statement continuations are shown in Figure~\ref{figure:sconts}.
+
+\newcommand{\ExitSK}[1]{\mathrm{ExitSK}(\econt,\,#1)}
+\newcommand{\BlockSK}[2]{\mathrm{BlockSK}({#1},\,{#2},\,\lbls,\,\clbls,\,\handler,\,\cstrace,\,\cex,\,\econt,\,\scont)}
+\newcommand{\WhileSK}{\mathrm{WhileSK}(\expr,\,\stmt,\,\env,\,\lbls,\,\clbls,\,\handler,\,\cstrace,\,\cex,\,\econt,\,\scont)}
+\newcommand{\BodySK}[3]{\mathrm{BodySK}({#1},\,{#2},\,\strace,\,\handler,\,\cstrace,\,\cex,\,{#3})}
+\newcommand{\NewSK}[2]{\mathrm{NewSK}({#1},\,{#2})}
+\newcommand{\FinallySK}[1]{\mathrm{FinallySK}({#1},\,\env,\,\lbls,\,\clbls,\,\strace,\,\handler,\,\econt,\,\scont)}
+\newcommand{\RethrowSK}[3]{\mathrm{RethrowSK}({#1},\,{#2},\,{#3})}
+\newcommand{\ForSK}{\mathrm{ForSK}(\mathrm{\varmeta{s}},\, \expressionmeta,\, \exprs,\, \statementmeta,\, \env,\, \env',\, \lbls,\, \clbls,\, \handler,\, \cstrace,\, \cex,\, \econt,\, \scont)}
+\newcommand{\WhileCondSK}{\mathrm{WhileCondSK}(\expr,\,\stmt,\,\env,\,\lbls,\,\clbls,\,\handler,\,\cstrace,\,\cex,\,\econt,\,\scont)}
+\begin{figure}[Htp]
+  \begin{eqfigure}
+  \begin{align}
+    &\ExitSK{\val} \label{scont:exit}\\
+    &\BlockSK{\stmts}{\env} \label{scont:block}\\
+    &\WhileSK \label{scont:while}\\
+    &\BodySK{\stmt}{\env}{\scont} \label{scont:body}\\
+    &\NewSK{\econt}{\loc} \label{scont:new}\\
+    &\FinallySK{\stmt} \label{scont:finally}\\
+    &\RethrowSK{\val}{\strace}{\handler} \label{scont:rethrow}\\
+    &\ForSK \label{scont:for}\\
+    &\WhileCondSK \label{scont:while}
+  \end{align}
+  \caption{Statement Continuations}
+  \label{figure:sconts}
+  \end{eqfigure}
+\end{figure}
+
+
+\subsubsection{Application continuation}
+\label{subsubsec:application-continuation}
+
+Application continuations, $\acont$, capture the application of a list of values resulting from the evaluation of list of expressions.
+
+\newcommand{\ValueA}[2]{\mathrm{ValueA}({#1},\,{#2})}
+\newcommand{\StringConcatenationA}{\mathrm{StringConcatenationA(\econt)}}
+\newcommand{\SuperMethodA}[1]{\mathrm{SuperMethodA}(\idmeta,\,\env,\,#1,\,\ExceptionHandlersRest,\,\econt)}
+\newcommand{\StaticInvA}[4]{\mathrm{StaticInvocationA}({#1},\,{#2},\,{#3},\,\ExceptionHandlersRest,\,{#4})}
+\newcommand{\DInstanceMethodA}{\mathrm{DInstanceMethodA}(\membermeta,\,\val,\,\ExceptionHandlers,\,\econt)}
+\newcommand{\FieldsA}[4]{\mathrm{FieldsA}({#1},\,{#2},\,{#3},\,\strace,\,\handler,\,\cstrace,\,\cex,\,{#4})}
+\newcommand{\SuperA}[3]{\mathrm{SuperA}({#1},\,{#2},\,\strace,\,\handler,\,\cstrace,\,\cex,\,{#3})}
+\newcommand{\ConstructorA}[3]{\mathrm{ConstructorA}({#1},\,{#2},\,\handler,\,\cstrace,\,\cex,\,{#3})}
+\newcommand{\RedirectingA}[3]{\mathrm{RedirectingA}({#1},\,{#2},\,\strace,\,\handler,\,\cstrace,\,\cex,\,{#3})}
+\newcommand{\ForInitA}[1]{\mathrm{ForInitA}(\mathrm{\varmeta{s}},\, #1,\, \exprs,\, \statementmeta,\, \env,\, \lbls,\, \clbls,\, \handler,\, \cstrace,\, \cex,\, \econt,\, \scont)}
+\newcommand{\ForUpdatesA}[2]{\mathrm{ForUpdatesA}(\mathrm{\varmeta{s}},\, #1,\, \exprs,\, \statementmeta,\, \env,\, #2,\, \lbls,\, \clbls,\, \handler,\, \cstrace,\, \cex,\, \econt,\, \scont)}
+\newcommand{\InstanceMethodA}{\mathrm{InstanceMethodA(\idmeta,\,\val,\,\strace,\,\handler,\,\cstrace,\,\cex,\,\econt)}}
+
+We use the application continuation $\ValueA{\acont}{\val}$, capturing a value and an application continuation, as application that adds a value to the list of values to eventually used by an application continuation that produces a configuration other than ApplicationConfiguration.
+We suffix the names of application continuations with ``$A$''.
+The different application continuations are shown in Figure~\ref{figure:acont}.
+
+\begin{figure}[Htp]
+  \begin{eqfigure}
+  \begin{align}
+    &\ValueA{\val}{\acont} \label{acont:value}\\
+    &\StringConcatenationA \label{acont:stringconcat}\\
+    &\ForInitA{\expressionmeta} \label{acont:forinit}\\
+    &\ForUpdatesA{\expressionmeta}{\env'} \label{acont:forupdates}\\
+    &\SuperMethodA{\strace} \label{acont:supermethod}\\
+    &\DInstanceMethodA \label{acont:staticinv}\\
+    &\FieldsA{\env}{Izs}{\loc}{\scont} \label{acont:fields}\\
+    &\ConstructorA{Q}{\strace}{\econt} \label{acont:constructor}\\
+    &\SuperA{Q}{\loc}{\scont} \label{acont:super}\\
+    &\RedirectingA{Q}{\loc}{\scont} \label{acont:redirecting}
+  \end{align}
+  \caption{Application Continuations}
+  \label{figure:acont}
+  \end{eqfigure}
+\end{figure}
+
+
+\subsubsection{Break continuations}
+\label{subsubsec:break-continuations}
+
+Break continuations, $\bcont$, capture the steps to be executed when a break to a given label is encountered.
+The different break continuations are shown in Figure~\ref{figure:breakcont}.
+\newcommand{\Break}[2]{\mathrm{Break}(#1,\,#2)}
+\newcommand{\FinallyBreak}[2]{\mathrm{FinallyBreak}({#1},\,\env,\,\lbls,\,\clbls,\,\strace,\,\handler,\,\cstrace,\,\cex,\,\econt,\,{#2})}
+
+\begin{figure}[Htp]
+  \begin{eqfigure}
+  \begin{align}
+    &\Break{\env}{\scont} \label{breakcont:break} \\
+    &\FinallyBreak{\stmt}{\scont} \label{breakcont:finallybreak}
+  \end{align}
+  \caption{Break Continuations}
+  \label{figure:breakcont}
+  \end{eqfigure}
+\end{figure}
+
+The break continuation Break, \ref{breakcont:break}, captures a statement continuation and the environment corresponding to a target label or a break statement.
+The break continuation FinallyBreak, \ref{breakcont:finallybreak}, captures the statement body and the components necessary for the execution of an enclosing Finally statement.
+They are added when a try/finally statement is executed.
+
+
+\subsubsection{Switch continuations}
+\label{subsubsec:switch-continuations}
+
+Switch continuations, $\switchcont$, capture the steps to be executed when a continue to a preceding switch case statement is executed.
+They capture the components needed for the execution of the case body statement.
+The different switch continuations are shown in Figure~\ref{figure:switchconts}.
+
+\newcommand{\ContinueK}{\mathrm{SwitchContinueK}(\stmt,\,\env,\,\lbls,\,\clbls,\,\handler,\,\cstrace,\,\cex,\,\econt,\,\scont)}
+\newcommand{\FinallyContinue}[2]{\mathrm{FinallyContinue}({#1},\,\env,\,\lbls,\,\clbls,\,\strace,\,\handler,\,\cstrace,\,\cex,\,\econt,\,{#2})}
+
+\begin{figure}[Htp]
+  \begin{eqfigure}
+  \begin{align}
+    &\ContinueK \label{switchcont:continue} \\
+    &\FinallyContinue{\stmt}{\scont} \label{switchcont:finallycontinue}
+  \end{align}
+  \caption{Switch Continuations}
+  \label{figure:switchconts}
+  \end{eqfigure}
+\end{figure}
+
+The switch continuation SwitchContinue, \ref{switchcont:continue}, captures the statement body of a preceding switch case, targeted by some continue statement, and the components necessary for its execution.
+The switch continuation FinallyContinue, \ref{switchcont:finallycontinue}, captures the statement body and the components necessary for the execution of an enclosing Finally statement.
+They are added when a try/finally statement is executed.
+
+
+\subsubsection{Exception handlers}
+\label{subsubsec:exception-handlers}
+
+The different exception handlers are shown in Figure~\ref{figure:handlers}.
+\newcommand{\ThrowH}[2]{\mathrm{ThrowK}({#1},\,{#2})}
+\newcommand{\CatchH}[1]{\mathrm{Catch}({#1},\,\env,\,\lbls,\,\clbls,\,\strace,\,\handler,\,\econt,\,\scont)}
+
+\begin{figure}[Htp]
+  \begin{eqfigure}
+  \begin{align}
+    &\ThrowH{\val}{\strace} \label{handle:throw} \\
+    &\CatchH{cs} \label{handle:catch}
+  \end{align}
+  \caption{Exception handlers}
+  \label{figure:handlers}
+  \end{eqfigure}
+\end{figure}
 
 \section{Semantics}
 \label{sec:semantics}
