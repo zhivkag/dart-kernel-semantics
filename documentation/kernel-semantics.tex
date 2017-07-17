@@ -156,17 +156,38 @@
 
 
 \begin{document}
-\title{Dart Kernel Semantics \\ (draft)}
+\title{Operational Semantics of Dart Kernel}
+\author{Dart Kernel Team \\ \href{mailto:dart-kernel@google.com}{dart-kernel@google.com}}
 
 \maketitle
 
-The small-step operational semantics of Dart Kernel is given by an abstract machine in the style of the CESK machine.   % TODO(dmitryas): Put \cite{cesk} here when we have bibliography.
-The machine is defined by a single step transition function where each step of the machine starts in a configuration and deterministically gives the next configuration.
+\begin{abstract}
 
+The \textsc{Dart Kernel} is a simplified representation of the \textsc{Dart} programming language.
+Similar to the \textsc{Core} of the Glasgow Haskell Compiler, \textsc{Dart Kernel} is more amenable to formal specification and analysis than the \textsc{Dart} surface language and is the primary intermediate representation used in the \textsc{Dart} compilation toolchain.
+This paper documents the syntax and operational semantics of \textsc{Dart Kernel} to enable framework authors for \textsc{Dart} to write safe transformations on \textsc{Dart Kernel}, to allow the creation of a reference interpreter for testing the backend implementations of \textsc{Dart}, and to facilitate academic analysis of the safety properties of \textsc{Dart}.
+
+\end{abstract}
+
+\setcounter{tocdepth}{1}
+\tableofcontents
+
+\section{Forward}
+
+\subsection{Audience}
+
+\subsection{Dart Kernel}
+The small-step operational
+semantics of Dart Kernel is given by an abstract machine in the style of the
+CESK machine. % TODO(dmitryas): Put \cite{cesk} here when we have bibliography.
+The machine is defined by a single step transition function where each step of
+the machine starts in a configuration and deterministically gives the next
+configuration.
+
+\subsection{Formalization Style}
 
 \section{Definitions}
 \label{sec:definitions}
-
 
 \subsection{Conventions}
 \label{subsec:conventions}
