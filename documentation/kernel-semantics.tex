@@ -220,7 +220,7 @@ In this way state of the CESK machine mimics states of the Dart VM at a very abs
     \item ``$\mlist{\mathbf{X}}$'' denotes the domain of meta-lists of elements from domain ``$\mathbf{X}$''.
         Note that the word ``List'' here is not in bold, so that it isn't confused with the domain $\mathbf{List}$ of Dart objects.
 \end{itemize}
-% TODO(dmitryas): Explain notation for Kernel syntactic constructs like "on T catch (e, s)".
+\todo{dmitryas: Explain notation for Kernel syntactic constructs like "on T catch (e, s)".}
 
 
 \subsection{Domains}
@@ -940,7 +940,7 @@ A method lookup searches for an instance method in the given class given the nam
 
 \subsection{Function values}
 \label{subsec:function-values}
-% todo: add async marker, type parameters, return type to FunctionValue
+\todo{add async marker, type parameters, return type to FunctionValue}
 \[
     \dfunval : \dformals \times \dstmt \times \denv
 \]
@@ -958,7 +958,7 @@ A method lookup searches for an instance method in the given class given the nam
 \newcommand{\VariableGet}[1]{#1}
 \newcommand{\VariableSet}[2]{#1=#2}
 
-% TODO(kmillikin): Names should not ignore the library.
+\todo{kmillikin: Names should not ignore the library.}
 \newcommand{\PropertyGet}[2]{#1.#2}
 \newcommand{\PropertySet}[3]{#1.#2=#3}
 
@@ -1110,11 +1110,11 @@ A method lookup searches for an instance method in the given class given the nam
   & \TryFinally{\statementmeta_1}{\statementmeta_2} \\
   & \Yield{\expressionmeta} \\
   & \VarDeclaration{\idmeta}{\expressionmeta} \\
-  % todo: Add sync*/async/async* marker and type parameters
   & \FunctionDeclaration{\typemeta}{\idmeta}{\formals}{}{\stmt} \\
 
 \end{array}
 \]
+  \todo{Add sync*/async/async* marker and type parameters}
 
 
 \section{Semantics}
@@ -1596,7 +1596,7 @@ Note that the default values for the optional parameters are constants, hence th
 Required parameters will not be added to the list of expressions when they are not provided.
 This is an implementation detail that allows us to ignore the distinction between provided or missing positional, optional and named arguments.
 After the evaluation of the argument expressions, and before binding the actual arguments to the formal parameters necessary checks ensure the actual arguments are valid or throw a dynamic error accordingly.
-% todo: Specify what *valid* means and what error is thrown when arguments are not *valid*
+\todo{Specify what *valid* means and what error is thrown when arguments are not *valid*}
 
 The statement body is then executed with the appropriate bindings.
 The specific CESK-transitions for the different invocations are described in the appropriate sections below.
@@ -2001,8 +2001,8 @@ Let $\val' = \deref{(\env(\this))}$, $C = \superclass{\val'}$ and $M$ the result
 The evaluation proceeds with evaluation of the right-hand side expression as shown in \eqref{eval:superpropertyset}.
 After the evaluation of the argument expression to a value $\val$, depending on $\membermeta$, the evaluation continues as follows:
 
+\todo{regroup all property extraction together since text is similar}
 \begin{itemize}
-    % todo: regroup all property extraction together since text is similar
     \item $\membermeta$ is an instance setter\\
         When $\membermeta$ is an invocation of a setter with body $\stmt$ and formal parameter $\formal$, the evaluation proceeds by executing the body in the environment which binds $\tt{this}$ to a location that contains $\deref{(\env(\this))}$ and the formal parameter $\formal$ to a location that contains $\val$.
         This is shown in the CESK-transition \eqref{econtconf:superpropertyset-setter}.
