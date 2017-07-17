@@ -1,10 +1,24 @@
-Require Import String.
+Require Import
+        String
+        Coq.FSets.FMapList
+        Coq.Structures.OrderedTypeEx.
+
+
+Module Import M := FMapList.Make(Nat_as_OT).
 
 (** Abstract syntax Kernel *)
 Definition identifier : Type :=  string.
-Variable Member : Type.
-Variable Location : Type.
+Definition location   : Type := nat.
+
+Inductive  member : Type :=
+ | Field          : member
+ | Method         : member
+ | Getter         : member
+ | Setter         : member.
+
 Variable DartType : Type.
+
+
 
 (** *)
 Definition node_id : Type := nat.
@@ -15,12 +29,12 @@ Inductive expr               : Type :=
  | VarSet                    : var_declaration -> expr -> expr
  | PropertyGet               : expr            -> identifier -> expr
  | PropertySet               : expr            -> identifier -> expr -> expr
- | DPropertyGet              : expr            -> Member -> expr
- | DPropertySet              : expr            -> Member -> expr -> expr
+ | DPropertyGet              : expr            -> member -> expr
+ | DPropertySet              : expr            -> member -> expr -> expr
  | SuperGet                  : identifier      -> expr
  | SuperSet                  : identifier      -> expr -> expr
- | StaticGet                 : Member          -> expr
- | StaticSet                 : Member          -> expr -> expr
+ | StaticGet                 : member          -> expr
+ | StaticSet                 : member          -> expr -> expr
  | Not                       : expr            -> expr
  | And                       : expr            -> expr
  | Or                        : expr            -> expr
@@ -41,10 +55,10 @@ Inductive expr               : Type :=
  | New                       : DartType        -> list expr -> expr
  | StaticInvocation          : identifier      -> list expr -> expr
  | InstanceMethodInvocation  : expr            -> identifier -> list expr -> expr
- | DInstanceMethodInvocation : expr            -> Member -> list expr -> expr
+ | DInstanceMethodInvocation : expr            -> member -> list expr -> expr
 with
  var_declaration             : Type :=
-  | VarDeclaration           : node_id         -> identifier -> expr -> var_declaration.
+ | VarDeclaration           : node_id         -> identifier -> expr -> var_declaration.
 
 
 (** Statements *)
@@ -70,11 +84,12 @@ Inductive stmt : Type :=
  | VarDecl     : var_declaration -> stmt
  | FunDecl     : DartType        -> identifier -> list DartType -> list identifier -> stmt -> stmt.
 
+
 (** Values *)
 
-Inductive Value : Type :=
- | IntVal : nat -> Value
- | DoubleVal
+Inductive value : Type :=
+ | IntVal : nat -> value
+ | DoubleVal : value
  | StringVal
  | ObjectVal 
  | ListVal 
@@ -83,14 +98,13 @@ Inductive Value : Type :=
  | NullVal.
 
 
-(** Functions *)
-
-Variable Environment : Type.
+Definition binding     : Type := var_declaration -> location.
+Definition environment : Type := M.t binding.
+Definition store       : Type := M.t value.
 
 Record function : Type := mkfunction {
                              f_formals : list var_declaration;
-                             f_env : Environment;
+                             f_env : environment;
                              f_body : stmt
                            }.
-
 (** CESK machine *)
