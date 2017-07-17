@@ -165,16 +165,20 @@
 
 The \textsc{Dart Kernel} is a simplified representation of the \textsc{Dart} programming language.
 Similar to the \textsc{Core} of the Glasgow Haskell Compiler, \textsc{Dart Kernel} is more amenable to formal specification and analysis than the \textsc{Dart} surface language and is the primary intermediate representation used in the \textsc{Dart} compilation toolchain.
-This paper documents the syntax and operational semantics of \textsc{Dart Kernel} to enable framework authors for \textsc{Dart} to write safe transformations on \textsc{Dart Kernel}, to allow the creation of a reference interpreter for testing the backend implementations of \textsc{Dart}, and to facilitate academic analysis of the safety properties of \textsc{Dart}.
+This paper documents the syntax and operational semantics of \textsc{Dart Kernel} to enable framework authors for \textsc{Dart} to write safe transformations on \textsc{Dart Kernel}, to allow the creation of a reference interpreter for testing the backend implementations of \textsc{Dart} and to facilitate academic analysis of the safety properties of \textsc{Dart}.
 
 \end{abstract}
 
-\setcounter{tocdepth}{1}
+\setcounter{tocdepth}{2}
 \tableofcontents
 
 \section{Forward}
 
 \subsection{Audience}
+
+This paper is targeted toward compiler authors, framework authors and academics.
+The reader should have a proficient understanding of basic concepts in programming language design and implementation, such abstract syntax, intermediate representations and operational semantics.
+Still, this paper aims to be as accessible as possible, so most concepts that are not familiar to an average \textsc{Dart} programmer will be explained in sufficient detail to understand the formalizations here.
 
 \subsection{Dart Kernel}
 The small-step operational
