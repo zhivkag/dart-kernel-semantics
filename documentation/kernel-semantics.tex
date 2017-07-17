@@ -28,6 +28,8 @@
 % Macros used below have been contributed in part by Olivier Danvy and Kevin Millikin
 \input{danvy-millikin-LMCS.mac}
 
+% Shorthard for ``Dart Kernel'' in small caps
+\newcommand{\kernel}{\textsc{Dart Kernel}}
 
 % A bit nicer symbol: ∅
 \renewcommand{\emptyset}{\varnothing}
@@ -175,20 +177,27 @@ This paper documents the syntax and operational semantics of \textsc{Dart Kernel
 \section{Forward}
 
 \subsection{Audience}
-
-This paper is targeted toward compiler authors, framework authors and academics.
+This paper is targeted toward compiler and framework authors and academics.
 The reader should have a proficient understanding of basic concepts in programming language design and implementation, such abstract syntax, intermediate representations and operational semantics.
-Still, this paper aims to be as accessible as possible, so most concepts that are not familiar to an average \textsc{Dart} programmer will be explained in sufficient detail to understand the formalizations here.
-
-\subsection{Dart Kernel}
-The small-step operational
-semantics of Dart Kernel is given by an abstract machine in the style of the
-CESK machine. % TODO(dmitryas): Put \cite{cesk} here when we have bibliography.
-The machine is defined by a single step transition function where each step of
-the machine starts in a configuration and deterministically gives the next
-configuration.
+Still, this paper aims to be as accessible as possible, so most concepts that are not familiar to an advanced \textsc{Dart} programmer will be explained in sufficient detail to understand the formalizations here.
 
 \subsection{Formalization Style}
+
+\subsubsection{Abstract Syntax}
+
+The abstract syntax of \kernel{} is slightly unusual in that it does not correspond to a concrete, textual syntax.
+It is instead a description of the data structures used by the \textsc{Dart} compliation toolchain, which are represented as directed acyclic graph.
+The semantics depends heavily on the use of ``pointer'' equality between nodes in the syntax graph, which is more fine-grained than structural equality.
+For example, a single \kernel{} program may have several syntax nodes that each define and initialize a variable with the same name and value, even in the same scope.
+A later assignment to the variable will disambiguate between these declarations by referring to the specific variable declaration node by pointer identity.
+Presenting the abstract syntax in this manner not only models the \kernel{} implementation more accurately, but allows us to ignore complications with variable renaming, shadowing and $\alpha$-conversion.
+
+\subsubsection{Small-step Operational Semantics}
+
+\subsubsection{CESK Machine}
+
+%% The small-step operational semantics of Dart Kernel is given by an abstract machine in the style of the CESK machine. % TODO(dmitryas): Put \cite{cesk} here when we have bibliography.
+%% The machine is defined by a single step transition function where each step of the machine starts in a configuration and deterministically gives the next configuration.
 
 \section{Definitions}
 \label{sec:definitions}
