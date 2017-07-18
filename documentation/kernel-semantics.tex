@@ -29,8 +29,11 @@
 % Macros used below have been contributed in part by Olivier Danvy and Kevin Millikin
 \input{danvy-millikin-LMCS.mac}
 
-% Shorthard for ``Dart Kernel'' in small caps
+% Shorthard for ``Dart Kernel'' in small caps.
 \newcommand{\kernel}{\textsc{Dart Kernel}}
+
+% Shorthand for ``Dart'' in small caps.
+\newcommand{\dart}{\textsc{Dart}}
 
 % A bit nicer symbol: ∅
 \renewcommand{\emptyset}{\varnothing}
@@ -159,16 +162,16 @@
 
 
 \begin{document}
-\title{Operational Semantics of Dart Kernel}
-\author{Dart Kernel Team \\ \href{mailto:dart-kernel@google.com}{dart-kernel@google.com}}
+\title{Operational Semantics of \kernel{}}
+\author{\kernel{} Team \\ \href{mailto:dart-kernel@google.com}{dart-kernel@google.com}}
 
 \maketitle
 
 \begin{abstract}
 
-The \textsc{Dart Kernel} is a simplified representation of the \textsc{Dart} programming language.
-Similar to the \textsc{Core} of the Glasgow Haskell Compiler, \textsc{Dart Kernel} is more amenable to formal specification and analysis than the \textsc{Dart} surface language and is the primary intermediate representation used in the \textsc{Dart} compilation toolchain.
-This paper documents the syntax and operational semantics of \textsc{Dart Kernel} to enable framework authors for \textsc{Dart} to write safe transformations on \textsc{Dart Kernel}, to allow the creation of a reference interpreter for testing the backend implementations of \textsc{Dart} and to facilitate academic analysis of the safety properties of \textsc{Dart}.
+The \kernel{} is a simplified representation of the \dart{} programming language.
+Similar to the \textsc{Core} of the Glasgow Haskell Compiler, \kernel{} is more amenable to formal specification and analysis than the \dart{} surface language and is the primary intermediate representation used in the \dart{} compilation toolchain.
+This paper documents the syntax and operational semantics of \kernel{} to enable framework authors for \dart{} to write safe transformations on \kernel{}, to allow the creation of a reference interpreter for testing the backend implementations of \dart{} and to facilitate academic analysis of the safety properties of \dart{}.
 
 \end{abstract}
 
@@ -180,14 +183,14 @@ This paper documents the syntax and operational semantics of \textsc{Dart Kernel
 \subsection{Audience}
 This paper is intended for compiler and framework authors and academics.
 The reader should have a proficient understanding of basic concepts in programming language design and implementation, such as abstract syntax, intermediate representations and operational semantics.
-Still, this paper aims to be as accessible as possible, so most concepts that are not familiar to an advanced \textsc{Dart} programmer will be explained in sufficient detail to understand the formalizations here.
+Still, this paper aims to be as accessible as possible, so most concepts that are not familiar to an advanced \dart{} programmer will be explained in sufficient detail to understand the formalizations here.
 
 \subsection{Formalization Style}
 
 \subsubsection{Abstract Syntax}
 
 The abstract syntax of \kernel{} is slightly unusual in that it does not have a tree structure or relate to any concrete, textual syntax.
-It is instead a description of the data structures used by the \textsc{Dart} compliation toolchain, which are represented as directed acyclic graph.
+It is instead a description of the data structures used by the \dart{} compliation toolchain, which are represented as directed acyclic graph.
 The semantics depends heavily on the use of ``pointer'' equality between nodes in the syntax graph, which is more fine-grained than structural equality.
 For example, a single \kernel{} program may have several syntax nodes that each define and initialize a variable with the same name and value, even in the same scope.
 A later assignment to the variable will disambiguate between these declarations by referring to the specific variable declaration node by pointer identity.
@@ -202,8 +205,8 @@ Some states of the machine have no outgoing transitions, corresponding to undefi
 \subsubsection{CESK Machine}
 
 The abstract machine is presented in the style of a CESK machine. \todo{dmitryas: add citation for CESK machine}
-The state space of the CESK machine is grouped into several configurations, most of which carry an environment, which maps variable declarations in the present scope to their current assignments, a store, which models the mutable object store in which all objects in a \textsc{Dart} program live, and a continuation, which captures the work to be done after the current operation is complete, i.e. a chain of call frames above the current frame.
-In this way states of the cesk machine mimic states of the \textsc{Dart} virtual machine at a very abstract level.
+The state space of the CESK machine is grouped into several configurations, most of which carry an environment, which maps variable declarations in the present scope to their current assignments, a store, which models the mutable object store in which all objects in a \dart{} program live, and a continuation, which captures the work to be done after the current operation is complete, i.e. a chain of call frames above the current frame.
+In this way states of the cesk machine mimic states of the \dart{} virtual machine at a very abstract level.
 
 \subsection{Conventions}
 \label{subsec:conventions}
@@ -216,7 +219,7 @@ In this way states of the cesk machine mimic states of the \textsc{Dart} virtual
     \item The names of the different kinds of continuations are written in normal text (e.g. VarSetK).
     \item The names of meta-functions start with lower case letter (e.g. $\extend$).
     \item ``$\mlist{\mathbf{X}}$'' denotes the domain of meta-lists of elements from domain ``$\mathbf{X}$''.
-        Note that the word ``List'' here is not in bold, so that it isn't confused with the domain $\mathbf{List}$ of Dart objects.
+        Note that the word ``List'' here is not in bold, so that it isn't confused with the domain $\mathbf{List}$ of \dart{} objects.
         \todo{sjindel: Why is this a domain?}
 \end{itemize}
 \todo{dmitryas: Explain notation for Kernel syntactic constructs like "on T catch (e, s)".}
@@ -455,7 +458,7 @@ For definition of ``$\deref$'' see Section~\ref{subsubsection:dereferecing}.
 \subsection{Values}
 \label{sec:values}
 
-The values supported by Dart Kernel are $\tt{literal}$ values (Section~\ref{subsec:literal-values}) and $\tt{object}$ values (Section~\ref{subsec:object-values}).
+The values supported by \kernel{} are $\tt{literal}$ values (Section~\ref{subsec:literal-values}) and $\tt{object}$ values (Section~\ref{subsec:object-values}).
 Values are irreducible terms, i.e, results of evaluation of expressions.
 
 
@@ -511,7 +514,7 @@ This implies that invocation of implicit setter will modify the global store and
 \subsubsection{Class}
 \label{subsec:class}
 
-A $\tt{class} \in \dclass$ captures the different properties for a defined class in Dart Kernel.
+A $\tt{class} \in \dclass$ captures the different properties for a defined class in \kernel{}.
 
 \begin{align}
 \notag
@@ -2637,7 +2640,7 @@ When the return expression is empty, the value $\tt{null}$ is applied to the ret
 
 \subsubsection{Loops}
 
-In Dart Kernel there are $\dowhile$, $\forin$, $\for$ and $\while$ loop statements.
+In \kernel{} there are $\dowhile$, $\forin$, $\for$ and $\while$ loop statements.
 The execution of the different loop statements is defined below:
 
 \begin{itemize}
