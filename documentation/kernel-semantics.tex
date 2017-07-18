@@ -1368,7 +1368,7 @@ The value corresponding to the evaluated expression is captured by the applicati
 \subsubsection{Basic literal evaluation}
 \label{subsubsec:basic-literal-eval}
 
-Kernel literals are evaluated to a value $\val \in \dlitval$ in one step.
+\kernel{} literals are evaluated to a value $\val \in \dlitval$ in one step.
 Transitions of the CESK machine for basic literals are presented in Figure~\ref{figure:expressions-evalconfigs}, rules \eqref{eval:int} - \eqref{eval:string}.
 
 
@@ -1412,7 +1412,7 @@ The CESK-transition function for boolean expressions is show in Figure~\ref{figu
 
 \subsubsection{Let}
 
-Let expressions in Kernel introduce a new variable, initialized to some value with an initializer expression, for the evaluation of the right-hand side let expression.
+Let expressions in \kernel{} introduce a new variable, initialized to some value with an initializer expression, for the evaluation of the right-hand side let expression.
 Let expressions are evaluated by first evaluating the initializer expression for the fresh variable as shown in the CESK-transition \eqref{eval:let}.
 It proceeds by extending the environment for the evaluation of the right-hand side let expression and producing the next configuration for evaluation of the later with the CESK-transition \eqref{econtconf:let}.
 
@@ -1455,7 +1455,7 @@ Otherwise, the evaluation of the expression results with an error, as shown in \
 \subsubsection{Function expressions}
 \label{subsubsec:function-expressions}
 
-Kernel supports encapsulating an executable unit of code with function expressions.
+\kernel{} supports encapsulating an executable unit of code with function expressions.
 To support function expressions we introduce $fv = \funval{\formals}{\stmt_{body}}{\env} \in \dfunval$ as a value that has the function statement body, $\stmt_{body} \in \dstmt$, its list of formal parameters, $\formals \in \dformals$, and the environment, $\env \in \denv$ in scope of the function expression.
 This ensures that there are no free variables in the body of $fv$.
 
@@ -1592,7 +1592,7 @@ Instance method, getter or setter invocation proceed by evaluation of the receiv
 For the other invocations, $\this$ is not bound.
 
 The evaluation of the invocation proceeds by evaluating the actual argument list and binding the values to the formal parameters of the function.
-Kernel supports positional, positional optional and named arguments.
+\kernel{} supports positional, positional optional and named arguments.
 
 We construct a modified list for the evaluation of the actual argument by adding all the arguments needed, including non-provided optional and named arguments to the list of expressions.
 Note that the default values for the optional parameters are constants, hence their evaluation does not have side effects.
@@ -1801,7 +1801,7 @@ A statement continuation, $\ExitSK{\econt}{\tt{null}}$ is added as next statemen
 \subsubsection{Property extraction}
 \label{subsubsec:property-extraction}
 
-Kernel allows access of a member as a property, which can be either getter access, which executes the getter, or method extraction, which converts a method into a closure, also known as tear-off.
+\kernel{} allows access of a member as a property, which can be either getter access, which executes the getter, or method extraction, which converts a method into a closure, also known as tear-off.
 Property extraction is supported with $\PropertyGet{\expr}{\idmeta}$.
 The evaluation of this expression is shown in \eqref{eval:propertyget}.
 After the evaluation of the receiver expression to a value $\val$, the property $\idmeta$ is looked up in methods, getters and implicit getters for the value $\val$.
@@ -1831,7 +1831,7 @@ If the lookup fails, a "NoSuchMethod" will be thrown, as shown in \eqref{econtco
 \subsubsection{Direct property extraction}
 \label{subsubsec:direct-property-extraction}
 
-In Kernel a property can be accessed without lookup, by direct reference to the member $\membermeta$.
+In \kernel{} a property can be accessed without lookup, by direct reference to the member $\membermeta$.
 This implies that the lookup step above is bypassed.
 Similar to Section~\ref{subsubsec:property-extraction}, this expression can be either getter access, which executes the getter, or method extraction, which converts a method into a closure, also known as tear-off.
 The evaluation proceeds as follows:
@@ -1930,7 +1930,7 @@ The evaluation proceeds as follows:
 \subsubsection{Property assignment}
 \label{subsubsec:property-assignment}
 
-An assignment in Kernel results with the invocation of a setter.
+An assignment in \kernel{} results with the invocation of a setter.
 The evaluation of a property assignment proceeds as follows.
 First, the left-hand side expression, i.e. the receiver expression, is evaluated as shown in \eqref{eval:propertyset}.
 Afterwards, the right-hand side expression is evaluated, as shown in \eqref{econtconf:propertyset-val}.
@@ -1956,7 +1956,7 @@ The evaluation proceeds as follows:
 \subsubsection{Direct property assignment}
 \label{subsubsec:direct-property-assignment}
 
-In Kernel a property can be set without lookup, by direct reference to the member of the instance.
+In \kernel{} a property can be set without lookup, by direct reference to the member of the instance.
 This implies that the lookup step described in \ref{subsubsec:property-assignment} above is bypassed.
 The evaluation of direct property assignment proceeds by evaluating the right-hand side expression, i.e. the receiver expression as shown in \eqref{eval:dpropertyset}.
 Afterwards, the evaluation continues with the left-hand side expression as shown in \eqref{econtconf:dpropertyset-val}.
@@ -1975,7 +1975,7 @@ After evaluating the receiver expression to $\val_0$ and the argument expression
 \subsubsection{Super property get}
 \label{subsubsec:super-property-get}
 
-Kernel allows access of a superclass member as a property, which can be either getter access, which executes the getter, or method extraction, which converts a method into a closure.
+\kernel{} allows access of a superclass member as a property, which can be either getter access, which executes the getter, or method extraction, which converts a method into a closure.
 Accessing a superclass member is accessed with the expression $\SuperPropertyGet{\idmeta}$ evaluated with the corresponding components: $\env$, $\strace$, $\handler$, $\cstrace$, $\cex$, $\econt$.
 Let $\val = \deref{(\env(\this))}$, $C = \superclass{\val}$ and $\membermeta$ the result of looking up $\idmeta$ in $C$.
 The evaluation of a super property extraction proceeds as follows:
@@ -1999,7 +1999,7 @@ The evaluation of a super property extraction proceeds as follows:
 \subsubsection{Super property assignment}
 \label{subsubsec:super-property-assignemnt}
 
-Kernel supports assignment of a super member with the expression $\SuperPropertySet{\idmeta}{\expressionmeta}$.
+\kernel{} supports assignment of a super member with the expression $\SuperPropertySet{\idmeta}{\expressionmeta}$.
 Let $\val' = \deref{(\env(\this))}$, $C = \superclass{\val'}$ and $M$ the result of looking up $\idmeta$ in $C$.
 The evaluation proceeds with evaluation of the right-hand side expression as shown in \eqref{eval:superpropertyset}.
 After the evaluation of the argument expression to a value $\val$, depending on $\membermeta$, the evaluation continues as follows:
@@ -2242,7 +2242,7 @@ Let $\synt{Q}$ be a constructor with non empty initializer list, $Izs$ and a con
 
 
 To further initialize the new instance, the body of the constructor will be executed.
-In Kernel the body of a constructor is executed after the execution of the initializer list and its super constructor.
+In \kernel{} the body of a constructor is executed after the execution of the initializer list and its super constructor.
 To support this, we add a new statement continuation, $BodySK$, that has the constructor body statement, the environment, the error handlers and stacktraces, and the next statement continuation.
 
 \begin{align*}
@@ -2267,7 +2267,7 @@ If the initializer list is empty, $Izs = []$, the next statement continuation is
     \end{multlined}
 \end{align*}
 
-In Kernel, a super initializer or a redirecting initializer, when present, will appear last in the initializer list.
+In \kernel{}, a super initializer or a redirecting initializer, when present, will appear last in the initializer list.
 If the initializer list contains at least two initializers, $Izs = Ininitalizer(E) :: Izs', Izs' \neq []$, we can assume that the next initializer to execute is a local or a field initializer.
 
 \begin{align*}
@@ -2303,8 +2303,8 @@ Otherwise, there is only one initializer to execute in the initializer list, $li
 \end{itemize}
 
 The transitions for the initializer continuation are described below.
-Besides redirecting and super initializers, in Kernel we also have field and local initializers, both containing an expression to evaluate, denoted as $Initializer(\expr) : LocalI(\variablemeta, \expr) + FieldI(f, \expr)$.
-Local initializers are special initializers in Kernel and they extend the environment for the execution of the initializer list.
+Besides redirecting and super initializers, in \kernel{} we also have field and local initializers, both containing an expression to evaluate, denoted as $Initializer(\expr) : LocalI(\variablemeta, \expr) + FieldI(f, \expr)$.
+Local initializers are special initializers in \kernel{} and they extend the environment for the execution of the initializer list.
 The transition steps for initializer continuation are as follows:
 
 \begin{align*}
@@ -2593,7 +2593,7 @@ The expression continuation for the execution of the rest of the statement will 
 
 \subsubsection{Return statement}
 
-Kernel supports return statements with or without an expression.
+\kernel{} supports return statements with or without an expression.
 In the first case, the execution proceeds with evaluation of the return expression, as shown in \eqref{execconf:return}.
 The expression continuation component in the ExecConfiguration is the return expression continuation.
 This is the expression continuation that is applied to the value the return expression evaluates to.
@@ -2654,7 +2654,7 @@ The execution of the different loop statements is defined below:
         First the statement body of the loop is executed as shown in \eqref{execconf:do}.
         We add while statement continuation as next statement continuation that will evaluate the condition expression accordingly, as shown in \eqref{scontconf:while}.
     \item $\forin$\\
-        In Kernel, $\forin$ loops, will be desugared into while loops and their execution will proceed as the $\while$ loop rule shown in Figure~\ref{figure:exec}.
+        In \kernel{}, $\forin$ loops, will be desugared into while loops and their execution will proceed as the $\while$ loop rule shown in Figure~\ref{figure:exec}.
     \item $\for$\\
         The execution of for loops starts with evaluation of the initializer expressions for the variable declarations in the for loop statement, as shown in \eqref{execconf:for}.
         After the evaluation of the initializer, the application continuation is applied to extend the environment and evaluate a non null condition expression, as shown in \eqref{acontconf:forinit}.
@@ -2669,7 +2669,7 @@ Loops $\dowhile$, $\forin$, $\for$ can be desugared to while loops with transfor
 
 \subsubsection{Labels}
 
-Kernel supports labelling statements, $\synt{L}: \stmt_{L}$, and breaking to L, $\bbreak \synt{L}$.
+\kernel{} supports labelling statements, $\synt{L}: \stmt_{L}$, and breaking to L, $\bbreak \synt{L}$.
 $\bbreak \synt{L}$ completes the execution of the labelled statement and proceeds to executing the rest of the program.
 To support breaking to a label, we add a labels component, $\lbls$, to statement configurations.
 $\lbls$ represents a list of pairs mapping a labelled statement, $\synt{L}: \stmt_L$, to a break statement continuation, $\bcont$.
@@ -2678,11 +2678,11 @@ Executing a labelled statement inserts a new break label, $\lbl$ in the list of 
 
 \subsubsection{Switch}
 
-Kernel supports dispatching control among a number of cases with $\switch$ statements.
+\kernel{} supports dispatching control among a number of cases with $\switch$ statements.
 The target expression $\expr$ is evaluated and matched against the different case clauses of the switch statement.
 
 Case clauses can have multiple constant expressions and there is no implicit fall-through between cases.
-Kernel supports continuing to execution of a preceding case clause with continue statements where the target of the continue statement is a preceding case clause, e.g, $\continue \synt{C}$ with $\synt{C}$ = case $\expri{1..i}$: $\stmt$.
+\kernel{} supports continuing to execution of a preceding case clause with continue statements where the target of the continue statement is a preceding case clause, e.g, $\continue \synt{C}$ with $\synt{C}$ = case $\expri{1..i}$: $\stmt$.
 To support continue, we add an optional $\clbls$ list, similar to the label list, which is set in a switch statement and unset otherwise.
 
 If there is a matching case clause, its statement is executed.
@@ -2732,7 +2732,7 @@ Otherwise, the execution continues as follows:
 
 \subsubsection{Exceptions}
 
-Kernel supports structured exception handling with $\synt{try/catch}$ and $\synt{try/finally}$ statements.
+\kernel{} supports structured exception handling with $\synt{try/catch}$ and $\synt{try/finally}$ statements.
 Exceptions are thrown with $\throw$ and $\rethrow$ expressions.
 To support throwing exceptions, we add a handler, $\handler$, and a stacktrace, $\strace$, component to expression configurations (and correspondingly, to statement configurations).
 To support $\rethrow$, we add an optional current error, $\cex$, and current stack trace, $\cstrace$, which are set when inside a catch block and unset otherwise.
@@ -2858,13 +2858,13 @@ $\continue \synt{L}$ statements continue to executing the statement of a precedi
 
 \subsubsection{Function declaration}
 
-Kernel supports local function declaration, where a final variable stores a function value.
+\kernel{} supports local function declaration, where a final variable stores a function value.
 Let $F$ be a function with a body $\stmt_{body}$ and a list of formal parameters, $\formals$, and let $fun \in \dvardecl$ be the corresponding final variable declaration.
 
 
 \subsection{Yield}
 
-Kernel supports suspending the execution of the body of a function with native yield statements.
+\kernel{} supports suspending the execution of the body of a function with native yield statements.
 Functions containing yield statements in the body are marked with $SyncStar$, $AsyncStar$ or $SyncYielding$.
 
 
