@@ -394,7 +394,6 @@ In this way states of the CESK machine mimic states of the \dart{} virtual machi
 \newcommand{\typemeta}{\ensuremath{\mathit{T}}}
 % Metavariables for statements
 \newcommand{\statementmeta}{\ensuremath{\mathit{\stmt}}}
-\newcommand{\labelmeta}{\ensuremath{\mathit{\tt{L}}}}
 
 \subsection{Locations}
 
@@ -605,7 +604,7 @@ Object values are composed of a reference to a class definition, which is shared
 
 \[
 \begin{array}{rl}
-  \expressionmeta \in \mathit{Expression} ::=
+  \expressionmeta \in \dexpr ::=
   & \VariableGet{\variablemeta} \\
   & \VariableSet{\variablemeta}{\expressionmeta} \\
   & \PropertyGet{\expressionmeta}{\idmeta} \\
@@ -639,7 +638,7 @@ Object values are composed of a reference to a class definition, which is shared
 
 % InvalidStatement
 \newcommand{\ExpressionStatement}[1]{\{\, #1\, \}}
-\newcommand{\Block}[1]{#1\, \statementmeta*}
+\newcommand{\Block}[1]{#1; \mlist{\statementmeta}}
 \newcommand{\EmptyStatement}{\{\}}
 
 % AssertStatement
@@ -667,12 +666,12 @@ Object values are composed of a reference to a class definition, which is shared
 \[
 \begin{array}{rl}
 
-  \statementmeta \in \mathit{Statements} ::=
+  \statementmeta \in \dstmt ::=
   & \ExpressionStatement{\expressionmeta} \\
   & \Block{\statementmeta} \\
   & \EmptyStatement \\
-  & \LabeledStatement{\labelmeta}{\statementmeta} \\
-  & \BreakStatement{\labelmeta} \\
+  & \LabeledStatement{\lbl}{\statementmeta} \\
+  & \BreakStatement{\lbl} \\
   & \WhileStatement{\expressionmeta}{\statementmeta} \\
   & \DoStatement{\statementmeta}{\expressionmeta} \\
   & \ForStatement{??}{\expressionmeta}{??}{\statementmeta} \\
