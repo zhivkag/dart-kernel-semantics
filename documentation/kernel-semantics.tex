@@ -312,6 +312,7 @@ In this way states of the CESK machine mimic states of the \dart{} virtual machi
 \newcommand{\dvector}{\mathbf{Vector}}
 \newcommand{\dmember}{\mathbf{Member}}
 \newcommand{\dident}{\mathbf{Identifier}}
+\newcommand{\idmeta}{\ensuremath{\mathit{X}}}
 
 \newcommand{\dclass}{\mathbf{Class}}
 \newcommand{\dformals}{\mathbf{Formals}}
@@ -369,7 +370,8 @@ In this way states of the CESK machine mimic states of the \dart{} virtual machi
     & : & \dclass & \text{domain of class definitions}\\
     \membermeta
     & : & \dmember & \text{domain of class members}\\
-    && \dident & \text{domain of identifiers}
+    \idmeta
+    & : & \dident & \text{domain of identifiers}
   \end{array}
 \]
 
@@ -384,12 +386,11 @@ In this way states of the CESK machine mimic states of the \dart{} virtual machi
 % Metavariables
 \newcommand{\expressionmeta}{\ensuremath{\mathit{E}}}
 \newcommand{\expressionsmeta}{\expressionmeta{s}}
-\newcommand{\variablemeta}{\ensuremath{\mathit{X}}}
+\newcommand{\variablemeta}{\ensuremath{\mathit{x}}}
 \newcommand{\boolmeta}{\ensuremath{\mathit{B}}}
 \newcommand{\integermeta}{\ensuremath{\mathit{I}}}
 \newcommand{\doublemeta}{\ensuremath{\mathit{D}}}
 \newcommand{\stringmeta}{\ensuremath{\mathit{S}}}
-\newcommand{\idmeta}{\ensuremath{\mathit{X}}}
 \newcommand{\typemeta}{\ensuremath{\mathit{T}}}
 % Metavariables for statements
 \newcommand{\statementmeta}{\ensuremath{\mathit{\stmt}}}
@@ -626,11 +627,7 @@ Object values are composed of a reference to a class definition, which is shared
   & \Rethrow \\
   & \Throw{\expressionmeta} \\
   & \AwaitExpression{\expressionmeta} \\
-  & \StringLiteral{\stringmeta} \\
-  & \IntLiteral{\integermeta} \\
-  & \DoubleLiteral{\doublemeta} \\
-  & \BoolLiteral{\tt{true}} \\
-  & \BoolLiteral{\tt{false}} \\
+  & \lit \\
   & \NullLiteral \\
   & \Let{\variablemeta}{\expressionmeta_0}{\expressionmeta_1} \\
 \end{array}
