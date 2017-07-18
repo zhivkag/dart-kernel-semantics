@@ -175,7 +175,7 @@ This paper documents the syntax and operational semantics of \textsc{Dart Kernel
 \setcounter{tocdepth}{2}
 \tableofcontents
 
-\section{Forward}
+\section{Foreword}
 
 \subsection{Audience}
 This paper is intended for compiler and framework authors and academics.
@@ -197,19 +197,19 @@ Presenting the abstract syntax in this manner not only models the \kernel{} impl
 
 The operational semantics of \kernel{} are given in ``small-step'' style, where each rule of the semantics corresponds to a simple transition from one state of an abstract machine to another.
 The rules are not nested or recursive, and only specify one possible outgoing transition from any state.
-Some states of the machine have no outgoing transitions, corresponding to undefined operations like out-of-bounds vector access.
+Some states of the machine have no outgoing transitions specified, corresponding to undefined operations like out-of-bounds vector access.
 
 \subsubsection{CESK Machine}
 
 The abstract machine is presented in the style of a CESK machine. \todo{dmitryas: add citation for CESK machine}
-The state space of the CESK machine is grouped into several configurations, most of which carry an environment, which maps variable declarations in the present scope to their current assignments, a store, which models the mutable object store in which all objects in a \textsc{Dart} program live, and a continuation, which captures the work to be done after the current operation is complete, i.e. a chain of call frames above the current frame.
-In this way states of the cesk machine mimic states of the \textsc{Dart} virtual machine at a very abstract level.
+The state space of the CESK machine is grouped into several configurations, most of which carry an environment, which maps variable declarations in the present scope to their current assignments, a store, which models the mutable object store in which all objects in a \textsc{Dart} program live, and a continuation, which captures the work to be done after the current operation is complete, roughly similar to a chain of call frames above the current function.
+In this way states of the CESK machine mimic states of the \textsc{Dart} virtual machine at a very abstract level.
 
 \subsection{Conventions}
 \label{subsec:conventions}
 
 \begin{itemize}
-    \item The symbols ``:'' (type-of) and ``$\in$'' (element-of) are used interchangeably.
+    \item The symbols ``:'' (is-of-type) and ``$\in$'' (element-of) are used interchangeably.
     \item The names of variables are italicized.
     \item The names of variables within a domain start with an upper case letter.
     \item The names of domains (meta-types defined in this paper) are written in bold (e.g. ``$\mathbf{Expr}$'').
@@ -232,21 +232,17 @@ In this way states of the cesk machine mimic states of the \textsc{Dart} virtual
 \section{Syntax}
 \label{sec:definitions}
 
-\subsection{Locations}
-\newcommand{\dlocation}{\mathbf{Location}}
-\newcommand{\loc}{\ensuremath{\alpha}}
-
-The object store is indexed by elements $\loc$ from the domain $\dlocation$.
-This domain is countably infinite, and we assume that we can generate fresh values from the domain within the abstract machine.
-It could be represented by natural numbers, for example, but arithmetic on locations is not meaningful.
-
 \subsection{Domains}
 \label{subsec:domains}
 
 % Variables
+\newcommand{\dlocation}{\mathbf{Location}}
+\newcommand{\loc}{\ensuremath{\alpha}}
+
 \newcommand{\expr}{\ensuremath{\mathit{E}}}
 \newcommand{\expri}[1]{\expr_\ensuremath{\mathit{#1}}}
 \newcommand{\exprs}{\expr\ensuremath{\mathit{s}}}
+\newcommand{\membermeta}{\ensuremath{\mathit{M}}}
 
 \newcommand{\stmt}{\ensuremath{\mathit{S}}}
 \newcommand{\stmti}[1]{\stmt_\ensuremath{#1}}
@@ -263,7 +259,10 @@ It could be represented by natural numbers, for example, but arithmetic on locat
 \newcommand{\ccases}{\scase\ensuremath{\mathit{s}}}
 
 \newcommand{\vals}{\ensuremath{vs}}
+\newcommand{\vvec}{\ensuremath{\vec{v}}}
 \newcommand{\env}{\ensuremath{\rho}}
+\newcommand{\lit}{\ensuremath{\mathscr{L}}}
+\newcommand{\classvar}{\ensuremath{c}}
 
 \newcommand{\lbl}{\ensuremath{\textit{lbl}}}
 \newcommand{\lbls}{\ensuremath{\textit{lbls}}}
@@ -278,6 +277,7 @@ It could be represented by natural numbers, for example, but arithmetic on locat
 
 \newcommand{\funval}[3]{\mathrm{FunctionValue}({#1},\,{#2},\,{#3})}
 \newcommand{\objval}{\mathrm{ObjectValue}(class, fields)}
+\newcommand{\obj}{\ensuremath{o}}
 
 \newcommand{\formal}{\ensuremath{A}}
 \newcommand{\formali}[1]{\ensuremath{A_{#1}}}
@@ -300,11 +300,15 @@ It could be represented by natural numbers, for example, but arithmetic on locat
 \newcommand{\denv}{\mathbf{Env}}
 
 \newcommand{\dval}{\mathbf{Value}}
+\newcommand{\dlit}{\mathbf{Literal}}
 \newcommand{\dvardecl}{\mathbf{VariableDeclaration}}
 \newcommand{\dstring}{\mathbf{StringValue}}
 \newcommand{\dfunval}{\mathbf{FunctionValue}}
 \newcommand{\dlitval}{\mathbf{LiteralValue}}
 \newcommand{\dobjval}{\mathbf{ObjectValue}}
+\newcommand{\dvector}{\mathbf{Vector}}
+\newcommand{\dmember}{\mathbf{Member}}
+\newcommand{\dident}{\mathbf{Identifier}}
 
 \newcommand{\dclass}{\mathbf{Class}}
 \newcommand{\dformals}{\mathbf{Formals}}
@@ -344,17 +348,25 @@ It could be represented by natural numbers, for example, but arithmetic on locat
     & : &  \emptyset + \dval & \text{domain of current exception values}\\
     \cstrace
     & : & \emptyset + \mlist{\dexpr} & \text{domain of current exception stack traces}\\
-
     \varmeta
     & : & \dvardecl & \text{domain of variable declarations}\\
     \loc
     & : & \dlocation & \text{domain of store locations}\\
     \val
     & : & \dval & \text{domain of values}\\
-    \vals
-    & : & \mlist{\dval}\\
+    \vals & : & \mlist{\dval} \\
+    \vvec & : & \dvector = \mlist{\dval}& \text{domain of vectors}\\
     \env
     & : & \denv & \text{domain of environments}\\
+    \obj
+    & : & \dobjval & \text{domain of object values}\\
+    \lit
+    & : & \dlit & \text{domain of literal values}\\
+    \classvar
+    & : & \dclass & \text{domain of class definitions}\\
+    \membermeta
+    & : & \dmember & \text{domain of class members}\\
+    && \dident & \text{domain of identifiers}
   \end{array}
 \]
 
@@ -375,16 +387,21 @@ It could be represented by natural numbers, for example, but arithmetic on locat
 \newcommand{\doublemeta}{\ensuremath{\mathit{D}}}
 \newcommand{\stringmeta}{\ensuremath{\mathit{S}}}
 \newcommand{\idmeta}{\ensuremath{\mathit{X}}}
-\newcommand{\membermeta}{\ensuremath{\mathit{M}}}
 \newcommand{\typemeta}{\ensuremath{\mathit{T}}}
 % Metavariables for statements
 \newcommand{\statementmeta}{\ensuremath{\mathit{\stmt}}}
 \newcommand{\labelmeta}{\ensuremath{\mathit{\tt{L}}}}
 
+\subsection{Locations}
+
+The object store is indexed by elements $\loc$ from the domain $\dlocation$.
+This domain is countably infinite, and we assume that we can generate fresh values from the domain within the abstract machine.
+It could be represented by natural numbers, for example, but arithmetic on locations is not meaningful.
+
 \subsection{Store}
 \label{subsec:store-definition}
 
-The store $s$ maps a location $\loc$ to a value $\val$.
+The store $s$ is a finite map from location $\loc$ to a value $\val$.
 The store is a mutable map and should not be confused with a function.
 A global store is assumed and locations reachable in the current scope are defined by the current environment function
 \[
@@ -455,116 +472,48 @@ For definition of ``$\deref$'' see Section~\ref{subsubsection:dereferecing}.
 \subsection{Values}
 \label{sec:values}
 
-The values supported by Dart Kernel are $\tt{literal}$ values (Section~\ref{subsec:literal-values}) and $\tt{object}$ values (Section~\ref{subsec:object-values}).
-Values are irreducible terms, i.e, results of evaluation of expressions.
+Values in \textsc{Dart Kernel} fall into two categories: $\dvector$ values (Section~\ref{subsubsec:vector-values}) and $\dobjval$ values (Section~\ref{subsec:object-values}).
+Values are irreducible terms, i.e, the result of the evaluation of expressions.
+Only object values may be in the image of the store.
 
+\subsubsection{Vector values}
+\label{subsubsec:vector-values}
 
-\subsubsection{Literal values}
-\label{subsubsec:literal-values}
+\textsc{Dart Kernel} has limited support for arrays without bounds checking via $\dvector$s.
+The step function for the CESK machine is not defined for operations that access an element vector outside its bounds.
+$\dvector$s cannot be introduced by any construct present in \textsc{Dart} itself, but rather are introduced only by \textsc{Dart Kernel} transformations which can ensure they are only used in a safe manner.
+
+\subsubsection{Literals}
+
+Some objects from primitive types contain a literal value and a specific class corresponding to the literal's type.
+The different types of literal values are:
+\[\dlit = \mathbf{int} + \mathbf{bool} + \mathbf{double} + \mathbf{List} + \mathbf{Map} + \mathbf{String} + \mathbf{Symbol} + \mathbf{Type}.\]
 
 Literal values are special values that store the specific payload and an associated class.
-The different literal values are presented below:
-\[
-  \begin{array}{lcl}
-    \val \in \dlitval &=& \mathbf{int} + \mathbf{bool} + \mathbf{double}\\
-    && + \mathbf{List} + \mathbf{Map} + \mathbf{String} + \mathbf{Symbol} + \mathbf{Type}.
-  \end{array}
-\]
-
-Literal values are special values that store the specific payload and an associated class.
-Each of the specific literal values contains predefined operators and/or methods, whose semantics we are not going to specify in this document.
-
-
-\subsubsection{Object values}
-\label{subsec:object-values}
-
-Object values have a $\tt{class}$ component and a $\tt{fields}$ component which is list of locations for each field, as shown below:
-\[
-    \dobjval : \dclass \times \mlist{\dlocation}.
-\]
-
-The $\tt{class}$ component captures the properties of the object, see Section~\eqref{subsec:class}.
-The object also stores a list of locations that represent the values of the fields for the given object.
-An object is mutated by modifying a field.
-A field is modified by changing the value stored at the location for the said field in the list of locations for the given object.
-Access and modification of fields is enabled with implicit getters and setters defined in the associated class component.
-Each field has an associated implicit getter, as defined below.
-Let $\loc$ be the location of field with name $fName$ for the object value $\val_0$:
-\begin{align*}
-  \getter \in \dobjval \times \mathbf{Name} &\rightarrow \dval\\
-  \getter(\val_0, fName) &= \val_1,
-\end{align*}
-
-\noindent where $\val_1 = \deref{\loc}$.
-
-Each non-final field has an associated implicit setter, as defined below.
-Let $\loc$ be the location of field $fName$ for the object value $\val_0$:
-\begin{align*}
-  \setter \in \dobjval \times \mathbf{Name} \times \dval &\rightarrow \dval\\
-  \setter(\val_0, fName, \val_1) &= \val_1,
-\end{align*}
-
-\noindent where $\val_1$ is the value to be stored in $\loc$ after the invocation of the implicit setter.
-This implies that invocation of implicit setter will modify the global store and  $\deref{\loc} = \val_1$ will hold after the transition.
-
+Each of the specific literal values contains predefined operators and methods, whose semantics are elided here.
 
 \subsubsection{Class}
 \label{subsec:class}
 
-A $\tt{class} \in \dclass$ captures the different properties for a defined class in Dart Kernel.
+A $\dclass$ encodes a class definition in Dart Kernel.
 
-\begin{align}
-\notag
-\dclass &\in \tt{superclass} \times \tt{interfaces} \times \tt{fieldGetters}\\\notag
-&\times \tt{fieldSetters} \times \tt{getters} \times \tt{setters} \times \tt{methods}
-\end{align}
-
-The different components of $\tt{class}$ capture the following properties:
-
-\begin{itemize}
-    \item $\tt{superclass}$\\
-        The class component captures the immediate superclass and we allow access to it in the different continuations in various steps defined below.
-
-    \item $\tt{interfaces}$\\
-        % TBD
-
-    \item $\tt{fieldGetters}$, $\tt{fieldSetters}$\\
-        The $\tt{fieldGetters}$ and $\tt{fieldSetters}$ components capture the functions allowing access to field members of the current class and the superclasses recursively.
-        The layout of the field members starts with the first field of the superclass highest in the class hierarchy and is continuous.
-        We create implicit getters for all instance fields and setters for all non-final instance fields.
-        For definition of implicit getters and setters see Section~\ref{subsec:object-values}.\\
-        To enable proper direct field member access, we create implicit getters and setters bound to the members also, not only the names.
-        Using only the identifier of the member for lookup of a direct member access is problematic because of possible overwrite of a member.
-
-    \item $\tt{getters}$, $\tt{setters}$\\
-        The $\tt{getters}$ and $\tt{setters}$ components capture the getters and the setters for the given class and all its superclasses recursively.
-
-    \item $\tt{methods}$\\
-        The $\tt{methods}$ component captures the methods for the given class and all its superclasses recursively.
-
-\end{itemize}
-
-
-\subsubsection{Property Lookup}
-\label{subsubsec:property-lookup}
-
-A property lookup searches for an instance method, a getter or a field with the given property name. If none of the following is found, an error is returned.
 \begin{align*}
-    \lookup \in \dclass \times \mathbf{Name} &\rightarrow \mathbf{Member}\\
-    \lookup(\idmeta) &= \membermeta
-\end{align*}
-where $\membermeta$ is an instance method, when $\idmeta$ is a method name, a getter when $\idmeta$ is a getter name or an implicit getter when $\idmeta$ is a field name.
-
-
-\subsubsection{Method Lookup}
-\label{subsubsec:method-lookup}
-
-A method lookup searches for an instance method in the given class given the name of the method.
-\begin{align*}
-    \methodLookup \in \dclass \times \mathbf{Name} &\rightarrow \mathbf{Member}\\
-    \methodLookup(\idmeta) &= \membermeta
+\dclass &= (\emptyset + \dclass) \times \mlist{\dclass} \times (\dident \mapsto \dmember)\\
+\dmember &= \mathbf{Getter} + \mathbf{Setter} + \mathbf{Method} \\
+\mathbf{Getter} &= \emptyset + \dstmt \\
+\mathbf{Setter} &= \emptyset + \dformals \times \dstmt \\
+\mathbf{Method} &= \dformals \times \dstmt
 \end{align*}
 
+A class definition contains a reference to the super class (none only in the case of the ``Object'' class), a list of interface classes and a finite map from identifiers to members which provides dynamic dispatch.
+
+\subsubsection{Object values}
+\label{subsec:object-values}
+
+Object values are composed of a reference to a class definition, which is shared across all instances of that object, and a list of locations which identify the values of the fields for a specific instance.
+\[
+    \dobjval = \dclass \times \mlist{\dlocation}.
+\]
 
 \subsubsection{Function values}
 \label{subsec:function-values}
