@@ -2817,16 +2817,29 @@ $\continue \synt{L}$ statements continue to executing the statement of a precedi
 Let $F$ be a function with a body $\stmt_{body}$ and a list of formal parameters, $\formals$, and let $fun \in \dvardecl$ be the corresponding final variable declaration.
 
 
+\subsection{Event loop}
+\label{subsec:eventloop}
+
+
+\subsubsection{Sync*}
+\label{subsubsec:syncstar}
+
+
+\subsubsection{Async}
+\label{subsubsec:async}
+
+
+\subsubsection{Async*}
+\label{subsubsec:asyncstar}
+
+
 \subsection{Yield}
+\todo{dmitryas: Write this section after native yield behavior is figured out, assuming that this section is about native "yield."}
 
 \kernel{} supports suspending the execution of the body of a function with native yield statements.
-Functions containing yield statements in the body are marked with $SyncStar$, $AsyncStar$ or $SyncYielding$.
+Functions containing yield statements in the body are marked with $SyncYielding$.
 
 
-\subsubsection{Yield in Sync*}
-\label{subsubsec:yeld-in-syncstar}
-\subsubsection{Yield in Async*}
-\label{subsubsec:yield-in-asyncstar}
 \subsubsection{Yield in SyncYielding}
 \label{subsubsec:yield-in-syncyelding}
 
