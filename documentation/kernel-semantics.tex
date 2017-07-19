@@ -1,4 +1,4 @@
-\documentclass[a4paper,oneside]{article}
+\documentclass[a4paper,oneside,fleqn]{article}
 
 
 \usepackage[utf8]{inputenc}
@@ -37,6 +37,9 @@
 
 % A bit nicer symbol: ∅
 \renewcommand{\emptyset}{\varnothing}
+
+% Some known sets.
+\newcommand{\NN}{\mathbb{N}}    % Natural numbers.
 
 
 % Meta-functions to be used in math mode.
@@ -448,21 +451,26 @@ When an environment is needed to further execute the program, it is saved by the
 \subsubsection{Extend}
 \label{subsubsec:extend-env}
 
-Function ``$\extend$'' creates a new environment by extending the provided environment with new bindings for the variable declarations to fresh locations for each of the provided values.
+Operator ``$\extend$'' creates a new environment by extending the provided environment with new bindings for the variable declarations to fresh locations for each of the provided values.
+This operator has an implicit operand which is the store of the CESK machine.
 \begin{align*}
     &\extend \in \denv \times \mlist{\dvardecl} \times \mlist{\dval} \rightarrow  \denv,\\
-    &\ext{\env}{\varmeta{s}}{\vals} = \env',
+    &\ext{\env}{(\varmeta_{1}, \dots, \varmeta_{n})}{(\val_{1}, \dots, \val_{n})} = \env',
 \end{align*}
 
 \noindent where
-\[
-    \env'(\varmeta) =\begin{cases}
-        \loc_i & \text{with }\deref{\loc_i} = \val_i\text{ if }\exists\varmeta_i \in \varmeta{s} \text{ s.t. } \varmeta_i = \varmeta,\\
-        \env(\varmeta) &\text{otherwise}.
+\begin{align*}
+    & n \in \NN,\\
+    & (\varmeta_{1}, \dots, \varmeta_{n}) \in \mlist{\dvardecl},\\
+    & (\val_{1}, \dots, \val_{n}) \in \mlist{\dval},\\
+    & (\alpha_{1}, \dots, \alpha_{n}) \in \mlist{\dlocation} \text{ --- list of fresh locations in the store},\\
+    & !\env'(\varmeta) =\begin{cases}
+        !\loc_i = \val_i, & \text{if }\varmeta = \varmeta_i,\\
+        !\env(\varmeta), &\text{otherwise}.
     \end{cases}
-\]
+\end{align*}
 
-For simpler notation, we allow ``$\extend$'' to be called with singleton lists as $\ext{\env}{\varmeta}{\val}$, which we consider equivalent to $\ext{\env}{\varmeta :: []}{\val :: []}$.
+For simpler notation, we allow ``$\extend$'' to be called on single values: $\ext{\env}{\varmeta}{\val}$, which we consider equivalent to calling it on singleton lists: $\ext{\env}{\varmeta :: []}{\val :: []}$.
 
 
 \subsubsection{Variable lookup}
