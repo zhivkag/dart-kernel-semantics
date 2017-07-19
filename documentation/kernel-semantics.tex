@@ -469,13 +469,12 @@ For simpler notation, we allow ``$\extend$'' to be called with singleton lists a
 \label{subsubsec:variable-lookup}
 
 A variable lookup consists of looking up the location of a variable from the environment with $\loc = \env(\varmeta)$ and reading the stored value $v$ with $\deref{\loc} = \deref{\env(\varmeta)}$ from the store.
-For definition of ``$\deref$'' see Section~\ref{subsubsection:dereferecing}.
 
 
 \subsection{Values}
 \label{sec:values}
 
-Values in \kernel{} fall into two categories: $\dvector$ values (Section~\ref{subsubsec:vector-values}) and $\dobjval$ values (Section~\ref{subsec:object-values}).
+Values in \kernel{} fall into two categories: $\dvector$ values and $\dobjval$ values.
 Values are irreducible terms, i.e, the result of the evaluation of expressions.
 Only object values may be in the image of the store.
 
