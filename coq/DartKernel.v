@@ -123,67 +123,67 @@ Definition curr_strace := list expr.
 Definition curr_error := expr.
 
 Inductive handler : Type :=
-| ThrowH
-| CatchH.
+ | ThrowH
+ | CatchH.
 
 (** Continuations. *)
 
 Inductive econt : Type :=
-| VarSetEK
-| ExpressionsEK
-| NotEK
-| AndEK
-| OrEK
-| ConditionalEK
-| LetEK
-| IsEK
-| AsEK
-| StaticGetEK
-| StaticSetEK
-| PropertyGetEK
-| PropertySetEK
-| PropertySetValueEK
-| DPropertyGetEK
-| DPropertySetEK
-| DPropertySetValueEK
-| SuperPropertyEK
-| InstanceMethodEK
-| DInstanceMethodEK
-| VarDeclarationEK
-| IfCodnitionEK
-| ForConditionEK
-| ExpressionEK.
+ | VarSetEK
+ | ExpressionsEK
+ | NotEK
+ | AndEK
+ | OrEK
+ | ConditionalEK
+ | LetEK
+ | IsEK
+ | AsEK
+ | StaticGetEK
+ | StaticSetEK
+ | PropertyGetEK
+ | PropertySetEK
+ | PropertySetValueEK
+ | DPropertyGetEK
+ | DPropertySetEK
+ | DPropertySetValueEK
+ | SuperPropertyEK
+ | InstanceMethodEK
+ | DInstanceMethodEK
+ | VarDeclarationEK
+ | IfCodnitionEK
+ | ForConditionEK
+ | ExpressionEK.
 
 Inductive scont : Type :=
-| ExitSK
-| BlockSK
-| WhileSK
-| BodySK
-| NewSK
-| FinallySK
-| RethrowSK
-| ForSK
-| WhileCondSK.
+ | ExitSK
+ | BlockSK
+ | WhileSK
+ | BodySK
+ | NewSK
+ | FinallySK
+ | RethrowSK
+ | ForSK
+ | WhileCondSK.
 
 Inductive acont : Type :=
-| ValueA
-| StringConcatenationA
-| ForInitA
-| ForUpdatesA
-| SuperMethodA
-| DInstanceMethodA
-| FieldsA
-| ConstructorA
-| SuperA
-| RedirectingA.
+ | ValueA
+ | StringConcatenationA
+ | ForInitA
+ | ForUpdatesA
+ | SuperMethodA
+ | DInstanceMethodA
+ | FieldsA
+ | ConstructorA
+ | SuperA
+ | RedirectingA.
 
 Inductive bcont : Type :=
-| BreakK
-| FinallyBreakK.
+ | BreakK
+ | FinallyBreakK.
 
 Inductive switch_cont : Type :=
-| SwitchContinueK
-| FinallySwitchContinueK.
+ | SwitchContinueK
+ | FinallySwitchContinueK.
 
 Inductive labels : Type :=
  | Labels : list label -> labels
@@ -192,24 +192,26 @@ with
   | Label : stmt -> scont -> env -> label.
 
 Inductive switch_labels : Type :=
-| SwitchLabels : list switch_label -> switch_labels
+ | SwitchLabels : list switch_label -> switch_labels
 with
-switch_label : Type :=
-| SwitchLabel: switch_cont -> env -> switch_label.
-
+ switch_label : Type :=
+  | SwitchLabel: switch_cont -> env -> switch_label.
 
 (** CESK machine *)
-
+Record program : Type := mkprogram {
+                             main_signature : fun_signature;
+                             main_body : stmt
+                           }.
 
 (** Configurations *)
 
 Inductive configuration : Type :=
-| EvalConfiguration         : expr        -> env        -> strace -> curr_strace   -> curr_error -> handler     -> econt      -> configuration
-| EvalListConfiguration     : list expr   -> env        -> strace -> curr_strace   -> curr_error -> handler     -> acont      -> configuration
-| ExecConfiguration         : stmt        -> env        -> labels -> switch_labels -> strace     -> curr_strace -> curr_error -> handler -> econt -> scont -> configuration
-| ValuePassingConfiguration : econt       -> value      -> configuration
-| ApplicationConfiguration  : acont       -> list value -> configuration
-| ForwardConfiguration      : scont       -> env        -> configuration
-| ThrowConfiguration        : handler     -> value      -> strace -> configuration
-| BreakConfiguration        : bcont       -> configuration
-| SwitchConfiguration       : switch_cont -> configuration.
+ | EvalConfiguration         : expr        -> env        -> strace -> curr_strace   -> curr_error -> handler     -> econt      -> configuration
+ | EvalListConfiguration     : list expr   -> env        -> strace -> curr_strace   -> curr_error -> handler     -> acont      -> configuration
+ | ExecConfiguration         : stmt        -> env        -> labels -> switch_labels -> strace     -> curr_strace -> curr_error -> handler -> econt -> scont -> configuration
+ | ValuePassingConfiguration : econt       -> value      -> configuration
+ | ApplicationConfiguration  : acont       -> list value -> configuration
+ | ForwardConfiguration      : scont       -> env        -> configuration
+ | ThrowConfiguration        : handler     -> value      -> strace -> configuration
+ | BreakConfiguration        : bcont       -> configuration
+ | SwitchConfiguration       : switch_cont -> configuration.
