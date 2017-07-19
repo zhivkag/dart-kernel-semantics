@@ -1436,7 +1436,7 @@ $fv \in \dfunval$ has only one property, $call$.
         \end{multlined}
         \label{acontconf:staticinvoc}
     \end{align}
-    \caption{The CESK-transition function for ApplicationConfiguration}
+    \caption{The CESK-transition function for ApplicationConfiguration for static invocation}
     \label{table:static-evalconfigs}
     \end{eqfigure}
 \end{figure}
@@ -1468,7 +1468,7 @@ The specific CESK-transitions for the different invocations are described in the
 % Figure showing the CESK-transition function starting from EvalConfgiration for
 % static property extraction and assignment, and static invocation
 %%
-\todo{zhivkag: Modify static getter invocation w.r.t. async semantics}
+\todo{zhivkag: Modify static method and getter invocation w.r.t. async semantics}
 \begin{figure}[Htp]
     \begin{eqfigure}
     \begin{align}
@@ -1518,7 +1518,7 @@ The specific CESK-transitions for the different invocations are described in the
             \cesktranswheresplit%
                 {\evalconf{\StaticInvocation{\{\membermeta\}}{\expressionsmeta}}{\env}{\strace}{\cstrace}{\cex}{\econt}}%
                 {\evallistconf{\exprs}{\env}{\strace}{\cstrace}{\cex}{\acont'}}%
-                {\text{where $\acont' = \StaticInvA{\formals}{\stmt}{\strace'}{\econt}$, $\strace' = \StaticInvocation{\{\membermeta\}}{\expressionsmeta}::\strace$}}
+                {\parbox{10cm}{where $\acont' = \StaticInvA{\formals}{\stmt}{\strace'}{\econt}$,\\ $\strace' = \StaticInvocation{\{\membermeta\}}{\expressionsmeta}::\strace$,\\where $\StaticGet{\membermeta}$ is a static method with formal parameters $\formals$ and body $\stmt$}}
         \end{multlined}
         \label{eval:staticinvoc}
     \end{align}
