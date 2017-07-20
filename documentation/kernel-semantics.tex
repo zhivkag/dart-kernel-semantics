@@ -316,7 +316,9 @@ In this way states of the CESK machine mimic states of the \dart{} virtual machi
 \newcommand{\dmember}{\mathbf{Member}}
 \newcommand{\dident}{\mathbf{Identifier}}
 \newcommand{\idmeta}{\ensuremath{\mathit{X}}}
+\newcommand{\dtype}{\mathbf{Type}}
 
+\newcommand{\typemeta}{\ensuremath{\mathit{T}}}
 \newcommand{\dclass}{\mathbf{Class}}
 \newcommand{\dformals}{\mathbf{Formals}}
 \[
@@ -368,21 +370,16 @@ In this way states of the CESK machine mimic states of the \dart{} virtual machi
     \obj
     & : & \dobjval & \text{domain of object values}\\
     \lit
-    & : & \dlit & \text{domain of literal values}\\
+    & : & \dlit & \text{domain of literals}\\
     \classvar
     & : & \dclass & \text{domain of class definitions}\\
     \membermeta
     & : & \dmember & \text{domain of class members}\\
     \idmeta
-    & : & \dident & \text{domain of identifiers}
-  \end{array}
-\]
-
-\[
-  \begin{array}{ccll}
-    \formal, \formali{i} & : & \dvardecl\\
+    & : & \dident & \text{domain of identifiers}\\
+    \typemeta & : & \dtype & \text{domain of Dart types}\\
+    \formal, \formali{i} & : & \dvardecl \\
     \formals & : & \dformals = \mlist{\dvardecl} &\text{ domain of formals}\\
-
   \end{array}
 \]
 
@@ -394,7 +391,6 @@ In this way states of the CESK machine mimic states of the \dart{} virtual machi
 \newcommand{\integermeta}{\ensuremath{\mathit{I}}}
 \newcommand{\doublemeta}{\ensuremath{\mathit{D}}}
 \newcommand{\stringmeta}{\ensuremath{\mathit{S}}}
-\newcommand{\typemeta}{\ensuremath{\mathit{T}}}
 % Metavariables for statements
 \newcommand{\statementmeta}{\ensuremath{\mathit{\stmt}}}
 
@@ -554,7 +550,7 @@ Object values are composed of a reference to a class definition, which is shared
 \newcommand{\SuperPropertyGet}[1]{\tt{super}.#1}
 \newcommand{\SuperPropertySet}[2]{\tt{super}.#1=#2}
 
-\newcommand{\StaticGet}[1]{\{#1\}}
+\newcommand{\StaticGet}[1]{\synt{\{}#1\synt{\}}}
 \newcommand{\StaticSet}[2]{\{#1\}=#2}
 
 %% MethodInvocation
@@ -1575,6 +1571,8 @@ The specific CESK-transitions for the different invocations are described in the
     \label{table:static-evalconfigs}
     \end{eqfigure}
 \end{figure}
+
+
 \subsubsection{Static and library fields}
 \label{subsubsec:static-and-library-fields}
 
@@ -1669,21 +1667,34 @@ A statement continuation, $\ExitSK{\econt}{\tt{null}}$ is added as next statemen
         \cesktranswheresplit%
             {\evalconf{\SuperPropertyGet{\idmeta}}{\env}{\strace}{\cstrace}{\cex}{\econt}}%
             {\contconf{\econt}{\funval{\formals}{\stmt}{\env'}}}%
-            {\parbox{10cm}{where $\env' = \ext{\env_{empty}}{\this}{\deref{(\env(\this))}}$,\\ $\membermeta = \superclass{\deref{\env(\this)}}.lookup(\idmeta)$,\\ $\membermeta$ is a method tear-off with formal parameters $\formals$, and body $\stmt$}}
+            {\parbox{10cm}{where:\\
+                \(\env' = \{(\this,\,\env(\this))\}\),
+                \(\deref{\env(\this)} = ((\textit{c}, \_, \_), \_)\),
+                \(c = (\_, \_, \textit{mems})\),
+                \(\textit{mems}(\idmeta) = \text{Method}(\formals, \stmt)\)}}
         \end{multlined}
         \label{eval:superpropertyget-tearoff}\\
         &\begin{multlined}
         \cesktranswheresplit*%
             {\evalconf{\SuperPropertyGet{\idmeta}}{\env}{\strace}{\cstrace}{\cex}{\econt}}%
-            {\execconf{\stmt}{\env'}{\lbls}{\clbls}{\SuperPropertyGet{\idmeta} :: \strace}{\handler}{\cex,\,\cstrace}{\econt}{\scont}}%
-            {\parbox{10cm}{where $\env' = \ext{\env_{empty}}{\this}{\deref{(\env(\this))}}$,\\ $\scont = \emptyset$, $\membermeta = \superclass{\deref{\env(\this)}}.lookup(\idmeta)$,\\ $\membermeta$ is a getter method with body $\stmt$}}
+            {\execconf{\stmt}{\env'}{[]}{[]}{\SuperPropertyGet{\idmeta} :: \strace}{\handler}{\cex,\,\cstrace}{\econt}{\scont}}%
+            {\parbox{10cm}{where:\\
+                \(\deref{\env(\this)} = ((c, \_, \_), \_)\),
+                \(c = (\_, \_, \textit{mems})\),
+                \(\textit{mems}(\idmeta) = \text{Getter}(S)\),
+                \(\env' = \{(\this, \env(\this))\}\)
+                }}
         \end{multlined}
         \label{eval:superpropertyget-getter}\\
         &\begin{multlined}
         \cesktranswheresplit%
             {\evalconf{\SuperPropertyGet{\idmeta}}{\env}{\strace}{\cstrace}{\cex}{\econt}}%
-            {\contconf{\econt}{M(\deref{(\env(\this))})}}%
-            {\text{where $\membermeta = \superclass{\deref{\env(\this)}}.lookup(\idmeta)$, $\membermeta$ is a implicit field getter}}
+            {\contconf{\econt}{\deref{\textit{fields}[i]}}}%
+            {\parbox{10cm}{where:\\
+                \(\deref{\env(\this)} = ((c, \_, \_), \textit{fields})\),
+                \(c = (\_, \_, \textit{mems})\),\\
+                \(\textit{mems}(\idmeta) = \text{Getter}(i \in \mathbb{N})\)
+            }}
         \end{multlined}
         \label{eval:superpropertyget-field}\\
         &\begin{multlined}
@@ -1709,57 +1720,72 @@ A statement continuation, $\ExitSK{\econt}{\tt{null}}$ is added as next statemen
     \cesktranswheresplit*%
         {\contconf{\PropertyGetK}{\val}}%
         {\contconf{\econt}{\funval{\formals}{\stmt}{\env}}}
-        {\parbox{10cm}{if $\membermeta$ is a method with body $\stmt$ and formals $\formals$ \\
-        where $\env = \ext{\env_{empty}}{\mathbf{this}}{\val}$}}
+        {\parbox{10cm}{where:\\
+            \(v = (c, \_)\),
+            \(c = (\_, \_, \textit{mems})\),
+            \(\textit{mems}(X) = \text{Method}(\formals, \stmt)\),\\
+            \(\env = \{(\this, \loc)\}\),
+            \(\loc\) is fresh against the store,
+            \(\deref{\loc} = \val\)
+        }}
     \end{multlined}
     \label{econtconf:propertyget-tearoff}\\
     &\begin{multlined}
         \cesktranswheresplit*%
         {\contconf{\PropertyGetK}{\val}}%
-        {\execconf{\stmt}{\env}{[]}{[]}{\PropertyGet{\val}{\idmeta} :: \strace}{\handler}{\cex,\,\cstrace}{\econt}{\scont}}%
-        {\parbox{10cm}{if $\membermeta$ is a getter with body $\stmt$\\
-        where $\env = \ext{\env_{empty}}{\mathbf{this}}{\val}$\\
-        $\scont = \emptyset$}}
+        {\execconf{\stmt}{\env}{[]}{[]}{\PropertyGet{\val}{\idmeta} :: \strace}{\handler}{\cex,\,\cstrace}{\econt}{\emptyset}}%
+        {\parbox{10cm}{where:\\
+            \(\val = (c, \_)\),
+            \(c = (\_, \_, \textit{mems})\),
+            \(\textit{mems}(X) = \text{Getter}(\stmt)\),\\
+            \(\env = \{(\this, \loc)\}\),
+            \(\loc\) is fresh against the store,
+            \(\deref{\loc} = \val\)
+        }}
     \end{multlined}
     \label{econtconf:propertyget-getter}\\
     &\begin{multlined}
         \cesktranswheresplit%
         {\contconf{\PropertyGetK}{\val}}%
-        {\contconf{\econt}{\text{\membermeta}(\val)}}%
-        {\parbox{10cm}{if $\membermeta$ is an implicit getter for field $\idmeta$\\
-        where $\env = \ext{\env_{empty}}{\mathbf{this}}{\val}$\\
-        $\scont = \emptyset$}}
+        {\contconf{\econt}{\deref{\textit{fields}[i]}}}%
+        {\parbox{10cm}{where:\\
+            \(v = (c, \textit{fields})\),
+            \(c = (\_, \_, \textit{mems})\),
+            \(\textit{mems}(X) = \text{Getter}(i \in \mathbb{N})\)
+        }}
     \end{multlined}
     \label{econtconf:propertyget-field}\\
     &\begin{multlined}
         \cesktranswheresplit*%
         {\contconf{\PropertyGetK}{\val}}%
         {\throwconf{\handler}{(\tt{throw}\text{ NoSuchMethod($\PropertyGet{\val}{\idmeta}$)}) :: \strace}{\text{NoSuchMethod}}}%
-        {\parbox{10cm}{if lookup of name $\idmeta$ was unsuccessful in class of value $\val$}}
+        {\parbox{10cm}{
+            \(\val = (c, \_, \_)\),
+            \(c = (\_, \_, \textit{mems})\),
+            \(\idmeta \not\in \textit{mems}\)
+        }}
     \end{multlined}
     \label{econtconf:propertyget-nosuchmethod}\\
     &\begin{multlined}
         \cesktranswheresplit*%
         {\contconf{\DPropertyGetK}{\val}}%
         {\contconf{\econt}{\funval{\formals}{\stmt}{\env}}}%
-        {\parbox{10cm}{if $\membermeta$ is a method with body $\stmt$ and formals $\formals$\\
-        where $\env = \ext{\env_{empty}}{\mathbf{this}}{\val}$}}
+        {\parbox{10cm}{where $\membermeta = \text{Method}(\formals, \stmt)$ and $\env = \ext{\env_{empty}}{\mathbf{this}}{\val}$}}
     \end{multlined}
     \label{econtconf:dpropertyget-tearoff}\\
     &\begin{multlined}
         \cesktranswheresplit*%
             {\contconf{\DPropertyGetK}{\val}}%
-            {\execconf{\stmt}{\env}{[]}{[]}{\DirectPropertyGet{\val}{\membermeta} :: \strace}{\handler}{\cex,\,\cstrace}{\econt}{\scont}}%
-            {\parbox{10cm}{if $\membermeta$ is getter with statement body $\stmt$ \\
-            where $\env = \ext{\env_{empty}}{\mathbf{this}}{\val}$ \\
-            $\scont = \emptyset$}}
+            {\execconf{\stmt}{\env}{[]}{[]}{\DirectPropertyGet{\val}{\membermeta} :: \strace}{\handler}{\cex,\,\cstrace}{\econt}{\emptyset}}%
+            {\parbox{10cm}{where $\membermeta = \text{Getter}(\stmt)$, $\env = \ext{\env_{empty}}{\mathbf{this}}{\val}$}}
     \end{multlined}
     \label{econtconf:dpropertyget-getter}\\
     &\begin{multlined}
-        \cesktranswhere%
+        \cesktranswheresplit%
         {\contconf{\DPropertyGetK}{\val}}%
-        {\contconf{\econt}{\deref{\val[\membermeta]}}}%
-        {\text{if $\membermeta$ is a field }}
+        {\contconf{\econt}{\deref{\textit{fields}[i]}}}%
+        {\parbox{10cm}{where
+            \(\val = (\_, \textit{fields})\), \(\membermeta = \text{Getter}(i \in \mathbb{N})\)}}
     \end{multlined}
     \label{econtconf:dpropertyget-field}
     \end{align}
