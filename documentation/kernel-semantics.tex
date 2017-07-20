@@ -582,7 +582,7 @@ A $\dclass$ encodes a class definition in \kernel{}.
 \mathbf{Method} &= \dformals \times \dstmt
 \end{align*}
 
-A class definition contains a reference to the super class (none only in the case of the ``Object'' class), a list of interface classes and a finite map from identifiers to members which provides dynamic dispatch.
+A class definition contains a reference to the superclass (none only in the case of the ``Object'' class), a list of interface classes and a finite map from identifiers to members which provides dynamic dispatch.
 The natural-indexed getters and setters correspond to the case where a field should be modified directly, and the number provides the index into an instance's list of locations.
 
 Although constructor definitions are included in the class definition, they are not presented here because the same syntax nodes are directly referenced by the expression form for constructor invocation.
