@@ -42,6 +42,10 @@
 \newcommand{\NN}{\mathbb{N}}    % Natural numbers.
 
 
+% Some auxiliary operators.
+\DeclareMathOperator{\dom}{Dom} % Domain of a function.
+
+
 % Meta-functions to be used in math mode.
 \DeclareMathOperator{\extend}{extend}
 \DeclareMathOperator{\concat}{concat}
@@ -232,7 +236,8 @@ In this way states of the CESK machine mimic states of the \dart{} virtual machi
 
 \begin{align*}
     [] &\text{ --- empty list}.\\
-    \varmeta :: list &\text{ --- a meta-list that is constructed by adding element $\varmeta$ to the head of the meta-list $list$}.
+    \varmeta :: list &\text{ --- a meta-list that is constructed by adding element $\varmeta$ to the head of the meta-list $list$}.\\
+    \dom(f) &\text{ --- the domain of function \(f\)}.
 \end{align*}
 
 \section{Syntax}
@@ -1472,7 +1477,7 @@ The specific CESK-transitions for the different invocations are described in the
             \cesktranswheresplit%
                 {\evalconf{\StaticGet{\membermeta}}{\env}{\strace}{\cstrace}{\cex}{\econt}}%
                 {\contconf{\econt}{\deref{\env^{M}(\membermeta)}}}%
-                {\text{where $\membermeta$ is a static field and $\membermeta \in \env^{M}$}}
+                {\text{where $\membermeta$ is a static field and $\membermeta \in \dom(\env^{M}$)}}
             \end{multlined}
         \label{eval:staticget-var}\\
         &\begin{multlined}
