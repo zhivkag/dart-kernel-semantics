@@ -1553,15 +1553,15 @@ The specific CESK-transitions for the different invocations are described in the
         &\begin{multlined}
             \cesktranswheresplit%
                 {\evalconf{\StaticGet{\membermeta}}{\env}{\strace}{\cstrace}{\cex}{\econt}}%
-                {\contconf{\econt}{\deref{\env^{M}(\membermeta)}}}%
-                {\text{where $\membermeta$ is a static field and $\membermeta \in \dom(\env^{M}$)}}
+                {\contconf{\econt}{\deref{\mainenv(\membermeta)}}}%
+                {\text{where $\membermeta$ is a static field and $\membermeta \in \dom(\mainenv$)}}
             \end{multlined}
         \label{eval:staticget-var}\\
         &\begin{multlined}
             \cesktranswheresplit%
                 {\evalconf{\StaticGet{\membermeta}}{\env}{\strace}{\cstrace}{\cex}{\econt}}%
                 {\contconf{\econt}{\tt{null}}}%
-                {\parbox{12cm}{where $\membermeta$ is a static field without an initializer expression and $\membermeta \notin \env^{M}$,\\$\env^{M} = \ext{\env^{M}}{\membermeta}{\NullLiteral}$ after transition}}
+                {\parbox{12cm}{where $\membermeta$ is a static field without an initializer expression and $\membermeta \notin \mainenv$,\\$\mainenv = \ext{\mainenv}{\membermeta}{\NullLiteral}$ after transition}}
         \end{multlined}
         \label{eval:staticget-varnew-null}\\
         &\begin{multlined}
@@ -1615,17 +1615,17 @@ The specific CESK-transitions for the different invocations are described in the
         &\cesktranswhere%
             {\contconf{\StaticGetK}{\val}}%
             {\contconf{\econt}{\val}}%
-            {\env^{M} = \ext{\env^{M}}{\membermeta}{\val}}
+            {\mainenv = \ext{\mainenv}{\membermeta}{\val}}
         \label{econtconf:staticget}\\
         &\cesktranswhere%
             {\contconf{\StaticSetK}{\val}}%
             {\contconf{\econt}{\val}}
-            {\text{$\env^{M} = \ext{\env^{M}}{\membermeta}{\val}$ if $\membermeta \notin \env^M$}}
+            {\text{$\mainenv = \ext{\mainenv}{\membermeta}{\val}$ if $\membermeta \notin \mainenv$}}
         \label{econtconf:staticset-var-new}\\
         &\cesktranswhere%
             {\contconf{\StaticSetK}{\val}}%
             {\contconf{\econt}{\val}}
-            {\text{$\update{\env^{M}(\membermeta)}{\val}$ if $\membermeta \in \env^M$}}
+            {\text{$\update{\mainenv(\membermeta)}{\val}$ if $\membermeta \in \mainenv$}}
         \label{econtconf:staticset-var}\\
         &\begin{multlined}
         \cesktranswheresplit%
@@ -1644,8 +1644,8 @@ The specific CESK-transitions for the different invocations are described in the
 \subsubsection{Static and Library Fields}
 \label{subsubsec:static-and-library-fields}
 
-In order to remember initialization and assignment of library variables and static variables, we introduce a global environment $\env^{M}$.
-The environment $\env^{M}$ stores bindings for static and library fields to locations for all static and library fields previously accessed or set during the execution of the program.
+In order to remember initialization and assignment of library variables and static variables, we introduce a global environment $\mainenv$.
+The environment $\mainenv$ stores bindings for static and library fields to locations for all static and library fields previously accessed or set during the execution of the program.
 Static and library variables are accessed with $\StaticGet{\membermeta}$.
 The member $\membermeta$ can be a static or library field, a getter or a method.
 When $\membermeta$ is a method, the expression $\StaticGet{\membermeta}$ is a method tear-off.
@@ -1665,7 +1665,7 @@ When $\membermeta$ is a method, the expression $\StaticGet{\membermeta}$ is a me
         When $\membermeta$ is a static getter, the body of the getter is executed, as shown in \eqref{eval:staticget-getter}.
 
     \item $\membermeta$ is a static method tear-off\\
-        When $\membermeta$ is a method with formal parameters $\formals$ and body $\stmt$, a new $\funval{\formals}{\stmt}{\env_{empty}}$ is created and bound to the member in the global environment $\env^{M}$, as shown in \eqref{eval:staticget-tearoff}.
+        When $\membermeta$ is a method with formal parameters $\formals$ and body $\stmt$, a new $\funval{\formals}{\stmt}{\env_{empty}}$ is created and bound to the member in the global environment $\mainenv$, as shown in \eqref{eval:staticget-tearoff}.
         The continuation $\econt$ is applied to this value.
 
 \end{itemize}
@@ -1675,8 +1675,8 @@ The target member can either be a static or library field, or it can be a static
 
 \begin{itemize}
     \item $\membermeta$ is a static or library field\\
-        The evaluation proceeds by extending the environment $\env^{M}$, when $\membermeta \notin \env^{M}$, as shown in \eqref{econtconf:staticset-var-new}.
-        Otherwise, when $\membermeta \in \env^{M}$, the value stored at location $\env^{M}(\membermeta)$ is modified accordingly, as shown in \eqref{econtconf:staticset-var}.
+        The evaluation proceeds by extending the environment $\mainenv$, when $\membermeta \notin \mainenv$, as shown in \eqref{econtconf:staticset-var-new}.
+        Otherwise, when $\membermeta \in \mainenv$, the value stored at location $\mainenv(\membermeta)$ is modified accordingly, as shown in \eqref{econtconf:staticset-var}.
 
     \item $\membermeta$ is a static setter\\
         The evaluation proceeds by executing the statement body of the setter. A statement continuation $\ExitSK{\econt}{\val}$ is added that applies the given expression continuation $\econt$ to the value of the right-hand side expression.
