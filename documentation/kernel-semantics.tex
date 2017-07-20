@@ -1450,19 +1450,33 @@ Function invocation occurs when a function expression (\ref{subsubsec:function-e
 Instance method, getter or setter invocation proceed by evaluation of the receiver expression and binding its value to $\this$.
 For the other invocations, $\this$ is not bound.
 
-The evaluation of the invocation proceeds by evaluating the actual argument list and binding the values to the formal parameters of the function.
+Execution of function invocation proceeds immediately when the target function is marked as "sync".
+\todo{Add text for generator sync and async function, and async function invocation.}
+
+The evaluation of the invocation proceeds by evaluating the actual argument list and binding the values of the evaluated argument list to the formal parameters of the function.
 \kernel{} supports positional, positional optional and named arguments.
 
-We construct a modified list for the evaluation of the actual argument by adding all the arguments needed, including non-provided optional and named arguments to the list of expressions.
-Note that the default values for the optional parameters are constants, hence their evaluation does not have side effects.
-Required parameters will not be added to the list of expressions when they are not provided.
-This is an implementation detail that allows us to ignore the distinction between provided or missing positional, optional and named arguments.
-After the evaluation of the argument expressions, and before binding the actual arguments to the formal parameters necessary checks ensure the actual arguments are valid or throw a dynamic error accordingly.
-\todo{Specify what *valid* means and what error is thrown when arguments are not *valid*}
+An invocation expression for a \kernel{} function contains a list of expressions that represent the actual arguments for the invocation.
+We construct a list of actual argument expressions containing the provided positional arguments and the provided named arguments.
+We also add the constant default expressions for the optional positional and named parameters.
+This is an implementation detail that allows us to evaluate all arguments for the invocation ignoring the distinction between provided or missing positional, optional and named arguments.
+Note that the default values for the optional positional and named parameters are constants, hence their evaluation does not have side effects and they evaluate to a value in one step.
 
-The statement body is then executed with the appropriate bindings.
+After the evaluation of the argument expressions, and before binding the actual arguments to the formal parameters necessary checks ensure the actual arguments are valid.
+
+Let $(\val_1, \dots, \val_n, \{a_{n+1} : \val_{n+1}, \dots, a_{n+l} : \val_{n+l}\})$ be the list of values that correspond to the actual arguments expressions for the function invocation with $a_i$ names of actual named arguments.
+The actual arguments are valid if:
+\begin{itemize}
+\item The number of positional actual arguments corresponds to the number of formal arguments for the function.
+\item The actual names of named arguments $a_i$ correspond to a named formal parameter.
+\end{itemize}
+
+If any of the above mentioned statements doesn't hold, a "NoSuchMethodError" is thrown.
+\todo{Elaborate how this error is constructed and passed to the current handler.}
+\todo{Add text for type checking the parameters.}
+
+Otherwise, the statement body is then executed with the appropriate bindings.
 The specific CESK-transitions for the different invocations are described in the appropriate sections below.
-
 
 %%
 % Figure showing the CESK-transition function starting from EvalConfgiration for
@@ -2836,7 +2850,7 @@ Let $F$ be a function with a body $\stmt_{body}$ and a list of formal parameters
 
 
 \subsection{Yield}
-\todo{dmitryas: Write this section after native yield behavior is figured out, assuming that this section is about native "yield."}
+\todo{dmitryas: Write this section after native yield behaviour is figured out, assuming that this section is about native "yield."}
 
 \kernel{} supports suspending the execution of the body of a function with native yield statements.
 Functions containing yield statements in the body are marked with $SyncYielding$.
