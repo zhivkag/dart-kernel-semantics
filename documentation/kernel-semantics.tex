@@ -228,7 +228,7 @@ This section contains definitions of syntactic and semantic domains, helper func
 \begin{itemize}
     \item The symbols ``:'' (is-of-type) and ``$\in$'' (element-of) are used interchangeably.
     \item The names of variables are italicized.
-    \item The names of variables within a domain start with an upper case letter.
+    \item The names of variables within a syntactic domain start with an upper case letter.
     \item The names of domains (meta-types defined in this paper) are written in bold (e.g. ``$\mathbf{Expr}$'').
     \item The names of the different kinds of continuations are written in normal text (e.g. VarSetK).
     \item The names of meta-functions start with lower case letter (e.g. $\extend$).
@@ -317,6 +317,7 @@ This section contains definitions of syntactic and semantic domains, helper func
 
 \newcommand{\dval}{\mathbf{Value}}
 \newcommand{\dlit}{\mathbf{Literal}}
+\newcommand{\dvar}{\mathbf{Variable}}
 \newcommand{\dvardecl}{\mathbf{VariableDeclaration}}
 \newcommand{\dstring}{\mathbf{StringValue}}
 \newcommand{\dfunval}{\mathbf{FunctionValue}}
@@ -328,7 +329,7 @@ This section contains definitions of syntactic and semantic domains, helper func
 \newcommand{\idmeta}{\ensuremath{\mathit{X}}}
 \newcommand{\dtype}{\mathbf{Type}}
 
-\newcommand{\typemeta}{\ensuremath{\mathit{T}}}
+\newcommand{\typemeta}{\ensuremath{\mathit{t}}}
 \newcommand{\dclass}{\mathbf{Class}}
 \newcommand{\dformals}{\mathbf{Formals}}
 \[
@@ -344,52 +345,52 @@ This section contains definitions of syntactic and semantic domains, helper func
     & : & \mlist{\dstmt}  & \text{}\\
 
     \econt
-    & : & \decont & \text{domain of expression continuations}\\
+    & : & \decont & \text{semantic domain of expression continuations}\\
     \acont
-    & : & \dacont & \text{domain of application continuations}\\
+    & : & \dacont & \text{semantic domain of application continuations}\\
     \scont
-    & : & \dscont & \text{domain of statement continuations}\\
+    & : & \dscont & \text{semantic domain of statement continuations}\\
     \bcont
-    & : & \dbcont & \text{domain of break continuations}\\
+    & : & \dbcont & \text{semantic domain of break continuations}\\
     \switchcont
-    & : & \dswitchcont & \text{domain of switch continuations}\\
+    & : & \dswitchcont & \text{semantic domain of switch continuations}\\
 
-    \lbl & : & \dlbl & \text{domain of labels}\\
+    \lbl & : & \dlbl & \text{semantic domain of labels}\\
     \lbls & : & \mlist{\dlbl} \\
-    \clbl & : & \dclbl & \text{domain of switch labels}\\
+    \clbl & : & \dclbl & \text{semantic domain of switch labels}\\
     \clbls & : & \mlist{\dclbl} \\
 
     \handler
     & : & \dhandler & \text{syntactic domain of exception handlers} \\
     \strace
-    & : & \mlist{\dexpr} & \text{domain of stack traces}\\
+    & : & \mlist{\dexpr} & \text{semantic domain of stack traces}\\
     \cex
-    & : &  \emptyset + \dval & \text{domain of current exception values}\\
+    & : &  \emptyset + \dval & \text{semantic domain of current exception values}\\
     \cstrace
-    & : & \emptyset + \mlist{\dexpr} & \text{domain of current exception stack traces}\\
+    & : & \emptyset + \mlist{\dexpr} & \text{semantic domain of current exception stack traces}\\
     \varmeta
-    & : & \dvardecl & \text{domain of variable declarations}\\
+    & : & \dvar & \text{semantic domain of variables}\\
     \loc
-    & : & \dlocation & \text{domain of store locations}\\
+    & : & \dlocation & \text{semantic domain of store locations}\\
     \val
-    & : & \dval & \text{domain of values}\\
+    & : & \dval & \text{semantic domain of values}\\
     \vals & : & \mlist{\dval} \\
-    \vvec & : & \dvector = \mlist{\dval}& \text{domain of vectors}\\
+    \vvec & : & \dvector = \mlist{\dval}& \text{semantic domain of vectors}\\
     \env
-    & : & \denv & \text{domain of environments}\\
+    & : & \denv & \text{semantic domain of environments}\\
     \obj
-    & : & \dobjval & \text{domain of object values}\\
+    & : & \dobjval & \text{semantic domain of object values}\\
     \lit
-    & : & \dlit & \text{domain of literals}\\
+    & : & \dlit & \text{syntactic domain of literals}\\
     \classvar
-    & : & \dclass & \text{domain of class definitions}\\
+    & : & \dclass & \text{semantic domain of class definitions}\\
     \membermeta
-    & : & \dmember & \text{domain of class members}\\
+    & : & \dmember & \text{syntactic domain of class members}\\
     \idmeta
-    & : & \dident & \text{domain of identifiers}\\
-    \typemeta & : & \dtype & \text{domain of Dart types}\\
-    \formal, \formali{i} & : & \dvardecl \\
-    \formals & : & \dformals = \mlist{\dvardecl} &\text{ domain of formals}\\
+    & : & \dident & \text{syntactic domain of identifiers}\\
+    \typemeta & : & \dtype & \text{semantic domain of Dart types}\\
+    \formal, \formali{i} & : & \dvardecl & \text{syntactic domain of variable declarations} \\
+    \formals & : & \dformals = \mlist{\dvardecl} &\text{syntactic domain of formal parameters}\\
   \end{array}
 \]
 
