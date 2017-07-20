@@ -1880,58 +1880,71 @@ The evaluation proceeds as follows:
     &\begin{multlined}
         \cesktranswheresplit*%
         {\contconf{\PropertySetVK}{\val_1}}%
-        {\execconf{\stmt}{\env}{\lbls}{\clbls}{(\PropertySet{\val_0}{\idmeta}{\val_1}) :: \strace}{\handler}{\cex,\,\cstrace}{\econt}{\scont}}%
-        {\parbox{10cm}{if \membermeta is setter with statement body $\stmt$ and formal parameter $\formal$\\
-        where $\env = \ext{\env_{empty}}{\mathbf{this} :: \formal :: []}{\val_0 :: \val_1 :: []}$\\
-        $\scont = \ExitSK{\val_1}$}}
+        {\execconf{\stmt}{\env}{[]}{[]}{(\PropertySet{\val_0}{\idmeta}{\val_1}) :: \strace}{\handler}{\cex,\,\cstrace}{\econt}{\scont}}%
+        {\parbox{10cm}{where:\\
+            \(\val_0 = ((\_, \_, \textit{mems}), \_)\),
+            \(\textit{mems}(\idmeta) = \text{Setter}(A, S)\)\\
+            \(\env = \ext{\env_{empty}}{\mathbf{this} :: \formal :: []}{\val_0 :: \val_1 :: []}\)\\
+            $\scont = \ExitSK{\val_1}$}}
     \end{multlined}
     \label{econtconf:propertyset-setter}\\
     &\begin{multlined}
         \cesktranswheresplit%
         {\contconf{\PropertySetVK}{\val}}%
-        {\contconf{\econt}{\{\membermeta\}(\val_0, \val_1)}}%
-        {\text{if $\membermeta$ is an implicit setter for field $\idmeta$}}
+        {\contconf{\econt}{\val_1}}%
+        {\parbox{10cm}{where:
+            \(M = \text{Setter}(i \in \mathbb{N})\),
+            \(\val_0 = (c, \textit{fields})\),
+            \(!(\textit{fields}[i]) := \val\)
+        }}
     \end{multlined}
     \label{econtconf:propertyset-field}\\
     &\begin{multlined}
         \cesktranswheresplit*%
         {\contconf{\DirectPropertySetK}{\val_0}}%
         {\evalconf{\expressionmeta_1}{\env}{\strace}{\cstrace}{\cex}{\econt'}}%
-        {\parbox{10cm}{    if $\membermeta$ is setter with statement body $\stmt$ and formal $\formal$\\
-        where $\econt' = \DPropertySetVK$}}
+        {\parbox{10cm}{where $\econt' = \DPropertySetVK$}}
     \end{multlined}
     \label{econtconf:dpropertyset-val}\\
     &\begin{multlined}
         \cesktranswheresplit*%
         {\contconf{\DPropertySetVK}{\val_1}}
-        {\execconf{\stmt}{\env}{\lbls}{\clbls}{(\DirectPropertySet{\val_0}{\membermeta}{\val_1}) :: \strace}{\handler}{\cex,\,\cstrace}{\econt}{\scont}}
-        {\parbox{10cm}{if $\membermeta$ is a setter with body $\stmt$ and formal parameter $\formal$
-        where $\env = \ext{\env_{empty}}{\mathbf{this} :: \formal :: []}{\val_0 :: \val_1 :: []}$\\
-        $\scont = \emptyset$\\}}
+        {\execconf{\stmt}{\env}{\lbls}{\clbls}{(\DirectPropertySet{\val_0}{\membermeta}{\val_1}) :: \strace}{\handler}{\cex,\,\cstrace}{\econt}{\emptyset}}
+        {\parbox{10cm}{where:\\
+            \(\membermeta = \text{Setter}(\formal, \stmt)\),
+            $\env = \ext{\env_{empty}}{\mathbf{this} :: \formal :: []}{\val_0 :: \val_1 :: []}$}}
     \end{multlined}
     \label{econtconf:dpropertyset-setter}\\
     &\begin{multlined}
-        \cesktranswheresplit*%
-        {\contconf{\DPropertySetVK}{\val_1}}%
-        {\contconf{\econt}{\update{\val_0[\membermeta]}{\val_1}}}%
-        {\text{if $\membermeta$ is a field}}
+        \cesktranswheresplit%
+        {\contconf{\DPropertySetVK}{\val}}%
+        {\contconf{\econt}{\val_1}}%
+        {\parbox{10cm}{where
+            \(\membermeta = \text{Setter}(i \in \mathbb{N})\),
+            \(\val = (c, \textit{fields})\),
+            \(\deref{\textit{fields}[i]} := \val_0\)
+        }}
     \end{multlined}
     \label{econtconf:dpropertyset-field}\\
     &\begin{multlined}
         \cesktranswheresplit*%
         {\contconf{\SuperPropertySetK}{\val}}
-        {\execconf{\stmt}{\env'}{\lbls}{\clbls}{(\SuperPropertySet{\idmeta}{\val}) :: \strace}{\handler}{\cex,\,\cstrace}{\econt}{\scont}}
-        {\parbox{10cm}{if $\membermeta$ is a setter method with body $\stmt$ and formal $\formal$\\
-        where $\env' =  \ext{\env_{empty}}{\this :: \formal :: []}{\deref{(\env(\this))} :: \val :: []}$,\\
-        $\scont = \emptyset$}}
+        {\execconf{\stmt}{\env'}{\lbls}{\clbls}{(\SuperPropertySet{\idmeta}{\val}) :: \strace}{\handler}{\cex,\,\cstrace}{\econt}{\emptyset}}
+        {\parbox{10cm}{where:\\
+            \(\deref{\env(\this)} = (((\_, \_, \textit{spmems}), \_, \_), \_)\)\\
+            \(\textit{spmems}(\idmeta) = \text{Setter}(\formal, \stmt)\)\\
+            $\env' =  \ext{\env_{empty}}{\this :: \formal :: []}{\deref{(\env(\this))} :: \val :: []}$
+        }}
     \end{multlined}
     \label{econtconf:superpropertyset-setter}\\
     &\begin{multlined}
         \cesktranswheresplit%
         {\contconf{\SuperPropertySetK}{\val}}%
         {\contconf{\econt}{\val}}%
-        {\parbox{10cm}{if $\membermeta$ is a field\\
-        where $\update{\deref{(\env(\this))}[\membermeta]}{\val}$ after the transition}}
+        {\parbox{10cm}{where:\\
+            \(\deref{\env(\this)} = (((\_, \_, \textit{spmems}), \_, \_), \_)\)\\
+            \(\textit{spmems}(\idmeta) = \text{Setter}(i \in \mathbb{N})\)\\
+            \(\update{\deref{(\env(\this))}[i]}{\val}\)}}
     \end{multlined}
     \label{econtconf:superpropertyset-field}
     \end{align}
