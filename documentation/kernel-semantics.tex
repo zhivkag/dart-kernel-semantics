@@ -339,6 +339,14 @@ This section contains definitions of syntactic and semantic domains, helper func
 \newcommand{\typemeta}{\ensuremath{\mathit{t}}}
 \newcommand{\dclass}{\mathbf{Class}}
 \newcommand{\dformals}{\mathbf{Formals}}
+
+% Constructor Initializers
+\newcommand{\Initializer}[1]{\synt{Initializer}(#1)}
+\newcommand{\FieldInitializer}[1]{\synt{FieldInitializer}(\field, #1)}
+\newcommand{\LocalInitializer}[1]{\synt{LocalInitializer}(\varmeta, #1)}
+\newcommand{\SuperInitializer}[2]{\synt{SuperInitializer}(#1,\,#2)}
+\newcommand{\RedirectingInitializer}[2]{\synt{RedirectingInitializer}(#1,\,#2)}
+
 \[
   \begin{array}{ccll}
     \expr, \expri{i}
@@ -578,6 +586,7 @@ A class definition contains a reference to the super class (none only in the cas
 The natural-indexed getters and setters correspond to the case where a field should be modified directly, and the number provides the index into an instance's list of locations.
 
 Although constructor definitions are included in the class definition, they are not presented here because the same syntax nodes are directly referenced by the expression form for constructor invocation.
+
 
 \subsubsection{Object Values}
 \label{subsec:object-values}
@@ -2221,13 +2230,33 @@ Similarly to Section~\ref{subsubsec:instance-method-invoc}, $\ExitSK{\val}$ is a
 \subsubsection{New Instance Creation}
 \label{subsubsec:new-instance}
 
-\newcommand{\Initializer}[1]{\mathrm{Initializer}(#1)}
-\newcommand{\SuperInitializer}[2]{\mathrm{SuperInitializer}(#1,\,#2)}
-\newcommand{\RedirectingInitializer}[2]{\mathrm{RedirectingInitializer}(#1,\,#2)}
+\kernel{} supports new instance creation with constructor invocation.
+A constructor can be run with $\new$ expression or when it is a target of an initializer.
+A constructor has an associated class definition, an initializer list, $Izs$, with various kinds of initializers and a function node with formal parameters, $\formals$, and a statement body $\stmt$.
 
-The expression $\new$ invokes a constructor to produce a new instance.
-The target constructor $\synt{Q}$ has a list of formal parameters, $\formals$, a list of initializers, $\synt{Izs}$, and a statement body, $\stmt_{body}$.
-The invocation of a constructor $\synt{Q}$ proceeds by evaluating the argument expressions as shown in \eqref{eval:new}.
+\kernel{} supports the following kinds of initializers:
+
+\begin{itemize}
+\item $\FieldInitializer{\expressionmeta}$ --- Field initializer for field $\field$ with expression $\expressionmeta$.\\
+Field initializers modify the field of the newly allocated instance to store the value the expression evaluates to.
+\item $\LocalInitializer{\expressionmeta}$ --- Local initializer for variable $\varmeta$ with expression $\expressionmeta$.\\
+Local initializers extend the environment for the initializer list of the constructor with a binding of variable declaration $\varmeta$ to the value the expression evaluates to.
+\item $\RedirectingInitializer{G}{\expressionsmeta}$ --- Redirecting initializer with target constructor $G$ and actual arguments for running the constructor $\expressionsmeta$.\\
+Redirecting initializers appear last in the list of initializers of a constructor and we say the current constructor is a generative redirecting constructor.
+The function node of a redirecting constructors does not have a statement body.
+When a redirecting constructor is run, only the initializer list of the constructor is executed.
+Fields for the newly allocated instance from the immediately enclosing class are initialized only when a non-redirecting constructor is run.
+This ensures that side effects from evaluating the actual arguments for the target constructor invocation of the redirecting constructor occur before any side effects from initializing the fields in the immediately enclosing class.
+\item $\SuperInitializer{G}{\expressionsmeta}$ --- Super initializer with target constructor $G$ and actual arguments for running the constructor $\expressionsmeta$.\\
+Super initializers appear last in the initializer list and all non-redirecting constructors other then the constructor for the object class, have a super initializer as the last in their initializer list.
+Before invoking the target constructor of the super initializer, all non initialized fields in the immediately enclosing class are set to $\NullLiteral$.
+\end{itemize}
+
+
+A new object value is allocated only a constructor is run with $\new$, i.e., invoked, otherwise we say that the constructor is run to further initialize an already allocated object value.
+
+Let $\new(Q(\expressionsmeta))$ be an expression invokes a constructor $Q$ to produce a new instance.
+The invocation of a constructor $Q$ proceeds by evaluating the argument expressions as shown in \eqref{eval:new}.
 After the evaluation of the argument expressions for the invocation, a fresh instance is allocated by creating an object value (see Section~\ref{subsec:object-values}).
 
 \begin{align*}
