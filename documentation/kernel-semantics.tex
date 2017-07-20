@@ -215,6 +215,13 @@ The abstract machine is presented in the style of a CESK machine. \todo{dmitryas
 The state space of the CESK machine is grouped into several configurations, most of which carry an environment, which maps variable declarations in the present scope to their current assignments, a store, which models the mutable object store in which all objects in a \dart{} program live, and a continuation, which captures the work to be done after the current operation is complete, roughly similar to a chain of call frames above the current function.
 In this way states of the CESK machine mimic states of the \dart{} virtual machine at a very abstract level.
 
+
+\section{Definitions}
+\label{sec:definitions}
+
+This section contains definitions of syntactic and semantic domains, helper functions, and notations used in the rest of the document.
+
+
 \subsection{Conventions}
 \label{subsec:conventions}
 
@@ -240,8 +247,6 @@ In this way states of the CESK machine mimic states of the \dart{} virtual machi
     \dom(f) &\text{ --- the domain of function \(f\)}.
 \end{align*}
 
-\section{Syntax}
-\label{sec:definitions}
 
 \subsection{Domains}
 \label{subsec:domains}
@@ -399,12 +404,6 @@ In this way states of the CESK machine mimic states of the \dart{} virtual machi
 % Metavariables for statements
 \newcommand{\statementmeta}{\ensuremath{\mathit{\stmt}}}
 
-\subsection{Locations}
-
-The object store is indexed by elements $\loc$ from the domain $\dlocation$.
-This domain is countably infinite, and we assume that we can generate fresh values from the domain within the abstract machine.
-It could be represented by natural numbers, for example, but arithmetic on locations is not meaningful.
-
 \subsection{Store}
 \label{subsec:store-definition}
 
@@ -414,6 +413,13 @@ A global store is assumed and locations reachable in the current scope are defin
 \[
     s : \dlocation \rightarrow \dval.
 \]
+
+
+\subsubsection{Locations}
+
+The object store is indexed by elements $\loc$ from the domain $\dlocation$.
+This domain is countably infinite, and we assume that we can generate fresh values from the domain within the abstract machine.
+It could be represented by natural numbers, for example, but arithmetic on locations is not meaningful.
 
 
 \subsubsection{Dereferencing}
@@ -474,7 +480,7 @@ This operator has an implicit operand which is the store of the CESK machine.
 For simpler notation, we allow ``$\extend$'' to be called on single values: $\ext{\env}{\varmeta}{\val}$, which we consider equivalent to calling it on singleton lists: $\ext{\env}{\varmeta :: []}{\val :: []}$.
 
 
-\subsubsection{Variable lookup}
+\subsubsection{Variable Lookup}
 \label{subsubsec:variable-lookup}
 
 A variable lookup consists of looking up the location of a variable from the environment with $\loc = \env(\varmeta)$ and reading the stored value $v$ with $\deref{\loc} = \deref{\env(\varmeta)}$ from the store.
@@ -487,7 +493,7 @@ Values in \kernel{} fall into two categories: $\dvector$ values and $\dobjval$ v
 Values are irreducible terms, i.e, the result of the evaluation of expressions.
 Only object values may be in the image of the store.
 
-\subsubsection{Vector values}
+\subsubsection{Vector Values}
 \label{subsubsec:vector-values}
 
 \kernel{} has limited support for arrays without bounds checking via $\dvector$s.
@@ -521,7 +527,7 @@ The natural-indexed getters and setters correspond to the case where a field sho
 
 Although constructor definitions are included in the class definition, they are not presented here because the same syntax nodes are directly referenced by the expression form for constructor invocation.
 
-\subsubsection{Object values}
+\subsubsection{Object Values}
 \label{subsec:object-values}
 
 Object values are composed of a reference to a class definition, which is shared across all instances of that object, and a list of locations which identify the values of the fields for a specific instance.
@@ -529,12 +535,16 @@ Object values are composed of a reference to a class definition, which is shared
     \dobjval = \dclass \times \mlist{\dlocation}
 \]
 
-\subsubsection{Function values}
+\subsubsection{Function Values}
 \label{subsec:function-values}
 \todo{add async marker, type parameters, return type to FunctionValue}
 \[
     \dfunval : \dformals \times \dstmt \times \denv
 \]
+
+
+\section{\kernel{} Syntax}
+\label{sec:definitions}
 
 
 \subsection{Expressions}
@@ -699,7 +709,7 @@ Object values are composed of a reference to a class definition, which is shared
 \]
   \todo{Add sync*/async/async* marker and type parameters}
 
-\section{Abstract Machine}
+\section{CESK Machine States}
 \subsection{Configurations}
 \label{subsec:cesk-configs}
 
@@ -832,7 +842,7 @@ They capture the information needed to resume the execution of the program.
 There are various types of continuations depending on the state for evaluation of an expression or execution of a statement.
 
 
-\subsubsection{Expression continuations}
+\subsubsection{Expression Continuations}
 \label{subsubsec:expression-continuations}
 
 Expression continuations, $\econt$, capture the steps after the evaluation of a given expression.
@@ -927,7 +937,7 @@ The different expression continuations are shown in Figure~\ref{figure:econts}.
 \end{figure}
 
 
-\subsubsection{Statement continuations}
+\subsubsection{Statement Continuations}
 \label{subsubsec:statement-continuations}
 
 Statement continuations, $\scont$, capture the steps after execution of a statement.
@@ -966,7 +976,7 @@ The different statement continuations are shown in Figure~\ref{figure:sconts}.
 \end{figure}
 
 
-\subsubsection{Application continuation}
+\subsubsection{Application Continuation}
 \label{subsubsec:application-continuation}
 
 Application continuations, $\acont$, capture the application of a list of values resulting from the evaluation of list of expressions.
@@ -1008,7 +1018,7 @@ The different application continuations are shown in Figure~\ref{figure:acont}.
 \end{figure}
 
 
-\subsubsection{Break continuations}
+\subsubsection{Break Continuations}
 \label{subsubsec:break-continuations}
 
 Break continuations, $\bcont$, capture the steps to be executed when a break to a given label is encountered.
@@ -1032,7 +1042,7 @@ The break continuation FinallyBreak, \ref{breakcont:finallybreak}, captures the 
 They are added when a try/finally statement is executed.
 
 
-\subsubsection{Switch continuations}
+\subsubsection{Switch Continuations}
 \label{subsubsec:switch-continuations}
 
 Switch continuations, $\switchcont$, capture the steps to be executed when a continue to a preceding switch case statement is executed.
@@ -1058,7 +1068,7 @@ The switch continuation FinallyContinue, \ref{switchcont:finallycontinue}, captu
 They are added when a try/finally statement is executed.
 
 
-\subsubsection{Exception handlers}
+\subsubsection{Exception Handlers}
 \label{subsubsec:exception-handlers}
 
 The different exception handlers are shown in Figure~\ref{figure:handlers}.
@@ -1076,11 +1086,12 @@ The different exception handlers are shown in Figure~\ref{figure:handlers}.
   \end{eqfigure}
 \end{figure}
 
-\section{Semantics}
+
+\section{CESK Machine Transitions}
 \label{sec:semantics}
 
 
-\subsection{Expression evaluation}
+\subsection{Expression Evaluation}
 \label{subsec:expr-evaluation}
 
 \newcommand{\this}{\tt{this}}
@@ -1321,14 +1332,14 @@ The value corresponding to the evaluated expression is captured by the applicati
 \end{figure}
 
 
-\subsubsection{Basic literal evaluation}
+\subsubsection{Basic Literal Evaluation}
 \label{subsubsec:basic-literal-eval}
 
 \kernel{} literals are evaluated to a value $\val \in \dlitval$ in one step.
 Transitions of the CESK machine for basic literals are presented in Figure~\ref{figure:expressions-evalconfigs}, rules \eqref{eval:int} - \eqref{eval:string}.
 
 
-\subsubsection{Variable assignment and lookup}
+\subsubsection{Variable Assignment and Lookup}
 \label{subsubsec:variable-assignment-and-lookup}
 
 A variable $\varmeta$ is accessed by reading the value stored at location $\env(\varmeta)$ in the store, \eqref{eval:varget}.
@@ -1336,7 +1347,7 @@ Assigning a value to a variable $\varmeta$ will modify the store, more specifica
 The evaluation of this expression proceeds by evaluating the right-hand side expression, as shown in \eqref{eval:varset} and setting the location $\env(\varmeta)$ in the store to the value this expression evaluates to, as shown in \eqref{econtconf:varset}.
 
 
-\subsubsection{Boolean expressions}
+\subsubsection{Boolean Expressions}
 \label{subsubsec:bool-expressions}
 
 The CESK-transition function for boolean expressions is show in Figure~\ref{figure:expressions-evalconfigs}, rules \eqref{eval:not} - \eqref{eval:cond}.
@@ -1392,7 +1403,7 @@ In the body of instance methods or constructors, there is a binding in the corre
 Evaluation of $\this$ expression resolves to that value in one step, as shown in \eqref{eval:this}.
 
 
-\subsubsection{Type test}
+\subsubsection{Type Test}
 \label{subsubsec:type-test}
 
 Type test expressions evaluate to a boolean literal value, in more than one step.
@@ -1400,7 +1411,7 @@ The evaluation of this kind of expression proceeds by evaluating the target expr
 When the target expression evaluates to a value $\val$ such that ``$\val $ is $\tt{T}$" holds, the value $true$ is applied to the expression continuation, $\econt$, as shown in \eqref{econtconf:is-true}, otherwise $\false$ is applied to $\econt$, as in \eqref{econtconf:is-false}.
 
 
-\subsubsection{Type cast}
+\subsubsection{Type Cast}
 \label{subsubsec:type-cast}
 
 Evaluation of type cast expression proceed to evaluation of the target expression to the corresponding value, as shown in \eqref{eval:as}.
@@ -1408,7 +1419,7 @@ When the target expression evaluates to a value $\val$ such that ``$\val $ is $\
 Otherwise, the evaluation of the expression results with an error, as shown in \eqref{econtconf:as-false}.
 
 
-\subsubsection{Function expressions}
+\subsubsection{Function Expressions}
 \label{subsubsec:function-expressions}
 
 \kernel{} supports encapsulating an executable unit of code with function expressions.
@@ -1443,7 +1454,7 @@ $fv \in \dfunval$ has only one property, $call$.
 \end{figure}
 
 
-\subsubsection{Function invocation}
+\subsubsection{Function Invocation}
 \label{subsubsec:function-invoc}
 
 Function invocation occurs when a function expression (\ref{subsubsec:function-expressions}), instance method (\ref{subsubsec:instance-method-invoc}, \ref{subsubsec:direct-instance-method-invoc}, \ref{subsubsec:super-method-invoc}), a getter(\ref{subsubsec:property-extraction}), a setter (\ref{subsubsec:property-assignment}) or a constructor is invoked with new or with super and redirecting initializer (\ref{subsubsec:new-instance}).
@@ -1578,7 +1589,7 @@ The specific CESK-transitions for the different invocations are described in the
 \end{figure}
 
 
-\subsubsection{Static and library fields}
+\subsubsection{Static and Library Fields}
 \label{subsubsec:static-and-library-fields}
 
 In order to remember initialization and assignment of library variables and static variables, we introduce a global environment $\env^{M}$.
@@ -1800,7 +1811,7 @@ A statement continuation, $\ExitSK{\econt}{\tt{null}}$ is added as next statemen
 \end{figure}
 
 
-\subsubsection{Property extraction}
+\subsubsection{Property Extraction}
 \label{subsubsec:property-extraction}
 
 \kernel{} allows access of a member as a property, which can be either getter access, which executes the getter, or method extraction, which converts a method into a closure, also known as tear-off.
@@ -1830,7 +1841,7 @@ The evaluation of the expression proceeds as follow:
 If the lookup fails, a ``NoSuchMethod'' will be thrown, as shown in \eqref{econtconf:propertyget-nosuchmethod}.
 
 
-\subsubsection{Direct property extraction}
+\subsubsection{Direct Property Extraction}
 \label{subsubsec:direct-property-extraction}
 
 In \kernel{} a property can be accessed without lookup, by direct reference to the member $\membermeta$.
@@ -1929,7 +1940,7 @@ The evaluation proceeds as follows:
 \end{figure}
 
 
-\subsubsection{Property assignment}
+\subsubsection{Property Assignment}
 \label{subsubsec:property-assignment}
 
 An assignment in \kernel{} results with the invocation of a setter.
@@ -1955,7 +1966,7 @@ The evaluation proceeds as follows:
 \end{itemize}
 
 
-\subsubsection{Direct property assignment}
+\subsubsection{Direct Property Assignment}
 \label{subsubsec:direct-property-assignment}
 
 In \kernel{} a property can be set without lookup, by direct reference to the member of the instance.
@@ -1974,7 +1985,7 @@ After evaluating the receiver expression to $\val_0$ and the argument expression
 \end{itemize}
 
 
-\subsubsection{Super property get}
+\subsubsection{Super Property Get}
 \label{subsubsec:super-property-get}
 
 \kernel{} allows access of a superclass member as a property, which can be either getter access, which executes the getter, or method extraction, which converts a method into a closure.
@@ -1998,7 +2009,7 @@ The evaluation of a super property extraction proceeds as follows:
 \end{itemize}
 
 
-\subsubsection{Super property assignment}
+\subsubsection{Super Property Assignment}
 \label{subsubsec:super-property-assignemnt}
 
 \kernel{} supports assignment of a super member with the expression $\SuperPropertySet{\idmeta}{\expressionmeta}$.
@@ -2127,7 +2138,7 @@ After the evaluation of the argument expression to a value $\val$, depending on 
 \end{figure}
 
 
-\subsubsection{Instance method invocation}
+\subsubsection{Instance Method Invocation}
 \label{subsubsec:instance-method-invoc}
 
 Method invocation is supported with $\InstanceMethodInvocation{\expressionmeta}{\idmeta}{\expressionsmeta}$.
@@ -2146,7 +2157,7 @@ We add $\ExitSK{\tt{null}}$ as next statement continuation.
 When a $\tt{return}$ statement is missing in the statement body $\stmt$ of the instance method $\membermeta$, the statement continuation $\ExitSK{\val}$ ensures that the execution will proceed to the corresponding expression continuation, in this case with $\val = \tt{null}$.
 
 
-\subsubsection{Direct instance method invocation}
+\subsubsection{Direct Instance Method Invocation}
 \label{subsubsec:direct-instance-method-invoc}
 
 Direct method invocation allows invocation of instance method by providing directly the member method to be invoked and bypass the lookup step described in Section~\ref{subsubsec:instance-method-invoc} above.
@@ -2158,7 +2169,7 @@ The CESK-transition is shown in \eqref{acontconf:dinstancemethod}.
 Similar to Section~\ref{subsubsec:instance-method-invoc}, $\ExitSK{\tt{null}}$ is added as next statement continuation.
 
 
-\subsubsection{Super method invocation}
+\subsubsection{Super Method Invocation}
 \label{subsubsec:super-method-invoc}
 
 Super method invocation is supported with $\SuperMethodInvocation{\idmeta}{\expressionsmeta}$.
@@ -2170,7 +2181,7 @@ The statement $\stmt$ is executed in an environment binding $\formals$ to the lo
 Similarly to Section~\ref{subsubsec:instance-method-invoc}, $\ExitSK{\val}$ is added as next statement continuation.
 
 
-\subsubsection{New instance creation}
+\subsubsection{New Instance Creation}
 \label{subsubsec:new-instance}
 
 \newcommand{\Initializer}[1]{\mathrm{Initializer}(#1)}
@@ -2366,7 +2377,7 @@ Then the value stored at location $\loc' = (\deref{\loc})[f]$ in the store $S$ w
 \end{align*}
 
 
-\subsection{Statement execution}
+\subsection{Statement Execution}
 \label{subsec:stmt-exectution}
 
 \begin{figure}[Htp]
@@ -2569,31 +2580,31 @@ Execution of a variable declaration statement proceeds by evaluating the right-h
 After the evaluation of the initializer expression to a value $\val$, the corresponding environment is extended with a new binding to a location that stores the value $\val$, as shown in \eqref{econtconf:vardecl}.
 
 
-\subsubsection{Empty statement}
+\subsubsection{Empty Statement}
 \label{subsubsec:emtpy-stmt}
 
 Execution of empty statement proceeds to the next ForwardConfiguration, as shown in \eqref{execconf:empty}.
 
 
-\subsubsection{Expression statement}
+\subsubsection{Expression Statement}
 \label{expression-stmt}
 
 Execution of expression statement proceeds by evaluating the expression, as shown in \eqref{execconf:expresion}.
 
 
-\subsubsection{Block statements}
+\subsubsection{Block Statements}
 
 Execution of block statements proceeds by executing each statement of the block with the environment function after the execution of the previous statement.
 The CESK-transition function for block statements is shown in \eqref{execconf:block}, \eqref{scontconf:block} and \eqref{scontconf:block-empty}.
 
 
-\subsubsection{If statement}
+\subsubsection{If Statement}
 
 Execution of conditional statements proceeds by evaluating the condition to a value, as shown in \eqref{execconf:if}.
 The expression continuation for the execution of the rest of the statement will dispatch on the value the condition expression evaluates to and produce a configuration for the execution of the next statement, as shown in \eqref{econtconf:if-true} and \eqref{econtconf:if-false}.
 
 
-\subsubsection{Return statement}
+\subsubsection{Return Statement}
 
 \kernel{} supports return statements with or without an expression.
 In the first case, the execution proceeds with evaluation of the return expression, as shown in \eqref{execconf:return}.
@@ -2858,13 +2869,13 @@ $\continue \synt{L}$ statements continue to executing the statement of a precedi
 \noindent where $\clbl = \continuel{L'}{\switchcont} \in \clbls \text{ with } L' == \mathbf{L}$.
 
 
-\subsubsection{Function declaration}
+\subsubsection{Function Declaration}
 
 \kernel{} supports local function declaration, where a final variable stores a function value.
 Let $F$ be a function with a body $\stmt_{body}$ and a list of formal parameters, $\formals$, and let $fun \in \dvardecl$ be the corresponding final variable declaration.
 
 
-\subsection{Event loop}
+\subsection{Event Loop}
 \label{subsec:eventloop}
 
 
