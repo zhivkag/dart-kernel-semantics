@@ -2102,9 +2102,9 @@ After the evaluation of the argument expression to a value $\val$, depending on 
         \label{eval:superinstancemethod}\\
         &\begin{multlined}
             \cesktranswheresplit%
-            {\evalconf{\new \synt{Q}(\exprs)}{\env}{st}{cex}{cst}{\econt}}%
+            {\evalconf{\new Q(\exprs)}{\env}{st}{cex}{cst}{\econt}}%
             {\evallistconf{\exprs}{\env}{st}{cex}{cst}{\acont'}}%
-            {\acont' = \ConstructorA{\synt{Q}}{\new \synt{Q}(\exprs) :: \strace}{\econt}}
+            {\acont' = \ConstructorA{Q}{\new Q(\exprs) :: \strace}{\econt}}
         \end{multlined}
         \label{eval:new}
     \end{align}
@@ -2232,50 +2232,61 @@ Similarly to Section~\ref{subsubsec:instance-method-invoc}, $\ExitSK{\val}$ is a
 
 \kernel{} supports new instance creation with constructor invocation.
 A constructor can be run with $\new$ expression or when it is a target of an initializer.
-A constructor has an associated class definition, an initializer list, $Izs$, with various kinds of initializers and a function node with formal parameters, $\formals$, and a statement body $\stmt$.
+\kernel{} also supports redirecting constructors, which invoke a specified target constructor without modifying the newly allocated instance.
 
-\kernel{} supports the following kinds of initializers:
+A constructor has an associated class definition, an initializer list, $Izs$, with various kinds of initializers, formal parameters, $\formals$, and a statement body $\stmt$.
+
+We support the following kinds of initializers:
 
 \begin{itemize}
-\item $\FieldInitializer{\expressionmeta}$ --- Field initializer for field $\field$ with expression $\expressionmeta$.\\
-Field initializers modify the field of the newly allocated instance to store the value the expression evaluates to.
-\item $\LocalInitializer{\expressionmeta}$ --- Local initializer for variable $\varmeta$ with expression $\expressionmeta$.\\
-Local initializers extend the environment for the initializer list of the constructor with a binding of variable declaration $\varmeta$ to the value the expression evaluates to.
-\item $\RedirectingInitializer{G}{\expressionsmeta}$ --- Redirecting initializer with target constructor $G$ and actual arguments for running the constructor $\expressionsmeta$.\\
-Redirecting initializer appears last in the list of initializers of a constructor.
-When the last initializer in the initializer list of a constructor is a redirecting initializer, we say the constructor is a redirecting constructor.
-The function node of redirecting constructors has an empty statement body.
-When a redirecting constructor is run, only the initializer list of the constructor is executed.
-Note that in other cases we first initialize instance fields in the immediately enclosing class with initializer expressions before proceeding to execution of the initializer list.
-Fields for the newly allocated instance from the immediately enclosing class are initialized only when a non-redirecting constructor is run.
-This ensures that side effects from evaluating the actual arguments for the target constructor of the redirecting constructor occur before any side effects from initializing the fields in the immediately enclosing class.
-\item $\SuperInitializer{G}{\expressionsmeta}$ --- Super initializer with target constructor $G$ and actual arguments for running the constructor $\expressionsmeta$.\\
-Super initializers appear last in the initializer list and all non-redirecting constructors other then the constructor for the object class, have a super initializer as the last in their initializer list.
-Before invoking the target constructor of the super initializer, all non initialized fields in the immediately enclosing class are set to $\NullLiteral$.
+\item $\FieldInitializer{\expressionmeta}$ --- Field initializer for field $\field$ with expression $\expressionmeta$.
+
+    Field initializers modify the field of the newly allocated instance to store the value the expression evaluates to.
+\item $\LocalInitializer{\expressionmeta}$ --- Local initializer for variable $\varmeta$ with expression $\expressionmeta$.
+
+    Local initializers extend the environment for the initializer list of the constructor with a binding of variable declaration $\varmeta$ to the value the expression evaluates to.
+\item $\RedirectingInitializer{G}{\expressionsmeta}$ --- Redirecting initializer with target constructor $G$ and actual arguments for running the constructor $\expressionsmeta$.
+
+    Redirecting initializer appears last in the list of initializers of a constructor.
+    When the last initializer in the initializer list of a constructor is a redirecting initializer, we say the constructor is a redirecting constructor.
+    The redirecting constructor has an empty statement body.
+    When a redirecting constructor is run, only the initializer list of the constructor is executed.
+
+    Note that in other cases we first initialize instance fields in the immediately enclosing class that have initializer expressions before proceeding to execution of the initializer list.
+    Fields for the newly allocated instance from the immediately enclosing class are initialized only when a non-redirecting constructor is run.
+    This ensures that side effects from evaluating the actual arguments for the target constructor of the redirecting constructor occur before any side effects from initializing the fields in the immediately enclosing class.
+\item $\SuperInitializer{G}{\expressionsmeta}$ --- Super initializer with target constructor $G$ and actual arguments for running the constructor $\expressionsmeta$.
+
+    Super initializers appear last in the initializer list and all non-redirecting constructors other then the constructor for the object class, have a super initializer as the last in their initializer list.
+    Before invoking the target constructor of the super initializer, all non initialized fields in the immediately enclosing class are set to $\NullLiteral$ to ensure that all fields have been initialized before they are used.
 \end{itemize}
 
 
 A new object value is allocated only a constructor is run with $\new$, i.e., invoked, otherwise we say that the constructor is run to further initialize an already allocated object value.
 
 Let $\new(Q(\expressionsmeta))$ be an expression invokes a constructor $Q$ to produce a new instance.
-The invocation of a constructor $Q$ proceeds by evaluating the argument expressions as shown in \eqref{eval:new}.
-After the evaluation of the argument expressions for the invocation, a fresh instance is allocated by creating an object value (see Section~\ref{subsec:object-values}).
+The invocation of a constructor $Q$ proceeds by evaluating the actual argument expressions as shown in \eqref{eval:new}.
+After the evaluation of the argument expressions for the invocation, a fresh instance is allocated by creating a value $\val \in \dobjval$ (see Section~\ref{subsec:object-values} for details on $\dobjval$).
+The execution of the constructor proceeds as follows:
 
 \begin{align*}
-    &\cesktrans%
-        {\acontconf{\ConstructorA{\synt{Q}}{\strace}{\econt}}{\val{s}}}%
-        {\contconf{\InitK{\synt{Q}}{\env'}{\scont}}{!\loc}},
+    &\begin{multlined}
+    \cesktranswheresplit*%
+        {\acontconf{\ConstructorA{Q}{\strace}{\econt}}{\val{s}}}%
+        {\contconf{\InitK{Q}{\env'}{\scont}}{\val}}%
+        {\parbox{15cm}{$\val = \objval \in \dobjval$,\\
+        $class$ corresponds to the class component of the constructor $Q$,\\
+        $fields \in \mlist{\dlocation}$ corresponds to a list of fresh locations in the store,\\
+        $\env' = \extend(\env_{empty}, \formals, \val{s})$,\\
+        $\scont = \NewSK{\econt}{\val}$}}
+    \end{multlined}
 \end{align*}
 
-\noindent where $\loc$ is the location of the newly allocated instance, $\val \in \dobjval$, in the store.
-The value $\val$ stores the class of the object and the fields, as a list of freshly allocated locations for each field of the new instance.
+We introduce a new statement continuation, $\NewSK{\econt}{\val}$ which captures the expression continuation that will be eventually applied to the newly allocated value after the execution of the statement body of the constructor.
 
-\begin{align*}
-    &\deref{\loc} = \objval \in \dobjval, fields \in \mlist{\dlocation},\\
-    &\env' = \extend(\env_{empty}, \formals, \val{s}),\\
-    &\scont = \NewSK{\econt}{\loc},\\
-    &\cesktrans{\scontconf{\NewSK{\econt}{\loc}}{\env}}{\contconf{\econt}{\deref{\loc}}}.
-\end{align*}
+\begin{align}
+    &\cesktrans{\scontconf{\NewSK{\econt}{\val}}{\env}}{\contconf{\econt}{\val}}.
+\end{align}
 
 Let $li = last(Izs)$ be the last initializer in the list of initializers, $Izs$, of constructor $\synt{Q}$.
 When $li$ is a redirecting initializer to target constructor $\synt{G}$, then execution of constructor $\synt{Q}$ proceeds immediately with execution of its initializer list, $Izs$.
