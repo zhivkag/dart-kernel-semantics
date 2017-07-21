@@ -2242,11 +2242,13 @@ Field initializers modify the field of the newly allocated instance to store the
 \item $\LocalInitializer{\expressionmeta}$ --- Local initializer for variable $\varmeta$ with expression $\expressionmeta$.\\
 Local initializers extend the environment for the initializer list of the constructor with a binding of variable declaration $\varmeta$ to the value the expression evaluates to.
 \item $\RedirectingInitializer{G}{\expressionsmeta}$ --- Redirecting initializer with target constructor $G$ and actual arguments for running the constructor $\expressionsmeta$.\\
-Redirecting initializers appear last in the list of initializers of a constructor and we say the current constructor is a generative redirecting constructor.
-The function node of a redirecting constructors does not have a statement body.
+Redirecting initializer appears last in the list of initializers of a constructor.
+When the last initializer in the initializer list of a constructor is a redirecting initializer, we say the constructor is a redirecting constructor.
+The function node of redirecting constructors has an empty statement body.
 When a redirecting constructor is run, only the initializer list of the constructor is executed.
+Note that in other cases we first initialize instance fields in the immediately enclosing class with initializer expressions before proceeding to execution of the initializer list.
 Fields for the newly allocated instance from the immediately enclosing class are initialized only when a non-redirecting constructor is run.
-This ensures that side effects from evaluating the actual arguments for the target constructor invocation of the redirecting constructor occur before any side effects from initializing the fields in the immediately enclosing class.
+This ensures that side effects from evaluating the actual arguments for the target constructor of the redirecting constructor occur before any side effects from initializing the fields in the immediately enclosing class.
 \item $\SuperInitializer{G}{\expressionsmeta}$ --- Super initializer with target constructor $G$ and actual arguments for running the constructor $\expressionsmeta$.\\
 Super initializers appear last in the initializer list and all non-redirecting constructors other then the constructor for the object class, have a super initializer as the last in their initializer list.
 Before invoking the target constructor of the super initializer, all non initialized fields in the immediately enclosing class are set to $\NullLiteral$.
