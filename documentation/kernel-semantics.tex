@@ -2275,41 +2275,48 @@ The execution of the constructor proceeds as follows:
         {\acontconf{\ConstructorA{Q}{\strace}{\econt}}{\val{s}}}%
         {\contconf{\InitK{Q}{\env'}{\scont}}{\val}}%
         {\parbox{15cm}{$\val = \objval \in \dobjval$,\\
-        $class$ corresponds to the class component of the constructor $Q$,\\
-        $fields \in \mlist{\dlocation}$ corresponds to a list of fresh locations in the store,\\
-        $\env' = \extend(\env_{empty}, \formals, \val{s})$,\\
-        $\scont = \NewSK{\econt}{\val}$}}
+            $class$ corresponds to the class component of the constructor $Q$,\\
+            $fields \in \mlist{\dlocation}$ corresponds to a list of fresh locations in the store,\\
+            $\env' = \extend(\env_{empty}, \formals, \val{s})$,\\
+	    $\scont = \NewSK{\econt}{\loc}$ with $\loc$ a new location such that $\deref{\loc}=\val$}}
     \end{multlined}
 \end{align*}
 
-We introduce a new statement continuation, $\NewSK{\econt}{\val}$ which captures the expression continuation that will be eventually applied to the newly allocated value after the execution of the statement body of the constructor.
+We introduce a new statement continuation, $\NewSK{\econt}{\loc}$ which captures the expression continuation that will be eventually applied to the newly allocated value after the execution of the statement body of the constructor.
+The CESK-transition from the corresponding ForwardConfiguration is shown below:
+\begin{align*}
+	&\cesktrans{\scontconf{\NewSK{\econt}{\loc}}{\env}}{\contconf{\econt}{\deref{\loc}}}
+\end{align*}
 
-\begin{align}
-    &\cesktrans{\scontconf{\NewSK{\econt}{\val}}{\env}}{\contconf{\econt}{\val}}.
-\end{align}
-
-Let $li = last(Izs)$ be the last initializer in the list of initializers, $Izs$, of constructor $\synt{Q}$.
-When $li$ is a redirecting initializer to target constructor $\synt{G}$, then execution of constructor $\synt{Q}$ proceeds immediately with execution of its initializer list, $Izs$.
-
+Let $initializer$ be the last initializer in the list of initializers, $Izs$, of constructor $Q$.
+When $initializer$ is a redirecting initializer to some target constructor $G$, then execution of constructor $Q$'s initializer list,  $Izs$, proceeds immediately.
+When the redirecting initializer is the only initializer in the list, the execution proceeds as follows:
 \begin{align*}
     &\begin{multlined}
         \cesktranswheresplit%
-            {\contconf{\InitK{\synt{Q}}{\env}{\scont}}{\val}}%
+            {\contconf{\InitK{Q}{\env}{\scont}}{\val}}%
             {\evallistconf{\exprs}{\env}{\strace}{\cstrace}{\cex}{\acont}}%
-            {\parbox{\textwidth-2cm}{if $Izs = RedirectingI(G, \exprs) :: []$,\\
-                where $\acont = \RedirectingA{G}{\loc}{\scont}$, $\deref{\loc} = \val$,}}
-    \end{multlined}\\
+            {\parbox{\textwidth-2cm}{if $Izs = \RedirectingInitializer{G}{\exprs} :: []$,\\
+                where $\acont = \RedirectingA{G}{\val}{\scont}$,}}
+    \end{multlined}
+\end{align*}
+Otherwise, the redirecting constructor $Q$ has other initializers in the initializer list.
+The redirecting constructor can have only local initializers in the list.
+The rules for executing the initializer list of redirecting and non-redirecting constructors are the same.
+The other initializers for redirecting constructor are introduced by transformations that only introduce local initializers.
+The CESK-transitions starting form the corresponding ValuePassingConfiguration proceeds with the first initializer in the list, denoted as $fi$ below:
+\begin{align*}
     &\begin{multlined}
         \cesktranswheresplit%
-            {\contconf{\InitK{\synt{Q}}{\env}{\scont}}{\val}}%
-            {\evalconf{\expr}{\env}{st}{cex}{cst}{\econt'}}%
-            {\parbox{\textwidth-2cm}{otherwise, where $fi = Initializer(\expr)$, first initializer in $Izs$,\\
-                $\econt' = \InitializerK{Izs}{\loc}{\env}{\scont}, \deref{\loc} = \val$,}}
+            {\contconf{\InitK{Q}{\env}{\scont}}{\val}}%
+            {\evalconf{\expr}{\env}{\strace}{\cex}{\cstrace}{\econt'}}%
+            {\parbox{\textwidth-2cm}{otherwise, where $fi = \LocalInitializer{\expr} + \FieldInitializer{\expr}$, first initializer in $Izs$,\\
+                $\econt' = \InitializerK{Izs}{\val}{\env}{\scont}$,}}
     \end{multlined}\\
     &\begin{multlined}
         \cesktranswheresplit*%
-            {\acontconf{\RedirectingA{G}{\loc}{\scont}}{\val{s}}}%
-            {\contconf{\InitK{\synt{G}}{\env'}{\scont}}{\deref{\loc}}}%
+            {\acontconf{\RedirectingA{G}{\val}{\scont}}{\val{s}}}%
+            {\contconf{\InitK{\synt{G}}{\env'}{\scont}}{\val}}%
             {\text{where $\env' = \extend(\env_{empty}, \formals, \val{s})$}}.
     \end{multlined}
 \end{align*}
