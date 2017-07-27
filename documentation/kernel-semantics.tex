@@ -1047,7 +1047,7 @@ Application continuations, $\acont$, capture the application of a list of values
 \newcommand{\SuperMethodA}[1]{\mathrm{SuperMethodA}(\idmeta,\,\env,\,#1,\,\ExceptionHandlersRest,\,\econt)}
 \newcommand{\StaticInvA}[4]{\mathrm{StaticInvocationA}({#1},\,{#2},\,{#3},\,\ExceptionHandlersRest,\,{#4})}
 \newcommand{\DInstanceMethodA}{\mathrm{DInstanceMethodA}(\membermeta,\,\val,\,\ExceptionHandlers,\,\econt)}
-\newcommand{\FieldsA}[4]{\mathrm{FieldsA}({#1},\,{#2},\,{#3},\,\strace,\,\handler,\,\cstrace,\,\cex,\,{#4})}
+\newcommand{\FieldsA}[4]{\mathrm{InstanceFieldsA}({#1},\,{#2},\,{#3},\,\strace,\,\handler,\,\cstrace,\,\cex,\,{#4})}
 \newcommand{\SuperA}[3]{\mathrm{SuperA}({#1},\,{#2},\,\strace,\,\handler,\,\cstrace,\,\cex,\,{#3})}
 \newcommand{\ConstructorA}[3]{\mathrm{ConstructorA}({#1},\,{#2},\,\handler,\,\cstrace,\,\cex,\,{#3})}
 \newcommand{\RedirectingA}[3]{\mathrm{RedirectingA}({#1},\,{#2},\,\strace,\,\handler,\,\cstrace,\,\cex,\,{#3})}
@@ -1068,7 +1068,7 @@ The different application continuations are shown in Figure~\ref{figure:acont}.
     &\ForUpdatesA{\expressionmeta}{\env'} \label{acont:forupdates}\\
     &\SuperMethodA{\strace} \label{acont:supermethod}\\
     &\DInstanceMethodA \label{acont:staticinv}\\
-    &\FieldsA{\env}{Izs}{\loc}{\scont} \label{acont:fields}\\
+    &\FieldsA{Q}{\loc}{\env}{\scont} \label{acont:fields}\\
     &\ConstructorA{Q}{\strace}{\econt} \label{acont:constructor}\\
     &\SuperA{Q}{\loc}{\scont} \label{acont:super}\\
     &\RedirectingA{Q}{\loc}{\scont} \label{acont:redirecting}
@@ -2322,7 +2322,7 @@ The CESK-transitions starting form the corresponding ValuePassingConfiguration p
 \end{align*}
 
 Otherwise, $\synt{Q}$ is a non-redirecting generative constructor, and execution of $\synt{Q}$ proceeds with evaluation of field initializers in the immediately enclosing class.
-Let $\synt{Q}$ be a constructor with non empty initializer list, $Izs$ and a constructor body $\stmt_{body}$.
+Let $\synt{Q}$ be a non-redirecting constructor.
 
 \begin{align*}
     &\begin{multlined}
@@ -2333,7 +2333,7 @@ Let $\synt{Q}$ be a constructor with non empty initializer list, $Izs$ and a con
                 \text{where }   \env'  &= \ext{\env}{\synt{this}}{\deref{\loc}},\\
                                 \exprs &= \text{initializer expressions for instance fields},\\
                                 \deref{\loc} &= \val,\\
-                                \acont &= \FieldsA{\env}{Izs}{\loc}{\scont'},\\
+				\acont &= \FieldsA{Q}{\loc}{\env}{\scont'},\\
                                 \scont' &= \BodySK{\stmt_{body}}{\env'}{\scont}.
             \end{aligned}}
     \end{multlined}
@@ -2360,7 +2360,7 @@ If the initializer list is empty, $Izs = []$, the next statement continuation is
 \begin{align*}
     &\begin{multlined}
         \cesktranswheresplit%
-            {\acontconf{\FieldsA{\env}{Izs}{\loc}{\scont}}{\val{s}}}%
+	    {\acontconf{\FieldsA{Q}{\loc}{\env}{\scont}}{\val{s}}}%
             {\scontconf{\scont}{\env}}%
             {\text{where $\deref{\deref\loc[f_i]} = \val_{i}, \forall f_i \in Fs, \forall \val_i \in \val{s}$}}.
     \end{multlined}
@@ -2372,7 +2372,7 @@ If the initializer list contains at least two initializers, $Izs = Ininitalizer(
 \begin{align*}
     &\begin{multlined}
         \cesktranswheresplit%
-            {\acontconf{\FieldsA{\env}{Izs}{\loc}{\scont}}{\val{s}}}%
+	    {\acontconf{\FieldsA{Q}{\loc}{\env}{\scont}}{\val{s}}}%
             {\evalconf{\expr}{\env}{st}{cex}{cst}{\econt'}}
             {\text{where $\deref{\deref{\loc[f_i]}} = \val_{i}$, $\forall f_i \in Fs, \forall \val_i \in \val{s}$, $\econt' = \InitializerListK{Izs}{\loc}{\env}{\scont}$}}.
     \end{multlined}
@@ -2386,7 +2386,7 @@ Otherwise, there is only one initializer to execute in the initializer list, $li
     \item When the last initializer is a redirecting constructor, i.e. $li = RedirectingI(G, \exprs)$, the transition is as follows:
         \begin{align*}
             \cesktranswheresplit%
-                {\acontconf{\FieldsA{\env}{li::[]}{\loc}{\scont}}{\val{s}}}%
+		{\acontconf{\FieldsA{Q}{\loc}{\env}{\scont}}{\val{s}}}%
                 {\evallistconf{\exprs}{\env}{\strace}{\cstrace}{\cex}{\acont}}%
                 {\text{where $\deref{\deref{\loc[f_i]}} = \val_{i}$, $\forall f_i \in Fs$, $\forall \val_i \in \val{s}$, $\acont = \RedirectingA{G}{\loc}{\scont}$}}.
         \end{align*}
@@ -2394,7 +2394,7 @@ Otherwise, there is only one initializer to execute in the initializer list, $li
     \item Otherwise, the last initializer is a super initializer, $li = Super(G, \exprs)$:
         \begin{align*}
             \cesktranswheresplit%
-                {\acontconf{\FieldsA{\env}{li::[]}{\loc}{\scont}}{\val{s}}}%
+		{\acontconf{\FieldsA{Q}{\loc}{\env}{\scont}}{\val{s}}}%
                 {\evallistconf{\exprs}{\env}{\strace}{\cstrace}{\cex}{\acont}}%
                 {\text{where $\deref{\deref{\loc[f_i]}} = \val_{i}$, $\forall f_i \in Fs$, $\forall \val_i \in \val{s}$, $\acont = \SuperA{G}{\loc}{\scont}$}}.
         \end{align*}
