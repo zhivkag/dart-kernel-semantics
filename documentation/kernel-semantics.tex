@@ -2555,13 +2555,6 @@ When the current initalizer being executed is a $\FieldInitializer{\expressionme
         \end{multlined}
         \label{execconf:switch}\\
         &\begin{multlined}
-            \cesktranswheresplit*%
-                {\execconf{\TryCatch{\stmt}{cs}}{\env}{\lbls}{\clbls}{\strace}{\handler}{\cex,\,\cstrace}{\econt}{\scont}}%
-                {\execconf{\stmt}{\env}{\lbls}{\clbls}{\strace}{\handler'}{\cex,\,\cstrace}{\econt}{\scont}}%
-                {\text{where $\handler' = \CatchH{cs}$}}
-        \end{multlined}
-        \label{execconf:try}\\
-        &\begin{multlined}
             \cesktranswheresplit%
                 {\execconf{\BreakStatement{L}}{\env}{\lbls}{\clbls}{\strace}{\handler}{\cex,\,\cstrace}{\econt}{\scont}}%
                 {\breakconf{\bcont}}%
@@ -2892,6 +2885,14 @@ The statement is unconditionally executed:
 \end{align*}
 
 $\synt{try/catch}$ statements execute their body with a new handler.
+\begin{align*}
+	\begin{multlined}
+            \cesktranswheresplit*%
+                {\execconf{\TryCatch{\stmt}{cs}}{\env}{\lbls}{\clbls}{\strace}{\handler}{\cex,\,\cstrace}{\econt}{\scont}}%
+                {\execconf{\stmt}{\env}{\lbls}{\clbls}{\strace}{\handler'}{\cex,\,\cstrace}{\econt}{\scont}}%
+                {\text{where $\handler' = \CatchH{cs}$}}
+        \end{multlined}
+\end{align*}
 
 $\synt{try/finally}$ statements execute their body with a new handler and additionally install new break and continue switch labels, a new return continuation, and a new statement continuation:
 
