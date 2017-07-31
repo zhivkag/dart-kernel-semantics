@@ -2294,7 +2294,7 @@ When the redirecting initializer is the only initializer in the list, the execut
             {\contconf{\InitK{Q}{\env}{\scont}}{\val}}%
             {\evallistconf{\exprs}{\env}{\strace}{\cstrace}{\cex}{\acont}}%
             {\parbox{\textwidth-2cm}{if $Izs = \RedirectingInitializer{G}{\exprs} :: []$,\\
-                where $\acont = \RedirectingA{G}{\val}{\scont}$,}}
+	        where $\acont = \RedirectingA{G}{\loc}{\scont}$, $\deref{\loc} = \val$,}}
     \end{multlined}
 \end{align*}
 Otherwise, the redirecting constructor $Q$ has other initializers in the initializer list.
@@ -2312,9 +2312,9 @@ The CESK-transitions starting form the corresponding ValuePassingConfiguration p
     \end{multlined}\\
     &\begin{multlined}
         \cesktranswheresplit*%
-            {\acontconf{\RedirectingA{G}{\val}{\scont}}{\val{s}}}%
+            {\acontconf{\RedirectingA{G}{\loc}{\scont}}{\val{s}}}%
             {\contconf{\InitK{\synt{G}}{\env'}{\scont}}{\val}}%
-            {\text{where $\env' = \extend(\env_{empty}, \formals, \val{s})$}}.
+	    {\text{where $\deref{\loc} = \val$, $\env' = \extend(\env_{empty}, \formals, \val{s})$}}.
     \end{multlined}
 \end{align*}
 
@@ -2386,18 +2386,7 @@ We consider multiple cases:
 			\end{multlined}
 		\end{align*}
 
-	\item Otherwise, there is only one initializer in the initializer list and it is $\RedirectingInitializer{G}{\expressionsmeta}$ or $\SuperInitializer{G}{\expressionsmeta}$.
-
-		When the initializer is redirecting, i.e. $\RedirectingInitializer{G}{\exprs}$, the transition is as follows:
-		\begin{align*}
-			\cesktranswheresplit%
-			{\acontconf{\FieldsA{Q}{\loc}{\env}{\scont}}{\val{s}}}%
-			{\evallistconf{\exprs}{\env}{\strace}{\cstrace}{\cex}{\acont}}%
-			{\parbox{10cm}{%
-				where $\deref{\deref{\loc[\field_i]}} = \val_{i}$, $\forall \field_i \in Fs$, $\forall \val_i \in \val{s}$,
-				\\$\acont = \RedirectingA{G}{\loc}{\scont}$}}
-		\end{align*}
-
+	\item Otherwise, there is only one initializer in the initializer list and it is a $\SuperInitializer{G}{\expressionsmeta}$. This is the case because the fields are initialzied only when a non-redirecitng constructor is run.
 		Otherwise, the initializer is a super initializer, $\SuperInitializer{G}{\exprs}$:
 		\begin{align*}
 			\cesktranswheresplit%
@@ -2421,7 +2410,7 @@ When the current initalizer being executed is a $\LocalInitializer{\expressionme
 	    {\parbox{10cm}{%
 		    where $\env' = \ext{\env}{\variablemeta}{\val}$,
 		    \\$Izs[k] = \LocalInitializer{\expressionmeta}$,
-		    \\$k+1 \leq length(Izs)$}}
+		    \\$k+1 \geq length(Izs)$}}
     \end{multlined}\\
     &\begin{multlined}
         \cesktranswheresplit*%
