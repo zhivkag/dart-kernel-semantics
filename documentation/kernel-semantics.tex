@@ -1184,8 +1184,8 @@ The value corresponding to the evaluated expression is captured by the applicati
     &\begin{multlined}
         \cesktranswheresplit%
             {\evallistconf{\expr :: \exprs}{\env}{\strace}{\cstrace}{\cex}{\acont}}%
-            {\evalconf{\expr}{\env}{\strace}{\cstrace}{\cex}{\econt'}}%
-            {\text{where $\econt' = \ExpressionsK{\exprs}{\env}{\acont}$}}
+            {\evalconf{\expr}{\env}{\strace}{\cstrace}{\cex}{\econt}}%
+            {\text{where $\econt = \ExpressionsK{\exprs}{\env}{\acont}$}}
     \end{multlined}\\
     &\cesktrans%
         {\evallistconf{[]}{\env}{\strace}{\cstrace}{\cex}{\acont}}%
