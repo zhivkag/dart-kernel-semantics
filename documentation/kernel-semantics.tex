@@ -583,8 +583,8 @@ A $\dclass$ encodes a class definition in \kernel{}.
 \begin{align*}
 \dclass &= (\emptyset + \dclass) \times \mlist{\dclass} \times (\dident \mapsto \dmember)\\
 \dmember &= \mathbf{Getter} + \mathbf{Setter} + \mathbf{Method} \\
-\mathbf{Getter} &= \mathbb{N} + \dstmt \\
-\mathbf{Setter} &= \mathbb{N} + \dformals \times \dstmt \\
+\mathbf{Getter} &= \NN + \dstmt \\
+\mathbf{Setter} &= \NN + \dformals \times \dstmt \\
 \mathbf{Method} &= \dformals \times \dstmt
 \end{align*}
 
@@ -1925,7 +1925,7 @@ The evaluation proceeds as follows:
         {\contconf{\PropertySetVK}{\val}}%
         {\contconf{\econt}{\val_1}}%
         {\parbox{10cm}{where:
-            \(M = \text{Setter}(i \in \mathbb{N})\),
+            \(M = \text{Setter}(i \in \NN)\),
             \(\val_0 = (c, \textit{fields})\),
             \(!(\textit{fields}[i]) := \val\)
         }}
@@ -1952,7 +1952,7 @@ The evaluation proceeds as follows:
         {\contconf{\DPropertySetVK}{\val}}%
         {\contconf{\econt}{\val_1}}%
         {\parbox{10cm}{where
-            \(\membermeta = \text{Setter}(i \in \mathbb{N})\),
+            \(\membermeta = \text{Setter}(i \in \NN)\),
             \(\val = (c, \textit{fields})\),
             \(\deref{\textit{fields}[i]} := \val_0\)
         }}
@@ -1975,7 +1975,7 @@ The evaluation proceeds as follows:
         {\contconf{\econt}{\val}}%
         {\parbox{10cm}{where:\\
             \(\deref{\env(\this)} = (((\_, \_, \textit{spmems}), \_, \_), \_)\)\\
-            \(\textit{spmems}(\idmeta) = \text{Setter}(i \in \mathbb{N})\)\\
+            \(\textit{spmems}(\idmeta) = \text{Setter}(i \in \NN)\)\\
             \(\update{\deref{(\env(\this))}[i]}{\val}\)}}
     \end{multlined}
     \label{econtconf:superpropertyset-field}
