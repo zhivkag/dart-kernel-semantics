@@ -82,6 +82,54 @@
 \newcommand{\Rethrow}{\synt{rethrow}}
 \newcommand{\Throw}[1]{\synt{throw}\,#1}
 
+% Domains
+\newcommand{\dexpr}{\mathbf{Expr}}
+\newcommand{\dstmt}{\mathbf{Stmt}}
+\newcommand{\dhandler}{\mathbf{Handler}}
+
+\newcommand{\decont}{\mathbf{ExprCont}}
+\newcommand{\dscont}{\mathbf{StmtCont}}
+\newcommand{\dacont}{\mathbf{ApplCont}}
+\newcommand{\dbcont}{\mathbf{BreakCont}}
+\newcommand{\dswitchcont}{\mathbf{SwitchCont}}
+
+\newcommand{\dlbl}{\mathbf{Label}}
+\newcommand{\dclbl}{\mathbf{SwitchLabel}}
+
+\newcommand{\denv}{\mathbf{Env}}
+\newcommand{\dmenv}{\mathbf{MainEnv}}
+\newcommand{\dfield}{\mathbf{Field}}
+
+\newcommand{\dval}{\mathbf{Value}}
+\newcommand{\dlit}{\mathbf{Literal}}
+\newcommand{\dvar}{\mathbf{Variable}}
+\newcommand{\dvardecl}{\mathbf{VariableDeclaration}}
+\newcommand{\dstring}{\mathbf{StringValue}}
+\newcommand{\dfunval}{\mathbf{FunctionValue}}
+\newcommand{\dlitval}{\mathbf{LiteralValue}}
+\newcommand{\dobjval}{\mathbf{ObjectValue}}
+\newcommand{\dvector}{\mathbf{Vector}}
+\newcommand{\dmember}{\mathbf{Member}}
+\newcommand{\dident}{\mathbf{Identifier}}
+\newcommand{\idmeta}{\ensuremath{\mathit{X}}}
+\newcommand{\dtype}{\mathbf{Type}}
+
+\newcommand{\typemeta}{\ensuremath{\mathit{t}}}
+\newcommand{\dclass}{\mathbf{Class}}
+\newcommand{\dformals}{\mathbf{Formals}}
+
+\newcommand{\ddom}{\mathbf{Dom}}    % Unspecified domain to use in examples.
+
+% Known domains for Dart types.
+\todo{dmitryas: Are these syntactic domains or semantic domains?}
+\newcommand{\dint}{\mathbf{int}}
+\newcommand{\dbool}{\mathbf{bool}}
+\newcommand{\ddouble}{\mathbf{double}}
+\newcommand{\dlist}{\mathbf{List}}
+\newcommand{\dmap}{\mathbf{Map}}
+\newcommand{\dstring}{\mathbf{String}}
+\newcommand{\dsymbol}{\mathbf{Symbol}}
+
 %%
 % Commands to typeset transitions of CESK machine.
 %
@@ -236,11 +284,11 @@ This section contains definitions of syntactic and semantic domains, helper func
     \item The symbols ``:'' (is-of-type) and ``$\in$'' (element-of) are used interchangeably.
     \item The names of variables are italicized.
     \item The names of variables within a syntactic domain start with an upper case letter.
-    \item The names of domains (meta-types defined in this paper) are written in bold (e.g. ``$\mathbf{Expr}$'').
+    \item The names of domains (meta-types defined in this paper) are written in bold (e.g. ``$\dexpr$'').
     \item The names of the different kinds of continuations are written in normal text (e.g. VarSetK).
     \item The names of meta-functions start with lower case letter (e.g. $\extend$).
-    \item ``$\mlist{\mathbf{X}}$'' denotes the domain of meta-lists of elements from domain ``$\mathbf{X}$''.
-        Note that the word ``List'' here is not in bold, so that it isn't confused with the domain $\mathbf{List}$ of \dart{} objects.
+    \item ``$\mlist{\ddom}$'' denotes the domain of meta-lists of elements from domain ``$\ddom$''.
+        Note that the word ``List'' here is not in bold, so that it isn't confused with the domain $\dlist$ of \dart{} objects.
         \todo{sjindel: Why is this a domain?}
 \end{itemize}
 \todo{dmitryas: Explain notation for Kernel syntactic constructs like "on T catch (e, s)".}
@@ -309,42 +357,6 @@ This section contains definitions of syntactic and semantic domains, helper func
 \newcommand{\formal}{\ensuremath{A}}
 \newcommand{\formali}[1]{\ensuremath{A_{#1}}}
 \newcommand{\formals}{\ensuremath{As}}
-
-% Domains
-\newcommand{\dexpr}{\mathbf{Expr}}
-\newcommand{\dstmt}{\mathbf{Stmt}}
-\newcommand{\dhandler}{\mathbf{Handler}}
-
-\newcommand{\decont}{\mathbf{ExprCont}}
-\newcommand{\dscont}{\mathbf{StmtCont}}
-\newcommand{\dacont}{\mathbf{ApplCont}}
-\newcommand{\dbcont}{\mathbf{BreakCont}}
-\newcommand{\dswitchcont}{\mathbf{SwitchCont}}
-
-\newcommand{\dlbl}{\mathbf{Label}}
-\newcommand{\dclbl}{\mathbf{SwitchLabel}}
-
-\newcommand{\denv}{\mathbf{Env}}
-\newcommand{\dmenv}{\mathbf{MainEnv}}
-\newcommand{\dfield}{\mathbf{Field}}
-
-\newcommand{\dval}{\mathbf{Value}}
-\newcommand{\dlit}{\mathbf{Literal}}
-\newcommand{\dvar}{\mathbf{Variable}}
-\newcommand{\dvardecl}{\mathbf{VariableDeclaration}}
-\newcommand{\dstring}{\mathbf{StringValue}}
-\newcommand{\dfunval}{\mathbf{FunctionValue}}
-\newcommand{\dlitval}{\mathbf{LiteralValue}}
-\newcommand{\dobjval}{\mathbf{ObjectValue}}
-\newcommand{\dvector}{\mathbf{Vector}}
-\newcommand{\dmember}{\mathbf{Member}}
-\newcommand{\dident}{\mathbf{Identifier}}
-\newcommand{\idmeta}{\ensuremath{\mathit{X}}}
-\newcommand{\dtype}{\mathbf{Type}}
-
-\newcommand{\typemeta}{\ensuremath{\mathit{t}}}
-\newcommand{\dclass}{\mathbf{Class}}
-\newcommand{\dformals}{\mathbf{Formals}}
 
 % Constructor Initializers
 \newcommand{\Initializer}[1]{\synt{Initializer}(#1)}
@@ -570,7 +582,7 @@ $\dvector$s cannot be introduced by any construct present in \dart{} itself, but
 
 Some objects from primitive types contain a literal value and a specific class corresponding to the literal's type.
 The different types of literal values are:
-\[\dlit = \mathbf{int} + \mathbf{bool} + \mathbf{double} + \mathbf{List} + \mathbf{Map} + \mathbf{String} + \mathbf{Symbol} + \mathbf{Type}.\]
+\[\dlit = \dint + \dbool + \ddouble + \dlist + \dmap + \dstring + \dsymbol + \dtype.\]
 
 Literal values are special values that store the specific payload and an associated class.
 Each of the specific literal values contains predefined operators and methods, whose semantics are elided here.
@@ -1197,31 +1209,31 @@ The value corresponding to the evaluated expression is captured by the applicati
         &\cesktranswhere%
             {\evalconf{\IntLiteral{\integermeta}}{\env}{\strace}{\cstrace}{\cex}{\econt}}%
             {\contconf{\econt}{\val}}%
-            {\text{where $\val = \mathrm{IntLiteral(\integermeta)} \in \mathbf{int}$}}
+            {\text{where $\val = \mathrm{IntLiteral(\integermeta)} \in \dint$}}
             \label{eval:int}\\
         &\cesktranswhere%
             {\evalconf{\DoubleLiteral{\doublemeta}}{\env}{\strace}{\cstrace}{\cex}{\econt}}%
             {\contconf{\econt}{\val}}%
-            {\text{where $\val = \mathrm{DoubleLiteral(\doublemeta)} \in \mathbf{double}$}}
+            {\text{where $\val = \mathrm{DoubleLiteral(\doublemeta)} \in \ddouble$}}
             \label{eval:double}\\
         &\begin{multlined}
             \cesktranswheresplit%
                 {\evalconf{\BoolLiteral{\true}}{\env}{\strace}{\cstrace}{\cex}{\econt}}%
                 {\contconf{\econt}{\val}}%
-                {\text{where $\val = \mathrm{BoolValue(\true)} = \true\in \mathbf{bool}$}}
+                {\text{where $\val = \mathrm{BoolValue(\true)} = \true\in \dbool$}}
         \end{multlined}
         \label{eval:true}\\
         &\begin{multlined}
             \cesktranswheresplit%
                 {\evalconf{\BoolLiteral{\false}}{\env}{\strace}{\cstrace}{\cex}{\econt}}%
                 {\contconf{\econt}{\val}}%
-                {\text{where $\val = \mathrm{BoolValue(\false)} = \false\in \mathbf{bool}$}}
+                {\text{where $\val = \mathrm{BoolValue(\false)} = \false\in \dbool$}}
         \end{multlined}
         \label{eval:false}\\
         &\cesktranswhere%
             {\evalconf{\StringLiteral{\stringmeta}}{\env}{\strace}{\cstrace}{\cex}{\econt}}%
             {\contconf{\econt}{\val}}%
-            {\text{where $\val = \mathrm{StringValue(\stringmeta)} \in \mathbf{String}$}}
+            {\text{where $\val = \mathrm{StringValue(\stringmeta)} \in \dstring$}}
             \label{eval:string}\\
         &\cesktrans%
             {\evalconf{\varmeta}{\env}{\strace}{\cstrace}{\cex}{\econt}}%
