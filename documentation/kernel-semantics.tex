@@ -56,7 +56,7 @@
 \DeclareMathOperator{\methodLookup}{methodLookup}
 
 % Keywords and syntactic constructs of Dart Kernel to be used in math mode.
-\newcommand{\synt}[1]{\ensuremath{\text{\textbf{#1}}}}
+\newcommand{\synt}[1]{\ensuremath{\text{\textbf{\texttt{#1}}}}}
 \DeclareMathOperator{\dowhile}{\synt{do~while}}
 \DeclareMathOperator{\while}{\synt{while}}
 \DeclareMathOperator{\forin}{\synt{for~in}}
@@ -75,6 +75,12 @@
 \DeclareMathOperator{\catch}{\synt{catch}}
 \DeclareMathOperator{\finally}{\synt{finally}}
 
+% Oftenly used syntactic meta-literals.
+\newcommand{\true}{\synt{true}}
+\newcommand{\false}{\synt{false}}
+\newcommand{\this}{\synt{this}}
+\newcommand{\Rethrow}{\synt{rethrow}}
+\newcommand{\Throw}[1]{\synt{throw}\,#1}
 
 %%
 % Commands to typeset transitions of CESK machine.
@@ -623,8 +629,8 @@ Object values are composed of a reference to a class definition, which is shared
 \newcommand{\DirectPropertyGet}[2]{#1.\{#2\}}
 \newcommand{\DirectPropertySet}[3]{#1.\{#2\}=#3}
 
-\newcommand{\SuperPropertyGet}[1]{\tt{super}.#1}
-\newcommand{\SuperPropertySet}[2]{\tt{super}.#1=#2}
+\newcommand{\SuperPropertyGet}[1]{\synt{super}.#1}
+\newcommand{\SuperPropertySet}[2]{\synt{super}.#1=#2}
 
 \newcommand{\StaticGet}[1]{\{#1\}}
 \newcommand{\StaticSet}[2]{\{#1\}=#2}
@@ -634,34 +640,31 @@ Object values are composed of a reference to a class definition, which is shared
 %% DirectMethodInvocation
 \newcommand{\DInstanceMethodInvocation}[3]{#1.\{#2\}(#3)}
 %% SuperMethodInvocation
-\newcommand{\SuperMethodInvocation}[2]{\tt{super}.#1(#2)}
+\newcommand{\SuperMethodInvocation}[2]{\synt{super}.#1(#2)}
 %% StaticInvocation
 \newcommand{\StaticInvocation}[2]{#1(#2)}
 %% ConstructorInvocation
 \newcommand{\New}[2]{\new\, #1\,(#2)}
 
-\newcommand{\Not}[1]{!#1}
-\newcommand{\AndExpression}[2]{#1\,\&\&\,#2}
-\newcommand{\OrExpression}[2]{#1\,||\,#2}
-\newcommand{\ConditionalExpression}[3]{#1\,?\,#2\,:\,#3}
+\newcommand{\Not}[1]{\synt{!}#1}
+\newcommand{\AndExpression}[2]{#1\,\synt{\&\&}\,#2}
+\newcommand{\OrExpression}[2]{#1\,\synt{||}\,#2}
+\newcommand{\ConditionalExpression}[3]{#1\,\synt{?}\,#2\,\synt{:}\,#3}
 
 %% StringConcatenation
-\newcommand{\StringConcatenation}[1]{\tt{Concat}\,#1}
+\newcommand{\StringConcatenation}[1]{\synt{Concat}\,#1}
 
-\newcommand{\IsExpression}[2]{#1\,\tt{is}\,#2}
-\newcommand{\AsExpression}[2]{#1\,\tt{as}\,#2}
+\newcommand{\IsExpression}[2]{#1\,\synt{is}\,#2}
+\newcommand{\AsExpression}[2]{#1\,\synt{as}\,#2}
 
 %% SymbolLiteral
 %% TypeLiteral
 
-\newcommand{\ThisExpression}{\tt{this}}
-\newcommand{\Rethrow}{\tt{rethrow}}
-\newcommand{\Throw}[1]{\tt{throw}\,#1}
 
 %% ListLiteral
 %% MapLiteral
 
-\newcommand{\AwaitExpression}[1]{\tt{await\,#1}}
+\newcommand{\AwaitExpression}[1]{\synt{await\,#1}}
 
 %% FunctionExpression
 
@@ -669,8 +672,8 @@ Object values are composed of a reference to a class definition, which is shared
 \newcommand{\IntLiteral}[1]{#1}
 \newcommand{\DoubleLiteral}[1]{#1}
 \newcommand{\BoolLiteral}[1]{#1}
-\newcommand{\NullLiteral}{\tt{null}}
-\newcommand{\Let}[3]{\tt{let}\,#1=#2\,\tt{in}\,#3}
+\newcommand{\NullLiteral}{\nnull}
+\newcommand{\Let}[3]{\synt{let}\,#1\synt{=}#2\,\synt{in}\,#3}
 
 %% LoadLibrary
 %% CheckLibraryIsLoaded
@@ -701,7 +704,7 @@ Object values are composed of a reference to a class definition, which is shared
   & \New{\synt{Q}}{\expressionmeta*} \\
   & \IsExpression{\expressionmeta}{\typemeta} \\
   & \AsExpression{\expressionmeta}{\typemeta} \\
-  & \ThisExpression \\
+  & \this \\
   & \Rethrow \\
   & \Throw{\expressionmeta} \\
   & \AwaitExpression{\expressionmeta} \\
@@ -717,29 +720,29 @@ Object values are composed of a reference to a class definition, which is shared
 
 % InvalidStatement
 \newcommand{\ExpressionStatement}[1]{\{\, #1\, \}}
-\newcommand{\Block}[1]{#1; \mlist{\statementmeta}}
+\newcommand{\Block}[1]{#1\synt{;} \mlist{\statementmeta}}
 \newcommand{\EmptyStatement}{\{\}}
 
 % AssertStatement
-\newcommand{\LabeledStatement}[2]{#1:\, #2}
-\newcommand{\BreakStatement}[1]{\tt{break}\, #1}
-\newcommand{\WhileStatement}[2]{\tt{while}\, (#1)\, #2}
-\newcommand{\DoStatement}[2]{\tt{do}\, #1\, \tt{while}\, (#2)}
-\newcommand{\ForStatement}[4]{\tt{for}\, (\,#1;\, #2;\, #3\,)\, #4}
-\newcommand{\ForInStatement}[3]{\tt{for}\,(#1\,\tt{in}\,#2)\,#3}
+\newcommand{\LabeledStatement}[2]{#1\synt{:}\, #2}
+\newcommand{\BreakStatement}[1]{\synt{break}\, #1}
+\newcommand{\WhileStatement}[2]{\synt{while}\, \synt{(}#1\synt{)}\, #2}
+\newcommand{\DoStatement}[2]{\synt{do}\, #1\, \synt{while}\, \synt{(}#2\synt{)}}
+\newcommand{\ForStatement}[4]{\synt{for}\, \synt{(}\,#1\synt{;}\, #2\synt{;}\, #3\,\synt{)}\, #4}
+\newcommand{\ForInStatement}[3]{\synt{for}\,\synt{(}#1\,\synt{in}\,#2\synt{)}\,#3}
 
-\newcommand{\SwitchStatement}[2]{\tt{switch}\,(#1)\,#2}
-\newcommand{\ContinueSwitchStatement}[1]{\tt{continue}\,#1}
-\newcommand{\IfStatement}[3]{\tt{if}\,(#1)\,#2\,\tt{else}\,#3}
-\newcommand{\ReturnStatement}[1]{\tt{return}\,#1}
+\newcommand{\SwitchStatement}[2]{\synt{switch}\,\synt{(}#1\synt{)}\,#2}
+\newcommand{\ContinueSwitchStatement}[1]{\synt{continue}\,#1}
+\newcommand{\IfStatement}[3]{\synt{if}\,\synt{(}#1\synt{)}\,#2\,\synt{else}\,#3}
+\newcommand{\ReturnStatement}[1]{\synt{return}\,#1}
 
-\newcommand{\TryCatch}[2]{\tt{try}\,#1\,\tt{catch}\,#2}
-\newcommand{\TryFinally}[2]{\tt{try}\,#1\,\tt{finally}\,#2}
+\newcommand{\TryCatch}[2]{\synt{try}\,#1\,\synt{catch}\,#2}
+\newcommand{\TryFinally}[2]{\synt{try}\,#1\,\synt{finally}\,#2}
 
-\newcommand{\Yield}[1]{\tt{yield}\,#1}
+\newcommand{\Yield}[1]{\synt{yield}\,#1}
 
-\newcommand{\VarDeclaration}[2]{\tt{var}\,#1=#2}
-\newcommand{\FunctionDeclaration}[5]{#1\,#2(\,#3\,)\,#4\,#5}
+\newcommand{\VarDeclaration}[2]{\synt{var}\,#1\synt{=}#2}
+\newcommand{\FunctionDeclaration}[5]{#1\,#2\synt{(}\,#3\,\synt{)}\,#4\,#5}
 
 % FunctionDeclaration
 \[
@@ -1156,7 +1159,6 @@ The different exception handlers are shown in Figure~\ref{figure:handlers}.
 \subsection{Expression Evaluation}
 \label{subsec:expr-evaluation}
 
-\newcommand{\this}{\tt{this}}
 \newcommand{\superclass}[1]{superclass({#1})}
 
 Expressions are evaluated by dispatching according to the expression component, $\expressionmeta$, in EvalConfiguration, Section~\ref{subsubsec:evalconfig}, and the list of expression component, $\exprs$, in EvalListConfiguration, Section~\ref{subsubsec:evallistconfig}.
@@ -1204,16 +1206,16 @@ The value corresponding to the evaluated expression is captured by the applicati
             \label{eval:double}\\
         &\begin{multlined}
             \cesktranswheresplit%
-                {\evalconf{\BoolLiteral{\tt{true}}}{\env}{\strace}{\cstrace}{\cex}{\econt}}%
+                {\evalconf{\BoolLiteral{\true}}{\env}{\strace}{\cstrace}{\cex}{\econt}}%
                 {\contconf{\econt}{\val}}%
-                {\text{where $\val = \mathrm{BoolValue(\tt{true})} = \tt{true}\in \mathbf{bool}$}}
+                {\text{where $\val = \mathrm{BoolValue(\true)} = \true\in \mathbf{bool}$}}
         \end{multlined}
         \label{eval:true}\\
         &\begin{multlined}
             \cesktranswheresplit%
-                {\evalconf{\BoolLiteral{\tt{false}}}{\env}{\strace}{\cstrace}{\cex}{\econt}}%
+                {\evalconf{\BoolLiteral{\false}}{\env}{\strace}{\cstrace}{\cex}{\econt}}%
                 {\contconf{\econt}{\val}}%
-                {\text{where $\val = \mathrm{BoolValue(\tt{false})} = \tt{false}\in \mathbf{bool}$}}
+                {\text{where $\val = \mathrm{BoolValue(\false)} = \false\in \mathbf{bool}$}}
         \end{multlined}
         \label{eval:false}\\
         &\cesktranswhere%
@@ -1226,7 +1228,7 @@ The value corresponding to the evaluated expression is captured by the applicati
             {\contconf{\econt}{\deref{\env(\varmeta)}}}
             \label{eval:varget}\\
         &\cesktrans%
-            {\evalconf{\varmeta = \expr}{\env}{\strace}{\cstrace}{\cex}{\econt}}%
+            {\evalconf{\varmeta \synt{=} \expr}{\env}{\strace}{\cstrace}{\cex}{\econt}}%
             {\evalconf{\expr}{\env}{\strace}{\cstrace}{\cex}{\VarSetK{\idmeta}{\env}{\ExceptionHandlers}{\econt}}}
             \label{eval:varset}\\
         &\cesktrans%
@@ -1278,7 +1280,7 @@ The value corresponding to the evaluated expression is captured by the applicati
         \end{multlined}
         \label{eval:as}\\
         &\cesktrans%
-            {\evalconf{\ThisExpression}{\env}{\strace}{\cstrace}{\cex}{\econt}}%
+            {\evalconf{\this}{\env}{\strace}{\cstrace}{\cex}{\econt}}%
             {\contconf{\econt}{\deref{\env(\this)}}}
             \label{eval:this}\\
         &\begin{multlined}
@@ -1302,9 +1304,6 @@ The value corresponding to the evaluated expression is captured by the applicati
     \label{figure:expressions-evalconfigs}
     \end{eqfigure}
 \end{figure}
-
-\newcommand{\true}{\tt{true}}
-\newcommand{\false}{\tt{false}}
 
 %%
 % Figure showing the CESK-transition function starting from ValuePassingConfiguration
@@ -1384,7 +1383,7 @@ The value corresponding to the evaluated expression is captured by the applicati
         \label{econtconf:as-true}\\
         &\cesktranswhere%
             {\contconf{\AsExpressionK}{\val}}%
-            {\throwconf{\handler}{\AsExpression{\expressionmeta}{\tt{T}} :: \strace}{\tt{CastError}}}%
+            {\throwconf{\handler}{\AsExpression{\expressionmeta}{\tt{T}} :: \strace}{\synt{CastError}}}%
             {\text{if $\val \text{ is not } \tt{T}$}}
         \label{econtconf:as-false}
     \end{align}
@@ -1506,7 +1505,7 @@ $fv \in \dfunval$ has only one property, $call$.
         \cesktranswheresplit*%
             {\acontconf{\StaticInvA{\formals}{\stmt}{\strace}{\econt}}{\val{s}}}%
             {\execconf{\stmt}{\env'}{[]}{[]}{\strace}{\handler}{\cex,\,\cstrace}{\econt}{\scont}}%
-            {\parbox{10cm}{where $\scont = \ExitSK{\tt{null}}$,\\ $\env' = \ext{\env_{empty}}{\formals}{\val{s}}$}}
+            {\parbox{10cm}{where $\scont = \ExitSK{\nnull}$,\\ $\env' = \ext{\env_{empty}}{\formals}{\val{s}}$}}
         \end{multlined}
         \label{acontconf:staticinvoc}
     \end{align}
@@ -1570,7 +1569,7 @@ The specific CESK-transitions for the different invocations are described in the
         &\begin{multlined}
             \cesktranswheresplit%
                 {\evalconf{\StaticGet{\membermeta}}{\env}{\strace}{\cstrace}{\cex}{\econt}}%
-                {\contconf{\econt}{\tt{null}}}%
+                {\contconf{\econt}{\nnull}}%
                 {\parbox{12cm}{where $\membermeta$ is a static field without an initializer expression and $\membermeta \notin \mainenv$,\\$\mainenv = \ext{\mainenv}{\membermeta}{\NullLiteral}$ after transition}}
         \end{multlined}
         \label{eval:staticget-varnew-null}\\
@@ -1665,7 +1664,7 @@ When $\membermeta$ is a method, the expression $\StaticGet{\membermeta}$ is a me
         Let $\expressionmeta_{\membermeta}$ be $\membermeta$'s initializer expression.
         \begin{itemize}
             \item When $\membermeta$ is accessed for the first time during the program's execution, the evaluation of $\StaticGet{\membermeta}$ proceeds with evaluation of the initializer expression $\expressionmeta_{\membermeta}$.
-            \item When $\expressionmeta$ is $\tt{null}$, the environment is extended with a binding to a fresh location that stores a $\tt{null}$ value for the field $\membermeta$, as shown in \eqref{eval:staticget-varnew-null}.
+            \item When $\expressionmeta$ is $\nnull$, the environment is extended with a binding to a fresh location that stores a $\nnull$ value for the field $\membermeta$, as shown in \eqref{eval:staticget-varnew-null}.
             \item When $\expressionmeta$ is an expression, this expression is evaluated as shown in \eqref{eval:staticget-varnew}.
                 The expression will evaluate to some value $\val$ that will be applied to the corresponding continuations, as shown in \eqref{econtconf:staticget}: the environment is extended with a binding to a fresh location that stores the value $\val$ and the continuation $\econt$ is applied to the value $\val$.
             \item When there is already a binding for the member $\membermeta$ in the global environment $\env_{M}$, the continuation $\econt$ is applied to the stored value, as shown in \eqref{eval:staticget-var}.
@@ -1704,7 +1703,7 @@ Static invocation is supported with $\StaticInvocation{\{\membermeta\}}{\express
 The evaluation of a static invocation proceeds by evaluating the arguments of the call, as shown in \eqref{eval:staticinvoc}.
 After the evaluation of the actual arguments for the invocation, the corresponding application is applied to the resulting list of values, as shown in \eqref{acontconf:staticinvoc}.
 In \eqref{acontconf:staticinvoc}, we apply the application continuation by creating a new environment for the execution of the body of the method by binding its formal parameters to the locations of the values for the actual arguments.
-A statement continuation, $\ExitSK{\econt}{\tt{null}}$ is added as next statement continuation to ensure that the execution of the body of the method returns correctly, when a return statement is not executed after the execution of the last statement of the body.
+A statement continuation, $\ExitSK{\econt}{\nnull}$ is added as next statement continuation to ensure that the execution of the body of the method returns correctly, when a return statement is not executed after the execution of the last statement of the body.
 
 %%
 % Figure showing the CESK-transition function starting from
@@ -1786,7 +1785,7 @@ A statement continuation, $\ExitSK{\econt}{\tt{null}}$ is added as next statemen
         {\contconf{\PropertyGetK}{\val}}%
         {\contconf{\econt}{\funval{\formals}{\stmt}{\env}}}
         {\parbox{10cm}{if $\membermeta$ is a method with body $\stmt$ and formals $\formals$ \\
-        where $\env = \ext{\env_{empty}}{\mathbf{this}}{\val}$}}
+        where $\env = \ext{\env_{empty}}{\this}{\val}$}}
     \end{multlined}
     \label{econtconf:propertyget-tearoff}\\
     &\begin{multlined}
@@ -1794,7 +1793,7 @@ A statement continuation, $\ExitSK{\econt}{\tt{null}}$ is added as next statemen
         {\contconf{\PropertyGetK}{\val}}%
         {\execconf{\stmt}{\env}{[]}{[]}{\PropertyGet{\val}{\idmeta} :: \strace}{\handler}{\cex,\,\cstrace}{\econt}{\scont}}%
         {\parbox{10cm}{if $\membermeta$ is a getter with body $\stmt$\\
-        where $\env = \ext{\env_{empty}}{\mathbf{this}}{\val}$\\
+        where $\env = \ext{\env_{empty}}{\this}{\val}$\\
         $\scont = \emptyset$}}
     \end{multlined}
     \label{econtconf:propertyget-getter}\\
@@ -1803,14 +1802,14 @@ A statement continuation, $\ExitSK{\econt}{\tt{null}}$ is added as next statemen
         {\contconf{\PropertyGetK}{\val}}%
         {\contconf{\econt}{\text{\membermeta}(\val)}}%
         {\parbox{10cm}{if $\membermeta$ is an implicit getter for field $\idmeta$\\
-        where $\env = \ext{\env_{empty}}{\mathbf{this}}{\val}$\\
+        where $\env = \ext{\env_{empty}}{\this}{\val}$\\
         $\scont = \emptyset$}}
     \end{multlined}
     \label{econtconf:propertyget-field}\\
     &\begin{multlined}
         \cesktranswheresplit*%
         {\contconf{\PropertyGetK}{\val}}%
-        {\throwconf{\handler}{(\tt{throw}\text{ NoSuchMethod($\PropertyGet{\val}{\idmeta}$)}) :: \strace}{\text{NoSuchMethod}}}%
+        {\throwconf{\handler}{(\throw\text{ NoSuchMethod($\PropertyGet{\val}{\idmeta}$)}) :: \strace}{\text{NoSuchMethod}}}%
         {\parbox{10cm}{if lookup of name $\idmeta$ was unsuccessful in class of value $\val$}}
     \end{multlined}
     \label{econtconf:propertyget-nosuchmethod}\\
@@ -1819,7 +1818,7 @@ A statement continuation, $\ExitSK{\econt}{\tt{null}}$ is added as next statemen
         {\contconf{\DPropertyGetK}{\val}}%
         {\contconf{\econt}{\funval{\formals}{\stmt}{\env}}}%
         {\parbox{10cm}{if $\membermeta$ is a method with body $\stmt$ and formals $\formals$\\
-        where $\env = \ext{\env_{empty}}{\mathbf{this}}{\val}$}}
+        where $\env = \ext{\env_{empty}}{\this}{\val}$}}
     \end{multlined}
     \label{econtconf:dpropertyget-tearoff}\\
     &\begin{multlined}
@@ -1827,7 +1826,7 @@ A statement continuation, $\ExitSK{\econt}{\tt{null}}$ is added as next statemen
             {\contconf{\DPropertyGetK}{\val}}%
             {\execconf{\stmt}{\env}{[]}{[]}{\DirectPropertyGet{\val}{\membermeta} :: \strace}{\handler}{\cex,\,\cstrace}{\econt}{\scont}}%
             {\parbox{10cm}{if $\membermeta$ is getter with statement body $\stmt$ \\
-            where $\env = \ext{\env_{empty}}{\mathbf{this}}{\val}$ \\
+            where $\env = \ext{\env_{empty}}{\this}{\val}$ \\
             $\scont = \emptyset$}}
     \end{multlined}
     \label{econtconf:dpropertyget-getter}\\
@@ -1858,11 +1857,11 @@ The evaluation of the expression proceeds as follow:
 \begin{itemize}
     \item $\membermeta$ is a method tear-off\\
         When $\membermeta$ is a method tear-off, the evaluation of the property extraction expression proceeds as shown in \eqref{econtconf:propertyget-tearoff}.
-        The member is converted to a value $\val \in \dfunval$, capturing the method body, its formal parameters and an environment with a $\tt{this}$ binding to a location that stores the current instance value and the expression continuation $\econt$ is applied to it.
+        The member is converted to a value $\val \in \dfunval$, capturing the method body, its formal parameters and an environment with a $\this$ binding to a location that stores the current instance value and the expression continuation $\econt$ is applied to it.
 
     \item $\membermeta$ is a getter\\
         When $\membermeta$ is a getter, the body of the getter is executed as shown in the CESK-transition function step \eqref{econtconf:propertyget-getter}.
-        The statement body is executed with an environment with a $\tt{this}$ binding to a location that stores the current instance value and no statement continuation.
+        The statement body is executed with an environment with a $\this$ binding to a location that stores the current instance value and no statement continuation.
         A getter should always contain a reachable return statement.
 
     \item $\membermeta$ is an implicit getter for a field $\idmeta$\\
@@ -1917,7 +1916,7 @@ The evaluation proceeds as follows:
         {\parbox{10cm}{where:\\
             \(\val_0 = ((\_, \_, \textit{mems}), \_)\),
             \(\textit{mems}(\idmeta) = \text{Setter}(A, S)\)\\
-            \(\env = \ext{\env_{empty}}{\mathbf{this} :: \formal :: []}{\val_0 :: \val_1 :: []}\)\\
+            \(\env = \ext{\env_{empty}}{\this :: \formal :: []}{\val_0 :: \val_1 :: []}\)\\
             $\scont = \ExitSK{\val_1}$}}
     \end{multlined}
     \label{econtconf:propertyset-setter}\\
@@ -1945,7 +1944,7 @@ The evaluation proceeds as follows:
         {\execconf{\stmt}{\env}{\lbls}{\clbls}{(\DirectPropertySet{\val_0}{\membermeta}{\val_1}) :: \strace}{\handler}{\cex,\,\cstrace}{\econt}{\emptyset}}
         {\parbox{10cm}{where:\\
             \(\membermeta = \text{Setter}(\formal, \stmt)\),
-            $\env = \ext{\env_{empty}}{\mathbf{this} :: \formal :: []}{\val_0 :: \val_1 :: []}$}}
+            $\env = \ext{\env_{empty}}{\this :: \formal :: []}{\val_0 :: \val_1 :: []}$}}
     \end{multlined}
     \label{econtconf:dpropertyset-setter}\\
     &\begin{multlined}
@@ -2001,7 +2000,7 @@ The evaluation proceeds as follows:
 
 \begin{itemize}
     \item $\membermeta$ is a setter invocation\\
-        When $\membermeta$ is an invocation of a setter with body $\stmt$ and formal parameter $\formal$, the evaluation proceeds by executing the body in the environment which binds $\tt{this}$ to a location that contains $\val_0$ and the formal parameter $\formal$ to a location that contains $\val_1$.
+        When $\membermeta$ is an invocation of a setter with body $\stmt$ and formal parameter $\formal$, the evaluation proceeds by executing the body in the environment which binds $\this$ to a location that contains $\val_0$ and the formal parameter $\formal$ to a location that contains $\val_1$.
         This is shown in the CESK-transition \eqref{econtconf:propertyset-setter}.
         Note that we add the special statement continuation $\ExitSK{\val_1}$, that will apply the value $\val_1$ to the current expression continuation.
 
@@ -2024,7 +2023,7 @@ After evaluating the receiver expression to $\val_0$ and the argument expression
 
 \begin{itemize}
     \item $\membermeta$ is an instance setter\\
-        When $\membermeta$ is an instance setter with body $\stmt$ and formal parameter $\formal$, the evaluation of the expression proceeds with execution of the body with an environment binding $\tt{this}$ to a location containing $\val_0$ and the formal parameter $\formal$ to a location storing $\val_1$.
+        When $\membermeta$ is an instance setter with body $\stmt$ and formal parameter $\formal$, the evaluation of the expression proceeds with execution of the body with an environment binding $\this$ to a location containing $\val_0$ and the formal parameter $\formal$ to a location storing $\val_1$.
 
     \item $\membermeta$ is a field\\
         When $\membermeta$ is a field the value stored at location $\val_0[\membermeta]$ is modified to store value the argument expression evaluates to, $\val_1$, as shown in \eqref{econtconf:dpropertyset-field}.
@@ -2044,7 +2043,7 @@ The evaluation of a super property extraction proceeds as follows:
     \item $\membermeta$ is a method tear-off\\
         When $\membermeta$ is a method tear-off, the evaluation of super property extraction expression proceeds as shown in \eqref{eval:superpropertyget-tearoff}.
         The member with body $\stmt$ and formal parameters $\formals$ is converted to a value $\val \in \dfunval$.
-        The value $\val$ captures the method body, its formal parameters and an environment with a $\tt{this}$ binding to a location that stores the current instance value and the expression continuation $\econt$ is applied to it.
+        The value $\val$ captures the method body, its formal parameters and an environment with a $\this$ binding to a location that stores the current instance value and the expression continuation $\econt$ is applied to it.
 
     \item $\membermeta$ is an instance getter\\
         When $\membermeta$ is an instance getter, the statement body of the getter is executed.
@@ -2067,7 +2066,7 @@ After the evaluation of the argument expression to a value $\val$, depending on 
 \todo{regroup all property extraction together since text is similar}
 \begin{itemize}
     \item $\membermeta$ is an instance setter\\
-        When $\membermeta$ is an invocation of a setter with body $\stmt$ and formal parameter $\formal$, the evaluation proceeds by executing the body in the environment which binds $\tt{this}$ to a location that contains $\deref{(\env(\this))}$ and the formal parameter $\formal$ to a location that contains $\val$.
+        When $\membermeta$ is an invocation of a setter with body $\stmt$ and formal parameter $\formal$, the evaluation proceeds by executing the body in the environment which binds $\this$ to a location that contains $\deref{(\env(\this))}$ and the formal parameter $\formal$ to a location that contains $\val$.
         This is shown in the CESK-transition \eqref{econtconf:superpropertyset-setter}.
         Note that we add the special statement continuation $\ExitSK{\val_1}$, that will apply the value $\val$ to the current expression continuation.
 
@@ -2145,7 +2144,7 @@ After the evaluation of the argument expression to a value $\val$, depending on 
             {\contconf{\InstanceMethodA}{\val{s}}}%
             {\execconf{\stmt}{\env}{[]}{[]}{\strace}{\handler}{\cex,\,\cstrace}{\econt}{\scont}}%
             {\parbox{10cm}{where $\membermeta = class(\val).lookup(\idmeta)$ is an instance method with body $\stmt$ and formals $\formals$\\
-            $\scont = \ExitSK{\tt{null}}$\\
+            $\scont = \ExitSK{\nnull}$\\
             $\env = \ext{\env_{empty}}{\this :: \formals}{\val :: \val{s}}$}}
     \end{multlined}
     \label{acontconf:instancemethod}\\
@@ -2154,7 +2153,7 @@ After the evaluation of the argument expression to a value $\val$, depending on 
             {\contconf{\DInstanceMethodA}{\val{s}}}%
             {\execconf{\stmt}{\env}{[]}{[]}{\strace}{\handler}{\cex,\,\cstrace}{\econt}{\scont}}%
             {\parbox{10cm}{where $\stmt$ is the statement body and $\formals$ are the formal parameters of the instace method $\membermeta$\\
-            $\scont = \ExitSK{\tt{null}}$,\\
+            $\scont = \ExitSK{\nnull}$,\\
             $\env = \ext{\env_{empty}}{\this :: \formals}{\val :: \val{s}}$}}
     \end{multlined}
     \label{acontconf:dinstancemethod}\\
@@ -2162,7 +2161,7 @@ After the evaluation of the argument expression to a value $\val$, depending on 
         \cesktranswheresplit*%
         {\contconf{\SuperMethodA{\strace}}{\val{s}}}%
         {\execconf{\stmt}{\env'}{[]}{[]}{\strace}{\handler}{\cex,\,\cstrace}{\econt}{\scont}}%
-        {\parbox{10cm}{where $\scont = \ExitSK{\tt{null}}$,\\
+        {\parbox{10cm}{where $\scont = \ExitSK{\nnull}$,\\
         $\env' = \ext{\env_{empty}}{\this :: \formals}{\deref{(\env(\this))} :: \val{s}}$    }}
     \end{multlined}
     \label{acontconf:superinstancemethod}
@@ -2197,11 +2196,11 @@ After the evaluation of the receiver expression to a value $\val$, we proceed wi
 After the evaluation of the receiver expression to a value $\val$ and the argument expressions to $\vals$, the instance method $\idmeta$ is looked up in the instance methods for the value $\val$.
 Let $\membermeta$ be the result of such lookup with statement body $\stmt$ and formal parameters $\formals$.
 
-The body $\stmt$ is then executed with an environment binding $\tt{this}$ to a location storing the instance value $\val$ and the formal parameters to fresh locations each storing the values in $\vals$.
+The body $\stmt$ is then executed with an environment binding $\this$ to a location storing the instance value $\val$ and the formal parameters to fresh locations each storing the values in $\vals$.
 The CESK-transition is shown in \eqref{acontconf:instancemethod}.
 
-We add $\ExitSK{\tt{null}}$ as next statement continuation.
-When a $\tt{return}$ statement is missing in the statement body $\stmt$ of the instance method $\membermeta$, the statement continuation $\ExitSK{\val}$ ensures that the execution will proceed to the corresponding expression continuation, in this case with $\val = \tt{null}$.
+We add $\ExitSK{\nnull}$ as next statement continuation.
+When a $\return$ statement is missing in the statement body $\stmt$ of the instance method $\membermeta$, the statement continuation $\ExitSK{\val}$ ensures that the execution will proceed to the corresponding expression continuation, in this case with $\val = \nnull$.
 
 
 \subsubsection{Direct Instance Method Invocation}
@@ -2211,9 +2210,9 @@ Direct method invocation allows invocation of instance method by providing direc
 The evaluation of the direct instance method invocation proceeds with the evaluation of the left-hand side expression, i.e., the receiver expression as shown in \eqref{eval:dinstancemethod}.
 After the evaluation of the receiver expression to a value $\val$, the evaluation proceeds with the evaluation of the argument expressions as shown in \eqref{acontconf:dinstancemethod}.
 The argument expressions are evaluated to a list of values $\vals$.
-The evaluation of the expression continues with the execution of the statement body in the environment that binds $\tt{this}$ to a location that stores the value $\val$ and the formal parameters $\formals$ to fresh locations storing values from $\vals$ accordingly.
+The evaluation of the expression continues with the execution of the statement body in the environment that binds $\this$ to a location that stores the value $\val$ and the formal parameters $\formals$ to fresh locations storing values from $\vals$ accordingly.
 The CESK-transition is shown in \eqref{acontconf:dinstancemethod}.
-Similar to Section~\ref{subsubsec:instance-method-invoc}, $\ExitSK{\tt{null}}$ is added as next statement continuation.
+Similar to Section~\ref{subsubsec:instance-method-invoc}, $\ExitSK{\nnull}$ is added as next statement continuation.
 
 
 \subsubsection{Super Method Invocation}
@@ -2221,10 +2220,10 @@ Similar to Section~\ref{subsubsec:instance-method-invoc}, $\ExitSK{\tt{null}}$ i
 
 Super method invocation is supported with $\SuperMethodInvocation{\idmeta}{\expressionsmeta}$.
 We first evaluate the argument expressions, as shown in the CESK-transition \eqref{eval:superinstancemethod}.
-After the evaluation of the argument expressions to list of values $\vals$ for the super method invocation, the evaluation continues with lookup for $\idmeta$ in the members of the value bound to $\tt{this}$ in the current environment.
+After the evaluation of the argument expressions to list of values $\vals$ for the super method invocation, the evaluation continues with lookup for $\idmeta$ in the members of the value bound to $\this$ in the current environment.
 Let $\val = \deref{(\env(\this))}$, $C = \superclass{\val}$ and $M$ the result of looking up $\idmeta$ in $C$.
 Let $\stmt$ be the statement body and $\formals$ the formal parameters for $\membermeta$.
-The statement $\stmt$ is executed in an environment binding $\formals$ to the locations containing the values in $\vals$ and $\tt{this}$ binding to location containing the same value bound to $\tt{this}$ in the current environment.
+The statement $\stmt$ is executed in an environment binding $\formals$ to the locations containing the values in $\vals$ and $\this$ binding to location containing the same value bound to $\this$ in the current environment.
 Similarly to Section~\ref{subsubsec:instance-method-invoc}, $\ExitSK{\val}$ is added as next statement continuation.
 
 
@@ -2240,22 +2239,22 @@ A constructor has an associated class definition, an initializer list, $Izs$, wi
 We support the following kinds of initializers:
 
 \begin{itemize}
-	\item $\FieldInitializer{\expressionmeta}$ --- Field initializer for field $\field$ with expression $\expressionmeta$.
-		Field initializers modify the field of the newly allocated instance to store the value the expression evaluates to.
-	\item $\LocalInitializer{\expressionmeta}$ --- Local initializer for variable $\varmeta$ with expression $\expressionmeta$.
-		Local initializers extend the environment for the initializer list of the constructor with a binding of variable declaration $\varmeta$ to the value the expression evaluates to.
-	\item $\RedirectingInitializer{G}{\expressionsmeta}$ --- Redirecting initializer with target constructor $G$ and actual arguments for running the constructor $\expressionsmeta$.
-		Redirecting initializer appears last in the list of initializers of a constructor.
-		When the last initializer in the initializer list of a constructor is a redirecting initializer, we say the constructor is a redirecting constructor.
-		The redirecting constructor has an empty statement body.
-		When a redirecting constructor is run, only the initializer list of the constructor is executed.
-		Note that in other cases we first initialize instance fields in the immediately enclosing class that have initializer expressions before proceeding to execution of the initializer list.
-		Fields for the newly allocated instance from the immediately enclosing class are initialized only when a non-redirecting constructor is run.
-		This ensures that side effects from evaluating the actual arguments for the target constructor of the redirecting constructor occur before any side effects from initializing the fields in the immediately enclosing class.
-	\item $\SuperInitializer{G}{\expressionsmeta}$ --- Super initializer with target constructor $G$ and actual arguments for running the constructor $\expressionsmeta$.
+    \item $\FieldInitializer{\expressionmeta}$ --- Field initializer for field $\field$ with expression $\expressionmeta$.
+        Field initializers modify the field of the newly allocated instance to store the value the expression evaluates to.
+    \item $\LocalInitializer{\expressionmeta}$ --- Local initializer for variable $\varmeta$ with expression $\expressionmeta$.
+        Local initializers extend the environment for the initializer list of the constructor with a binding of variable declaration $\varmeta$ to the value the expression evaluates to.
+    \item $\RedirectingInitializer{G}{\expressionsmeta}$ --- Redirecting initializer with target constructor $G$ and actual arguments for running the constructor $\expressionsmeta$.
+        Redirecting initializer appears last in the list of initializers of a constructor.
+        When the last initializer in the initializer list of a constructor is a redirecting initializer, we say the constructor is a redirecting constructor.
+        The redirecting constructor has an empty statement body.
+        When a redirecting constructor is run, only the initializer list of the constructor is executed.
+        Note that in other cases we first initialize instance fields in the immediately enclosing class that have initializer expressions before proceeding to execution of the initializer list.
+        Fields for the newly allocated instance from the immediately enclosing class are initialized only when a non-redirecting constructor is run.
+        This ensures that side effects from evaluating the actual arguments for the target constructor of the redirecting constructor occur before any side effects from initializing the fields in the immediately enclosing class.
+    \item $\SuperInitializer{G}{\expressionsmeta}$ --- Super initializer with target constructor $G$ and actual arguments for running the constructor $\expressionsmeta$.
 
-		Super initializers appear last in the initializer list and all non-redirecting constructors other then the constructor for the object class, have a super initializer as the last in their initializer list.
-		Before invoking the target constructor of the super initializer, all non initialized fields in the immediately enclosing class are set to $\NullLiteral$ to ensure that all fields have been initialized before they are used.
+        Super initializers appear last in the initializer list and all non-redirecting constructors other then the constructor for the object class, have a super initializer as the last in their initializer list.
+        Before invoking the target constructor of the super initializer, all non initialized fields in the immediately enclosing class are set to $\NullLiteral$ to ensure that all fields have been initialized before they are used.
 \end{itemize}
 
 
@@ -2275,14 +2274,14 @@ The execution of the constructor proceeds as follows:
             $class$ corresponds to the class component of the constructor $Q$,\\
             $fields \in \mlist{\dlocation}$ corresponds to a list of fresh locations in the store,\\
             $\env' = \extend(\env_{empty}, \formals, \val{s})$,\\
-	    $\scont = \NewSK{\econt}{\loc}$ with $\loc$ a new location such that $\deref{\loc}=\val$}}
+        $\scont = \NewSK{\econt}{\loc}$ with $\loc$ a new location such that $\deref{\loc}=\val$}}
     \end{multlined}
 \end{align*}
 
 We introduce a new statement continuation, $\NewSK{\econt}{\loc}$ which captures the expression continuation that will be eventually applied to the newly allocated value after the execution of the statement body of the constructor.
 The CESK-transition from the corresponding ForwardConfiguration is shown below:
 \begin{align*}
-	&\cesktrans{\scontconf{\NewSK{\econt}{\loc}}{\env}}{\contconf{\econt}{\deref{\loc}}}
+    &\cesktrans{\scontconf{\NewSK{\econt}{\loc}}{\env}}{\contconf{\econt}{\deref{\loc}}}
 \end{align*}
 
 Let $initializer$ be the last initializer in the list of initializers, $Izs$, of constructor $Q$.
@@ -2294,7 +2293,7 @@ When the redirecting initializer is the only initializer in the list, the execut
             {\contconf{\InitK{Q}{\env}{\scont}}{\val}}%
             {\evallistconf{\exprs}{\env}{\strace}{\cstrace}{\cex}{\acont}}%
             {\parbox{\textwidth-2cm}{if $Izs = \RedirectingInitializer{G}{\exprs} :: []$,\\
-	        where $\acont = \RedirectingA{G}{\loc}{\scont}$, $\deref{\loc} = \val$,}}
+            where $\acont = \RedirectingA{G}{\loc}{\scont}$, $\deref{\loc} = \val$,}}
     \end{multlined}
 \end{align*}
 Otherwise, the redirecting constructor $Q$ has other initializers in the initializer list.
@@ -2314,7 +2313,7 @@ The CESK-transitions starting form the corresponding ValuePassingConfiguration p
         \cesktranswheresplit*%
             {\acontconf{\RedirectingA{G}{\loc}{\scont}}{\val{s}}}%
             {\contconf{\InitK{\synt{G}}{\env'}{\scont}}{\val}}%
-	    {\text{where $\deref{\loc} = \val$, $\env' = \extend(\env_{empty}, \formals, \val{s})$}}.
+        {\text{where $\deref{\loc} = \val$, $\env' = \extend(\env_{empty}, \formals, \val{s})$}}.
     \end{multlined}
 \end{align*}
 
@@ -2327,10 +2326,10 @@ Let $\synt{Q}$ be a non-redirecting constructor.
             {\contconf{\InitK{\synt{Q}}{\env}{\scont}}{\val}}%
             {\evallistconf{\exprs}{\env}{\strace}{\cstrace}{\cex}{\acont}}%
             {\begin{aligned}
-                \text{where }   \env'  &= \ext{\env}{\synt{this}}{\deref{\loc}},\\
+                \text{where }   \env'  &= \ext{\env}{\this}{\deref{\loc}},\\
                                 \exprs &= \text{initializer expressions for instance fields},\\
                                 \deref{\loc} &= \val,\\
-				\acont &= \FieldsA{Q}{\loc}{\env}{\scont'},\\
+                \acont &= \FieldsA{Q}{\loc}{\env}{\scont'},\\
                                 \scont' &= \BodySK{\stmt_{body}}{\env'}{\scont}.
             \end{aligned}}
     \end{multlined}
@@ -2356,46 +2355,46 @@ After the update of the values stored in the field locations of the object value
 The next configuration is produced depending on the initializer list of the constructor.
 We consider multiple cases:
 \begin{itemize}
-	\item The initializer list is empty, $Izs = []$.
-		Note that this can be true only for the superclass `object`.
-		All other constructors will have at least one initializer, $\SuperInitializer{G}{\expressionsmeta}$ that targets some constructor $G$.
-		The CESK-transition for the case when the initializer list is empty is shown below:
-		\begin{align*}
-			&\begin{multlined}
-				\cesktranswheresplit%
-				{\acontconf{\FieldsA{Q}{\loc}{\env}{\scont}}{\val{s}}}%
-				{\scontconf{\scont}{\env}}%
-				{\text{where $\deref{\deref\loc[\field_i]} = \val_{i}, \forall \field_i \in Fs, \forall \val_i \in \val{s}$}}.
-			\end{multlined}
-		\end{align*}
-	\item The initializer list contains at least one initializer with an expression to evaluate.
-		This initializer is a $\FieldInitializer{\expressionmeta}$ or a $\LocalInitializer{\expressionmeta}$.
-		In \kernel{}, a super initializer or a redirecting initializer, when present, will appear last in the initializer list.
-		If the initializer list contains at least two initializers, we can assume that the next initializer is as described above.
-		The CESK-transition function for this case is shown below:
-		\begin{align*}
-			&\begin{multlined}
-				\cesktranswheresplit%
-				{\acontconf{\FieldsA{Q}{\loc}{\env}{\scont}}{\val{s}}}%
-				{\evalconf{\expr}{\env}{st}{cex}{cst}{\econt'}}
-				{\parbox{10cm}{%
-					where $\deref{\deref{\loc[\field_i]}} = \val_{i}$, $\forall \field_i \in Fs, \forall \field_i \in \val{s}$,
-					\\$\econt' = \InitializerListEK{Q}{k}{\loc}{\env}{\scont}$,
-					\\$k = 0$ is the index of the initializer whose expression is evaluated in the next step,
-					\\ $\expressionmeta$ is the expression from $\FieldInitializer{\expressionmeta}$ or $\LocalInitializer{\expressionmeta}$}}
-			\end{multlined}
-		\end{align*}
+    \item The initializer list is empty, $Izs = []$.
+        Note that this can be true only for the superclass `object`.
+        All other constructors will have at least one initializer, $\SuperInitializer{G}{\expressionsmeta}$ that targets some constructor $G$.
+        The CESK-transition for the case when the initializer list is empty is shown below:
+        \begin{align*}
+            &\begin{multlined}
+                \cesktranswheresplit%
+                {\acontconf{\FieldsA{Q}{\loc}{\env}{\scont}}{\val{s}}}%
+                {\scontconf{\scont}{\env}}%
+                {\text{where $\deref{\deref\loc[\field_i]} = \val_{i}, \forall \field_i \in Fs, \forall \val_i \in \val{s}$}}.
+            \end{multlined}
+        \end{align*}
+    \item The initializer list contains at least one initializer with an expression to evaluate.
+        This initializer is a $\FieldInitializer{\expressionmeta}$ or a $\LocalInitializer{\expressionmeta}$.
+        In \kernel{}, a super initializer or a redirecting initializer, when present, will appear last in the initializer list.
+        If the initializer list contains at least two initializers, we can assume that the next initializer is as described above.
+        The CESK-transition function for this case is shown below:
+        \begin{align*}
+            &\begin{multlined}
+                \cesktranswheresplit%
+                {\acontconf{\FieldsA{Q}{\loc}{\env}{\scont}}{\val{s}}}%
+                {\evalconf{\expr}{\env}{st}{cex}{cst}{\econt'}}
+                {\parbox{10cm}{%
+                    where $\deref{\deref{\loc[\field_i]}} = \val_{i}$, $\forall \field_i \in Fs, \forall \field_i \in \val{s}$,
+                    \\$\econt' = \InitializerListEK{Q}{k}{\loc}{\env}{\scont}$,
+                    \\$k = 0$ is the index of the initializer whose expression is evaluated in the next step,
+                    \\ $\expressionmeta$ is the expression from $\FieldInitializer{\expressionmeta}$ or $\LocalInitializer{\expressionmeta}$}}
+            \end{multlined}
+        \end{align*}
 
-	\item Otherwise, there is only one initializer in the initializer list and it is a $\SuperInitializer{G}{\expressionsmeta}$. This is the case because the fields are initialzied only when a non-redirecitng constructor is run.
-		Otherwise, the initializer is a super initializer, $\SuperInitializer{G}{\exprs}$:
-		\begin{align*}
-			\cesktranswheresplit%
-			{\acontconf{\FieldsA{Q}{\loc}{\env}{\scont}}{\val{s}}}%
-			{\evallistconf{\exprs}{\env}{\strace}{\cstrace}{\cex}{\acont}}%
-			{\parbox{10cm}{%
-				where $\deref{\deref{\loc[\field_i]}} = \val_{i}$, $\forall \field_i \in Fs$, $\forall \val_i \in \val{s}$,
-				\\$\acont = \SuperA{G}{\loc}{\scont}$}}
-		\end{align*}
+    \item Otherwise, there is only one initializer in the initializer list and it is a $\SuperInitializer{G}{\expressionsmeta}$. This is the case because the fields are initialzied only when a non-redirecitng constructor is run.
+        Otherwise, the initializer is a super initializer, $\SuperInitializer{G}{\exprs}$:
+        \begin{align*}
+            \cesktranswheresplit%
+            {\acontconf{\FieldsA{Q}{\loc}{\env}{\scont}}{\val{s}}}%
+            {\evallistconf{\exprs}{\env}{\strace}{\cstrace}{\cex}{\acont}}%
+            {\parbox{10cm}{%
+                where $\deref{\deref{\loc[\field_i]}} = \val_{i}$, $\forall \field_i \in Fs$, $\forall \val_i \in \val{s}$,
+                \\$\acont = \SuperA{G}{\loc}{\scont}$}}
+        \end{align*}
 \end{itemize}
 
 The CESK-transition functions starting in an ValuePassingConfiguration, with an initializer list expression continuation are described below.
@@ -2405,32 +2404,32 @@ When the current initalizer being executed is a $\LocalInitializer{\expressionme
 \begin{align*}
     &\begin{multlined}
         \cesktranswheresplit%
-	    {\contconf{\InitializerListEK{Q}{k}{\env}{\loc}{\scont}}{\val}}%
+        {\contconf{\InitializerListEK{Q}{k}{\env}{\loc}{\scont}}{\val}}%
             {\scontconf{\scont}{\env'}}%
-	    {\parbox{10cm}{%
-		    where $\env' = \ext{\env}{\variablemeta}{\val}$,
-		    \\$Izs[k] = \LocalInitializer{\expressionmeta}$,
-		    \\$k+1 \geq length(Izs)$}}
+        {\parbox{10cm}{%
+            where $\env' = \ext{\env}{\variablemeta}{\val}$,
+            \\$Izs[k] = \LocalInitializer{\expressionmeta}$,
+            \\$k+1 \geq length(Izs)$}}
     \end{multlined}\\
     &\begin{multlined}
         \cesktranswheresplit*%
-	    {\contconf{\InitializerListEK{Q}{k}{\env}{\loc}{\scont}}{\val}}%
+        {\contconf{\InitializerListEK{Q}{k}{\env}{\loc}{\scont}}{\val}}%
             {\evallistconf{\exprs}{\env'}{\strace}{\cstrace}{\cex}{\acont}}%
-	    {\parbox{10cm}{%
-		    where $\env' = \ext{\env}{\variablemeta}{\val}$,
-		    \\$Izs[k] = \LocalInitializer{\expressionmeta}$,
-		    \\$\acont = \SuperA{G}{\loc}{\scont}$, if $Izs[k+1] = \SuperInitializer{G}{\exprs}$,
-		    \\$\acont = \RedirectingA{G}{\loc}{\scont}$, if $Izs[k+1] = \RedirectingInitializer{G}{\exprs}$}}
+        {\parbox{10cm}{%
+            where $\env' = \ext{\env}{\variablemeta}{\val}$,
+            \\$Izs[k] = \LocalInitializer{\expressionmeta}$,
+            \\$\acont = \SuperA{G}{\loc}{\scont}$, if $Izs[k+1] = \SuperInitializer{G}{\exprs}$,
+            \\$\acont = \RedirectingA{G}{\loc}{\scont}$, if $Izs[k+1] = \RedirectingInitializer{G}{\exprs}$}}
     \end{multlined}\\
     &\begin{multlined}
         \cesktranswheresplit%
-	    {\contconf{\InitializerListEK{Q}{k}{\env}{\loc}{\scont}}{\val}}%
+        {\contconf{\InitializerListEK{Q}{k}{\env}{\loc}{\scont}}{\val}}%
             {\evalconf{\expri{1}}{\env'}{st}{cex}{cst}{\econt'}}%
             {\parbox{\textwidth-2cm}{%
-		    where $\env' = \ext{\env}{\variablemeta}{\val}$,
-		    \\$Izs[k] = \LocalInitializer{\expressionmeta}$,
-		    \\$Izs[k+1] = \LocalInitializer{\expressionmeta_1}$ or $\FieldInitializer{\expressionmeta_1}$,
-		    \\$\econt' = \InitializerListEK{Izs}{k+1}{\loc}{\env'}{\scont}$}}
+            where $\env' = \ext{\env}{\variablemeta}{\val}$,
+            \\$Izs[k] = \LocalInitializer{\expressionmeta}$,
+            \\$Izs[k+1] = \LocalInitializer{\expressionmeta_1}$ or $\FieldInitializer{\expressionmeta_1}$,
+            \\$\econt' = \InitializerListEK{Izs}{k+1}{\loc}{\env'}{\scont}$}}
     \end{multlined}
 \end{align*}
 
@@ -2443,31 +2442,31 @@ When the current initalizer being executed is a $\FieldInitializer{\expressionme
 \begin{align*}
     &\begin{multlined}
         \cesktranswheresplit%
-	    {\contconf{\InitializerListEK{Q}{k}{\loc}{\env}{\scont}}{\val}}%
+        {\contconf{\InitializerListEK{Q}{k}{\loc}{\env}{\scont}}{\val}}%
             {\scontconf{\scont}{\env'}}%
-	    {\parbox{10cm}{%
-		    where $\update{(\deref{\loc})[\field]}{\val}$,
-		    \\$Izs[k] = \FieldInitializer{\expressionmeta}$}}
+        {\parbox{10cm}{%
+            where $\update{(\deref{\loc})[\field]}{\val}$,
+            \\$Izs[k] = \FieldInitializer{\expressionmeta}$}}
     \end{multlined}\\
     &\begin{multlined}
         \cesktranswheresplit*%
-	    {\contconf{\InitializerListEK{Q}{k}{\loc}{\env}{\scont}}{\val}}%
+        {\contconf{\InitializerListEK{Q}{k}{\loc}{\env}{\scont}}{\val}}%
             {\evallistconf{\exprs}{\env}{\strace}{\cstrace}{\cex}{\acont}}%
             {\parbox{\textwidth-2cm}{%
                 where $\update{(\deref{\loc})[\field]}{\val}$,
-		\\$Izs[k] = \FieldInitializer{\expressionmeta}$,
-		\\$\acont = \SuperA{G}{\loc}{\scont}$, if $Izs[k+1] = \SuperInitializer{G}{\exprs}$,
-		\\$\acont = \RedirectingA{G}{\loc}{\scont}$, if $Izs[k+1] = \RedirectingInitializer{G}{\exprs}$}}
+        \\$Izs[k] = \FieldInitializer{\expressionmeta}$,
+        \\$\acont = \SuperA{G}{\loc}{\scont}$, if $Izs[k+1] = \SuperInitializer{G}{\exprs}$,
+        \\$\acont = \RedirectingA{G}{\loc}{\scont}$, if $Izs[k+1] = \RedirectingInitializer{G}{\exprs}$}}
     \end{multlined}\\
     &\begin{multlined}
         \cesktranswheresplit%
-	    {\contconf{\InitializerListEK{Q}{k}{\env}{\loc}{\scont}}{\val}}%
+        {\contconf{\InitializerListEK{Q}{k}{\env}{\loc}{\scont}}{\val}}%
             {\evalconf{\expri{1}}{\env}{st}{cex}{cst}{\econt}}%
-	    {\parbox{10cm}{%
-		    where $\update{(\deref\loc)[\field]}{\val}$,
-		     \\$Izs[k] = \FieldInitializer{\expressionmeta}$,
-		     \\$Izs[k+1] = \LocalInitializer{\expressionmeta_1}$ or $\FieldInitializer{\expressionmeta_1}$,
-		     \\$\econt' = \InitializerListEK{Izs}{k+1}{\env'}{\loc}{\scont}$}}
+        {\parbox{10cm}{%
+            where $\update{(\deref\loc)[\field]}{\val}$,
+             \\$Izs[k] = \FieldInitializer{\expressionmeta}$,
+             \\$Izs[k+1] = \LocalInitializer{\expressionmeta_1}$ or $\FieldInitializer{\expressionmeta_1}$,
+             \\$\econt' = \InitializerListEK{Izs}{k+1}{\env'}{\loc}{\scont}$}}
     \end{multlined}
 \end{align*}
 
@@ -2558,7 +2557,7 @@ When the current initalizer being executed is a $\FieldInitializer{\expressionme
             \cesktranswheresplit%
                 {\execconf{\BreakStatement{L}}{\env}{\lbls}{\clbls}{\strace}{\handler}{\cex,\,\cstrace}{\econt}{\scont}}%
                 {\breakconf{\bcont}}%
-                {\text{where $\lbl = Label(L', \bcont) \in \lbls \text{ with } L' == \mathbf{L}$}}
+                {\text{where $\lbl = Label(L', \bcont) \in \lbls \text{ with } L' == \synt{L}$}}
         \end{multlined}
         \label{execconf:break}\\
         &\begin{multlined}
@@ -2614,12 +2613,12 @@ When the current initalizer being executed is a $\FieldInitializer{\expressionme
         \end{multlined}
         \label{econtconf:while-true}\\
         &\cesktrans%
-              {\contconf{\ForCondK}{\tt{false}}}%
+              {\contconf{\ForCondK}{\false}}%
               {\scontconf{\scont}{\env}}
         \label{econtconf:for-false}\\
         &\begin{multlined}
               \cesktranswheresplit*%
-                  {\contconf{\ForCondK}{\tt{true}}}%
+                  {\contconf{\ForCondK}{\true}}%
                   {\execconf{\scont}{\env'}{\lbls}{\clbls}{\strace}{\handler}{\cstrace,\,\cex}{\econt}{\scont'}}%
                   {\text{where $\scont' = \ForSK$}}
         \end{multlined}
@@ -2698,7 +2697,7 @@ The expression continuation for the execution of the rest of the statement will 
 In the first case, the execution proceeds with evaluation of the return expression, as shown in \eqref{execconf:return}.
 The expression continuation component in the ExecConfiguration is the return expression continuation.
 This is the expression continuation that is applied to the value the return expression evaluates to.
-When the return expression is empty, the value $\tt{null}$ is applied to the return expression continuation component in the ExecConfiguration as shown in \eqref{execconf:return-empty}.
+When the return expression is empty, the value $\nnull$ is applied to the return expression continuation component in the ExecConfiguration as shown in \eqref{execconf:return-empty}.
 
 \begin{figure}
     \begin{eqfigure}
@@ -2794,7 +2793,7 @@ The new statement continuation is necessary because implicit fall-through is not
     &\begin{multlined}
         \cesktranssplit%
             {\contconf{\SwitchK{\scase :: \scases}{\clbls}}{\val}}%
-            {\execconf{\stmt}{\env}{\lbls}{\clbls}{\strace}{\handler}{\cex,\,\cstrace}{\econt}{\ExitSK{\tt{null}}}},
+            {\execconf{\stmt}{\env}{\lbls}{\clbls}{\strace}{\handler}{\cex,\,\cstrace}{\econt}{\ExitSK{\nnull}}},
     \end{multlined}
 \end{align*}
 
@@ -2886,7 +2885,7 @@ The statement is unconditionally executed:
 
 $\synt{try/catch}$ statements execute their body with a new handler.
 \begin{align*}
-	\begin{multlined}
+    \begin{multlined}
             \cesktranswheresplit*%
                 {\execconf{\TryCatch{\stmt}{cs}}{\env}{\lbls}{\clbls}{\strace}{\handler}{\cex,\,\cstrace}{\econt}{\scont}}%
                 {\execconf{\stmt}{\env}{\lbls}{\clbls}{\strace}{\handler'}{\cex,\,\cstrace}{\econt}{\scont}}%
@@ -2939,7 +2938,7 @@ $\bbreak \synt{L}$ statements break from an enclosing label $\synt{L}$ and execu
         {\breakconf{\bcont}},
 \end{align*}
 
-\noindent where $\lbl = Label(L', \bcont) \in \lbls \text{ with } L' == \mathbf{L}$.
+\noindent where $\lbl = Label(L', \bcont) \in \lbls \text{ with } L' == \synt{L}$.
 
 
 \subsubsection{Continue}
@@ -2962,7 +2961,7 @@ $\continue \synt{L}$ statements continue to executing the statement of a precedi
         {\switchconf{\switchcont}},
 \end{align*}
 
-\noindent where $\clbl = \continuel{L'}{\switchcont} \in \clbls \text{ with } L' == \mathbf{L}$.
+\noindent where $\clbl = \continuel{L'}{\switchcont} \in \clbls \text{ with } L' == \synt{L}$.
 
 
 \subsubsection{Function Declaration}
