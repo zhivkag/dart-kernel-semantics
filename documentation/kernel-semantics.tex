@@ -1707,7 +1707,7 @@ The target member can either be a static or library field, or it can be a static
         Otherwise, when $\membermeta \in \mainenv$, the value stored at location $\mainenv(\membermeta)$ is modified accordingly, as shown in \eqref{econtconf:staticset-var}.
 
     \item $\membermeta$ is a static setter\\
-        The evaluation proceeds by executing the statement body of the setter. A statement continuation $\ExitSK{\econt}{\val}$ is added that applies the given expression continuation $\econt$ to the value of the right-hand side expression.
+        The evaluation proceeds by executing the statement body of the setter. A statement continuation $\ExitSK{\val}$ is added that applies the given expression continuation $\econt$ to the value of the right-hand side expression.
         The statement body is executed in an environment that has only the binding from the formal parameter of the static setter to the value of the right-hand side expression, as shown in \eqref{econtconf:staticset-setter}.
 
     \item Otherwise, $\membermeta$ is a static or library setter with body $\stmt$ and formal parameter $\formal$.
@@ -1722,7 +1722,7 @@ Static invocation is supported with $\StaticInvocation{\{\membermeta\}}{\express
 The evaluation of a static invocation proceeds by evaluating the arguments of the call, as shown in \eqref{eval:staticinvoc}.
 After the evaluation of the actual arguments for the invocation, the corresponding application is applied to the resulting list of values, as shown in \eqref{acontconf:staticinvoc}.
 In \eqref{acontconf:staticinvoc}, we apply the application continuation by creating a new environment for the execution of the body of the method by binding its formal parameters to the locations of the values for the actual arguments.
-A statement continuation, $\ExitSK{\econt}{\nnull}$ is added as next statement continuation to ensure that the execution of the body of the method returns correctly, when a return statement is not executed after the execution of the last statement of the body.
+A statement continuation, $\ExitSK{\nnull}$ is added as next statement continuation to ensure that the execution of the body of the method returns correctly, when a return statement is not executed after the execution of the last statement of the body.
 
 %%
 % Figure showing the CESK-transition function starting from
