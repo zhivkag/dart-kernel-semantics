@@ -977,7 +977,7 @@ The different expression continuations are shown in Figure~\ref{figure:econts}.
 \newcommand{\FinallyK}[1]{\mathrm{FinallyEK}({#1},\,\env,\,\lbls,\,\clbls,\,\strace,\,\handler,\,\econt)}
 \newcommand{\FinallyReturnK}[1]{\mathrm{FinallyReturnEK}({#1},\,\env,\,\lbls,\,\clbls,\,\strace,\,\handler,\,\econt)}
 
-\newcommand{\ForCondK}{\mathrm{ForConditionEK}(\mathrm{\varmeta{s}},\, \expressionmeta,\, \exprs,\, \statementmeta,\, \env,\, \env',\, \lbls,\, \clbls,\, \handler,\, \cstrace,\, \cex,\, \econt,\, \scont)}
+\newcommand{\ForCondK}{\mathrm{ForConditionEK}(\varmeta{s},\, \expressionmeta,\, \exprs,\, \statementmeta,\, \env,\, \env',\, \lbls,\, \clbls,\, \handler,\, \cstrace,\, \cex,\, \econt,\, \scont)}
 \newcommand{\ExpressionK}[2]{\mathrm{ExpressionEK}({#1},\,{#2})}
 \begin{figure}[Htp]
   \begin{eqfigure}
@@ -1066,8 +1066,8 @@ Application continuations, $\acont$, capture the application of a list of values
 \newcommand{\SuperA}[3]{\mathrm{SuperA}({#1},\,{#2},\,\strace,\,\handler,\,\cstrace,\,\cex,\,{#3})}
 \newcommand{\ConstructorA}[3]{\mathrm{ConstructorA}({#1},\,{#2},\,\handler,\,\cstrace,\,\cex,\,{#3})}
 \newcommand{\RedirectingA}[3]{\mathrm{RedirectingA}({#1},\,{#2},\,\strace,\,\handler,\,\cstrace,\,\cex,\,{#3})}
-\newcommand{\ForInitA}[1]{\mathrm{ForInitA}(\mathrm{\varmeta{s}},\, #1,\, \exprs,\, \statementmeta,\, \env,\, \lbls,\, \clbls,\, \handler,\, \cstrace,\, \cex,\, \econt,\, \scont)}
-\newcommand{\ForUpdatesA}[2]{\mathrm{ForUpdatesA}(\mathrm{\varmeta{s}},\, #1,\, \exprs,\, \statementmeta,\, \env,\, #2,\, \lbls,\, \clbls,\, \handler,\, \cstrace,\, \cex,\, \econt,\, \scont)}
+\newcommand{\ForInitA}[1]{\mathrm{ForInitA}(\varmeta{s},\, #1,\, \exprs,\, \statementmeta,\, \env,\, \lbls,\, \clbls,\, \handler,\, \cstrace,\, \cex,\, \econt,\, \scont)}
+\newcommand{\ForUpdatesA}[2]{\mathrm{ForUpdatesA}(\varmeta{s},\, #1,\, \exprs,\, \statementmeta,\, \env,\, #2,\, \lbls,\, \clbls,\, \handler,\, \cstrace,\, \cex,\, \econt,\, \scont)}
 \newcommand{\InstanceMethodA}{\mathrm{InstanceMethodA(\idmeta,\,\val,\,\strace,\,\handler,\,\cstrace,\,\cex,\,\econt)}}
 
 We use the application continuation $\ValueA{\acont}{\val}$, capturing a value and an application continuation, as application that adds a value to the list of values to eventually used by an application continuation that produces a configuration other than ApplicationConfiguration.
