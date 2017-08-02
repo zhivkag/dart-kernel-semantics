@@ -988,7 +988,7 @@ The different expression continuations are shown in Figure~\ref{figure:econts}.
     &\AndK{\expressionmeta}{\ExceptionHandlers}{\econt} \label{econt:and}\\
     &\OrK{\expressionmeta}{\ExceptionHandlers}{\econt} \label{econt:or}\\
     &\ConditionalK{\expressionmeta_1}{\expressionmeta_2}{\ExceptionHandlers}{\econt} \label{econt:cond}\\
-    &\LetK{\idmeta}{\expressionmeta}{\ExceptionHandlers}{\econt} \label{econt:let}\\
+    &\LetK{\varmeta}{\expressionmeta}{\ExceptionHandlers}{\econt} \label{econt:let}\\
     &\IsExpressionK \label{econt:is}\\
     &\AsExpressionK \label{econt:as}\\
     &\StaticGetK \label{econt:static-get}\\
@@ -1199,7 +1199,7 @@ The value corresponding to the evaluated expression is captured by the applicati
 \end{figure}
 
 %%
-% Figure showing the CEK-transition function starting from EvalConfiguration for simple
+% Figure showing the CESK-transition function starting from EvalConfiguration for simple
 % expressions.
 %%
 \begin{figure}[Htp]
@@ -1250,14 +1250,14 @@ The value corresponding to the evaluated expression is captured by the applicati
             \cesktranswheresplit%
                 {\evalconf{\AndExpression{\expressionmeta_0}{\expressionmeta_1}}{\env}{\strace}{\cstrace}{\cex}{\econt}}%
                 {\evalconf{\expressionmeta_0}{\env}{\strace}{\cstrace}{\cex}{\econt'}}%
-                {\text{where $\econt' = \AndK{\expri{2}}{\env}{\econt}$}}%
+                {\text{where $\econt' = \AndK{\expressionmeta_1}{\env}{\econt}$}}%
         \end{multlined}
         \label{eval:and}\\
         &\begin{multlined}
             \cesktranswheresplit%
                 {\evalconf{\OrExpression{\expressionmeta_0}{\expressionmeta_1}}{\env}{\strace}{\cstrace}{\cex}{\econt}}%
                 {\evalconf{\expressionmeta_0}{\env}{\strace}{\cstrace}{\cex}{\econt'}}%
-                {\text{where $\econt' = \OrK{\expri{2}}{\env}{\econt}$}}%
+                {\text{where $\econt' = \OrK{\expressionmeta_1}{\env}{\econt}$}}%
         \end{multlined}
         \label{eval:or}\\
         &\begin{multlined}
@@ -1271,7 +1271,7 @@ The value corresponding to the evaluated expression is captured by the applicati
             \cesktranswheresplit%
                 {\evalconf{\Let{\varmeta}{\expri{1}}{\expri{2}}}{\env}{\strace}{\cstrace}{\cex}{\econt}}%
                 {\evalconf{\expri{1}}{\env}{\strace}{\cstrace}{\cex}{\econt'}}%
-                {\text{where }\econt' = \LetK{\expri{2}}{\env}{\varmeta}{\econt}}
+                {\text{where }\econt' = \LetK{\varmeta}{\expri{2}}{\env}{\econt}}
         \end{multlined}
         \label{eval:let}\\
         &\begin{multlined}
@@ -1301,8 +1301,8 @@ The value corresponding to the evaluated expression is captured by the applicati
         \end{multlined}
         \label{eval:throw}\\
         &\cesktrans%
-            {\evalconf{\rethrow}{\env}{\strace}{inr(\val)}{\strace'}{\econt}}%
-            {\throwconf{\handler}{\val}{\strace'}}
+            {\evalconf{\rethrow}{\env}{\strace}{\strace'}{\cex}{\econt}}%
+            {\throwconf{\handler}{\cex}{\strace'}}
             \label{eval:rethrow}\\
         &\begin{multlined}
             \cesktranswheresplit%
@@ -1329,11 +1329,13 @@ The value corresponding to the evaluated expression is captured by the applicati
             {\evallistconf{\exprs}{\env}{\strace}{\cstrace}{\cex}{\ValueA{\val}{\acont}}}
         \end{multlined}
         \label{econtconf:exprs}\\
-        &\cesktranswhere%
+        &\begin{multlined}
+        \cesktranswheresplit%
             {\contconf{\VarSetK{\idmeta}{\env}{\ExceptionHandlers}{\econt}}{\val}}%
             {\contconf{\econt}{\val}}%
-            {\deref{\env(\idmeta)} = \val \text{ after transition}}
-            \label{econtconf:varset}\\
+        {\text{where $\deref{\env(\idmeta)} = \val$ after transition}}
+        \end{multlined}
+        \label{econtconf:varset}\\
         &\cesktrans%
             {\contconf{\NotK{\econt}}{\true}}%
             {\contconf{\econt}{\false}}
@@ -1374,28 +1376,28 @@ The value corresponding to the evaluated expression is captured by the applicati
         \cesktranswheresplit%
             {\contconf{\LetK{\expri{2}}{\env}{\varmeta}{\econt}}{\val}}%
             {\evalconf{\expri{2}}{\env'}{\strace}{\cstrace}{\cex}{\econt}}%
-            {\env'=\ext{\env}{\varmeta}{\val}}
+            {\text{where $\env'=\ext{\env}{\varmeta}{\val}$}}
         \end{multlined}
         \label{econtconf:let}\\
         &\cesktranswhere%
             {\contconf{\IsExpressionK}{\val}}%
             {\contconf{\econt}{\true}}%
-            {\text{if $\val \text{ is } \tt{T}$}}
+            {\text{where $\val$ is $\tt{T}$}}
         \label{econtconf:is-true}\\
         &\cesktranswhere%
             {\contconf{\IsExpressionK}{\val}}%
             {\contconf{\econt}{\false}}%
-            {\text{otherwise}}
+            {\text{where $\val$ is not $\tt{T}$}}
         \label{econtconf:is-false}\\
         &\cesktranswhere%
             {\contconf{\AsExpressionK}{\val}}%
             {\contconf{\econt}{\val}}%
-            {\text{if $\val \text{ is } \tt{T}$}}
+            {\text{where $\val$ is $\tt{T}$}}
         \label{econtconf:as-true}\\
         &\cesktranswhere%
             {\contconf{\AsExpressionK}{\val}}%
             {\throwconf{\handler}{\AsExpression{\expressionmeta}{\tt{T}} :: \strace}{\synt{CastError}}}%
-            {\text{if $\val \text{ is not } \tt{T}$}}
+            {\text{where $\val$ is not $\tt{T}$}}
         \label{econtconf:as-false}
     \end{align}
     \caption{The CESK-transition function for ValuePassingConfiguration: simple expressions}
@@ -1516,7 +1518,7 @@ $fv \in \dfunval$ has only one property, $call$.
         \cesktranswheresplit*%
             {\acontconf{\StaticInvA{\formals}{\stmt}{\strace}{\econt}}{\val{s}}}%
             {\execconf{\stmt}{\env'}{[]}{[]}{\strace}{\handler}{\cex,\,\cstrace}{\econt}{\scont}}%
-            {\parbox{10cm}{where $\scont = \ExitSK{\nnull}$,\\ $\env' = \ext{\env_{empty}}{\formals}{\val{s}}$}}
+            {\parbox{10cm}{where $\scont = \ExitSK{\nnull}$, $\env' = \ext{\env_{empty}}{\formals}{\val{s}}$}}
         \end{multlined}
         \label{acontconf:staticinvoc}
     \end{align}
@@ -1581,7 +1583,9 @@ The specific CESK-transitions for the different invocations are described in the
             \cesktranswheresplit%
                 {\evalconf{\StaticGet{\membermeta}}{\env}{\strace}{\cstrace}{\cex}{\econt}}%
                 {\contconf{\econt}{\nnull}}%
-                {\parbox{12cm}{where $\membermeta$ is a static field without an initializer expression and $\membermeta \notin \mainenv$,\\$\mainenv = \ext{\mainenv}{\membermeta}{\NullLiteral}$ after transition}}
+                {\parbox{12cm}{
+                    where $\membermeta$ is a static field without an initializer expression and $\membermeta \notin \mainenv$,\\
+                    $\mainenv = \ext{\mainenv}{\membermeta}{\NullLiteral}$ after transition}}
         \end{multlined}
         \label{eval:staticget-varnew-null}\\
         &\begin{multlined}
@@ -1616,7 +1620,11 @@ The specific CESK-transitions for the different invocations are described in the
             \cesktranswheresplit%
                 {\evalconf{\StaticInvocation{\{\membermeta\}}{\expressionsmeta}}{\env}{\strace}{\cstrace}{\cex}{\econt}}%
                 {\evallistconf{\exprs}{\env}{\strace}{\cstrace}{\cex}{\acont'}}%
-                {\parbox{10cm}{where $\acont' = \StaticInvA{\formals}{\stmt}{\strace'}{\econt}$,\\ $\strace' = \StaticInvocation{\{\membermeta\}}{\expressionsmeta}::\strace$,\\where $\StaticGet{\membermeta}$ is a static method with formal parameters $\formals$ and body $\stmt$}}
+                {\begin{aligned}
+                    \text{where } \acont' &= \StaticInvA{\formals}{\stmt}{\strace'}{\econt},\\
+                                  \strace' &= \StaticInvocation{\{\membermeta\}}{\expressionsmeta}::\strace,\\
+                                  \StaticGet{\membermeta} &\text{ is a static method with formal parameters }\formals \text{ and body }\stmt
+                  \end{aligned}}
         \end{multlined}
         \label{eval:staticinvoc}
     \end{align}
@@ -1635,23 +1643,23 @@ The specific CESK-transitions for the different invocations are described in the
         &\cesktranswhere%
             {\contconf{\StaticGetK}{\val}}%
             {\contconf{\econt}{\val}}%
-            {\mainenv = \ext{\mainenv}{\membermeta}{\val}}
+            {\text{where $\mainenv = \ext{\mainenv}{\membermeta}{\val}$}}
         \label{econtconf:staticget}\\
         &\cesktranswhere%
             {\contconf{\StaticSetK}{\val}}%
             {\contconf{\econt}{\val}}
-            {\text{$\mainenv = \ext{\mainenv}{\membermeta}{\val}$ if $\membermeta \notin \mainenv$}}
+            {\text{where $\mainenv = \ext{\mainenv}{\membermeta}{\val}$, $\membermeta \notin \mainenv$}}
         \label{econtconf:staticset-var-new}\\
         &\cesktranswhere%
             {\contconf{\StaticSetK}{\val}}%
             {\contconf{\econt}{\val}}
-            {\text{$\update{\mainenv(\membermeta)}{\val}$ if $\membermeta \in \mainenv$}}
+            {\text{where $\update{\mainenv(\membermeta)}{\val}$, $\membermeta \in \mainenv$}}
         \label{econtconf:staticset-var}\\
         &\begin{multlined}
         \cesktranswheresplit%
             {\contconf{\StaticSetK}{\val}}%
             {\execconf{\stmt}{\env}{[]}{[]}{\strace}{\handler}{\cex,\,\cstrace}{\econt}{\scont}}%
-            {\text{$\scont = \ExitSK{\val}$, $\env = \ext{\env_{empty}}{\formal}{\val}$}}
+            {\text{where $\scont = \ExitSK{\val}$, $\env = \ext{\env_{empty}}{\formal}{\val}$}}
         \end{multlined}
         \label{econtconf:staticset-setter}
     \end{align}
@@ -1674,18 +1682,18 @@ When $\membermeta$ is a method, the expression $\StaticGet{\membermeta}$ is a me
     \item $\membermeta$ is a static or library field\\
         Let $\expressionmeta_{\membermeta}$ be $\membermeta$'s initializer expression.
         \begin{itemize}
-            \item When $\membermeta$ is accessed for the first time during the program's execution, the evaluation of $\StaticGet{\membermeta}$ proceeds with evaluation of the initializer expression $\expressionmeta_{\membermeta}$.
-            \item When $\expressionmeta$ is $\nnull$, the environment is extended with a binding to a fresh location that stores a $\nnull$ value for the field $\membermeta$, as shown in \eqref{eval:staticget-varnew-null}.
-            \item When $\expressionmeta$ is an expression, this expression is evaluated as shown in \eqref{eval:staticget-varnew}.
+            \item If $\membermeta$ is accessed for the first time during the program's execution, the evaluation of $\StaticGet{\membermeta}$ proceeds with evaluation of the initializer expression $\expressionmeta_{\membermeta}$.
+            \item If $\expressionmeta$ is $\nnull$, the environment is extended with a binding to a fresh location that stores a $\nnull$ value for the field $\membermeta$, as shown in \eqref{eval:staticget-varnew-null}.
+            \item If $\expressionmeta$ is an expression, this expression is evaluated as shown in \eqref{eval:staticget-varnew}.
                 The expression will evaluate to some value $\val$ that will be applied to the corresponding continuations, as shown in \eqref{econtconf:staticget}: the environment is extended with a binding to a fresh location that stores the value $\val$ and the continuation $\econt$ is applied to the value $\val$.
-            \item When there is already a binding for the member $\membermeta$ in the global environment $\env_{M}$, the continuation $\econt$ is applied to the stored value, as shown in \eqref{eval:staticget-var}.
+            \item If there is already a binding for the member $\membermeta$ in the global environment $\env_{M}$, the continuation $\econt$ is applied to the stored value, as shown in \eqref{eval:staticget-var}.
         \end{itemize}
 
     \item $\membermeta$ is a static getter\\
-        When $\membermeta$ is a static getter, the body of the getter is executed, as shown in \eqref{eval:staticget-getter}.
+        If $\membermeta$ is a static getter, the body of the getter is executed, as shown in \eqref{eval:staticget-getter}.
 
     \item $\membermeta$ is a static method tear-off\\
-        When $\membermeta$ is a method with formal parameters $\formals$ and body $\stmt$, a new $\funval{\formals}{\stmt}{\env_{empty}}$ is created and bound to the member in the global environment $\mainenv$, as shown in \eqref{eval:staticget-tearoff}.
+        If $\membermeta$ is a method with formal parameters $\formals$ and body $\stmt$, a new $\funval{\formals}{\stmt}{\env_{empty}}$ is created and bound to the member in the global environment $\mainenv$, as shown in \eqref{eval:staticget-tearoff}.
         The continuation $\econt$ is applied to this value.
 
 \end{itemize}
@@ -1755,14 +1763,23 @@ A statement continuation, $\ExitSK{\econt}{\nnull}$ is added as next statement c
         \cesktranswheresplit%
             {\evalconf{\SuperPropertyGet{\idmeta}}{\env}{\strace}{\cstrace}{\cex}{\econt}}%
             {\contconf{\econt}{\funval{\formals}{\stmt}{\env'}}}%
-            {\parbox{10cm}{where $\env' = \ext{\env_{empty}}{\this}{\deref{(\env(\this))}}$,\\ $\membermeta = \superclass{\deref{\env(\this)}}.lookup(\idmeta)$,\\ $\membermeta$ is a method tear-off with formal parameters $\formals$, and body $\stmt$}}
+            {\begin{aligned}
+                \text{where } \env' &= \ext{\env_{empty}}{\this}{\deref{(\env(\this))}},\\
+                              \membermeta &= \superclass{\deref{\env(\this)}}.lookup(\idmeta),\\
+                              \membermeta &\text{ is a method tear-off with formal parameters }\formals \text{ and body } \stmt
+             \end{aligned}}
         \end{multlined}
         \label{eval:superpropertyget-tearoff}\\
         &\begin{multlined}
         \cesktranswheresplit*%
             {\evalconf{\SuperPropertyGet{\idmeta}}{\env}{\strace}{\cstrace}{\cex}{\econt}}%
             {\execconf{\stmt}{\env'}{\lbls}{\clbls}{\SuperPropertyGet{\idmeta} :: \strace}{\handler}{\cex,\,\cstrace}{\econt}{\scont}}%
-            {\parbox{10cm}{where $\env' = \ext{\env_{empty}}{\this}{\deref{(\env(\this))}}$,\\ $\scont = \emptyset$, $\membermeta = \superclass{\deref{\env(\this)}}.lookup(\idmeta)$,\\ $\membermeta$ is a getter method with body $\stmt$}}
+            {\begin{aligned}
+                \text{where } \env' &= \ext{\env_{empty}}{\this}{\deref{(\env(\this))}},\\
+                              \scont &= \emptyset,\\
+                              \membermeta &= \superclass{\deref{\env(\this)}}.lookup(\idmeta),\\
+                              \membermeta &\text{ is a getter method with body }\stmt
+            \end{aligned}}
         \end{multlined}
         \label{eval:superpropertyget-getter}\\
         &\begin{multlined}
@@ -1795,16 +1812,16 @@ A statement continuation, $\ExitSK{\econt}{\nnull}$ is added as next statement c
     \cesktranswheresplit*%
         {\contconf{\PropertyGetK}{\val}}%
         {\contconf{\econt}{\funval{\formals}{\stmt}{\env}}}
-        {\parbox{10cm}{if $\membermeta$ is a method with body $\stmt$ and formals $\formals$ \\
-        where $\env = \ext{\env_{empty}}{\this}{\val}$}}
+        {\parbox{10cm}{where $\membermeta$ is a method with body $\stmt$ and formals $\formals$ \\
+         $\env = \ext{\env_{empty}}{\this}{\val}$}}
     \end{multlined}
     \label{econtconf:propertyget-tearoff}\\
     &\begin{multlined}
         \cesktranswheresplit*%
         {\contconf{\PropertyGetK}{\val}}%
         {\execconf{\stmt}{\env}{[]}{[]}{\PropertyGet{\val}{\idmeta} :: \strace}{\handler}{\cex,\,\cstrace}{\econt}{\scont}}%
-        {\parbox{10cm}{if $\membermeta$ is a getter with body $\stmt$\\
-        where $\env = \ext{\env_{empty}}{\this}{\val}$\\
+        {\parbox{10cm}{where $\membermeta$ is a getter with body $\stmt$\\
+        $\env = \ext{\env_{empty}}{\this}{\val}$\\
         $\scont = \emptyset$}}
     \end{multlined}
     \label{econtconf:propertyget-getter}\\
@@ -1924,22 +1941,23 @@ The evaluation proceeds as follows:
         \cesktranswheresplit*%
         {\contconf{\PropertySetVK}{\val_1}}%
         {\execconf{\stmt}{\env}{[]}{[]}{(\PropertySet{\val_0}{\idmeta}{\val_1}) :: \strace}{\handler}{\cex,\,\cstrace}{\econt}{\scont}}%
-        {\parbox{10cm}{where:\\
-            \(\val_0 = ((\_, \_, \textit{mems}), \_)\),
-            \(\textit{mems}(\idmeta) = \text{Setter}(A, S)\)\\
-            \(\env = \ext{\env_{empty}}{\this :: \formal :: []}{\val_0 :: \val_1 :: []}\)\\
-            $\scont = \ExitSK{\val_1}$}}
+        {\begin{aligned}
+            \text{where } \val_0 &= ((\_, \_, \textit{mems}), \_),\\
+                          \textit{mems}(\idmeta) &= \text{Setter}(A, S),\\
+                          \env &= \ext{\env_{empty}}{\this :: \formal :: []}{\val_0 :: \val_1 :: []},\\
+                          \scont &= \ExitSK{\val_1}\\
+         \end{aligned}}
     \end{multlined}
     \label{econtconf:propertyset-setter}\\
     &\begin{multlined}
         \cesktranswheresplit%
         {\contconf{\PropertySetVK}{\val}}%
         {\contconf{\econt}{\val_1}}%
-        {\parbox{10cm}{where:
-            \(M = \text{Setter}(i \in \NN)\),
-            \(\val_0 = (c, \textit{fields})\),
-            \(!(\textit{fields}[i]) := \val\)
-        }}
+        {\begin{aligned}
+            \text{where } &\membermeta = \text{Setter}(i \in \NN),\\
+                          &\val_0 = (c, \textit{fields}),\\
+                           &!(\textit{fields}[i]) := \val\\
+        \end{aligned}}
     \end{multlined}
     \label{econtconf:propertyset-field}\\
     &\begin{multlined}
@@ -1953,41 +1971,43 @@ The evaluation proceeds as follows:
         \cesktranswheresplit*%
         {\contconf{\DPropertySetVK}{\val_1}}
         {\execconf{\stmt}{\env}{\lbls}{\clbls}{(\DirectPropertySet{\val_0}{\membermeta}{\val_1}) :: \strace}{\handler}{\cex,\,\cstrace}{\econt}{\emptyset}}
-        {\parbox{10cm}{where:\\
-            \(\membermeta = \text{Setter}(\formal, \stmt)\),
-            $\env = \ext{\env_{empty}}{\this :: \formal :: []}{\val_0 :: \val_1 :: []}$}}
+        {\begin{aligned}
+            \text{where } \membermeta &= \text{Setter}(\formal, \stmt),\\
+            \env &= \ext{\env_{empty}}{\this :: \formal :: []}{\val_0 :: \val_1 :: []}
+        \end{aligned}}
     \end{multlined}
     \label{econtconf:dpropertyset-setter}\\
     &\begin{multlined}
         \cesktranswheresplit%
         {\contconf{\DPropertySetVK}{\val}}%
         {\contconf{\econt}{\val_1}}%
-        {\parbox{10cm}{where
-            \(\membermeta = \text{Setter}(i \in \NN)\),
-            \(\val = (c, \textit{fields})\),
-            \(\deref{\textit{fields}[i]} := \val_0\)
-        }}
+        {\begin{aligned}
+        \text{where }&\membermeta = \text{Setter}(i \in \NN),\\
+                     &\val = (c, \textit{fields}),\\
+                     &\deref{\textit{fields}[i]} := \val_0\\
+        \end{aligned}}
     \end{multlined}
     \label{econtconf:dpropertyset-field}\\
     &\begin{multlined}
         \cesktranswheresplit*%
         {\contconf{\SuperPropertySetK}{\val}}
         {\execconf{\stmt}{\env'}{\lbls}{\clbls}{(\SuperPropertySet{\idmeta}{\val}) :: \strace}{\handler}{\cex,\,\cstrace}{\econt}{\emptyset}}
-        {\parbox{10cm}{where:\\
-            \(\deref{\env(\this)} = (((\_, \_, \textit{spmems}), \_, \_), \_)\)\\
-            \(\textit{spmems}(\idmeta) = \text{Setter}(\formal, \stmt)\)\\
-            $\env' =  \ext{\env_{empty}}{\this :: \formal :: []}{\deref{(\env(\this))} :: \val :: []}$
-        }}
+        {\begin{aligned}
+        \text{where } \deref{\env(\this)} &= (((\_, \_, \textit{spmems}), \_, \_), \_)\\
+                      \textit{spmems}(\idmeta) &= \text{Setter}(\formal, \stmt)\\
+                      \env' &=  \ext{\env_{empty}}{\this :: \formal :: []}{\deref{(\env(\this))} :: \val :: []}\\
+        \end{aligned}}
     \end{multlined}
     \label{econtconf:superpropertyset-setter}\\
     &\begin{multlined}
         \cesktranswheresplit%
         {\contconf{\SuperPropertySetK}{\val}}%
         {\contconf{\econt}{\val}}%
-        {\parbox{10cm}{where:\\
-            \(\deref{\env(\this)} = (((\_, \_, \textit{spmems}), \_, \_), \_)\)\\
-            \(\textit{spmems}(\idmeta) = \text{Setter}(i \in \NN)\)\\
-            \(\update{\deref{(\env(\this))}[i]}{\val}\)}}
+        {\begin{aligned}
+            \text{where } &\deref{\env(\this)} = (((\_, \_, \textit{spmems}), \_, \_), \_)\\
+                          &\textit{spmems}(\idmeta) = \text{Setter}(i \in \NN)\\
+                          &\update{\deref{(\env(\this))}[i]}{\val}\\
+        \end{aligned}}
     \end{multlined}
     \label{econtconf:superpropertyset-field}
     \end{align}
@@ -2392,7 +2412,7 @@ We consider multiple cases:
                     where $\deref{\deref{\loc[\field_i]}} = \val_{i}$, $\forall \field_i \in Fs, \forall \field_i \in \val{s}$,
                     \\$\econt' = \InitializerListEK{Q}{k}{\loc}{\env}{\scont}$,
                     \\$k = 0$ is the index of the initializer whose expression is evaluated in the next step,
-                    \\ $\expressionmeta$ is the expression from $\FieldInitializer{\expressionmeta}$ or $\LocalInitializer{\expressionmeta}$}}
+                    \\$\expressionmeta$ is the expression from $\FieldInitializer{\expressionmeta}$ or $\LocalInitializer{\expressionmeta}$}}
             \end{multlined}
         \end{align*}
 
