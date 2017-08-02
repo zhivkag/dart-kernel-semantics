@@ -121,7 +121,7 @@
 \newcommand{\ddom}{\mathbf{Dom}}    % Unspecified domain to use in examples.
 
 % Known domains for Dart types.
-\todo{dmitryas: Are these syntactic domains or semantic domains?}
+%\todo{dmitryas: Are these syntactic domains or semantic domains?}
 \newcommand{\dint}{\mathbf{int}}
 \newcommand{\dbool}{\mathbf{bool}}
 \renewcommand{\ddouble}{\mathbf{double}}
@@ -1334,7 +1334,7 @@ The value corresponding to the evaluated expression is captured by the applicati
         \cesktranswheresplit%
             {\contconf{\VarSetK{\idmeta}{\env}{\ExceptionHandlers}{\econt}}{\val}}%
             {\contconf{\econt}{\val}}%
-		{\text{where $\deref{\env(\idmeta)} = \val$ after transition}}
+        {\text{where $\deref{\env(\idmeta)} = \val$ after transition}}
         \end{multlined}
         \label{econtconf:varset}\\
         &\cesktrans%
@@ -1584,7 +1584,9 @@ The specific CESK-transitions for the different invocations are described in the
             \cesktranswheresplit%
                 {\evalconf{\StaticGet{\membermeta}}{\env}{\strace}{\cstrace}{\cex}{\econt}}%
                 {\contconf{\econt}{\nnull}}%
-                {\parbox{12cm}{where $\membermeta$ is a static field without an initializer expression and $\membermeta \notin \mainenv$,\\$\mainenv = \ext{\mainenv}{\membermeta}{\NullLiteral}$ after transition}}
+                {\parbox{12cm}{
+                    where $\membermeta$ is a static field without an initializer expression and $\membermeta \notin \mainenv$,\\
+                    $\mainenv = \ext{\mainenv}{\membermeta}{\NullLiteral}$ after transition}}
         \end{multlined}
         \label{eval:staticget-varnew-null}\\
         &\begin{multlined}
@@ -1619,7 +1621,11 @@ The specific CESK-transitions for the different invocations are described in the
             \cesktranswheresplit%
                 {\evalconf{\StaticInvocation{\{\membermeta\}}{\expressionsmeta}}{\env}{\strace}{\cstrace}{\cex}{\econt}}%
                 {\evallistconf{\exprs}{\env}{\strace}{\cstrace}{\cex}{\acont'}}%
-                {\parbox{10cm}{where $\acont' = \StaticInvA{\formals}{\stmt}{\strace'}{\econt}$,\\ $\strace' = \StaticInvocation{\{\membermeta\}}{\expressionsmeta}::\strace$,\\where $\StaticGet{\membermeta}$ is a static method with formal parameters $\formals$ and body $\stmt$}}
+                {\begin{aligned}
+                    \text{where } \acont' &= \StaticInvA{\formals}{\stmt}{\strace'}{\econt},\\
+                                  \strace' &= \StaticInvocation{\{\membermeta\}}{\expressionsmeta}::\strace,\\
+                                  \StaticGet{\membermeta} &\text{ is a static method with formal parameters }\formals \text{ and body }\stmt
+                  \end{aligned}}
         \end{multlined}
         \label{eval:staticinvoc}
     \end{align}
@@ -1758,14 +1764,23 @@ A statement continuation, $\ExitSK{\econt}{\nnull}$ is added as next statement c
         \cesktranswheresplit%
             {\evalconf{\SuperPropertyGet{\idmeta}}{\env}{\strace}{\cstrace}{\cex}{\econt}}%
             {\contconf{\econt}{\funval{\formals}{\stmt}{\env'}}}%
-            {\parbox{10cm}{where $\env' = \ext{\env_{empty}}{\this}{\deref{(\env(\this))}}$,\\ $\membermeta = \superclass{\deref{\env(\this)}}.lookup(\idmeta)$,\\ $\membermeta$ is a method tear-off with formal parameters $\formals$, and body $\stmt$}}
+            {\begin{aligned}
+                \text{where } \env' &= \ext{\env_{empty}}{\this}{\deref{(\env(\this))}},\\
+                              \membermeta &= \superclass{\deref{\env(\this)}}.lookup(\idmeta),\\
+                              \membermeta &\text{ is a method tear-off with formal parameters }\formals \text{ and body } \stmt
+             \end{aligned}}
         \end{multlined}
         \label{eval:superpropertyget-tearoff}\\
         &\begin{multlined}
         \cesktranswheresplit*%
             {\evalconf{\SuperPropertyGet{\idmeta}}{\env}{\strace}{\cstrace}{\cex}{\econt}}%
             {\execconf{\stmt}{\env'}{\lbls}{\clbls}{\SuperPropertyGet{\idmeta} :: \strace}{\handler}{\cex,\,\cstrace}{\econt}{\scont}}%
-            {\parbox{10cm}{where $\env' = \ext{\env_{empty}}{\this}{\deref{(\env(\this))}}$,\\ $\scont = \emptyset$, $\membermeta = \superclass{\deref{\env(\this)}}.lookup(\idmeta)$,\\ $\membermeta$ is a getter method with body $\stmt$}}
+            {\begin{aligned}
+                \text{where } \env' &= \ext{\env_{empty}}{\this}{\deref{(\env(\this))}},\\
+                              \scont &= \emptyset,\\
+                              \membermeta &= \superclass{\deref{\env(\this)}}.lookup(\idmeta),\\
+                              \membermeta &\text{ is a getter method with body }\stmt
+            \end{aligned}}
         \end{multlined}
         \label{eval:superpropertyget-getter}\\
         &\begin{multlined}
@@ -1798,16 +1813,16 @@ A statement continuation, $\ExitSK{\econt}{\nnull}$ is added as next statement c
     \cesktranswheresplit*%
         {\contconf{\PropertyGetK}{\val}}%
         {\contconf{\econt}{\funval{\formals}{\stmt}{\env}}}
-        {\parbox{10cm}{if $\membermeta$ is a method with body $\stmt$ and formals $\formals$ \\
-        where $\env = \ext{\env_{empty}}{\this}{\val}$}}
+        {\parbox{10cm}{where $\membermeta$ is a method with body $\stmt$ and formals $\formals$ \\
+         $\env = \ext{\env_{empty}}{\this}{\val}$}}
     \end{multlined}
     \label{econtconf:propertyget-tearoff}\\
     &\begin{multlined}
         \cesktranswheresplit*%
         {\contconf{\PropertyGetK}{\val}}%
         {\execconf{\stmt}{\env}{[]}{[]}{\PropertyGet{\val}{\idmeta} :: \strace}{\handler}{\cex,\,\cstrace}{\econt}{\scont}}%
-        {\parbox{10cm}{if $\membermeta$ is a getter with body $\stmt$\\
-        where $\env = \ext{\env_{empty}}{\this}{\val}$\\
+        {\parbox{10cm}{where $\membermeta$ is a getter with body $\stmt$\\
+        $\env = \ext{\env_{empty}}{\this}{\val}$\\
         $\scont = \emptyset$}}
     \end{multlined}
     \label{econtconf:propertyget-getter}\\
@@ -1927,22 +1942,23 @@ The evaluation proceeds as follows:
         \cesktranswheresplit*%
         {\contconf{\PropertySetVK}{\val_1}}%
         {\execconf{\stmt}{\env}{[]}{[]}{(\PropertySet{\val_0}{\idmeta}{\val_1}) :: \strace}{\handler}{\cex,\,\cstrace}{\econt}{\scont}}%
-        {\parbox{10cm}{where\\
-            \(\val_0 = ((\_, \_, \textit{mems}), \_)\),
-            \(\textit{mems}(\idmeta) = \text{Setter}(A, S)\)\\
-            \(\env = \ext{\env_{empty}}{\this :: \formal :: []}{\val_0 :: \val_1 :: []}\)\\
-            $\scont = \ExitSK{\val_1}$}}
+        {\begin{aligned}
+            \text{where } \val_0 &= ((\_, \_, \textit{mems}), \_),\\
+                          \textit{mems}(\idmeta) &= \text{Setter}(A, S),\\
+                          \env &= \ext{\env_{empty}}{\this :: \formal :: []}{\val_0 :: \val_1 :: []},\\
+                          \scont &= \ExitSK{\val_1}\\
+         \end{aligned}}
     \end{multlined}
     \label{econtconf:propertyset-setter}\\
     &\begin{multlined}
         \cesktranswheresplit%
         {\contconf{\PropertySetVK}{\val}}%
         {\contconf{\econt}{\val_1}}%
-        {\parbox{10cm}{where
-            \(M = \text{Setter}(i \in \NN)\),
-            \(\val_0 = (c, \textit{fields})\),
-            \(!(\textit{fields}[i]) := \val\)
-        }}
+        {\begin{aligned}
+            \text{where } &\membermeta = \text{Setter}(i \in \NN),\\
+                          &\val_0 = (c, \textit{fields}),\\
+                           &!(\textit{fields}[i]) := \val\\
+        \end{aligned}}
     \end{multlined}
     \label{econtconf:propertyset-field}\\
     &\begin{multlined}
@@ -1956,41 +1972,43 @@ The evaluation proceeds as follows:
         \cesktranswheresplit*%
         {\contconf{\DPropertySetVK}{\val_1}}
         {\execconf{\stmt}{\env}{\lbls}{\clbls}{(\DirectPropertySet{\val_0}{\membermeta}{\val_1}) :: \strace}{\handler}{\cex,\,\cstrace}{\econt}{\emptyset}}
-        {\parbox{10cm}{where\\
-            \(\membermeta = \text{Setter}(\formal, \stmt)\),
-            $\env = \ext{\env_{empty}}{\this :: \formal :: []}{\val_0 :: \val_1 :: []}$}}
+        {\begin{aligned}
+            \text{where } \membermeta &= \text{Setter}(\formal, \stmt),\\
+            \env &= \ext{\env_{empty}}{\this :: \formal :: []}{\val_0 :: \val_1 :: []}
+        \end{aligned}}
     \end{multlined}
     \label{econtconf:dpropertyset-setter}\\
     &\begin{multlined}
         \cesktranswheresplit%
         {\contconf{\DPropertySetVK}{\val}}%
         {\contconf{\econt}{\val_1}}%
-        {\parbox{10cm}{where
-            \(\membermeta = \text{Setter}(i \in \NN)\),
-            \(\val = (c, \textit{fields})\),
-            \(\deref{\textit{fields}[i]} := \val_0\)
-        }}
+        {\begin{aligned}
+        \text{where }&\membermeta = \text{Setter}(i \in \NN),\\
+                     &\val = (c, \textit{fields}),\\
+                     &\deref{\textit{fields}[i]} := \val_0\\
+        \end{aligned}}
     \end{multlined}
     \label{econtconf:dpropertyset-field}\\
     &\begin{multlined}
         \cesktranswheresplit*%
         {\contconf{\SuperPropertySetK}{\val}}
         {\execconf{\stmt}{\env'}{\lbls}{\clbls}{(\SuperPropertySet{\idmeta}{\val}) :: \strace}{\handler}{\cex,\,\cstrace}{\econt}{\emptyset}}
-        {\parbox{10cm}{where\\
-            \(\deref{\env(\this)} = (((\_, \_, \textit{spmems}), \_, \_), \_)\)\\
-            \(\textit{spmems}(\idmeta) = \text{Setter}(\formal, \stmt)\)\\
-            $\env' =  \ext{\env_{empty}}{\this :: \formal :: []}{\deref{(\env(\this))} :: \val :: []}$
-        }}
+        {\begin{aligned}
+        \text{where } \deref{\env(\this)} &= (((\_, \_, \textit{spmems}), \_, \_), \_)\\
+                      \textit{spmems}(\idmeta) &= \text{Setter}(\formal, \stmt)\\
+                      \env' &=  \ext{\env_{empty}}{\this :: \formal :: []}{\deref{(\env(\this))} :: \val :: []}\\
+        \end{aligned}}
     \end{multlined}
     \label{econtconf:superpropertyset-setter}\\
     &\begin{multlined}
         \cesktranswheresplit%
         {\contconf{\SuperPropertySetK}{\val}}%
         {\contconf{\econt}{\val}}%
-        {\parbox{10cm}{where\\
-            \(\deref{\env(\this)} = (((\_, \_, \textit{spmems}), \_, \_), \_)\)\\
-            \(\textit{spmems}(\idmeta) = \text{Setter}(i \in \NN)\)\\
-            \(\update{\deref{(\env(\this))}[i]}{\val}\)}}
+        {\begin{aligned}
+            \text{where } &\deref{\env(\this)} = (((\_, \_, \textit{spmems}), \_, \_), \_)\\
+                          &\textit{spmems}(\idmeta) = \text{Setter}(i \in \NN)\\
+                          &\update{\deref{(\env(\this))}[i]}{\val}\\
+        \end{aligned}}
     \end{multlined}
     \label{econtconf:superpropertyset-field}
     \end{align}
@@ -2395,7 +2413,7 @@ We consider multiple cases:
                     where $\deref{\deref{\loc[\field_i]}} = \val_{i}$, $\forall \field_i \in Fs, \forall \field_i \in \val{s}$,
                     \\$\econt' = \InitializerListEK{Q}{k}{\loc}{\env}{\scont}$,
                     \\$k = 0$ is the index of the initializer whose expression is evaluated in the next step,
-                    \\ $\expressionmeta$ is the expression from $\FieldInitializer{\expressionmeta}$ or $\LocalInitializer{\expressionmeta}$}}
+                    \\$\expressionmeta$ is the expression from $\FieldInitializer{\expressionmeta}$ or $\LocalInitializer{\expressionmeta}$}}
             \end{multlined}
         \end{align*}
 
