@@ -535,13 +535,12 @@ The main environment is created before the execution of the main function and it
 Similar to Section~\ref{subsec:env-definition}, static and library fields can be looked up in the main environment.
 
 For each static or library field $\field$, we define $\mainenv(\field) = \loc$, where $\loc$ is a fresh location in the store.
-In \kernel{} static and library fields are initializer when they are first accessed, hence on creation of $\mainenv$ the fresh location will contain a special value, $\deref{\loc} = \emptyset$.
+In \kernel{} static and library fields are initialized when they are first accessed, hence on creation of $\mainenv$ the fresh locations will contain a special value, $\deref{\loc} = \emptyset, \loc \in \dlocation$.
 
 \subsubsection{Static and Library Field Lookup}
 \label{subsubsec:static-field-lookup}
 
 A static and library field lookup for field $\field$ consists of looking up the location of the static field from the main environment with $\loc = \mainenv(\field)$ and reading the stored value $v$ with $\deref{\loc} = \deref{\mainenv(\field)}$ from the store.
-\todo{How are locations obtained from an env for updating the store?}
 
 
 \subsection{Values}
