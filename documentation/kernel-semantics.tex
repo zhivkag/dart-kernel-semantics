@@ -129,6 +129,12 @@
 \newcommand{\dsemstring}{\mathbf{String}}
 \newcommand{\dsemsymbol}{\mathbf{Symbol}}
 
+% Functions for projection on components of class.
+\newcommand{\superclass}[1]{\textit{superclass}({#1})}
+\newcommand{\members}[1]{\textit{members}(#1)}
+\newcommand{\lookupMember}[2]{\textit{lookupMember}(#1,\,#2)}
+\newcommand{\class}[1]{\textit{class}(#1)}
+
 %%
 % Commands to typeset transitions of CESK machine.
 %
@@ -298,7 +304,8 @@ This section contains definitions of syntactic and semantic domains, helper func
 \begin{align*}
     [] &\text{ --- empty list}.\\
     \varmeta :: list &\text{ --- a meta-list that is constructed by adding element $\varmeta$ to the head of the meta-list $list$}.\\
-    \dom(f) &\text{ --- the domain of function \(f\)}.
+    \dom(f) &\text{ --- the domain of function \(f\)}.\\
+    \pi_i(x) &\text{ --- the $i^{th}$ component of $x \in \ddom_1 \times \dots \times \ddom_n$}.
 \end{align*}
 
 
@@ -587,7 +594,7 @@ Literal values are special values that store the specific payload and an associa
 Each of the specific literal values contains predefined operators and methods, whose semantics are elided here.
 
 \subsubsection{Class}
-\label{subsec:class}
+\label{subsubsec:class}
 
 A $\dclass$ encodes a class definition in \kernel{}.
 
@@ -604,6 +611,23 @@ The natural-indexed getters and setters correspond to the case where a field sho
 
 Although constructor definitions are included in the class definition, they are not presented here because the same syntax nodes are directly referenced by the expression form for constructor invocation.
 
+For accessing the superclass component of elements in the domain $\dclass$ we define:
+\begin{align*}
+\textit{superclass} &\in \dclass \rightarrow \dclass,\\
+\superclass{c_1} &= \pi_1(c_1) = c_2, \text{where $c_2 \in \dclass$ is the first component of $c_1 \in \dclass$}
+\end{align*}
+
+For accessing the members component of elements in the domain $\dclass$, we define:
+\begin{align*}
+\textit{members} &\in \dclass \rightarrow (\dident \mapsto \dmember),\\
+\members{c} &= \pi_3(c), \text{where $c \in \dclass$}
+\end{align*}
+
+For looking up a member, given its identifier $\idmeta \in \dident$, we define:
+\begin{align*}
+\textit{lookupMember} &\in \dclass \times \dident \rightarrow \dmember,\\
+\lookupMember{c}{\idmeta} &= \members{c}(\idmeta), \text{where $c \in \dclass, \idmeta \in \dident$}
+\end{align*}
 
 \subsubsection{Object Values}
 \label{subsec:object-values}
@@ -612,6 +636,12 @@ Object values are composed of a reference to a class definition, which is shared
 \[
     \dobjval = \dclass \times \mlist{\dlocation}
 \]
+
+We define the following function for accessing the class component of an element in $\dobjval$:
+\begin{align*}
+\textit{class} &\in \dobjval \rightarrow \dclass,\\
+\class{\val} &= \pi_1(\val) = c, \text{where $c \in \dclass$ is the first component of $\val \in \dobjval$}
+\end{align*}
 
 \subsubsection{Function Values}
 \label{subsec:function-values}
@@ -1170,7 +1200,6 @@ The different exception handlers are shown in Figure~\ref{figure:handlers}.
 \subsection{Expression Evaluation}
 \label{subsec:expr-evaluation}
 
-\newcommand{\superclass}[1]{superclass({#1})}
 
 Expressions are evaluated by dispatching according to the expression component, $\expressionmeta$, in EvalConfiguration, Section~\ref{subsubsec:evalconfig}, and the list of expression component, $\exprs$, in EvalListConfiguration, Section~\ref{subsubsec:evallistconfig}.
 
