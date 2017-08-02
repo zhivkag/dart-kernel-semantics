@@ -121,14 +121,13 @@
 \newcommand{\ddom}{\mathbf{Dom}}    % Unspecified domain to use in examples.
 
 % Known domains for Dart types.
-%\todo{dmitryas: Are these syntactic domains or semantic domains?}
-\newcommand{\dint}{\mathbf{int}}
-\newcommand{\dbool}{\mathbf{bool}}
-\renewcommand{\ddouble}{\mathbf{double}}
-\newcommand{\dlist}{\mathbf{List}}
-\newcommand{\dmap}{\mathbf{Map}}
-\renewcommand{\dstring}{\mathbf{String}}
-\newcommand{\dsymbol}{\mathbf{Symbol}}
+\newcommand{\dsemint}{\mathbf{int}}
+\newcommand{\dsembool}{\mathbf{bool}}
+\newcommand{\dsemdouble}{\mathbf{double}}
+\newcommand{\dsemlist}{\mathbf{List}}
+\newcommand{\dsemmap}{\mathbf{Map}}
+\newcommand{\dsemstring}{\mathbf{String}}
+\newcommand{\dsemsymbol}{\mathbf{Symbol}}
 
 %%
 % Commands to typeset transitions of CESK machine.
@@ -288,7 +287,7 @@ This section contains definitions of syntactic and semantic domains, helper func
     \item The names of the different kinds of continuations are written in normal text (e.g. VarSetK).
     \item The names of meta-functions start with lower case letter (e.g. $\extend$).
     \item ``$\mlist{\ddom}$'' denotes the domain of meta-lists of elements from domain ``$\ddom$''.
-        Note that the word ``List'' here is not in bold, so that it isn't confused with the domain $\dlist$ of \dart{} objects.
+        Note that the word ``List'' here is not in bold, so that it isn't confused with the domain $\dsemlist$ of \dart{} objects.
         \todo{sjindel: Why is this a domain?}
 \end{itemize}
 \todo{dmitryas: Explain notation for Kernel syntactic constructs like "on T catch (e, s)".}
@@ -582,7 +581,7 @@ $\dvector$s cannot be introduced by any construct present in \dart{} itself, but
 
 Some objects from primitive types contain a literal value and a specific class corresponding to the literal's type.
 The different types of literal values are:
-\[\dlit = \dint + \dbool + \ddouble + \dlist + \dmap + \dstring + \dsymbol + \dtype.\]
+\[\dlit = \dsemint + \dsembool + \dsemdouble + \dsemlist + \dsemmap + \dsemstring + \dsemsymbol + \dtype.\]
 
 Literal values are special values that store the specific payload and an associated class.
 Each of the specific literal values contains predefined operators and methods, whose semantics are elided here.
@@ -1209,31 +1208,31 @@ The value corresponding to the evaluated expression is captured by the applicati
         &\cesktranswhere%
             {\evalconf{\IntLiteral{\integermeta}}{\env}{\strace}{\cstrace}{\cex}{\econt}}%
             {\contconf{\econt}{\val}}%
-            {\text{where $\val = \mathrm{IntLiteral(\integermeta)} \in \dint$}}
+            {\text{where $\val = \mathrm{IntLiteral(\integermeta)} \in \dsemint$}}
             \label{eval:int}\\
         &\cesktranswhere%
             {\evalconf{\DoubleLiteral{\doublemeta}}{\env}{\strace}{\cstrace}{\cex}{\econt}}%
             {\contconf{\econt}{\val}}%
-            {\text{where $\val = \mathrm{DoubleLiteral(\doublemeta)} \in \ddouble$}}
+            {\text{where $\val = \mathrm{DoubleLiteral(\doublemeta)} \in \dsemdouble$}}
             \label{eval:double}\\
         &\begin{multlined}
             \cesktranswheresplit%
                 {\evalconf{\BoolLiteral{\true}}{\env}{\strace}{\cstrace}{\cex}{\econt}}%
                 {\contconf{\econt}{\val}}%
-                {\text{where $\val = \mathrm{BoolValue(\true)} = \true\in \dbool$}}
+                {\text{where $\val = \mathrm{BoolValue(\true)} = \true\in \dsembool$}}
         \end{multlined}
         \label{eval:true}\\
         &\begin{multlined}
             \cesktranswheresplit%
                 {\evalconf{\BoolLiteral{\false}}{\env}{\strace}{\cstrace}{\cex}{\econt}}%
                 {\contconf{\econt}{\val}}%
-                {\text{where $\val = \mathrm{BoolValue(\false)} = \false\in \dbool$}}
+                {\text{where $\val = \mathrm{BoolValue(\false)} = \false\in \dsembool$}}
         \end{multlined}
         \label{eval:false}\\
         &\cesktranswhere%
             {\evalconf{\StringLiteral{\stringmeta}}{\env}{\strace}{\cstrace}{\cex}{\econt}}%
             {\contconf{\econt}{\val}}%
-            {\text{where $\val = \mathrm{StringValue(\stringmeta)} \in \dstring$}}
+            {\text{where $\val = \mathrm{StringValue(\stringmeta)} \in \dsemstring$}}
             \label{eval:string}\\
         &\cesktrans%
             {\evalconf{\varmeta}{\env}{\strace}{\cstrace}{\cex}{\econt}}%
@@ -1464,11 +1463,11 @@ It proceeds by extending the environment for the evaluation of the right-hand si
 
 The function $\concat$ concatenates the strings from the given meta-list into a single value.
 \begin{align*}
-  \concat : \mlist{\dstring} &\rightarrow \dstring\\
+  \concat : \mlist{\dsemstring} &\rightarrow \dsemstring\\
   \concat( s_1 :: \dots :: s_n :: []) &= s_1 \dots s_n
 \end{align*}
 The evaluation of concatenation expression proceeds by evaluating the target expressions in the specified order, as shown with the CESK-transition \eqref{eval:concat}.
-Once all expressions have been evaluated the corresponding application is applied, as shown in \eqref{acontconf:concat}, which results with an expression continuation application to the resulting $\dstring$.
+Once all expressions have been evaluated the corresponding application is applied, as shown in \eqref{acontconf:concat}, which results with an expression continuation application to the resulting $\dsemstring$.
 
 
 \subsubsection{This}
