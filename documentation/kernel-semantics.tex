@@ -531,8 +531,8 @@ The main environment denoted as $\mainenv$ is a function that maps static and li
 We introduce the main environment to support static and library field extraction and assignment.
 This environment is visible during the execution of a \kernel{} program, therefore it should be in the left and right-hand side of all the transition presented in the paper.
 In order to simplify the transitions, we assume the main environment is implicit.
-Similar to Section~\ref{subsec:env-definition}, the main environment static and library fields can be looked up in it.
 The main environment is created before the execution of the main function and it is defined for all static and library fields.
+Similar to Section~\ref{subsec:env-definition}, static and library fields can be looked up in the main environment.
 
 For each static or library field $\field$, we define $\mainenv(\field) = \loc$, where $\loc$ is a fresh location in the store.
 In \kernel{} static and library fields are initializer when they are first accessed, hence on creation of $\mainenv$ the fresh location will contain a special value, $\deref{\loc} = \emptyset$.
