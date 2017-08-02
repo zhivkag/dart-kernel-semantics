@@ -1775,10 +1775,10 @@ A statement continuation, $\ExitSK{\econt}{\nnull}$ is added as next statement c
             {\evalconf{\SuperPropertyGet{\idmeta}}{\env}{\strace}{\cstrace}{\cex}{\econt}}%
             {\execconf{\stmt}{\env'}{\lbls}{\clbls}{\SuperPropertyGet{\idmeta} :: \strace}{\handler}{\cex,\,\cstrace}{\econt}{\scont}}%
             {\begin{aligned}
-                \text{where } \env' &= \ext{\env_{empty}}{\this}{\deref{(\env(\this))}},\\
-                              \scont &= \emptyset,\\
-                              \membermeta &= \superclass{\deref{\env(\this)}}.lookup(\idmeta),\\
-                              \membermeta &\text{ is a getter method with body }\stmt
+                \text{where } \membermeta &= \superclass{\deref{\env(\this)}}.lookup(\idmeta),\\
+                              \membermeta &\text{ is a getter method with body }\stmt,\\
+                              \env' &= \ext{\env_{empty}}{\this}{\deref{(\env(\this))}},\\
+                              \scont &= \ExitSK{\nnull}
             \end{aligned}}
         \end{multlined}
         \label{eval:superpropertyget-getter}\\
