@@ -1272,7 +1272,7 @@ The value corresponding to the evaluated expression is captured by the applicati
             \cesktranswheresplit%
                 {\evalconf{\Let{\varmeta}{\expri{1}}{\expri{2}}}{\env}{\strace}{\cstrace}{\cex}{\econt}}%
                 {\evalconf{\expri{1}}{\env}{\strace}{\cstrace}{\cex}{\econt'}}%
-		{\text{where }\econt' = \LetK{\varmeta}{\expri{2}}{\env}{\econt}}
+                {\text{where }\econt' = \LetK{\varmeta}{\expri{2}}{\env}{\econt}}
         \end{multlined}
         \label{eval:let}\\
         &\begin{multlined}
@@ -1302,7 +1302,7 @@ The value corresponding to the evaluated expression is captured by the applicati
         \end{multlined}
         \label{eval:throw}\\
         &\cesktrans%
-	    {\evalconf{\rethrow}{\env}{\strace}{\strace'}{\cex}{\econt}}%
+            {\evalconf{\rethrow}{\env}{\strace}{\strace'}{\cex}{\econt}}%
             {\throwconf{\handler}{\cex}{\strace'}}
             \label{eval:rethrow}\\
         &\begin{multlined}
@@ -1377,7 +1377,7 @@ The value corresponding to the evaluated expression is captured by the applicati
         \cesktranswheresplit%
             {\contconf{\LetK{\expri{2}}{\env}{\varmeta}{\econt}}{\val}}%
             {\evalconf{\expri{2}}{\env'}{\strace}{\cstrace}{\cex}{\econt}}%
-	    {\text{where $\env'=\ext{\env}{\varmeta}{\val}$}}
+            {\text{where $\env'=\ext{\env}{\varmeta}{\val}$}}
         \end{multlined}
         \label{econtconf:let}\\
         &\cesktranswhere%
@@ -1388,7 +1388,7 @@ The value corresponding to the evaluated expression is captured by the applicati
         &\cesktranswhere%
             {\contconf{\IsExpressionK}{\val}}%
             {\contconf{\econt}{\false}}%
-	    {\text{where $\val$ is not $\tt{T}$}}
+            {\text{where $\val$ is not $\tt{T}$}}
         \label{econtconf:is-false}\\
         &\cesktranswhere%
             {\contconf{\AsExpressionK}{\val}}%
@@ -1638,7 +1638,7 @@ The specific CESK-transitions for the different invocations are described in the
         &\cesktranswhere%
             {\contconf{\StaticGetK}{\val}}%
             {\contconf{\econt}{\val}}%
-	    {\text{where $\mainenv = \ext{\mainenv}{\membermeta}{\val}$}}
+            {\text{where $\mainenv = \ext{\mainenv}{\membermeta}{\val}$}}
         \label{econtconf:staticget}\\
         &\cesktranswhere%
             {\contconf{\StaticSetK}{\val}}%
