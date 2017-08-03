@@ -2167,6 +2167,7 @@ After the evaluation of the argument expression to a value $\val$, depending on 
     \end{eqfigure}
 \end{figure}
 
+
 \begin{figure}[Htp]
     \begin{eqfigure}
     \begin{align}
@@ -2174,26 +2175,34 @@ After the evaluation of the argument expression to a value $\val$, depending on 
             \cesktranswheresplit*%
             {\contconf{\InstanceMethodA}{\val{s}}}%
             {\execconf{\stmt}{\env}{[]}{[]}{\strace}{\handler}{\cex,\,\cstrace}{\econt}{\scont}}%
-            {\parbox{10cm}{where $\membermeta = class(\val).lookup(\idmeta)$ is an instance method with body $\stmt$ and formals $\formals$\\
-            $\scont = \ExitSK{\nnull}$\\
-            $\env = \ext{\env_{empty}}{\this :: \formals}{\val :: \val{s}}$}}
+            {\begin{aligned}
+                \text{where } \membermeta &= class(\val).lookup(\idmeta)\text{ is an instance method with body $\stmt$ and formals $\formals$},\\
+                              \scont &= \ExitSK{\nnull},\\
+                              \env &= \ext{\env_{empty}}{\this :: \formals}{\val :: \val{s}}
+            \end{aligned}}
     \end{multlined}
     \label{acontconf:instancemethod}\\
     &\begin{multlined}
             \cesktranswheresplit*%
             {\contconf{\DInstanceMethodA}{\val{s}}}%
             {\execconf{\stmt}{\env}{[]}{[]}{\strace}{\handler}{\cex,\,\cstrace}{\econt}{\scont}}%
-            {\parbox{10cm}{where $\stmt$ is the statement body and $\formals$ are the formal parameters of the instace method $\membermeta$\\
-            $\scont = \ExitSK{\nnull}$,\\
-            $\env = \ext{\env_{empty}}{\this :: \formals}{\val :: \val{s}}$}}
+            {\begin{aligned}
+                \text{where } \stmt &\text{ is the statement body and $\formals$ are the formal parameters of the instace method $\membermeta$},\\
+                              \scont &= \ExitSK{\nnull},\\
+                              \env &= \ext{\env_{empty}}{\this :: \formals}{\val :: \val{s}}
+            \end{aligned}}
     \end{multlined}
     \label{acontconf:dinstancemethod}\\
     &\begin{multlined}
         \cesktranswheresplit*%
         {\contconf{\SuperMethodA{\strace}}{\val{s}}}%
         {\execconf{\stmt}{\env'}{[]}{[]}{\strace}{\handler}{\cex,\,\cstrace}{\econt}{\scont}}%
-        {\parbox{10cm}{where $\scont = \ExitSK{\nnull}$,\\
-        $\env' = \ext{\env_{empty}}{\this :: \formals}{\deref{(\env(\this))} :: \val{s}}$    }}
+        {\begin{aligned}
+            \text{where } \membermeta &= superclass(class(\val)).lookup(\idmeta)\text{ is an instance method with body $\stmt$ and formals $\formals$},\\
+                          \scont &= \ExitSK{\nnull},\\
+                          \env' &= \ext{\env_{empty}}{\this :: \formals}{\val :: \val{s}},\\
+                          \val &= \deref{(\env(\this))}
+        \end{aligned}}
     \end{multlined}
     \label{acontconf:superinstancemethod}
     \end{align}
