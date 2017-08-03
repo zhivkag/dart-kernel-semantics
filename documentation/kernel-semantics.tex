@@ -1775,10 +1775,10 @@ A statement continuation, $\ExitSK{\nnull}$ is added as next statement continuat
             {\evalconf{\SuperPropertyGet{\idmeta}}{\env}{\strace}{\cstrace}{\cex}{\econt}}%
             {\execconf{\stmt}{\env'}{\lbls}{\clbls}{\SuperPropertyGet{\idmeta} :: \strace}{\handler}{\cex,\,\cstrace}{\econt}{\scont}}%
             {\begin{aligned}
-                \text{where } \env' &= \ext{\env_{empty}}{\this}{\deref{(\env(\this))}},\\
-                              \scont &= \emptyset,\\
-                              \membermeta &= \superclass{\deref{\env(\this)}}.lookup(\idmeta),\\
-                              \membermeta &\text{ is a getter method with body }\stmt
+                \text{where } \membermeta &= \superclass{\deref{\env(\this)}}.lookup(\idmeta),\\
+                              \membermeta &\text{ is a getter method with body }\stmt,\\
+                              \env' &= \ext{\env_{empty}}{\this}{\deref{(\env(\this))}},\\
+                              \scont &= \ExitSK{\nnull}
             \end{aligned}}
         \end{multlined}
         \label{eval:superpropertyget-getter}\\
@@ -1812,57 +1812,67 @@ A statement continuation, $\ExitSK{\nnull}$ is added as next statement continuat
     \cesktranswheresplit*%
         {\contconf{\PropertyGetK}{\val}}%
         {\contconf{\econt}{\funval{\formals}{\stmt}{\env}}}
-        {\parbox{10cm}{where $\membermeta$ is a method with body $\stmt$ and formals $\formals$ \\
-         $\env = \ext{\env_{empty}}{\this}{\val}$}}
+        {\begin{aligned}
+            \text{where } \membermeta &\text{ is a method with body $\stmt$ and formals $\formals$},\\
+                          \env &= \ext{\env_{empty}}{\this}{\val}
+        \end{aligned}}
     \end{multlined}
     \label{econtconf:propertyget-tearoff}\\
     &\begin{multlined}
         \cesktranswheresplit*%
         {\contconf{\PropertyGetK}{\val}}%
         {\execconf{\stmt}{\env}{[]}{[]}{\PropertyGet{\val}{\idmeta} :: \strace}{\handler}{\cex,\,\cstrace}{\econt}{\scont}}%
-        {\parbox{10cm}{where $\membermeta$ is a getter with body $\stmt$\\
-        $\env = \ext{\env_{empty}}{\this}{\val}$\\
-        $\scont = \emptyset$}}
+        {\begin{aligned}
+            \text{where } \membermeta&\text{ is a getter with body $\stmt$},\\
+                          \env &= \ext{\env_{empty}}{\this}{\val},\\
+                          \scont &= \ExitSK{\nnull}
+        \end{aligned}}
     \end{multlined}
     \label{econtconf:propertyget-getter}\\
     &\begin{multlined}
         \cesktranswheresplit%
         {\contconf{\PropertyGetK}{\val}}%
         {\contconf{\econt}{\text{\membermeta}(\val)}}%
-        {\parbox{10cm}{if $\membermeta$ is an implicit getter for field $\idmeta$\\
-        where $\env = \ext{\env_{empty}}{\this}{\val}$\\
-        $\scont = \emptyset$}}
+        {\begin{aligned}
+            \text{where } \membermeta &\text{ is an implicit getter for field $\idmeta$},\\
+                          \env &= \ext{\env_{empty}}{\this}{\val},\\
+                          \scont &= \ExitSK{\nnull}
+        \end{aligned}}
     \end{multlined}
     \label{econtconf:propertyget-field}\\
     &\begin{multlined}
         \cesktranswheresplit*%
         {\contconf{\PropertyGetK}{\val}}%
         {\throwconf{\handler}{(\throw\text{ NoSuchMethod($\PropertyGet{\val}{\idmeta}$)}) :: \strace}{\text{NoSuchMethod}}}%
-        {\parbox{10cm}{if lookup of name $\idmeta$ was unsuccessful in class of value $\val$}}
+        {\parbox{10cm}{where lookup of name $\idmeta$ was unsuccessful in class of value $\val$}}
     \end{multlined}
     \label{econtconf:propertyget-nosuchmethod}\\
     &\begin{multlined}
         \cesktranswheresplit*%
         {\contconf{\DPropertyGetK}{\val}}%
         {\contconf{\econt}{\funval{\formals}{\stmt}{\env}}}%
-        {\parbox{10cm}{if $\membermeta$ is a method with body $\stmt$ and formals $\formals$\\
-        where $\env = \ext{\env_{empty}}{\this}{\val}$}}
+        {\begin{aligned}
+            \text{where } \membermeta &\text{ is a method with body $\stmt$ and formals $\formals$},\\
+                          \env &= \ext{\env_{empty}}{\this}{\val}
+         \end{aligned}}
     \end{multlined}
     \label{econtconf:dpropertyget-tearoff}\\
     &\begin{multlined}
         \cesktranswheresplit*%
             {\contconf{\DPropertyGetK}{\val}}%
             {\execconf{\stmt}{\env}{[]}{[]}{\DirectPropertyGet{\val}{\membermeta} :: \strace}{\handler}{\cex,\,\cstrace}{\econt}{\scont}}%
-            {\parbox{10cm}{if $\membermeta$ is getter with statement body $\stmt$ \\
-            where $\env = \ext{\env_{empty}}{\this}{\val}$ \\
-            $\scont = \emptyset$}}
+            {\begin{aligned}
+                \text{where } \membermeta &\text{ is getter with statement body $\stmt$},\\
+                              \env &= \ext{\env_{empty}}{\this}{\val},\\
+                              \scont &= \ExitSK{\nnull}
+             \end{aligned}}
     \end{multlined}
     \label{econtconf:dpropertyget-getter}\\
     &\begin{multlined}
         \cesktranswhere%
         {\contconf{\DPropertyGetK}{\val}}%
         {\contconf{\econt}{\deref{\val[\membermeta]}}}%
-        {\text{if $\membermeta$ is a field }}
+        {\text{where $\membermeta$ is a field }}
     \end{multlined}
     \label{econtconf:dpropertyget-field}
     \end{align}
