@@ -48,6 +48,7 @@
 
 % Meta-functions to be used in math mode.
 \DeclareMathOperator{\extend}{extend}
+\DeclareMathOperator{\update}{update}
 \DeclareMathOperator{\extendMain}{extendMain}
 \DeclareMathOperator{\concat}{concat}
 \DeclareMathOperator{\getter}{implicitGetter}
@@ -79,7 +80,7 @@
 \DeclareMathOperator{\superclass}{\synt{superclass}}
 \DeclareMathOperator{\members}{\synt{members}}
 \DeclareMathOperator{\lookupMember}{\synt{lookupMember}}
-\DeclareMathOperator{\class}{\synt{class})}
+\DeclareMathOperator{\class}{\synt{class}}
 
 
 % Oftenly used syntactic meta-literals.
@@ -292,7 +293,7 @@ This section contains definitions of syntactic and semantic domains, helper func
     \item The names of variables are italicized.
     \item The names of variables within a syntactic domain start with an upper case letter.
     \item The names of domains (meta-types defined in this paper) are written in bold (e.g. ``$\dexpr$'').
-    \item The names of the different kinds of continuations are written in normal text (e.g. VarSetK).
+    \item The names of the different kinds of continuations are written in normal text (e.g. VarSetEK).
     \item The names of meta-functions start with lower case letter (e.g. $\extend$).
     \item ``$\mlist{\ddom}$'' denotes the domain of meta-lists of elements from domain ``$\ddom$''.
         Note that the word ``List'' here is not in bold, so that it isn't confused with the domain $\dsemlist$ of \dart{} objects.
@@ -470,7 +471,7 @@ It could be represented by natural numbers, for example, but arithmetic on locat
 \label{subsubsection:dereferecing}
 
 \newcommand{\deref}[1]{!#1}
-Function ``$\deref{}$'' is used to access the value stored in the store at the given location.
+The function ``$\deref{}$'' is used to access the value stored in the store at the given location.
 The location is stored in the environment, or in the list of field locations for object values.
 ``$\deref{}$'' has an implicit argument which is the store of CESK machine.
 \begin{align*}
@@ -482,10 +483,10 @@ The location is stored in the environment, or in the list of field locations for
 \subsubsection{Update}
 \label{subsubsec:store-update}
 
-\newcommand{\update}[2]{{#1} := {#2}}
-Operator ``$\update{\loc}{\val}$'' updates the store at location $\loc \in \dlocation$ with value $\val \in \dval$.
+%\newcommand{\update}[2]{{#1} := {#2}}
+The operator ``$\update(\loc,\, \val)$'' updates the store at location $\loc \in \dlocation$ with value $\val \in \dval$.
 It has an implicit operand which is the store of the CESK machine.
-Upon execution the operator returns a value from domain $\dval$, s.\,t. $(\update{\loc}{\val}) = \val$, where $\val$ is the value in the store at location $\loc$.
+Upon execution the operator returns a value from domain $\dval$, s.\,t. $\update(\loc,\,\val) = \val$, where $\val$ is the value in the store at location $\loc$.
 
 
 \subsection{Environment}
@@ -595,20 +596,20 @@ Although constructor definitions are included in the class definition, they are 
 
 For accessing the superclass component of elements in the domain $\dclass$ we define:
 \begin{align*}
-\synt{superclass} &\in \dclass \rightarrow \dclass,\\
-\superclass(c_1) &= \pi_1(c_1) = c_2, \text{where $c_2 \in \dclass$ is the first component of $c_1 \in \dclass$}
+\superclass &\in \dclass \rightarrow \dclass,\\
+\superclass(c_1) &= \pi_1(c_1) = c_2, \text{ where $c_2 \in \dclass$ is the first component of $c_1 \in \dclass$}
 \end{align*}
 
 For accessing the members component of elements in the domain $\dclass$, we define:
 \begin{align*}
-\synt{members} &\in \dclass \rightarrow (\dident \mapsto \dmember),\\
+\members &\in \dclass \rightarrow (\dident \mapsto \dmember),\\
 \members(c) &= \pi_3(c), \text{where $c \in \dclass$}
 \end{align*}
 
 For looking up a member, given its identifier $\idmeta \in \dident$, we define:
 \begin{align*}
-\synt{lookupMember} &\in \dclass \times \dident \rightarrow \dmember,\\
-\lookupMember(c, \, \idmeta) &= \members(c)(\idmeta), \text{where $c \in \dclass, \idmeta \in \dident$}
+\lookupMember &\in \dclass \times \dident \rightarrow \dmember,\\
+\lookupMember(c, \, \idmeta) &= \members(c)(\idmeta), \text{ where $c \in \dclass, \idmeta \in \dident$}
 \end{align*}
 
 \subsubsection{Object Values}
@@ -621,15 +622,17 @@ Object values are composed of a reference to a class definition, which is shared
 
 We define the following function for accessing the class component of an element in $\dobjval$:
 \begin{align*}
-\textit{class} &\in \dobjval \rightarrow \dclass,\\
-\class{\val} &= \pi_1(\val) = c, \text{where $c \in \dclass$ is the first component of $\val \in \dobjval$}
+\class &\in \dobjval \rightarrow \dclass,\\
+\class(\val) &= \pi_1(\val) = c, \text{ where $c \in \dclass$ is the first component of $\val \in \dobjval$}
 \end{align*}
 
 \subsubsection{Function Values}
 \label{subsec:function-values}
-\todo{add async marker, type parameters, return type to FunctionValue}
+Function values capture the body, formals and the environment in which a function was created.
+To support recursive functions, we add a location component to the function value and store the environment in it.
+This allows us to modify the environment and add a binding to a location containing the function value for local functions.
 \[
-    \dfunval : \dformals \times \dstmt \times \denv
+    \dfunval : \dformals \times \dstmt \times \dlocation
 \]
 
 
