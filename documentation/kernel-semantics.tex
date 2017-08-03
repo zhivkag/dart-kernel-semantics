@@ -1009,7 +1009,7 @@ The different expression continuations are shown in Figure~\ref{figure:econts}.
 \newcommand{\FinallyK}[1]{\mathrm{FinallyEK}({#1},\,\env,\,\lbls,\,\clbls,\,\strace,\,\handler,\,\econt)}
 \newcommand{\FinallyReturnK}[1]{\mathrm{FinallyReturnEK}({#1},\,\env,\,\lbls,\,\clbls,\,\strace,\,\handler,\,\econt)}
 
-\newcommand{\ForCondK}{\mathrm{ForConditionEK}(\mathrm{\varmeta{s}},\, \expressionmeta,\, \exprs,\, \statementmeta,\, \env,\, \env',\, \lbls,\, \clbls,\, \handler,\, \cstrace,\, \cex,\, \econt,\, \scont)}
+\newcommand{\ForCondK}{\mathrm{ForConditionEK}(\varmeta{s},\, \expressionmeta,\, \exprs,\, \statementmeta,\, \env,\, \env',\, \lbls,\, \clbls,\, \handler,\, \cstrace,\, \cex,\, \econt,\, \scont)}
 \newcommand{\ExpressionK}[2]{\mathrm{ExpressionEK}({#1},\,{#2})}
 \begin{figure}[Htp]
   \begin{eqfigure}
@@ -1063,7 +1063,7 @@ The different statement continuations are shown in Figure~\ref{figure:sconts}.
 \newcommand{\NewSK}[2]{\mathrm{NewSK}({#1},\,{#2})}
 \newcommand{\FinallySK}[1]{\mathrm{FinallySK}({#1},\,\env,\,\lbls,\,\clbls,\,\strace,\,\handler,\,\econt,\,\scont)}
 \newcommand{\RethrowSK}[3]{\mathrm{RethrowSK}({#1},\,{#2},\,{#3})}
-\newcommand{\ForSK}{\mathrm{ForSK}(\mathrm{\varmeta{s}},\, \expressionmeta,\, \exprs,\, \statementmeta,\, \env,\, \env',\, \lbls,\, \clbls,\, \handler,\, \cstrace,\, \cex,\, \econt,\, \scont)}
+\newcommand{\ForSK}{\mathrm{ForSK}(\varmeta{s},\, \expressionmeta,\, \exprs,\, \statementmeta,\, \env,\, \env',\, \lbls,\, \clbls,\, \handler,\, \cstrace,\, \cex,\, \econt,\, \scont)}
 \newcommand{\WhileCondSK}{\mathrm{WhileCondSK}(\expr,\,\stmt,\,\env,\,\lbls,\,\clbls,\,\handler,\,\cstrace,\,\cex,\,\econt,\,\scont)}
 \begin{figure}[Htp]
   \begin{eqfigure}
@@ -1098,8 +1098,8 @@ Application continuations, $\acont$, capture the application of a list of values
 \newcommand{\SuperA}[3]{\mathrm{SuperA}({#1},\,{#2},\,\strace,\,\handler,\,\cstrace,\,\cex,\,{#3})}
 \newcommand{\ConstructorA}[3]{\mathrm{ConstructorA}({#1},\,{#2},\,\handler,\,\cstrace,\,\cex,\,{#3})}
 \newcommand{\RedirectingA}[3]{\mathrm{RedirectingA}({#1},\,{#2},\,\strace,\,\handler,\,\cstrace,\,\cex,\,{#3})}
-\newcommand{\ForInitA}[1]{\mathrm{ForInitA}(\mathrm{\varmeta{s}},\, #1,\, \exprs,\, \statementmeta,\, \env,\, \lbls,\, \clbls,\, \handler,\, \cstrace,\, \cex,\, \econt,\, \scont)}
-\newcommand{\ForUpdatesA}[2]{\mathrm{ForUpdatesA}(\mathrm{\varmeta{s}},\, #1,\, \exprs,\, \statementmeta,\, \env,\, #2,\, \lbls,\, \clbls,\, \handler,\, \cstrace,\, \cex,\, \econt,\, \scont)}
+\newcommand{\ForInitA}[1]{\mathrm{ForInitA}(\varmeta{s},\, #1,\, \exprs,\, \statementmeta,\, \env,\, \lbls,\, \clbls,\, \handler,\, \cstrace,\, \cex,\, \econt,\, \scont)}
+\newcommand{\ForUpdatesA}[2]{\mathrm{ForUpdatesA}(\varmeta{s},\, #1,\, \exprs,\, \statementmeta,\, \env,\, #2,\, \lbls,\, \clbls,\, \handler,\, \cstrace,\, \cex,\, \econt,\, \scont)}
 \newcommand{\InstanceMethodA}{\mathrm{InstanceMethodA(\idmeta,\,\val,\,\strace,\,\handler,\,\cstrace,\,\cex,\,\econt)}}
 
 We use the application continuation $\ValueA{\acont}{\val}$, capturing a value and an application continuation, as application that adds a value to the list of values to eventually used by an application continuation that produces a configuration other than ApplicationConfiguration.
@@ -1806,10 +1806,10 @@ A statement continuation, $\ExitSK{\nnull}$ is added as next statement continuat
             {\evalconf{\SuperPropertyGet{\idmeta}}{\env}{\strace}{\cstrace}{\cex}{\econt}}%
             {\execconf{\stmt}{\env'}{\lbls}{\clbls}{\SuperPropertyGet{\idmeta} :: \strace}{\handler}{\cex,\,\cstrace}{\econt}{\scont}}%
             {\begin{aligned}
-                \text{where } \env' &= \ext{\env_{empty}}{\this}{\deref{(\env(\this))}},\\
-                              \scont &= \emptyset,\\
-                              \membermeta &= \superclass(\deref{\env(\this)}).lookup(\idmeta),\\
-                              \membermeta &\text{ is a getter method with body }\stmt
+                \text{where } \membermeta &= \superclass(\deref{\env(\this)}).lookup(\idmeta),\\
+                              \membermeta &\text{ is a getter method with body }\stmt,\\
+                              \env' &= \ext{\env_{empty}}{\this}{\deref{(\env(\this))}},\\
+                              \scont &= \ExitSK{\nnull}
             \end{aligned}}
         \end{multlined}
         \label{eval:superpropertyget-getter}\\
@@ -1843,57 +1843,67 @@ A statement continuation, $\ExitSK{\nnull}$ is added as next statement continuat
     \cesktranswheresplit*%
         {\contconf{\PropertyGetK}{\val}}%
         {\contconf{\econt}{\funval{\formals}{\stmt}{\env}}}
-        {\parbox{10cm}{where $\membermeta$ is a method with body $\stmt$ and formals $\formals$ \\
-         $\env = \ext{\env_{empty}}{\this}{\val}$}}
+        {\begin{aligned}
+            \text{where } \membermeta &\text{ is a method with body $\stmt$ and formals $\formals$},\\
+                          \env &= \ext{\env_{empty}}{\this}{\val}
+        \end{aligned}}
     \end{multlined}
     \label{econtconf:propertyget-tearoff}\\
     &\begin{multlined}
         \cesktranswheresplit*%
         {\contconf{\PropertyGetK}{\val}}%
         {\execconf{\stmt}{\env}{[]}{[]}{\PropertyGet{\val}{\idmeta} :: \strace}{\handler}{\cex,\,\cstrace}{\econt}{\scont}}%
-        {\parbox{10cm}{where $\membermeta$ is a getter with body $\stmt$\\
-        $\env = \ext{\env_{empty}}{\this}{\val}$\\
-        $\scont = \emptyset$}}
+        {\begin{aligned}
+            \text{where } \membermeta&\text{ is a getter with body $\stmt$},\\
+                          \env &= \ext{\env_{empty}}{\this}{\val},\\
+                          \scont &= \ExitSK{\nnull}
+        \end{aligned}}
     \end{multlined}
     \label{econtconf:propertyget-getter}\\
     &\begin{multlined}
         \cesktranswheresplit%
         {\contconf{\PropertyGetK}{\val}}%
         {\contconf{\econt}{\text{\membermeta}(\val)}}%
-        {\parbox{10cm}{if $\membermeta$ is an implicit getter for field $\idmeta$\\
-        where $\env = \ext{\env_{empty}}{\this}{\val}$\\
-        $\scont = \emptyset$}}
+        {\begin{aligned}
+            \text{where } \membermeta &\text{ is an implicit getter for field $\idmeta$},\\
+                          \env &= \ext{\env_{empty}}{\this}{\val},\\
+                          \scont &= \ExitSK{\nnull}
+        \end{aligned}}
     \end{multlined}
     \label{econtconf:propertyget-field}\\
     &\begin{multlined}
         \cesktranswheresplit*%
         {\contconf{\PropertyGetK}{\val}}%
         {\throwconf{\handler}{(\throw\text{ NoSuchMethod($\PropertyGet{\val}{\idmeta}$)}) :: \strace}{\text{NoSuchMethod}}}%
-        {\parbox{10cm}{if lookup of name $\idmeta$ was unsuccessful in class of value $\val$}}
+        {\parbox{10cm}{where lookup of name $\idmeta$ was unsuccessful in class of value $\val$}}
     \end{multlined}
     \label{econtconf:propertyget-nosuchmethod}\\
     &\begin{multlined}
         \cesktranswheresplit*%
         {\contconf{\DPropertyGetK}{\val}}%
         {\contconf{\econt}{\funval{\formals}{\stmt}{\env}}}%
-        {\parbox{10cm}{if $\membermeta$ is a method with body $\stmt$ and formals $\formals$\\
-        where $\env = \ext{\env_{empty}}{\this}{\val}$}}
+        {\begin{aligned}
+            \text{where } \membermeta &\text{ is a method with body $\stmt$ and formals $\formals$},\\
+                          \env &= \ext{\env_{empty}}{\this}{\val}
+         \end{aligned}}
     \end{multlined}
     \label{econtconf:dpropertyget-tearoff}\\
     &\begin{multlined}
         \cesktranswheresplit*%
             {\contconf{\DPropertyGetK}{\val}}%
             {\execconf{\stmt}{\env}{[]}{[]}{\DirectPropertyGet{\val}{\membermeta} :: \strace}{\handler}{\cex,\,\cstrace}{\econt}{\scont}}%
-            {\parbox{10cm}{if $\membermeta$ is getter with statement body $\stmt$ \\
-            where $\env = \ext{\env_{empty}}{\this}{\val}$ \\
-            $\scont = \emptyset$}}
+            {\begin{aligned}
+                \text{where } \membermeta &\text{ is getter with statement body $\stmt$},\\
+                              \env &= \ext{\env_{empty}}{\this}{\val},\\
+                              \scont &= \ExitSK{\nnull}
+             \end{aligned}}
     \end{multlined}
     \label{econtconf:dpropertyget-getter}\\
     &\begin{multlined}
         \cesktranswhere%
         {\contconf{\DPropertyGetK}{\val}}%
         {\contconf{\econt}{\deref{\val[\membermeta]}}}%
-        {\text{if $\membermeta$ is a field }}
+        {\text{where $\membermeta$ is a field }}
     \end{multlined}
     \label{econtconf:dpropertyget-field}
     \end{align}
@@ -2198,6 +2208,7 @@ After the evaluation of the argument expression to a value $\val$, depending on 
     \end{eqfigure}
 \end{figure}
 
+
 \begin{figure}[Htp]
     \begin{eqfigure}
     \begin{align}
@@ -2205,26 +2216,34 @@ After the evaluation of the argument expression to a value $\val$, depending on 
             \cesktranswheresplit*%
             {\contconf{\InstanceMethodA}{\val{s}}}%
             {\execconf{\stmt}{\env}{[]}{[]}{\strace}{\handler}{\cex,\,\cstrace}{\econt}{\scont}}%
-            {\parbox{10cm}{where $\membermeta = class(\val).lookup(\idmeta)$ is an instance method with body $\stmt$ and formals $\formals$\\
-            $\scont = \ExitSK{\nnull}$\\
-            $\env = \ext{\env_{empty}}{\this :: \formals}{\val :: \val{s}}$}}
+            {\begin{aligned}
+                \text{where } \membermeta &= class(\val).lookup(\idmeta)\text{ is an instance method with body $\stmt$ and formals $\formals$},\\
+                              \scont &= \ExitSK{\nnull},\\
+                              \env &= \ext{\env_{empty}}{\this :: \formals}{\val :: \val{s}}
+            \end{aligned}}
     \end{multlined}
     \label{acontconf:instancemethod}\\
     &\begin{multlined}
             \cesktranswheresplit*%
             {\contconf{\DInstanceMethodA}{\val{s}}}%
             {\execconf{\stmt}{\env}{[]}{[]}{\strace}{\handler}{\cex,\,\cstrace}{\econt}{\scont}}%
-            {\parbox{10cm}{where $\stmt$ is the statement body and $\formals$ are the formal parameters of the instace method $\membermeta$\\
-            $\scont = \ExitSK{\nnull}$,\\
-            $\env = \ext{\env_{empty}}{\this :: \formals}{\val :: \val{s}}$}}
+            {\begin{aligned}
+                \text{where } \stmt &\text{ is the statement body and $\formals$ are the formal parameters of the instace method $\membermeta$},\\
+                              \scont &= \ExitSK{\nnull},\\
+                              \env &= \ext{\env_{empty}}{\this :: \formals}{\val :: \val{s}}
+            \end{aligned}}
     \end{multlined}
     \label{acontconf:dinstancemethod}\\
     &\begin{multlined}
         \cesktranswheresplit*%
         {\contconf{\SuperMethodA{\strace}}{\val{s}}}%
         {\execconf{\stmt}{\env'}{[]}{[]}{\strace}{\handler}{\cex,\,\cstrace}{\econt}{\scont}}%
-        {\parbox{10cm}{where $\scont = \ExitSK{\nnull}$,\\
-        $\env' = \ext{\env_{empty}}{\this :: \formals}{\deref{(\env(\this))} :: \val{s}}$    }}
+        {\begin{aligned}
+            \text{where } \membermeta &= superclass(class(\val)).lookup(\idmeta)\text{ is an instance method with body $\stmt$ and formals $\formals$},\\
+                          \scont &= \ExitSK{\nnull},\\
+                          \env' &= \ext{\env_{empty}}{\this :: \formals}{\val :: \val{s}},\\
+                          \val &= \deref{(\env(\this))}
+        \end{aligned}}
     \end{multlined}
     \label{acontconf:superinstancemethod}
     \end{align}
@@ -2658,7 +2677,7 @@ When the current initalizer being executed is a $\FieldInitializer{\expressionme
         &\begin{multlined}
             \cesktranssplit%
                 {\contconf{\IfCondK{\stmti{1}}{\stmti{2}}}{\false}}%
-                {\execconf{\stmti{1}}{\env}{\lbls}{\clbls}{\strace}{\handler}{\cstrace,\,\cex}{\econt}{\scont}}
+                {\execconf{\stmti{2}}{\env}{\lbls}{\clbls}{\strace}{\handler}{\cstrace,\,\cex}{\econt}{\scont}}
         \end{multlined}
         \label{econtconf:if-false}\\
         &\begin{multlined}
@@ -2671,7 +2690,7 @@ When the current initalizer being executed is a $\FieldInitializer{\expressionme
               \cesktranswheresplit*%
                   {\contconf{\WhileCondK}{\true}}%
                   {\execconf{\stmt}{\env}{\lbls}{\clbls}{\strace}{\handler}{\cstrace,\,\cex}{\econt}{\scont'}}
-                  {\text{where $\scont' = \WhileCondK$}}
+                  {\text{where $\scont' = \WhileCondSK$}}
         \end{multlined}
         \label{econtconf:while-true}\\
         &\cesktrans%
@@ -2704,9 +2723,10 @@ When the current initalizer being executed is a $\FieldInitializer{\expressionme
             {\scontconf{\scont}{\env}},
         \label{scontconf:block-empty}\\
         &\begin{multlined}
-            \cesktranssplit%
-                {\scontconf{\WhileCondK}{\_}}%
+            \cesktranswheresplit*%
+                {\scontconf{\WhileCondSK}{\_}}%
                 {\evalconf{\expr}{\env}{\strace}{\cstrace}{\cex}{\econt'}}
+                {\text{where $\econt' = \WhileCondK$}}
         \end{multlined}
         \label{scontconf:while}\\
         &\begin{multlined}
@@ -2767,7 +2787,7 @@ When the return expression is empty, the value $\nnull$ is applied to the return
         &\begin{multlined}
             \cesktranswheresplit*%
                 {\acontconf{\ForInitA{\nnull}}{\vals}}%
-                {\execconf{\scont}{\env'}{\lbls}{\clbls}{\strace}{\handler}{\cex,\,\cstrace}{\econt}{\scont'}}%
+                {\execconf{\stmt}{\env'}{\lbls}{\clbls}{\strace}{\handler}{\cex,\,\cstrace}{\econt}{\scont'}}%
                 {\parbox{\textwidth-2cm}{where $\env' = \extend(\env, \varmeta{s}, \vals)$,\\
                 $\scont' = \ForSK$}}
         \end{multlined}
