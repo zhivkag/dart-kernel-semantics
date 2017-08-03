@@ -75,6 +75,13 @@
 \DeclareMathOperator{\catch}{\synt{catch}}
 \DeclareMathOperator{\finally}{\synt{finally}}
 
+% Functions for projection on components of class.
+\DeclareMathOperator{\superclass}{\synt{superclass}}
+\DeclareMathOperator{\members}{\synt{members}}
+\DeclareMathOperator{\lookupMember}{\synt{lookupMember}}
+\DeclareMathOperator{\class}{\synt{class})}
+
+
 % Oftenly used syntactic meta-literals.
 \newcommand{\true}{\synt{true}}
 \newcommand{\false}{\synt{false}}
@@ -128,6 +135,7 @@
 \newcommand{\dsemmap}{\mathbf{Map}}
 \newcommand{\dsemstring}{\mathbf{String}}
 \newcommand{\dsemsymbol}{\mathbf{Symbol}}
+
 
 %%
 % Commands to typeset transitions of CESK machine.
@@ -298,7 +306,8 @@ This section contains definitions of syntactic and semantic domains, helper func
 \begin{align*}
     [] &\text{ --- empty list}.\\
     \varmeta :: list &\text{ --- a meta-list that is constructed by adding element $\varmeta$ to the head of the meta-list $list$}.\\
-    \dom(f) &\text{ --- the domain of function \(f\)}.
+    \dom(f) &\text{ --- the domain of function \(f\)}.\\
+    \pi_i(x) &\text{ --- the $i^{th}$ component of $x \in \ddom_1 \times \dots \times \ddom_n$}.
 \end{align*}
 
 
@@ -587,7 +596,7 @@ Literal values are special values that store the specific payload and an associa
 Each of the specific literal values contains predefined operators and methods, whose semantics are elided here.
 
 \subsubsection{Class}
-\label{subsec:class}
+\label{subsubsec:class}
 
 A $\dclass$ encodes a class definition in \kernel{}.
 
@@ -604,6 +613,23 @@ The natural-indexed getters and setters correspond to the case where a field sho
 
 Although constructor definitions are included in the class definition, they are not presented here because the same syntax nodes are directly referenced by the expression form for constructor invocation.
 
+For accessing the superclass component of elements in the domain $\dclass$ we define:
+\begin{align*}
+\synt{superclass} &\in \dclass \rightarrow \dclass,\\
+\superclass(c_1) &= \pi_1(c_1) = c_2, \text{where $c_2 \in \dclass$ is the first component of $c_1 \in \dclass$}
+\end{align*}
+
+For accessing the members component of elements in the domain $\dclass$, we define:
+\begin{align*}
+\synt{members} &\in \dclass \rightarrow (\dident \mapsto \dmember),\\
+\members(c) &= \pi_3(c), \text{where $c \in \dclass$}
+\end{align*}
+
+For looking up a member, given its identifier $\idmeta \in \dident$, we define:
+\begin{align*}
+\synt{lookupMember} &\in \dclass \times \dident \rightarrow \dmember,\\
+\lookupMember(c, \, \idmeta) &= \members(c)(\idmeta), \text{where $c \in \dclass, \idmeta \in \dident$}
+\end{align*}
 
 \subsubsection{Object Values}
 \label{subsec:object-values}
@@ -612,6 +638,12 @@ Object values are composed of a reference to a class definition, which is shared
 \[
     \dobjval = \dclass \times \mlist{\dlocation}
 \]
+
+We define the following function for accessing the class component of an element in $\dobjval$:
+\begin{align*}
+\textit{class} &\in \dobjval \rightarrow \dclass,\\
+\class{\val} &= \pi_1(\val) = c, \text{where $c \in \dclass$ is the first component of $\val \in \dobjval$}
+\end{align*}
 
 \subsubsection{Function Values}
 \label{subsec:function-values}
@@ -1170,7 +1202,6 @@ The different exception handlers are shown in Figure~\ref{figure:handlers}.
 \subsection{Expression Evaluation}
 \label{subsec:expr-evaluation}
 
-\newcommand{\superclass}[1]{superclass({#1})}
 
 Expressions are evaluated by dispatching according to the expression component, $\expressionmeta$, in EvalConfiguration, Section~\ref{subsubsec:evalconfig}, and the list of expression component, $\exprs$, in EvalListConfiguration, Section~\ref{subsubsec:evallistconfig}.
 
@@ -1765,7 +1796,7 @@ A statement continuation, $\ExitSK{\nnull}$ is added as next statement continuat
             {\contconf{\econt}{\funval{\formals}{\stmt}{\env'}}}%
             {\begin{aligned}
                 \text{where } \env' &= \ext{\env_{empty}}{\this}{\deref{(\env(\this))}},\\
-                              \membermeta &= \superclass{\deref{\env(\this)}}.lookup(\idmeta),\\
+                              \membermeta &= \superclass(\deref{\env(\this)}).lookup(\idmeta),\\
                               \membermeta &\text{ is a method tear-off with formal parameters }\formals \text{ and body } \stmt
              \end{aligned}}
         \end{multlined}
@@ -1775,7 +1806,7 @@ A statement continuation, $\ExitSK{\nnull}$ is added as next statement continuat
             {\evalconf{\SuperPropertyGet{\idmeta}}{\env}{\strace}{\cstrace}{\cex}{\econt}}%
             {\execconf{\stmt}{\env'}{\lbls}{\clbls}{\SuperPropertyGet{\idmeta} :: \strace}{\handler}{\cex,\,\cstrace}{\econt}{\scont}}%
             {\begin{aligned}
-                \text{where } \membermeta &= \superclass{\deref{\env(\this)}}.lookup(\idmeta),\\
+                \text{where } \membermeta &= \superclass(\deref{\env(\this)}).lookup(\idmeta),\\
                               \membermeta &\text{ is a getter method with body }\stmt,\\
                               \env' &= \ext{\env_{empty}}{\this}{\deref{(\env(\this))}},\\
                               \scont &= \ExitSK{\nnull}
@@ -1786,7 +1817,7 @@ A statement continuation, $\ExitSK{\nnull}$ is added as next statement continuat
         \cesktranswheresplit%
             {\evalconf{\SuperPropertyGet{\idmeta}}{\env}{\strace}{\cstrace}{\cex}{\econt}}%
             {\contconf{\econt}{M(\deref{(\env(\this))})}}%
-            {\text{where $\membermeta = \superclass{\deref{\env(\this)}}.lookup(\idmeta)$, $\membermeta$ is a implicit field getter}}
+            {\text{where $\membermeta = \superclass(\deref{\env(\this)}).lookup(\idmeta)$, $\membermeta$ is a implicit field getter}}
         \end{multlined}
         \label{eval:superpropertyget-field}\\
         &\begin{multlined}
@@ -2077,7 +2108,7 @@ After evaluating the receiver expression to $\val_0$ and the argument expression
 
 \kernel{} allows access of a superclass member as a property, which can be either getter access, which executes the getter, or method extraction, which converts a method into a closure.
 Accessing a superclass member is accessed with the expression $\SuperPropertyGet{\idmeta}$ evaluated with the corresponding components: $\env$, $\strace$, $\handler$, $\cstrace$, $\cex$, $\econt$.
-Let $\val = \deref{(\env(\this))}$, $C = \superclass{\val}$ and $\membermeta$ the result of looking up $\idmeta$ in $C$.
+Let $\val = \deref{(\env(\this))}$, $C = \superclass(\val)$ and $\membermeta$ the result of looking up $\idmeta$ in $C$.
 The evaluation of a super property extraction proceeds as follows:
 
 \begin{itemize}
@@ -2100,7 +2131,7 @@ The evaluation of a super property extraction proceeds as follows:
 \label{subsubsec:super-property-assignemnt}
 
 \kernel{} supports assignment of a super member with the expression $\SuperPropertySet{\idmeta}{\expressionmeta}$.
-Let $\val' = \deref{(\env(\this))}$, $C = \superclass{\val'}$ and $M$ the result of looking up $\idmeta$ in $C$.
+Let $\val' = \deref{(\env(\this))}$, $C = \superclass(\val')$ and $M$ the result of looking up $\idmeta$ in $C$.
 The evaluation proceeds with evaluation of the right-hand side expression as shown in \eqref{eval:superpropertyset}.
 After the evaluation of the argument expression to a value $\val$, depending on $\membermeta$, the evaluation continues as follows:
 
@@ -2271,7 +2302,7 @@ Similar to Section~\ref{subsubsec:instance-method-invoc}, $\ExitSK{\nnull}$ is a
 Super method invocation is supported with $\SuperMethodInvocation{\idmeta}{\expressionsmeta}$.
 We first evaluate the argument expressions, as shown in the CESK-transition \eqref{eval:superinstancemethod}.
 After the evaluation of the argument expressions to list of values $\vals$ for the super method invocation, the evaluation continues with lookup for $\idmeta$ in the members of the value bound to $\this$ in the current environment.
-Let $\val = \deref{(\env(\this))}$, $C = \superclass{\val}$ and $M$ the result of looking up $\idmeta$ in $C$.
+Let $\val = \deref{(\env(\this))}$, $C = \superclass(\val)$ and $M$ the result of looking up $\idmeta$ in $C$.
 Let $\stmt$ be the statement body and $\formals$ the formal parameters for $\membermeta$.
 The statement $\stmt$ is executed in an environment binding $\formals$ to the locations containing the values in $\vals$ and $\this$ binding to location containing the same value bound to $\this$ in the current environment.
 Similarly to Section~\ref{subsubsec:instance-method-invoc}, $\ExitSK{\val}$ is added as next statement continuation.
