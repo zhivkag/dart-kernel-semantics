@@ -540,36 +540,16 @@ The main environment denoted as $\mainenv$ is a function that maps static and li
 We introduce the main environment to support static and library field extraction and assignment.
 This environment is visible during the execution of a \kernel{} program, therefore it should be in the left and right-hand side of all the transition presented in the paper.
 In order to simplify the transitions, we assume the main environment is implicit.
-Similar to Sectionn~\ref{subsec:env-definition}, the main environment can be extended and a field can be looked up in it.
+The main environment is created before the execution of the main function and it is defined for all static and library fields.
+Similar to Section~\ref{subsec:env-definition}, static and library fields can be looked up in the main environment.
 
-\subsubsection{Extend}
-\label{subsubsec:extend-main-env}
-
-The operator ``$\extendMain$'' creates a new main environment by extending the main environment with a new binding for the provided static field to a fresh location for the provided value.
-The newly created main environment overrides the current main environment.
-This operator has two implicit operands: the store and the main environment of the CESK machine.
-\begin{align*}
-    &\extendMain \in \dmenv \times \dfield \times \dval \rightarrow  \dmenv,\\
-    &\extendMain({\field},\,{\val}) = \mainenv',
-\end{align*}
-
-\noindent where
-\begin{align*}
-    & \field \in \dfield,\\
-    & \loc \text{ --- fresh location in the store},\\
-    & !\mainenv'(\field') =\begin{cases}
-        !\loc = \val, & \text{if }\field' = \field,\\
-        !\mainenv(\field'), & \text{otherwise}.
-    \end{cases}
-\end{align*}
-After the operation, the main environment is $\mainenv'$.
-
+For each static or library field $\field$, we define $\mainenv(\field) = \loc$, where $\loc$ is a fresh location in the store.
+In \kernel{} static and library fields are initialized when they are first accessed, hence on creation of $\mainenv$ the fresh locations will contain a special value, $\deref{\loc} = \emptyset, \loc \in \dlocation$.
 
 \subsubsection{Static and Library Field Lookup}
 \label{subsubsec:static-field-lookup}
 
 A static and library field lookup for field $\field$ consists of looking up the location of the static field from the main environment with $\loc = \mainenv(\field)$ and reading the stored value $v$ with $\deref{\loc} = \deref{\mainenv(\field)}$ from the store.
-\todo{How are locations obtained from an env for updating the store?}
 
 
 \subsection{Values}
@@ -1607,30 +1587,35 @@ The specific CESK-transitions for the different invocations are described in the
             \cesktranswheresplit%
                 {\evalconf{\StaticGet{\membermeta}}{\env}{\strace}{\cstrace}{\cex}{\econt}}%
                 {\contconf{\econt}{\deref{\mainenv(\membermeta)}}}%
-                {\text{where $\membermeta$ is a static field and $\membermeta \in \dom(\mainenv$)}}
+                {\text{where $\membermeta$ is a static field and $\deref{\mainenv(\membermeta)} \neq \emptyset$}}
             \end{multlined}
         \label{eval:staticget-var}\\
         &\begin{multlined}
             \cesktranswheresplit%
                 {\evalconf{\StaticGet{\membermeta}}{\env}{\strace}{\cstrace}{\cex}{\econt}}%
                 {\contconf{\econt}{\nnull}}%
-                {\parbox{12cm}{
-                    where $\membermeta$ is a static field without an initializer expression and $\membermeta \notin \mainenv$,\\
-                    $\mainenv = \ext{\mainenv}{\membermeta}{\NullLiteral}$ after transition}}
+                {\begin{aligned}
+                    \text{where } &\membermeta \text{ is a static field without an initializer expression},\\
+                                  &\deref{\mainenv(\membermeta) = \emptyset},\\
+                                  &\update{\mainenv(\membermeta)}{\NullLiteral}\text{ after transition}
+                 \end{aligned}}
         \end{multlined}
         \label{eval:staticget-varnew-null}\\
         &\begin{multlined}
             \cesktranswheresplit%
                 {\evalconf{\StaticGet{\membermeta}}{\env}{\strace}{\cstrace}{\cex}{\econt}}%
                 {\evalconf{\expressionmeta}{\env}{\strace}{\cstrace}{\cex}{\econt'}}%
-                {\text{where $\membermeta$ is a static field with initializer expression $\expressionmeta$, $\econt' = \StaticGetK$}}
+                {\begin{aligned}
+                    \text{where } &\membermeta \text{ is a static field with initializer expression $\expressionmeta$},\\
+                                  &\econt' = \StaticGetK
+                \end{aligned}}
         \end{multlined}
         \label{eval:staticget-varnew}\\
         &\begin{multlined}
             \cesktranswheresplit%
                 {\evalconf{\StaticGet{\membermeta}}{\env}{\strace}{\cstrace}{\cex}{\econt}}%
                 {\execconf{\stmt}{\env_{empty}}{[]}{[]}{\StaticGet{\membermeta} ::\strace}{\handler}{\cex,\,\cstrace}{\econt}{\emptyset}}%
-                {\text{where $\membermeta$ is a sync getter with body $\stmt$}}
+                {\text{where $\membermeta$ is a getter with body $\stmt$}}
         \end{multlined}
         \label{eval:staticget-getter}\\
         &\begin{multlined}
@@ -1654,7 +1639,7 @@ The specific CESK-transitions for the different invocations are described in the
                 {\begin{aligned}
                     \text{where } \acont' &= \StaticInvA{\formals}{\stmt}{\strace'}{\econt},\\
                                   \strace' &= \StaticInvocation{\{\membermeta\}}{\expressionsmeta}::\strace,\\
-                                  \StaticGet{\membermeta} &\text{ is a static method with formal parameters }\formals \text{ and body }\stmt
+                                  \membermeta &\text{ is a static method with formal parameters }\formals \text{ and body }\stmt
                   \end{aligned}}
         \end{multlined}
         \label{eval:staticinvoc}
@@ -1674,23 +1659,22 @@ The specific CESK-transitions for the different invocations are described in the
         &\cesktranswhere%
             {\contconf{\StaticGetK}{\val}}%
             {\contconf{\econt}{\val}}%
-            {\text{where $\mainenv = \ext{\mainenv}{\membermeta}{\val}$}}
+            {\text{where $\update{\mainenv(\membermeta)}{\val}$}}
         \label{econtconf:staticget}\\
         &\cesktranswhere%
             {\contconf{\StaticSetK}{\val}}%
             {\contconf{\econt}{\val}}
-            {\text{where $\mainenv = \ext{\mainenv}{\membermeta}{\val}$, $\membermeta \notin \mainenv$}}
-        \label{econtconf:staticset-var-new}\\
-        &\cesktranswhere%
-            {\contconf{\StaticSetK}{\val}}%
-            {\contconf{\econt}{\val}}
-            {\text{where $\update{\mainenv(\membermeta)}{\val}$, $\membermeta \in \mainenv$}}
+            {\text{where $\update{\mainenv(\membermeta)}{\val}$}}
         \label{econtconf:staticset-var}\\
         &\begin{multlined}
         \cesktranswheresplit%
             {\contconf{\StaticSetK}{\val}}%
             {\execconf{\stmt}{\env}{[]}{[]}{\strace}{\handler}{\cex,\,\cstrace}{\econt}{\scont}}%
-            {\text{where $\scont = \ExitSK{\val}$, $\env = \ext{\env_{empty}}{\formal}{\val}$}}
+            {\begin{aligned}
+                \text{where }  &\membermeta \text{ is a static setter with formal parameter }\formal \text{ and body }\stmt\\
+                               &\scont = \ExitSK{\val},\\
+                               &\env = \ext{\env_{empty}}{\formal}{\val}
+            \end{aligned}}
         \end{multlined}
         \label{econtconf:staticset-setter}
     \end{align}
@@ -1703,8 +1687,8 @@ The specific CESK-transitions for the different invocations are described in the
 \subsubsection{Static and Library Fields}
 \label{subsubsec:static-and-library-fields}
 
-In order to remember initialization and assignment of library variables and static variables, we introduce a global environment $\mainenv$.
-The environment $\mainenv$ stores bindings for static and library fields to locations for all static and library fields previously accessed or set during the execution of the program.
+In order to remember initialization and assignment of library variables and static variables, we introduce a global environment $\mainenv$ described in Section~\ref{subsec:main-env}.
+The environment $\mainenv$ stores bindings for static and library fields to locations for all static and library fields allocated before the execution of the program.
 Static and library variables are accessed with $\StaticGet{\membermeta}$.
 The member $\membermeta$ can be a static or library field, a getter or a method.
 When $\membermeta$ is a method, the expression $\StaticGet{\membermeta}$ is a method tear-off.
@@ -1714,10 +1698,10 @@ When $\membermeta$ is a method, the expression $\StaticGet{\membermeta}$ is a me
         Let $\expressionmeta_{\membermeta}$ be $\membermeta$'s initializer expression.
         \begin{itemize}
             \item If $\membermeta$ is accessed for the first time during the program's execution, the evaluation of $\StaticGet{\membermeta}$ proceeds with evaluation of the initializer expression $\expressionmeta_{\membermeta}$.
-            \item If $\expressionmeta$ is $\nnull$, the environment is extended with a binding to a fresh location that stores a $\nnull$ value for the field $\membermeta$, as shown in \eqref{eval:staticget-varnew-null}.
+            \item If $\expressionmeta$ is $\nnull$, the location for $\membermeta$ is updated to store a $\nnull$ value, as shown in \eqref{eval:staticget-varnew-null}.
             \item If $\expressionmeta$ is an expression, this expression is evaluated as shown in \eqref{eval:staticget-varnew}.
-                The expression will evaluate to some value $\val$ that will be applied to the corresponding continuations, as shown in \eqref{econtconf:staticget}: the environment is extended with a binding to a fresh location that stores the value $\val$ and the continuation $\econt$ is applied to the value $\val$.
-            \item If there is already a binding for the member $\membermeta$ in the global environment $\env_{M}$, the continuation $\econt$ is applied to the stored value, as shown in \eqref{eval:staticget-var}.
+                The expression will evaluate to some value $\val$ that will be applied to the corresponding continuations, as shown in \eqref{econtconf:staticget}: the location for the field $\membermeta$ is updated to store the value $\val$ and the continuation $\econt$ is applied to the value $\val$.
+            \item If the location for the member $\membermeta$ in the global environment $\env_{M}$ has been previously accessed or initialized and does not store the empty value $\emptyset$, the continuation $\econt$ is applied to the stored value, as shown in \eqref{eval:staticget-var}.
         \end{itemize}
 
     \item $\membermeta$ is a static getter\\
@@ -1734,11 +1718,11 @@ The target member can either be a static or library field, or it can be a static
 
 \begin{itemize}
     \item $\membermeta$ is a static or library field\\
-        The evaluation proceeds by extending the environment $\mainenv$, when $\membermeta \notin \mainenv$, as shown in \eqref{econtconf:staticset-var-new}.
-        Otherwise, when $\membermeta \in \mainenv$, the value stored at location $\mainenv(\membermeta)$ is modified accordingly, as shown in \eqref{econtconf:staticset-var}.
+        The evaluation proceeds by updating the value stored at the corresponding location in the environment $\mainenv$, as shown in \eqref{econtconf:staticset-var}.
 
     \item $\membermeta$ is a static setter\\
-        The evaluation proceeds by executing the statement body of the setter. A statement continuation $\ExitSK{\val}$ is added that applies the given expression continuation $\econt$ to the value of the right-hand side expression.
+        The evaluation proceeds by executing the statement body of the setter.
+        A statement continuation $\ExitSK{\val}$ is added that applies the given expression continuation $\econt$ to the value of the right-hand side expression.
         The statement body is executed in an environment that has only the binding from the formal parameter of the static setter to the value of the right-hand side expression, as shown in \eqref{econtconf:staticset-setter}.
 
     \item Otherwise, $\membermeta$ is a static or library setter with body $\stmt$ and formal parameter $\formal$.
