@@ -977,7 +977,7 @@ The different expression continuations are shown in Figure~\ref{figure:econts}.
 \newcommand{\FinallyK}[1]{\mathrm{FinallyEK}({#1},\,\env,\,\lbls,\,\clbls,\,\strace,\,\handler,\,\econt)}
 \newcommand{\FinallyReturnK}[1]{\mathrm{FinallyReturnEK}({#1},\,\env,\,\lbls,\,\clbls,\,\strace,\,\handler,\,\econt)}
 
-\newcommand{\ForCondK}{\mathrm{ForConditionEK}(\mathrm{\varmeta{s}},\, \expressionmeta,\, \exprs,\, \statementmeta,\, \env,\, \env',\, \lbls,\, \clbls,\, \handler,\, \cstrace,\, \cex,\, \econt,\, \scont)}
+\newcommand{\ForCondK}{\mathrm{ForConditionEK}(\varmeta{s},\, \expressionmeta,\, \exprs,\, \statementmeta,\, \env,\, \env',\, \lbls,\, \clbls,\, \handler,\, \cstrace,\, \cex,\, \econt,\, \scont)}
 \newcommand{\ExpressionK}[2]{\mathrm{ExpressionEK}({#1},\,{#2})}
 \begin{figure}[Htp]
   \begin{eqfigure}
@@ -1031,7 +1031,7 @@ The different statement continuations are shown in Figure~\ref{figure:sconts}.
 \newcommand{\NewSK}[2]{\mathrm{NewSK}({#1},\,{#2})}
 \newcommand{\FinallySK}[1]{\mathrm{FinallySK}({#1},\,\env,\,\lbls,\,\clbls,\,\strace,\,\handler,\,\econt,\,\scont)}
 \newcommand{\RethrowSK}[3]{\mathrm{RethrowSK}({#1},\,{#2},\,{#3})}
-\newcommand{\ForSK}{\mathrm{ForSK}(\mathrm{\varmeta{s}},\, \expressionmeta,\, \exprs,\, \statementmeta,\, \env,\, \env',\, \lbls,\, \clbls,\, \handler,\, \cstrace,\, \cex,\, \econt,\, \scont)}
+\newcommand{\ForSK}{\mathrm{ForSK}(\varmeta{s},\, \expressionmeta,\, \exprs,\, \statementmeta,\, \env,\, \env',\, \lbls,\, \clbls,\, \handler,\, \cstrace,\, \cex,\, \econt,\, \scont)}
 \newcommand{\WhileCondSK}{\mathrm{WhileCondSK}(\expr,\,\stmt,\,\env,\,\lbls,\,\clbls,\,\handler,\,\cstrace,\,\cex,\,\econt,\,\scont)}
 \begin{figure}[Htp]
   \begin{eqfigure}
@@ -1066,9 +1066,9 @@ Application continuations, $\acont$, capture the application of a list of values
 \newcommand{\SuperA}[3]{\mathrm{SuperA}({#1},\,{#2},\,\strace,\,\handler,\,\cstrace,\,\cex,\,{#3})}
 \newcommand{\ConstructorA}[3]{\mathrm{ConstructorA}({#1},\,{#2},\,\handler,\,\cstrace,\,\cex,\,{#3})}
 \newcommand{\RedirectingA}[3]{\mathrm{RedirectingA}({#1},\,{#2},\,\strace,\,\handler,\,\cstrace,\,\cex,\,{#3})}
-\newcommand{\ForInitA}[1]{\mathrm{ForInitA}(\mathrm{\varmeta{s}},\, #1,\, \exprs,\, \statementmeta,\, \env,\, \lbls,\, \clbls,\, \handler,\, \cstrace,\, \cex,\, \econt,\, \scont)}
-\newcommand{\ForUpdatesA}[2]{\mathrm{ForUpdatesA}(\mathrm{\varmeta{s}},\, #1,\, \exprs,\, \statementmeta,\, \env,\, #2,\, \lbls,\, \clbls,\, \handler,\, \cstrace,\, \cex,\, \econt,\, \scont)}
-\newcommand{\InstanceMethodA}{\mathrm{InstanceMethodA}(\idmeta,\,\val,\,\strace,\,\handler,\,\cstrace,\,\cex,\,\econt)}
+\newcommand{\ForInitA}[1]{\mathrm{ForInitA}(\varmeta{s},\, #1,\, \exprs,\, \statementmeta,\, \env,\, \lbls,\, \clbls,\, \handler,\, \cstrace,\, \cex,\, \econt,\, \scont)}
+\newcommand{\ForUpdatesA}[2]{\mathrm{ForUpdatesA}(\varmeta{s},\, #1,\, \exprs,\, \statementmeta,\, \env,\, #2,\, \lbls,\, \clbls,\, \handler,\, \cstrace,\, \cex,\, \econt,\, \scont)}
+\newcommand{\InstanceMethodA}{\mathrm{InstanceMethodA(\idmeta,\,\val,\,\strace,\,\handler,\,\cstrace,\,\cex,\,\econt)}}
 
 We use the application continuation $\ValueA{\acont}{\val}$, capturing a value and an application continuation, as application that adds a value to the list of values to eventually used by an application continuation that produces a configuration other than ApplicationConfiguration.
 We suffix the names of application continuations with ``$A$''.
@@ -1707,7 +1707,7 @@ The target member can either be a static or library field, or it can be a static
         Otherwise, when $\membermeta \in \mainenv$, the value stored at location $\mainenv(\membermeta)$ is modified accordingly, as shown in \eqref{econtconf:staticset-var}.
 
     \item $\membermeta$ is a static setter\\
-        The evaluation proceeds by executing the statement body of the setter. A statement continuation $\ExitSK{\econt}{\val}$ is added that applies the given expression continuation $\econt$ to the value of the right-hand side expression.
+        The evaluation proceeds by executing the statement body of the setter. A statement continuation $\ExitSK{\val}$ is added that applies the given expression continuation $\econt$ to the value of the right-hand side expression.
         The statement body is executed in an environment that has only the binding from the formal parameter of the static setter to the value of the right-hand side expression, as shown in \eqref{econtconf:staticset-setter}.
 
     \item Otherwise, $\membermeta$ is a static or library setter with body $\stmt$ and formal parameter $\formal$.
@@ -1722,7 +1722,7 @@ Static invocation is supported with $\StaticInvocation{\{\membermeta\}}{\express
 The evaluation of a static invocation proceeds by evaluating the arguments of the call, as shown in \eqref{eval:staticinvoc}.
 After the evaluation of the actual arguments for the invocation, the corresponding application is applied to the resulting list of values, as shown in \eqref{acontconf:staticinvoc}.
 In \eqref{acontconf:staticinvoc}, we apply the application continuation by creating a new environment for the execution of the body of the method by binding its formal parameters to the locations of the values for the actual arguments.
-A statement continuation, $\ExitSK{\econt}{\nnull}$ is added as next statement continuation to ensure that the execution of the body of the method returns correctly, when a return statement is not executed after the execution of the last statement of the body.
+A statement continuation, $\ExitSK{\nnull}$ is added as next statement continuation to ensure that the execution of the body of the method returns correctly, when a return statement is not executed after the execution of the last statement of the body.
 
 %%
 % Figure showing the CESK-transition function starting from
@@ -2636,7 +2636,7 @@ When the current initalizer being executed is a $\FieldInitializer{\expressionme
         &\begin{multlined}
             \cesktranssplit%
                 {\contconf{\IfCondK{\stmti{1}}{\stmti{2}}}{\false}}%
-                {\execconf{\stmti{1}}{\env}{\lbls}{\clbls}{\strace}{\handler}{\cstrace,\,\cex}{\econt}{\scont}}
+                {\execconf{\stmti{2}}{\env}{\lbls}{\clbls}{\strace}{\handler}{\cstrace,\,\cex}{\econt}{\scont}}
         \end{multlined}
         \label{econtconf:if-false}\\
         &\begin{multlined}
@@ -2649,7 +2649,7 @@ When the current initalizer being executed is a $\FieldInitializer{\expressionme
               \cesktranswheresplit*%
                   {\contconf{\WhileCondK}{\true}}%
                   {\execconf{\stmt}{\env}{\lbls}{\clbls}{\strace}{\handler}{\cstrace,\,\cex}{\econt}{\scont'}}
-                  {\text{where $\scont' = \WhileCondK$}}
+                  {\text{where $\scont' = \WhileCondSK$}}
         \end{multlined}
         \label{econtconf:while-true}\\
         &\cesktrans%
@@ -2682,9 +2682,10 @@ When the current initalizer being executed is a $\FieldInitializer{\expressionme
             {\scontconf{\scont}{\env}},
         \label{scontconf:block-empty}\\
         &\begin{multlined}
-            \cesktranssplit%
-                {\scontconf{\WhileCondK}{\_}}%
+            \cesktranswheresplit*%
+                {\scontconf{\WhileCondSK}{\_}}%
                 {\evalconf{\expr}{\env}{\strace}{\cstrace}{\cex}{\econt'}}
+                {\text{where $\econt' = \WhileCondK$}}
         \end{multlined}
         \label{scontconf:while}\\
         &\begin{multlined}
@@ -2745,7 +2746,7 @@ When the return expression is empty, the value $\nnull$ is applied to the return
         &\begin{multlined}
             \cesktranswheresplit*%
                 {\acontconf{\ForInitA{\nnull}}{\vals}}%
-                {\execconf{\scont}{\env'}{\lbls}{\clbls}{\strace}{\handler}{\cex,\,\cstrace}{\econt}{\scont'}}%
+                {\execconf{\stmt}{\env'}{\lbls}{\clbls}{\strace}{\handler}{\cex,\,\cstrace}{\econt}{\scont'}}%
                 {\parbox{\textwidth-2cm}{where $\env' = \extend(\env, \varmeta{s}, \vals)$,\\
                 $\scont' = \ForSK$}}
         \end{multlined}
