@@ -2640,7 +2640,7 @@ When the current initalizer being executed is a $\FieldInitializer{\expressionme
               \cesktranswheresplit*%
                   {\contconf{\WhileCondK}{\true}}%
                   {\execconf{\stmt}{\env}{\lbls}{\clbls}{\strace}{\handler}{\cstrace,\,\cex}{\econt}{\scont'}}
-                  {\text{where $\scont' = \WhileCondK$}}
+                  {\text{where $\scont' = \WhileCondSK$}}
         \end{multlined}
         \label{econtconf:while-true}\\
         &\cesktrans%
@@ -2673,9 +2673,10 @@ When the current initalizer being executed is a $\FieldInitializer{\expressionme
             {\scontconf{\scont}{\env}},
         \label{scontconf:block-empty}\\
         &\begin{multlined}
-            \cesktranssplit%
-                {\scontconf{\WhileCondK}{\_}}%
+            \cesktranswheresplit*%
+                {\scontconf{\WhileCondSK}{\_}}%
                 {\evalconf{\expr}{\env}{\strace}{\cstrace}{\cex}{\econt'}}
+                {\text{where $\econt' = \WhileCondK$}}
         \end{multlined}
         \label{scontconf:while}\\
         &\begin{multlined}
