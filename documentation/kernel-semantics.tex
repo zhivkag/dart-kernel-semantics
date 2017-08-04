@@ -3022,20 +3022,17 @@ $\synt{try/finally}$ statements execute their body with a new handler and additi
 \end{align*}
 
 \noindent where
-
-\begin{align*}
-&\handler' = \FinallyK{\stmti{0}},\\
-&\econt' = \FinallyReturnK{\stmti{1}},\\
-&\scont' = \FinallySK{\stmti{1}},\\
-&\begin{multlined}
-    \lbls' = \lbrace \mathrm{Label}(L, \bcont') \mid \mathrm{Label}(L, \bcont) \in \lbls\rbrace,\\
-    \bcont' = \FinallyBreak{\stmti{1}}{\bcont},
-\end{multlined}\\
-&\begin{multlined}
-    \clbls' =  \lbrace \continuel{C}{\switchcont'} \mid  \continuel{C}{\switchcont} \in \clbls\rbrace,\\
-    \switchcont' = \FinallyContinue{\stmti{1}}{\switchcont}.
-\end{multlined}
-\end{align*}
+\[
+\begin{aligned}
+    \handler' &= \FinallyK{\stmti{0}},\\
+    \econt' &= \FinallyReturnK{\stmti{1}},\\
+    \scont' &= \FinallySK{\stmti{1}},\\
+    \lbls' &= \lbrace \mathrm{Label}(L, \bcont') \mid \mathrm{Label}(L, \bcont) \in \lbls\rbrace,\\
+    \bcont' &= \FinallyBreak{\stmti{1}}{\bcont},\\
+    \clbls' &= \lbrace \continuel{C}{\switchcont'} \mid  \continuel{C}{\switchcont} \in \clbls\rbrace,\\
+    \switchcont' &= \FinallyContinue{\stmti{1}}{\switchcont}
+\end{aligned}
+\]
 
 
 \subsubsection{Break}
