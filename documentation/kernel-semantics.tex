@@ -754,7 +754,7 @@ This allows us to modify the environment and add a binding to a location contain
 
 % InvalidStatement
 \newcommand{\ExpressionStatement}[1]{\{\, #1\, \}}
-\newcommand{\Block}[1]{#1\synt{;} \mlist{\statementmeta}}
+\newcommand{\Block}[1]{\{\, #1\, \}}
 \newcommand{\EmptyStatement}{\{\}}
 
 % AssertStatement
@@ -778,20 +778,19 @@ This allows us to modify the environment and add a binding to a location contain
 \newcommand{\VarDeclaration}[2]{\synt{var}\,#1\synt{=}#2}
 \newcommand{\FunctionDeclaration}[5]{#1\,#2\synt{(}\,#3\,\synt{)}\,#4\,#5}
 
-% FunctionDeclaration
 \[
 \begin{array}{rl}
 
   \statementmeta \in \dstmt ::=
   & \ExpressionStatement{\expressionmeta} \\
-  & \Block{\statementmeta} \\
+  & \Block{\statementmeta{s}} \\
   & \EmptyStatement \\
   & \LabeledStatement{\lbl}{\statementmeta} \\
   & \BreakStatement{\lbl} \\
   & \WhileStatement{\expressionmeta}{\statementmeta} \\
   & \DoStatement{\statementmeta}{\expressionmeta} \\
-  & \ForStatement{??}{\expressionmeta}{??}{\statementmeta} \\
-  & \ForInStatement{\idmeta}{\expressionmeta}{\statementmeta} \\
+  & \ForStatement{\varmeta{s}}{\expressionmeta}{\expressionsmeta}{\statementmeta} \\
+  & \ForInStatement{\varmeta}{\expressionmeta}{\statementmeta} \\
   & \SwitchStatement{\expressionmeta}{\tt{SCs}} \\
   & \ContinueSwitchStatement{\statementmeta} \\
   & \IfStatement{\expressionmeta}{\statementmeta_1}{\statementmeta_2} \\
@@ -2615,9 +2614,9 @@ When the current initalizer being executed is a $\FieldInitializer{\expressionme
         \label{execconf:expresion}\\
         &\begin{multlined}
             \cesktranswheresplit*%
-                {\execconf{\Block{\stmt_1}}{\env}{\lbls}{\clbls}{\strace}{\handler}{\cex,\,\cstrace}{\econt}{\scont}}%
+                {\execconf{\Block{\stmt_1 :: \stmt{s}}}{\env}{\lbls}{\clbls}{\strace}{\handler}{\cex,\,\cstrace}{\econt}{\scont}}%
                 {\execconf{\stmt_1}{\env}{\lbls}{\clbls}{\strace}{\handler}{\cex,\,\cstrace}{\econt}{\scont'}}%
-                {\text{where $\scont' = \BlockSK{\stmt*}{\env}$}}
+                {\text{where $\scont' = \BlockSK{\stmt{s}}{\env}$}}
         \end{multlined}
         \label{execconf:block}\\
         &\begin{multlined}
