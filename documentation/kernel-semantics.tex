@@ -1608,7 +1608,7 @@ The specific CESK-transitions for the different invocations are described in the
                 {\begin{aligned}
                     \text{where } &\membermeta \text{ is a static field without an initializer expression},\\
                                   &\deref{\mainenv(\membermeta) = \emptyset},\\
-                                  &\update{\mainenv(\membermeta)}{\NullLiteral}\text{ after transition}
+                                  &\deref{(\mainenv(\membermeta))} = \NullLiteral \text{ after transition}
                  \end{aligned}}
         \end{multlined}
         \label{eval:staticget-varnew-null}\\
@@ -1625,8 +1625,11 @@ The specific CESK-transitions for the different invocations are described in the
         &\begin{multlined}
             \cesktranswheresplit%
                 {\evalconf{\StaticGet{\membermeta}}{\env}{\strace}{\cstrace}{\cex}{\econt}}%
-                {\execconf{\stmt}{\env_{empty}}{[]}{[]}{\StaticGet{\membermeta} ::\strace}{\handler}{\cex,\,\cstrace}{\econt}{\emptyset}}%
-                {\text{where $\membermeta$ is a getter with body $\stmt$}}
+                {\execconf{\stmt}{\env_{empty}}{[]}{[]}{\StaticGet{\membermeta} ::\strace}{\handler}{\cex,\,\cstrace}{\econt}{\scont}}%
+                {\begin{aligned}
+                    \text{where } \membermeta &\text{is a getter with body $\stmt$}
+                                  \scont = \ExitSK{\nnull}
+                \end{aligned}}
         \end{multlined}
         \label{eval:staticget-getter}\\
         &\begin{multlined}
@@ -1670,12 +1673,12 @@ The specific CESK-transitions for the different invocations are described in the
         &\cesktranswhere%
             {\contconf{\StaticGetK}{\val}}%
             {\contconf{\econt}{\val}}%
-            {\text{where $\update{\mainenv(\membermeta)}{\val}$}}
+            {\text{where $\deref{(\mainenv(\membermeta))} = \val$ after transition}}
         \label{econtconf:staticget}\\
         &\cesktranswhere%
             {\contconf{\StaticSetK}{\val}}%
             {\contconf{\econt}{\val}}
-            {\text{where $\update{\mainenv(\membermeta)}{\val}$}}
+            {\text{where $\deref{(\mainenv(\membermeta))} = \val$ after transition}}
         \label{econtconf:staticset-var}\\
         &\begin{multlined}
         \cesktranswheresplit%
@@ -2004,10 +2007,11 @@ The evaluation proceeds as follows:
     &\begin{multlined}
         \cesktranswheresplit*%
         {\contconf{\DPropertySetVK}{\val_1}}
-        {\execconf{\stmt}{\env}{\lbls}{\clbls}{(\DirectPropertySet{\val_0}{\membermeta}{\val_1}) :: \strace}{\handler}{\cex,\,\cstrace}{\econt}{\emptyset}}
+        {\execconf{\stmt}{\env}{\lbls}{\clbls}{(\DirectPropertySet{\val_0}{\membermeta}{\val_1}) :: \strace}{\handler}{\cex,\,\cstrace}{\econt}{\scont}}
         {\begin{aligned}
             \text{where } \membermeta &= \text{Setter}(\formal, \stmt),\\
-            \env &= \ext{\env_{empty}}{\this :: \formal :: []}{\val_0 :: \val_1 :: []}
+            \env &= \ext{\env_{empty}}{\this :: \formal :: []}{\val_0 :: \val_1 :: []}\\
+            \scont &= \ExitSK{\val_1}
         \end{aligned}}
     \end{multlined}
     \label{econtconf:dpropertyset-setter}\\
@@ -2024,11 +2028,12 @@ The evaluation proceeds as follows:
     &\begin{multlined}
         \cesktranswheresplit*%
         {\contconf{\SuperPropertySetK}{\val}}
-        {\execconf{\stmt}{\env'}{\lbls}{\clbls}{(\SuperPropertySet{\idmeta}{\val}) :: \strace}{\handler}{\cex,\,\cstrace}{\econt}{\emptyset}}
+        {\execconf{\stmt}{\env'}{\lbls}{\clbls}{(\SuperPropertySet{\idmeta}{\val}) :: \strace}{\handler}{\cex,\,\cstrace}{\econt}{\scont}}
         {\begin{aligned}
         \text{where } c &= \superclass(\class(\deref{(\env(\this))}))\\
                       \lookupMember(c,\,\idmeta) &= \text{Setter}(\formal, \stmt)\\
                       \env' &=  \ext{\env_{empty}}{\this :: \formal :: []}{\deref{(\env(\this))} :: \val :: []}\\
+                      \scont &= \ExitSK{\val}
         \end{aligned}}
     \end{multlined}
     \label{econtconf:superpropertyset-setter}\\
@@ -2136,7 +2141,6 @@ After the evaluation of the argument expression to a value $\val$, depending on 
 
     \item $\membermeta$ is a field\\
         When the lookup results with a field, the implicit setter for the field is invoked with the receiver value $\deref{(\env(\this))}$ and the field value $\val$, as shown in \eqref{econtconf:superpropertyset-field}.
-        The $\update{\deref{(\env(\this))}[\membermeta]}{\val}$ modifies the value stored in the location of field $\membermeta$ with the right-hand side expression.
 
 \end{itemize}
 
