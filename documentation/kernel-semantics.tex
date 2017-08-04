@@ -81,6 +81,7 @@
 \DeclareMathOperator{\members}{\synt{members}}
 \DeclareMathOperator{\lookupMember}{\synt{lookupMember}}
 \DeclareMathOperator{\class}{\synt{class}}
+\DeclareMathOperator{\getfield}{\synt{field}}
 
 
 % Oftenly used syntactic meta-literals.
@@ -624,6 +625,13 @@ We define the following function for accessing the class component of an element
 \begin{align*}
 \class &\in \dobjval \rightarrow \dclass,\\
 \class(\val) &= \pi_1(\val) = c, \text{ where $c \in \dclass$ is the first component of $\val \in \dobjval$}
+\end{align*}
+
+
+We define the following function for accessing the location of a field at position $i \in \NN$ in $\dobjval$:
+\begin{align*}
+\getfield &\in \dobjval \times \NN \rightarrow \dlocation,\\
+\getfield(\val, i) &= \pi_2(\val)[i] = \loc, \text{ where $\pi_2(\val) \in \mlist{\dlocation}$ and $\pi_2(\val)[i]$ is the location at position $i \in \NN$}
 \end{align*}
 
 \subsubsection{Function Values}
@@ -1970,8 +1978,7 @@ The evaluation proceeds as follows:
         {\contconf{\PropertySetVK}{\val_1}}%
         {\execconf{\stmt}{\env}{[]}{[]}{(\PropertySet{\val_0}{\idmeta}{\val_1}) :: \strace}{\handler}{\cex,\,\cstrace}{\econt}{\scont}}%
         {\begin{aligned}
-            \text{where } \val_0 &= ((\_, \_, \textit{mems}), \_),\\
-                          \textit{mems}(\idmeta) &= \text{Setter}(A, S),\\
+            \text{where } \lookupMember(\class(\val_0),\,\idmeta) &= \text{Setter}(A, S),\\
                           \env &= \ext{\env_{empty}}{\this :: \formal :: []}{\val_0 :: \val_1 :: []},\\
                           \scont &= \ExitSK{\val_1}\\
          \end{aligned}}
@@ -1982,9 +1989,8 @@ The evaluation proceeds as follows:
         {\contconf{\PropertySetVK}{\val}}%
         {\contconf{\econt}{\val_1}}%
         {\begin{aligned}
-            \text{where } &\membermeta = \text{Setter}(i \in \NN),\\
-                          &\val_0 = (c, \textit{fields}),\\
-                           &!(\textit{fields}[i]) := \val\\
+            \text{where } \lookupMember(\class(\val_0),\,\idmeta) &= \text{Setter}(i \in \NN),\\
+                          \deref{(\getfield(\val_0,\, i))} &= \val \text{ after the transtion}\\
         \end{aligned}}
     \end{multlined}
     \label{econtconf:propertyset-field}\\
@@ -2008,11 +2014,10 @@ The evaluation proceeds as follows:
     &\begin{multlined}
         \cesktranswheresplit%
         {\contconf{\DPropertySetVK}{\val}}%
-        {\contconf{\econt}{\val_1}}%
+        {\contconf{\econt}{\val}}%
         {\begin{aligned}
-        \text{where }&\membermeta = \text{Setter}(i \in \NN),\\
-                     &\val = (c, \textit{fields}),\\
-                     &\deref{\textit{fields}[i]} := \val_0\\
+        \text{where } \membermeta &= \text{Setter}(i \in \NN),\\
+                      \deref{(\getfield(\val_0,\, i))} &= \val \text{ after the transtion}\\
         \end{aligned}}
     \end{multlined}
     \label{econtconf:dpropertyset-field}\\
@@ -2021,8 +2026,8 @@ The evaluation proceeds as follows:
         {\contconf{\SuperPropertySetK}{\val}}
         {\execconf{\stmt}{\env'}{\lbls}{\clbls}{(\SuperPropertySet{\idmeta}{\val}) :: \strace}{\handler}{\cex,\,\cstrace}{\econt}{\emptyset}}
         {\begin{aligned}
-        \text{where } \deref{\env(\this)} &= (((\_, \_, \textit{spmems}), \_, \_), \_)\\
-                      \textit{spmems}(\idmeta) &= \text{Setter}(\formal, \stmt)\\
+        \text{where } c &= \superclass(\class(\deref{(\env(\this))}))\\
+                      \lookupMember(c,\,\idmeta) &= \text{Setter}(\formal, \stmt)\\
                       \env' &=  \ext{\env_{empty}}{\this :: \formal :: []}{\deref{(\env(\this))} :: \val :: []}\\
         \end{aligned}}
     \end{multlined}
@@ -2032,9 +2037,9 @@ The evaluation proceeds as follows:
         {\contconf{\SuperPropertySetK}{\val}}%
         {\contconf{\econt}{\val}}%
         {\begin{aligned}
-            \text{where } &\deref{\env(\this)} = (((\_, \_, \textit{spmems}), \_, \_), \_)\\
-                          &\textit{spmems}(\idmeta) = \text{Setter}(i \in \NN)\\
-                          &\update{\deref{(\env(\this))}[i]}{\val}\\
+            \text{where } c &= \superclass(\class(\deref{(\env(\this))}))\\
+                          \lookupMember(c,\,\idmeta) &= \text{Setter}(i \in \NN)\\
+                          \deref{(\getfield(\deref{(\env(\this))},\, i))} &= \val \text{ after the transtion}\\
         \end{aligned}}
     \end{multlined}
     \label{econtconf:superpropertyset-field}
@@ -2226,11 +2231,10 @@ After the evaluation of the argument expression to a value $\val$, depending on 
         {\contconf{\SuperMethodA{\strace}}{\val{s}}}%
         {\execconf{\stmt}{\env'}{[]}{[]}{\strace}{\handler}{\cex,\,\cstrace}{\econt}{\scont}}%
         {\begin{aligned}
-            \text{where } \membermeta &= superclass(class(\val)).lookup(\idmeta)\text{ is an instance method with body $\stmt$ and formals $\formals$},\\
+            \text{where } c &= \superclass(\class(\val))\\
+                          \membermeta &= \lookupMember(c,\,\idmeta)\text{ is an instance method with body $\stmt$ and formals $\formals$},\\
                           \scont &= \ExitSK{\nnull},\\
-                          \env' &= \ext{\env_{empty}}{\this :: \formals}{\val :: \val{s}},\\
-                          \val &= \deref{(\env(\this))}
-        \end{aligned}}
+                          \env' &= \ext{\env_{empty}}{\this :: \formals}{\deref{(\env(\this))} :: \val{s}}        \end{aligned}}
     \end{multlined}
     \label{acontconf:superinstancemethod}
     \end{align}
@@ -2338,11 +2342,13 @@ The execution of the constructor proceeds as follows:
     \cesktranswheresplit*%
         {\acontconf{\ConstructorA{Q}{\strace}{\econt}}{\val{s}}}%
         {\contconf{\InitK{Q}{\env'}{\scont}}{\val}}%
-        {\parbox{15cm}{$\val = \objval \in \dobjval$,\\
-            $class$ corresponds to the class component of the constructor $Q$,\\
-            $fields \in \mlist{\dlocation}$ corresponds to a list of fresh locations in the store,\\
-            $\env' = \extend(\env_{empty}, \formals, \val{s})$,\\
-        $\scont = \NewSK{\econt}{\loc}$ with $\loc$ a new location such that $\deref{\loc}=\val$}}
+        {\begin{aligned}
+            \val &= \objval \in \dobjval,\\
+            class &\text{ is class component of the constructor }Q,\\
+            fields &\in \mlist{\dlocation} \text{ is a list of fresh locations in the store},\\
+            \env' &= \extend(\env_{empty}, \formals, \val{s}),\\
+            \scont &= \NewSK{\econt}{\loc} \text{ with $\loc$ a new location such that $\deref{\loc}=\val$}
+        \end{aligned}}
     \end{multlined}
 \end{align*}
 
@@ -2360,22 +2366,47 @@ When the redirecting initializer is the only initializer in the list, the execut
         \cesktranswheresplit%
             {\contconf{\InitK{Q}{\env}{\scont}}{\val}}%
             {\evallistconf{\exprs}{\env}{\strace}{\cstrace}{\cex}{\acont}}%
-            {\parbox{\textwidth-2cm}{if $Izs = \RedirectingInitializer{G}{\exprs} :: []$,\\
-            where $\acont = \RedirectingA{G}{\loc}{\scont}$, $\deref{\loc} = \val$,}}
+            {\begin{aligned}
+                \text{where } Izs &= \RedirectingInitializer{G}{\exprs} :: [],\\
+                              \acont &= \RedirectingA{G}{\loc}{\scont},\\
+                              \deref{\loc} &= \val
+             \end{aligned}}
     \end{multlined}
 \end{align*}
 Otherwise, the redirecting constructor $Q$ has other initializers in the initializer list.
 The redirecting constructor can have only local initializers in the list.
 The rules for executing the initializer list of redirecting and non-redirecting constructors are the same.
 The other initializers for redirecting constructor are introduced by transformations that only introduce local initializers.
-The CESK-transitions starting form the corresponding ValuePassingConfiguration proceeds with the first initializer in the list, denoted as $fi$ below:
+
+The CESK-transition starting form the corresponding ValuePassingConfiguration proceeds with the first initializer in the list, denoted as $fi$ below:
 \begin{align*}
     &\begin{multlined}
         \cesktranswheresplit%
             {\contconf{\InitK{Q}{\env}{\scont}}{\val}}%
-            {\evalconf{\expr}{\env}{\strace}{\cex}{\cstrace}{\econt'}}%
-            {\parbox{\textwidth-2cm}{otherwise, where $fi = \LocalInitializer{\expr} + \FieldInitializer{\expr}$, first initializer in $Izs$,\\
-                $\econt' = \InitializerK{Izs}{\val}{\env}{\scont}$,}}
+            {\evalconf{\expr}{\env}{\strace}{\cex}{\cstrace}{\econt}}%
+            {\begin{aligned}
+                \text{where } fi &= \LocalInitializer{\expr} + \FieldInitializer{\expr},\\
+                              fi &\text{ is first initializer in }Izs,\\
+                              \econt &= \InitializerK{Izs}{\val}{\env}{\scont}
+             \end{aligned}}
+    \end{multlined}
+\end{align*}
+
+Otherwise, $Q$ is a non-redirecting generative constructor, and execution of $Q$ proceeds with evaluation of field initializers in the immediately enclosing class.
+Let $Q$ be a non-redirecting constructor below.
+
+\begin{align*}
+    &\begin{multlined}
+        \cesktranswheresplit%
+            {\contconf{\InitK{Q}{\env}{\scont}}{\val}}%
+            {\evallistconf{\exprs}{\env}{\strace}{\cstrace}{\cex}{\acont}}%
+            {\begin{aligned}
+                \text{where }   \env'  &= \ext{\env}{\this}{\val},\\
+                                \exprs &= \text{initializer expressions for instance fields},\\
+                                \deref{\loc} &= \val,\text{ a fresh location that stores $\val$}\\
+                \acont &= \FieldsA{Q}{\loc}{\env}{\scont'},\\
+                                \scont' &= \BodySK{\stmt_{body}}{\env'}{\scont}.
+            \end{aligned}}
     \end{multlined}\\
     &\begin{multlined}
         \cesktranswheresplit*%
@@ -2385,30 +2416,12 @@ The CESK-transitions starting form the corresponding ValuePassingConfiguration p
     \end{multlined}
 \end{align*}
 
-Otherwise, $\synt{Q}$ is a non-redirecting generative constructor, and execution of $\synt{Q}$ proceeds with evaluation of field initializers in the immediately enclosing class.
-Let $\synt{Q}$ be a non-redirecting constructor.
-
-\begin{align*}
-    &\begin{multlined}
-        \cesktranswheresplit%
-            {\contconf{\InitK{\synt{Q}}{\env}{\scont}}{\val}}%
-            {\evallistconf{\exprs}{\env}{\strace}{\cstrace}{\cex}{\acont}}%
-            {\begin{aligned}
-                \text{where }   \env'  &= \ext{\env}{\this}{\deref{\loc}},\\
-                                \exprs &= \text{initializer expressions for instance fields},\\
-                                \deref{\loc} &= \val,\\
-                \acont &= \FieldsA{Q}{\loc}{\env}{\scont'},\\
-                                \scont' &= \BodySK{\stmt_{body}}{\env'}{\scont}.
-            \end{aligned}}
-    \end{multlined}
-\end{align*}
-
 
 To further initialize the new instance, the body of the constructor will be eventually executed, after the execution of the instance field initializers, the constructor initializer list and its super constructor.
-To support this, we add a new statement continuation, $BodySK$, that has the constructor body statement, the environment for the execution of the body, the error handlers and stacktraces, and the next statement continuation.
-We add the newly created statement continuation as next continuation for the execution of the instance field initializers, the constructor intializer list and the super constructor.
-Note that the statement continuation for the body of the constructor will not be added, since redirecting constructors do not have a body.
-The CESK-transition for this statement continuation is shown below:
+To support this, we add a new statement continuation, BodySK, that captures the constructor body statement, the environment for the execution of the body, the error handlers and stack trace, and the next statement continuation.
+We add the newly created statement continuation as next continuation for the execution of the instance field initializers, the constructor initializer list and the super constructor.
+Note that the statement continuation for the body of the constructor is not added when the constructor is redirecting, since redirecting constructors do not have a body.
+The CESK-transition for this statement continuation is shown below/
 
 \begin{align*}
     &\cesktrans%
@@ -2417,7 +2430,7 @@ The CESK-transition for this statement continuation is shown below:
 \end{align*}
 
 The application continuation applied on the evaluated expressions for the instance field initializers updates the values stored in the locations for each field  of the object value.
-An update of field $f_i$, stored at location $\loc' = (\deref{\loc})[f_i]$ with value $\val_i$ is expressed as $\update{(\deref{\loc})[f_i]}{\val_{i}}$, so the following holds $\deref{\loc'} = \deref{\deref{\loc[f_i]}} = \val_{i}$ after the update.
+An update of field $\field_i$, stored at location $\loc' = (\deref{\loc})[i]$ with value $\val_i$ is expressed as $\update((\deref{\loc}[i],\, \val_{i})$, so the following holds $\deref{\loc'} = \deref{(\deref{(\loc)}[i])} = \val_{i}$ after the update.
 
 After the update of the values stored in the field locations of the object value, the application continuation will produce the next configuration.
 The next configuration is produced depending on the initializer list of the constructor.
@@ -2432,12 +2445,11 @@ We consider multiple cases:
                 \cesktranswheresplit%
                 {\acontconf{\FieldsA{Q}{\loc}{\env}{\scont}}{\val{s}}}%
                 {\scontconf{\scont}{\env}}%
-                {\text{where $\deref{\deref\loc[\field_i]} = \val_{i}, \forall \field_i \in Fs, \forall \val_i \in \val{s}$}}.
+                {\text{where $\deref{(\deref{(\loc)}[i])}= \val_{i}, \forall \field_i \in Fs, \forall \val_i \in \val{s}$}}.
             \end{multlined}
         \end{align*}
     \item The initializer list contains at least one initializer with an expression to evaluate.
         This initializer is a $\FieldInitializer{\expressionmeta}$ or a $\LocalInitializer{\expressionmeta}$.
-        In \kernel{}, a super initializer or a redirecting initializer, when present, will appear last in the initializer list.
         If the initializer list contains at least two initializers, we can assume that the next initializer is as described above.
         The CESK-transition function for this case is shown below:
         \begin{align*}
@@ -2445,59 +2457,79 @@ We consider multiple cases:
                 \cesktranswheresplit%
                 {\acontconf{\FieldsA{Q}{\loc}{\env}{\scont}}{\val{s}}}%
                 {\evalconf{\expr}{\env}{st}{cex}{cst}{\econt'}}
-                {\parbox{10cm}{%
-                    where $\deref{\deref{\loc[\field_i]}} = \val_{i}$, $\forall \field_i \in Fs, \forall \field_i \in \val{s}$,
-                    \\$\econt' = \InitializerListEK{Q}{k}{\loc}{\env}{\scont}$,
-                    \\$k = 0$ is the index of the initializer whose expression is evaluated in the next step,
-                    \\$\expressionmeta$ is the expression from $\FieldInitializer{\expressionmeta}$ or $\LocalInitializer{\expressionmeta}$}}
+                {\begin{aligned}
+                   \text{where } \deref{(\deref{\loc[i]})} &= \val_{i}, \forall \field_i \in Fs, \forall \field_i \in \val{s},\\
+                                 \econt' &= \InitializerListEK{Q}{k}{\loc}{\env}{\scont},\\
+                                 k &= 0 \text{ is the index of the initializer whose expression is evaluated in the next step},\\
+                                 \expressionmeta &\text{ is the expression from $\FieldInitializer{\expressionmeta}$ or $\LocalInitializer{\expressionmeta}$}
+                \end{aligned}}
             \end{multlined}
         \end{align*}
 
-    \item Otherwise, there is only one initializer in the initializer list and it is a $\SuperInitializer{G}{\expressionsmeta}$. This is the case because the fields are initialzied only when a non-redirecitng constructor is run.
+    \item Otherwise, there is only one initializer in the initializer list and it is a $\SuperInitializer{G}{\expressionsmeta}$.
+        This is the case because the fields are initialized only when a non-redirecting constructor is run.
         Otherwise, the initializer is a super initializer, $\SuperInitializer{G}{\exprs}$:
         \begin{align*}
             \cesktranswheresplit%
             {\acontconf{\FieldsA{Q}{\loc}{\env}{\scont}}{\val{s}}}%
             {\evallistconf{\exprs}{\env}{\strace}{\cstrace}{\cex}{\acont}}%
-            {\parbox{10cm}{%
-                where $\deref{\deref{\loc[\field_i]}} = \val_{i}$, $\forall \field_i \in Fs$, $\forall \val_i \in \val{s}$,
-                \\$\acont = \SuperA{G}{\loc}{\scont}$}}
+            {\begin{aligned}
+                \text{where } \deref{\deref{\loc[\field_i]}} &= \val_{i}, \forall \field_i \in Fs, \forall \val_i \in \val{s},\\
+                \acont &= \SuperA{G}{\loc}{\scont}
+            \end{aligned}}
         \end{align*}
 \end{itemize}
 
 The CESK-transition functions starting in an ValuePassingConfiguration, with an initializer list expression continuation are described below.
 
-In the CESK-transitions below, we denote by $Izs$ the list of initializers for the target constructor $Q$.
-When the current initalizer being executed is a $\LocalInitializer{\expressionmeta}$, we have the following cases:
+When the current initializer being executed is a $\LocalInitializer{\expressionmeta}$, we have the following cases:
 \begin{align*}
     &\begin{multlined}
         \cesktranswheresplit%
         {\contconf{\InitializerListEK{Q}{k}{\env}{\loc}{\scont}}{\val}}%
             {\scontconf{\scont}{\env'}}%
-        {\parbox{10cm}{%
-            where $\env' = \ext{\env}{\variablemeta}{\val}$,
-            \\$Izs[k] = \LocalInitializer{\expressionmeta}$,
-            \\$k+1 \geq length(Izs)$}}
+        {\begin{aligned}
+            \text{where } \env' &= \ext{\env}{\variablemeta}{\val},\\
+                          Izs &\text{ is the initializer list of the constructor $Q$},\\
+                          Izs[k] &= \LocalInitializer{\expressionmeta},\\
+                          k+1 &\geq length(Izs)
+        \end{aligned}}
     \end{multlined}\\
     &\begin{multlined}
         \cesktranswheresplit*%
         {\contconf{\InitializerListEK{Q}{k}{\env}{\loc}{\scont}}{\val}}%
             {\evallistconf{\exprs}{\env'}{\strace}{\cstrace}{\cex}{\acont}}%
-        {\parbox{10cm}{%
-            where $\env' = \ext{\env}{\variablemeta}{\val}$,
-            \\$Izs[k] = \LocalInitializer{\expressionmeta}$,
-            \\$\acont = \SuperA{G}{\loc}{\scont}$, if $Izs[k+1] = \SuperInitializer{G}{\exprs}$,
-            \\$\acont = \RedirectingA{G}{\loc}{\scont}$, if $Izs[k+1] = \RedirectingInitializer{G}{\exprs}$}}
+        {\begin{aligned}
+            \text{where } \env' &= \ext{\env}{\variablemeta}{\val},\\
+                          Izs &\text{ is the initializer list of the constructor $Q$},\\
+                          Izs[k] &= \LocalInitializer{\expressionmeta},\\
+                          \acont &= \SuperA{G}{\loc}{\scont},\\
+                          Izs[k+1] &= \SuperInitializer{G}{\exprs},\\
+         \end{aligned}}
+    \end{multlined}\\
+    &\begin{multlined}
+        \cesktranswheresplit*%
+        {\contconf{\InitializerListEK{Q}{k}{\env}{\loc}{\scont}}{\val}}%
+            {\evallistconf{\exprs}{\env'}{\strace}{\cstrace}{\cex}{\acont}}%
+        {\begin{aligned}
+            \text{where } \env' &= \ext{\env}{\variablemeta}{\val},\\
+                          Izs &\text{ is the initializer list of the constructor $Q$},\\
+                          Izs[k] &= \LocalInitializer{\expressionmeta},\\
+                          \acont &= \RedirectingA{G}{\loc}{\scont},\\
+                          Izs[k+1] &= \RedirectingInitializer{G}{\exprs}
+         \end{aligned}}
     \end{multlined}\\
     &\begin{multlined}
         \cesktranswheresplit%
         {\contconf{\InitializerListEK{Q}{k}{\env}{\loc}{\scont}}{\val}}%
             {\evalconf{\expri{1}}{\env'}{st}{cex}{cst}{\econt'}}%
-            {\parbox{\textwidth-2cm}{%
-            where $\env' = \ext{\env}{\variablemeta}{\val}$,
-            \\$Izs[k] = \LocalInitializer{\expressionmeta}$,
-            \\$Izs[k+1] = \LocalInitializer{\expressionmeta_1}$ or $\FieldInitializer{\expressionmeta_1}$,
-            \\$\econt' = \InitializerListEK{Izs}{k+1}{\loc}{\env'}{\scont}$}}
+        {\begin{aligned}
+            \text{where } \env' &= \ext{\env}{\variablemeta}{\val},\\
+                          Izs &\text{ is the initializer list of the constructor $Q$},\\
+                          Izs[k] &= \LocalInitializer{\expressionmeta},\\
+                          Izs[k+1] &= \LocalInitializer{\expressionmeta_1} \text{ or }\FieldInitializer{\expressionmeta_1},\\
+                          \econt' &= \InitializerListEK{Izs}{k+1}{\loc}{\env'}{\scont}
+        \end{aligned}}
     \end{multlined}
 \end{align*}
 
@@ -2512,29 +2544,43 @@ When the current initalizer being executed is a $\FieldInitializer{\expressionme
         \cesktranswheresplit%
         {\contconf{\InitializerListEK{Q}{k}{\loc}{\env}{\scont}}{\val}}%
             {\scontconf{\scont}{\env'}}%
-        {\parbox{10cm}{%
-            where $\update{(\deref{\loc})[\field]}{\val}$,
-            \\$Izs[k] = \FieldInitializer{\expressionmeta}$}}
+        {\begin{aligned}
+            \text{where } \deref{((\deref{\loc})[i]}) &= {\val}, i \in \NN \text{ s.t $i$ is the position of $\field$ in fields of $\deref{\loc}$} \\
+                          Izs[k] &= \FieldInitializer{\expressionmeta}
+        \end{aligned}}
     \end{multlined}\\
     &\begin{multlined}
         \cesktranswheresplit*%
         {\contconf{\InitializerListEK{Q}{k}{\loc}{\env}{\scont}}{\val}}%
             {\evallistconf{\exprs}{\env}{\strace}{\cstrace}{\cex}{\acont}}%
-            {\parbox{\textwidth-2cm}{%
-                where $\update{(\deref{\loc})[\field]}{\val}$,
-        \\$Izs[k] = \FieldInitializer{\expressionmeta}$,
-        \\$\acont = \SuperA{G}{\loc}{\scont}$, if $Izs[k+1] = \SuperInitializer{G}{\exprs}$,
-        \\$\acont = \RedirectingA{G}{\loc}{\scont}$, if $Izs[k+1] = \RedirectingInitializer{G}{\exprs}$}}
+        {\begin{aligned}
+            \text{where } \deref{((\deref{\loc})[i]}) &= {\val}, i \in \NN \text{ s.t $i$ is the position of $\field$ in fields of $\deref{\loc}$} \\
+                          Izs[k] &= \FieldInitializer{\expressionmeta}\\
+                          \acont &= \SuperA{G}{\loc}{\scont},\\
+                          Izs[k+1] &= \SuperInitializer{G}{\exprs}
+         \end{aligned}}
+    \end{multlined}\\
+    &\begin{multlined}
+        \cesktranswheresplit*%
+        {\contconf{\InitializerListEK{Q}{k}{\loc}{\env}{\scont}}{\val}}%
+            {\evallistconf{\exprs}{\env}{\strace}{\cstrace}{\cex}{\acont}}%
+        {\begin{aligned}
+            \text{where } \deref{((\deref{\loc})[i]}) &= {\val}, i \in \NN \text{ s.t $i$ is the position of $\field$ in fields of $\deref{\loc}$} \\
+                          Izs[k] &= \FieldInitializer{\expressionmeta}\\
+                          \acont &= \RedirectingA{G}{\loc}{\scont},\\
+                          Izs[k+1] &= \RedirectingInitializer{G}{\exprs}
+         \end{aligned}}
     \end{multlined}\\
     &\begin{multlined}
         \cesktranswheresplit%
         {\contconf{\InitializerListEK{Q}{k}{\env}{\loc}{\scont}}{\val}}%
             {\evalconf{\expri{1}}{\env}{st}{cex}{cst}{\econt}}%
-        {\parbox{10cm}{%
-            where $\update{(\deref\loc)[\field]}{\val}$,
-             \\$Izs[k] = \FieldInitializer{\expressionmeta}$,
-             \\$Izs[k+1] = \LocalInitializer{\expressionmeta_1}$ or $\FieldInitializer{\expressionmeta_1}$,
-             \\$\econt' = \InitializerListEK{Izs}{k+1}{\env'}{\loc}{\scont}$}}
+        {\begin{aligned}
+            \text{where } \deref{((\deref{\loc})[i]}) &= {\val}, i \in \NN \text{ s.t $i$ is the position of $\field$ in fields of $\deref{\loc}$} \\
+                          Izs[k] &= \FieldInitializer{\expressionmeta}\\
+                          Izs[k+1] &= \LocalInitializer{\expressionmeta_1} \text{ or }\FieldInitializer{\expressionmeta_1},\\
+                          \econt' &= \InitializerListEK{Izs}{k+1}{\env'}{\loc}{\scont}
+        \end{aligned}}
     \end{multlined}
 \end{align*}
 
