@@ -101,6 +101,7 @@
 \newcommand{\dacont}{\mathbf{ApplCont}}
 \newcommand{\dbcont}{\mathbf{BreakCont}}
 \newcommand{\dswitchcont}{\mathbf{SwitchCont}}
+\newcommand{\dncont}{\mathbf{EventCont}}
 
 \newcommand{\dlbl}{\mathbf{Label}}
 \newcommand{\dclbl}{\mathbf{SwitchLabel}}
@@ -368,6 +369,9 @@ This section contains definitions of syntactic and semantic domains, helper func
 \newcommand{\formali}[1]{\ensuremath{A_{#1}}}
 \newcommand{\formals}{\ensuremath{As}}
 
+\newcommand{\ncont}{\cont_\ensuremath{N}}
+\newcommand{\eventloop}{\ensuremath{G}}
+
 % Constructor Initializers
 \newcommand{\Initializer}[1]{\synt{Initializer}(#1)}
 \newcommand{\FieldInitializer}[1]{\synt{FieldInitializer}(\field, #1)}
@@ -436,6 +440,8 @@ This section contains definitions of syntactic and semantic domains, helper func
     \typemeta & : & \dtype & \text{semantic domain of Dart types}\\
     \formal, \formali{i} & : & \dvardecl & \text{syntactic domain of variable declarations} \\
     \formals & : & \dformals = \mlist{\dvardecl} &\text{syntactic domain of formal parameters}\\
+    \ncont & : & \dncont &\text{semantic domain of event loop continuations}\\
+    \eventloop & : & \mlist{\dncont} &\text{semantic domain of event loops}\\
   \end{array}
 \]
 
@@ -823,8 +829,10 @@ Configurations contain different components and the transition step dispatches t
 \newcommand{\evallistconf}[6]{\langle{#1},\,{#2},\,{#3},\handler,\,{#4},\,{#5},\,{#6}\rangle_{\mathrm{evalList}}}
 \newcommand{\evalconf}[6]{\langle{#1},\,{#2},\,{#3},\handler,\,{#4},\,{#5},\,{#6}\rangle_{\mathrm{eval}}}
 \newcommand{\execconf}[9]{\langle{#1},\,{#2},\,{#3},\,{#4},\,{#5},\,{#6},\,{#7},\,{#8},\,{#9}\rangle_{\mathrm{exec}}}
+\newcommand{\eventconf}[2]{\langle{#1},\,{#2}\rangle_{\mathrm{event}}}
 
 % Transition
+\todo{dmitryas: Add G (event loop) to all configurations.}
 \begin{figure}[Htp]
   \begin{eqfigure}
   \begin{align}
@@ -836,8 +844,8 @@ Configurations contain different components and the transition step dispatches t
     &\scontconf{\scont}{\env} & :\quad & \text{ForwardConfiguration} \label{config:scont}\\
     &\throwconf{\handler}{\val}{\strace} & :\quad & \text{ThrowConfiguration} \label{config:throw}\\
     &\breakconf{\bcont} & :\quad & \text{BreakConfiguration} \label{config:bcont}\\
-    &\switchconf{\switchcont} & :\quad &
-    \text{SwitchConfiguration}
+    &\switchconf{\switchcont} & :\quad & \text{SwitchConfiguration} \\
+    &\eventconf{\ncont}{\eventloop} & :\quad & \text{EventLoopConfiguration}
     \label{config:switchcont}
   \end{align}
   \caption{States for the CESK machine}
@@ -1001,6 +1009,9 @@ The different expression continuations are shown in Figure~\ref{figure:econts}.
 
 \newcommand{\ForCondK}{\mathrm{ForConditionEK}(\varmeta{s},\, \expressionmeta,\, \exprs,\, \statementmeta,\, \env,\, \env',\, \lbls,\, \clbls,\, \handler,\, \cstrace,\, \cex,\, \econt,\, \scont)}
 \newcommand{\ExpressionK}[2]{\mathrm{ExpressionEK}({#1},\,{#2})}
+
+\newcommand{\AsyncReturnEK}[1]{\mathrm{AsyncReturnEK}({#1})}
+
 \begin{figure}[Htp]
   \begin{eqfigure}
   \begin{align}
@@ -1027,7 +1038,8 @@ The different expression continuations are shown in Figure~\ref{figure:econts}.
     &\IfCondK{\expressionmeta_1}{\expressionmeta_2} \label{econt:if-cond}\\
     &\ForCondK \label{econt:for-cond}\\
     &\ExpressionK{\scont}{\env} \label{econt:expression}\\
-    &\InitializerListEK{Q}{i}{\loc}{\env}{\scont} \label{econt:initializer-list}
+    &\InitializerListEK{Q}{i}{\loc}{\env}{\scont} \label{econt:initializer-list}\\
+    &\AsyncReturnEK{\econt}
   \end{align}
   \caption{Expression Continuations}
   \label{figure:econts}
@@ -1182,6 +1194,22 @@ The different exception handlers are shown in Figure~\ref{figure:handlers}.
   \caption{Exception handlers}
   \label{figure:handlers}
   \end{eqfigure}
+\end{figure}
+
+
+\subsubsection{Event Loop Continuations}
+
+\newcommand{\StartNK}[3]{\mathrm{StartNK}({#1},\,{#2},\,{#3})}
+\newcommand{\ResumeNK}[2]{\mathrm{ResumeNK}({#1},\,{#2})}
+
+\begin{figure}[Htp]
+    \begin{eqfigure}
+        \begin{align}
+            &\StartNK{\stmt}{\env}{\econt}\\
+            &\ResumeNK{\econt}{\val}
+        \end{align}
+        \caption{Event loop continuations}
+    \end{eqfigure}
 \end{figure}
 
 
@@ -3089,12 +3117,35 @@ Let $F$ be a function with a body $\stmt_{body}$ and a list of formal parameters
 \label{subsec:eventloop}
 
 
-\subsubsection{Sync*}
-\label{subsubsec:syncstar}
-
-
 \subsubsection{Async}
 \label{subsubsec:async}
+
+Notes here are for those who will rewrite the basic async specification into full async specification.
+They should be changed in the final version.
+
+What to read:
+\begin{itemize}
+    \item The Event Loop and Dart \url{https://webdev.dartlang.org/articles/performance/event-loop}.
+
+    \item Dart Language Asynchrony Support: Phase 1 \url{https://www.dartlang.org/articles/language/await-async}.
+
+    \item Spicing Up Dart with Side Effects \url{http://dl.acm.org/citation.cfm?id=2747873}.
+
+\end{itemize}
+
+Along other things, the following is not considered in the basic version:
+\begin{itemize}
+    \item The labels and switch labels are ommitted.
+
+    \item The exception-related components and transitions are ommitted.
+
+    \item For simplicity, all functions are considered to have exactly one required positional parameter and zero named parameters.
+
+\end{itemize}
+
+
+\subsubsection{Sync*}
+\label{subsubsec:syncstar}
 
 
 \subsubsection{Async*}
