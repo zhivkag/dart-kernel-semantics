@@ -1359,8 +1359,12 @@ The value corresponding to the evaluated expression is captured by the applicati
         &\begin{multlined}
             \cesktranswheresplit%
                 {\evalconf{F}{\env}{st}{cex}{cst}{\econt}}%
-                {\contconf{\econt}{\funval{\formals}{\stmt}{\env}}}%
-                {\text{where $F$ is a function expression with formal parameters $\formals$ and body $\stmt$}}
+                {\contconf{\econt}{\val}}%
+                {\begin{aligned}
+                    \text{where } \val &= \funval{\formals}{\stmt}{\loc}\\
+                                  F &\text{ is a function expression with formal parameters $\formals$ and body $\stmt$}\\
+                                  \deref{\loc} &= \env \text{ after transtion}
+                \end{aligned}}
         \end{multlined}
     \end{align}
     \caption{The CESK-transition function for EvalConfiguration: simple expressions}
@@ -1549,7 +1553,7 @@ Otherwise, the evaluation of the expression results with an error, as shown in \
 \label{subsubsec:function-expressions}
 
 \kernel{} supports encapsulating an executable unit of code with function expressions.
-To support function expressions we introduce $fv = \funval{\formals}{\stmt_{body}}{\env} \in \dfunval$ as a value that has the function statement body, $\stmt_{body} \in \dstmt$, its list of formal parameters, $\formals \in \dformals$, and the environment, $\env \in \denv$ in scope of the function expression.
+To support function expressions we introduce $fv = \funval{\formals}{\stmt_{body}}{\loc} \in \dfunval$ as a value that has the function statement body, $\stmt_{body} \in \dstmt$, its list of formal parameters, $\formals \in \dformals$, and the environment, $\deref{\loc} = \env \in \denv$ in scope of the function expression.
 This ensures that there are no free variables in the body of $fv$.
 
 $fv \in \dfunval$ has only one property, $call$.
@@ -1665,8 +1669,11 @@ The specific CESK-transitions for the different invocations are described in the
         &\begin{multlined}
             \cesktranswheresplit%
                 {\evalconf{\StaticGet{\membermeta}}{\env}{\strace}{\cstrace}{\cex}{\econt}}%
-                {\contconf{\econt}{\funval{\formals}{\stmt}{\env_{empty}}}}%
-                {\text{where $\membermeta$ is a method tear-off with formal parameters $\formals$ and body $\stmt$}}
+                {\contconf{\econt}{\funval{\formals}{\stmt}{\loc}}}%
+                {\begin{aligned}
+                    \text{where } \deref{\loc} &= \env_{empty} \text{ after transition}\\
+                                  \membermeta &\text{ is a method tear-off with formal parameters $\formals$ and body $\stmt$}
+                \end{aligned}}
         \end{multlined}
         \label{eval:staticget-tearoff}\\
         &\begin{multlined}
@@ -1752,7 +1759,7 @@ When $\membermeta$ is a method, the expression $\StaticGet{\membermeta}$ is a me
         If $\membermeta$ is a static getter, the body of the getter is executed, as shown in \eqref{eval:staticget-getter}.
 
     \item $\membermeta$ is a static method tear-off\\
-        If $\membermeta$ is a method with formal parameters $\formals$ and body $\stmt$, a new $\funval{\formals}{\stmt}{\env_{empty}}$ is created and bound to the member in the global environment $\mainenv$, as shown in \eqref{eval:staticget-tearoff}.
+        If $\membermeta$ is a method with formal parameters $\formals$ and body $\stmt$, a new $\funval{\formals}{\stmt}{\loc}, \deref{\loc} = \env_{empty}$ is created and bound to the member in the global environment $\mainenv$, as shown in \eqref{eval:staticget-tearoff}.
         The continuation $\econt$ is applied to this value.
 
 \end{itemize}
@@ -1821,11 +1828,13 @@ A statement continuation, $\ExitSK{\nnull}$ is added as next statement continuat
         &\begin{multlined}
         \cesktranswheresplit%
             {\evalconf{\SuperPropertyGet{\idmeta}}{\env}{\strace}{\cstrace}{\cex}{\econt}}%
-            {\contconf{\econt}{\funval{\formals}{\stmt}{\env'}}}%
+            {\contconf{\econt}{\val}}%
             {\begin{aligned}
-                \text{where } \env' &= \ext{\env_{empty}}{\this}{\deref{(\env(\this))}},\\
+                \text{where } \val &= \funval{\formals}{\stmt}{\loc}\\
+                              \deref{\loc} &= \env'\\
+                              \env' &= \ext{\env_{empty}}{\this}{\deref{(\env(\this))}},\\
                               \membermeta &= \superclass(\deref{\env(\this)}).lookup(\idmeta),\\
-                              \membermeta &\text{ is a method tear-off with formal parameters }\formals \text{ and body } \stmt
+                              \membermeta &\text{ is a method tear-off with formal parameters $\formals$ and body $\stmt$}
              \end{aligned}}
         \end{multlined}
         \label{eval:superpropertyget-tearoff}\\
@@ -1870,9 +1879,10 @@ A statement continuation, $\ExitSK{\nnull}$ is added as next statement continuat
     &\begin{multlined}
     \cesktranswheresplit*%
         {\contconf{\PropertyGetK}{\val}}%
-        {\contconf{\econt}{\funval{\formals}{\stmt}{\env}}}
+        {\contconf{\econt}{\funval{\formals}{\stmt}{\loc}}}
         {\begin{aligned}
             \text{where } \membermeta &\text{ is a method with body $\stmt$ and formals $\formals$},\\
+                          \deref{\loc} &= \env \text{ after transition}\\
                           \env &= \ext{\env_{empty}}{\this}{\val}
         \end{aligned}}
     \end{multlined}
@@ -1909,9 +1919,10 @@ A statement continuation, $\ExitSK{\nnull}$ is added as next statement continuat
     &\begin{multlined}
         \cesktranswheresplit*%
         {\contconf{\DPropertyGetK}{\val}}%
-        {\contconf{\econt}{\funval{\formals}{\stmt}{\env}}}%
+        {\contconf{\econt}{\funval{\formals}{\stmt}{\loc}}}%
         {\begin{aligned}
-            \text{where } \membermeta &\text{ is a method with body $\stmt$ and formals $\formals$},\\
+            \text{where } \deref{\loc} = \env \text{ after transition}\\
+                          \membermeta &\text{ is a method with body $\stmt$ and formals $\formals$},\\
                           \env &= \ext{\env_{empty}}{\this}{\val}
          \end{aligned}}
     \end{multlined}
@@ -2716,10 +2727,15 @@ When the current initalizer being executed is a $\FieldInitializer{\expressionme
         \end{multlined}
         \label{execconf:continue}\\
         &\begin{multlined}
-            \cesktranswheresplit*%
-                {\execconf{fun(\formals) \stmt_{body}}{\env}{\lbls}{\clbls}{\strace}{\handler}{\cstrace,\,\cex}{\econt}{\scont}}%
-                {\contconf{\econt}{\funval{\stmt_{body}}{\formals}{\env'}}}%
-                {\text{where $\env' = \ext{\env}{fun}{\funval{\stmt_{body}}{\formals}{\env'}}$}}
+            \cesktranswheresplit%
+                {\execconf{\FunctionDeclaration{\typemeta}{\idmeta}{\formals}{}{\stmt}}{\env}{\lbls}{\clbls}{\strace}{\handler}{\cstrace,\,\cex}{\econt}{\scont}}%
+                {\contconf{\econt}{\val}}%
+                {\begin{aligned}
+                    \text{where } \val &= \funval{\stmt_{body}}{\formals}{\loc}\\
+                                  \env' &= \ext{\env}{\varmeta}{\val}\\
+                                  \deref{\loc} &= \env' \text{ after transition}\\
+                                  \varmeta &= \text{a variable declaration corresponding to identifier $\idmeta$}
+                \end{aligned}}
         \end{multlined}
         \label{execconf:function}
     \end{align}
@@ -3139,6 +3155,9 @@ Let $F$ be a function with a body $\stmt_{body}$ and a list of formal parameters
 
 \subsubsection{Async}
 \label{subsubsec:async}
+
+
+
 
 Notes here are for those who will rewrite the basic async specification into full async specification.
 They should be changed in the final version.
