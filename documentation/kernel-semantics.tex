@@ -692,7 +692,7 @@ This allows us to modify the environment and add a binding to a location contain
 \newcommand{\ConditionalExpression}[3]{#1\,\synt{?}\,#2\,\synt{:}\,#3}
 
 %% StringConcatenation
-\newcommand{\StringConcatenation}[1]{\synt{Concat}\,#1}
+\newcommand{\StringConcatenation}[2]{#1\,\dots\,#2}
 
 \newcommand{\IsExpression}[2]{#1\,\synt{is}\,#2}
 \newcommand{\AsExpression}[2]{#1\,\synt{as}\,#2}
@@ -1287,10 +1287,13 @@ The value corresponding to the evaluated expression is captured by the applicati
             {\evalconf{\varmeta}{\env}{\strace}{\cstrace}{\cex}{\econt}}%
             {\contconf{\econt}{\deref{\env(\varmeta)}}}
             \label{eval:varget}\\
-        &\cesktrans%
+        &\begin{multlined}
+            \cesktranswheresplit%
             {\evalconf{\varmeta \synt{=} \expr}{\env}{\strace}{\cstrace}{\cex}{\econt}}%
-            {\evalconf{\expr}{\env}{\strace}{\cstrace}{\cex}{\VarSetK{\idmeta}{\env}{\ExceptionHandlers}{\econt}}}
-            \label{eval:varset}\\
+            {\evalconf{\expr}{\env}{\strace}{\cstrace}{\cex}{\econt'}}
+            {\econt' = \VarSetK{\idmeta}{\env}{\ExceptionHandlers}{\econt}}
+        \end{multlined}
+        \label{eval:varset}\\
         &\cesktrans%
             {\evalconf{\Not{\expressionmeta}}{\env}{\strace}{\cstrace}{\cex}{\econt}}%
             {\evalconf{\expressionmeta}{\env}{\strace}{\cstrace}{\cex}{\NotK{\econt}}}
@@ -1325,7 +1328,7 @@ The value corresponding to the evaluated expression is captured by the applicati
         \label{eval:let}\\
         &\begin{multlined}
             \cesktranssplit%
-                {\evalconf{\StringConcatenation{\exprs}}{\env}{\strace}{\cstrace}{\cex}{\econt}}%
+                {\evalconf{\StringConcatenation{\expressionmeta_1}{\expressionmeta_N}}{\env}{\strace}{\cstrace}{\cex}{\econt}}%
                 {\evallistconf{\exprs}{\env}{\strace}{\cstrace}{\cex}{\StringConcatenationA}}
         \end{multlined}
         \label{eval:concat}\\
@@ -2935,45 +2938,62 @@ If there is a matching case clause, its statement is executed.
 A new statement continuation is added as next statement continuation that will throw when reached.
 The new statement continuation is necessary because implicit fall-through is not supported and an explicit break of the flow is required (with either of $\continue$, $\bbreak$, $\return$, $\throw$).
 
-\begin{align*}
+\begin{figure}[Htp]
+  \begin{eqfigure}
+  \begin{align}
     &\begin{multlined}
-        \cesktranssplit%
+        \cesktranswheresplit*%
             {\contconf{\SwitchK{\scase :: \scases}{\clbls}}{\val}}%
-            {\execconf{\stmt}{\env}{\lbls}{\clbls}{\strace}{\handler}{\cex,\,\cstrace}{\econt}{\ExitSK{\nnull}}},
+            {\execconf{\stmt}{\env}{\lbls}{\clbls}{\strace}{\handler}{\cex,\,\cstrace}{\econt}{\ExitSK{\nnull}}}%
+            {\begin{aligned}
+                \text{where } &\scase = \case \expri{1}, \dots, \expri{i} \synt{ : } \stmt,\\
+                              &\text{$\scase$ is a matching $\case$ clause}
+            \end{aligned}}
     \end{multlined}
-\end{align*}
-
-\noindent where $\scase = \case \expri{1}, \dots, \expri{i} \synt{ : } \stmt$ and $\scase$ is a matching $\case$ clause.
-
-A case clause is matching if is $\default$ or there is at least one of the constant expressions in the case clause identical to the target value of the switch.
-
-If a non-matching $\case$ clause, $\scase$, is the target of a continue statement, it installs a new continue label.
-A new continue label is installed to support execution of its statement with the appropriate configuration if a continue to this clause is encountered.
-\begin{align*}
+    \label{econt:switch-matching}\\
     &\begin{multlined}
-        \cesktranssplit
+        \cesktranswheresplit*%
             {\contconf{\SwitchK{\scase :: \scases}{\clbls}}{\val}}%
-            {\contconf{\SwitchK{\scases}{\clbl :: \clbls}}{\val}},
+            {\contconf{\SwitchK{\scases}{\clbl :: \clbls}}{\val}}%
+            {\begin{aligned}
+                \text{where } &\text{$SC$ is a target of a $\mathrm{continue}$},\\
+                              &\clbl = \continuel{\scase}{\switchcont},\\
+                              &\switchcont = \ContinueK
+            \end{aligned}}
     \end{multlined}
-\end{align*}
-
-\noindent where
-\begin{align*}
-    &\clbl = \continuel{\scase}{\switchcont},\\
-    &\switchcont = \ContinueK.
-\end{align*}
-
-Otherwise, the execution continues as follows:
-\begin{align*}
+    \label{econt:switch-continue}\\
     &\begin{multlined}
-        \cesktranssplit%
+        \cesktranswheresplit*%
             {\contconf{\SwitchK{\scase :: \scases}{\clbls}}{\val}}%
-            {\contconf{\SwitchK{\scases}{\clbls}}{\val}},
-    \end{multlined}\\
+            {\contconf{\SwitchK{\scases}{\clbls}}{\val}}%
+            {\text{where $SC$ is not a target of a $\mathrm{continue}$}},
+    \end{multlined}
+    \label{econt:switch-next}\\
     &\cesktrans%
         {\contconf{\SwitchK{[]}{\clbls}}{\val}}%
-        {\scontconf{\scont}{\env}}.
-\end{align*}
+        {\scontconf{\scont}{\env}}
+  \end{align}
+  \end{eqfigure}
+  \caption{The CESK-transition function starting in ValuePassingConfiguration: switch statements}
+  \label{fig:econt-switch}
+\end{figure}
+
+The execution of switch statements is shown in \eqref{execconf:switch}, where the target expression is evaluated to some value $\val$.
+
+In Figure~\ref{fig:econt-switch} we show how the SwitchEK is applied to the target value of the switch. 
+We consider three cases: if a switch case is a matching case clause, if it is a non-matching case clause target of a continue in a following switch case or a non-matching switch clause that is not the target of a continue.
+
+We add a CESK-transition that evaluates all the expressions in the associated switch cases.
+These expressions being constant, their evaluation has no side effects.
+
+A case clause is matching if is $\default$ or there is at least one of the constant expressions in the case clause identical to the target value of the switch.
+The CESK-transition function  matching case is shown in \eqref{econt:switch-matching}.
+
+If a non-matching $\case$ clause, $\scase$, is the target of a continue statement, it installs a new continue label.
+A new continue label is installed to support execution of its statement with the appropriate configuration when a continue to this clause is executed.
+The CESK-transition is shown in \eqref{econt:switch-continue}.
+
+If the switch case is not target of a continue, the execution of the switch statement proceeds to the next switch case, as shown in \eqref{econt:switch-next}.
 
 
 \subsubsection{Exceptions}
@@ -3135,9 +3155,9 @@ What to read:
 
 Along other things, the following is not considered in the basic version:
 \begin{itemize}
-    \item The labels and switch labels are ommitted.
+    \item The labels and switch labels are omitted.
 
-    \item The exception-related components and transitions are ommitted.
+    \item The exception-related components and transitions are omitted.
 
     \item For simplicity, all functions are considered to have exactly one required positional parameter and zero named parameters.
 
