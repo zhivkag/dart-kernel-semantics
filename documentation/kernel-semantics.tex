@@ -1291,7 +1291,7 @@ The value corresponding to the evaluated expression is captured by the applicati
             \cesktranswheresplit%
             {\evalconf{\varmeta \synt{=} \expr}{\env}{\strace}{\cstrace}{\cex}{\econt}}%
             {\evalconf{\expr}{\env}{\strace}{\cstrace}{\cex}{\econt'}}
-            {\econt' = \VarSetK{\idmeta}{\env}{\ExceptionHandlers}{\econt}}
+            {\econt' = \VarSetK{\variablemeta}{\env}{\ExceptionHandlers}{\econt}}
         \end{multlined}
         \label{eval:varset}\\
         &\cesktrans%
@@ -1661,8 +1661,8 @@ The specific CESK-transitions for the different invocations are described in the
                 {\evalconf{\StaticGet{\membermeta}}{\env}{\strace}{\cstrace}{\cex}{\econt}}%
                 {\execconf{\stmt}{\env_{empty}}{[]}{[]}{\StaticGet{\membermeta} ::\strace}{\handler}{\cex,\,\cstrace}{\econt}{\scont}}%
                 {\begin{aligned}
-                    \text{where } \membermeta &\text{is a getter with body $\stmt$}
-                                  \scont = \ExitSK{\nnull}
+                    \text{where } \membermeta &\text{is a getter with body $\stmt$}\\
+                                  \scont &= \ExitSK{\nnull}
                 \end{aligned}}
         \end{multlined}
         \label{eval:staticget-getter}\\
