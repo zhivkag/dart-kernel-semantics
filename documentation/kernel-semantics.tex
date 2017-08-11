@@ -56,6 +56,11 @@
 \DeclareMathOperator{\lookup}{lookup}
 \DeclareMathOperator{\methodLookup}{methodLookup}
 
+% Meta-functions for operations on list
+\DeclareMathOperator{\head}{head}
+\DeclareMathOperator{\tail}{tail}
+\DeclareMathOperator{\append}{append}
+
 % Keywords and syntactic constructs of Dart Kernel to be used in math mode.
 \newcommand{\synt}[1]{\ensuremath{\text{\textbf{\texttt{#1}}}}}
 \DeclareMathOperator{\dowhile}{\synt{do~while}}
@@ -307,10 +312,28 @@ This section contains definitions of syntactic and semantic domains, helper func
 \label{subsec:notations}
 
 \begin{align*}
-    [] &\text{ --- empty list}.\\
-    \varmeta :: list &\text{ --- a meta-list that is constructed by adding element $\varmeta$ to the head of the meta-list $list$}.\\
     \dom(f) &\text{ --- the domain of function \(f\)}.\\
     \pi_i(x) &\text{ --- the $i^{th}$ component of $x \in \ddom_1 \times \dots \times \ddom_n$}.
+\end{align*}
+
+\subsubsection{Semantic list}
+\label{subsubsec:semantic-list}
+
+Throughout the document we use semantic lists which represent lists of elements from some semantic domain.
+We define a list $l \in \mlist{\ddom}$ and are constructed as follows:
+\begin{align*}
+    [] &\text{ --- empty list}.\\
+    x :: \textit{list} &\text{ --- a meta-list that is constructed by adding element $x \in \ddom$ to the head of the meta-list $list$}.
+\end{align*}
+
+In addition of the usual $\head$ and $\tail$ operations on a list, we add $\append$ operator.
+\begin{align*}
+    &\head \in \mlist{\ddom} \rightarrow \ddom\\
+    &\head(x :: \textit{list}) = x \text{ where $x :: \text{list} \in \mlist{\ddom}$ is a non empt y list}\\[2mm]
+    &\tail \in \mlist{\ddom} \rightarrow \mlist{\ddom}\\
+    &\tail(x :: \textit{list}) = list \text{ where $x :: \text{list} \in \mlist{\ddom}$ is a non empt y list}\\[2mm]
+    &\append \in \mlist{\ddom} \times \ddom \rightarrow \mlist{\ddom}\\
+    &\append(list, x) = list ::: x \text{ where $x \in \ddom$ is added as last element of the $list \in \mlist{\ddom}$}
 \end{align*}
 
 
@@ -1695,7 +1718,7 @@ The specific CESK-transitions for the different invocations are described in the
         \end{multlined}
         \label{eval:staticinvoc}
     \end{align}
-    \caption{The CESK-transition function for EvalConfiguration: static variable extraction and assignment, and static method invocation}
+    \caption{The CESK-transition function for EvalConfiguration: static variable extraction and assignment, and sync static method invocation}
     \label{table:static-evalconfigs}
     \end{eqfigure}
 \end{figure}
@@ -3152,12 +3175,29 @@ Let $F$ be a function with a body $\stmt_{body}$ and a list of formal parameters
 \subsection{Event Loop}
 \label{subsec:eventloop}
 
+\dart{} supports asynchronous execution of code with async functions and await expressions.
+We introduce an event loop to define the behaviour of asynchronous code.
+We denote the event loop with $\eventloop$.
+$\eventloop$ represents a list of event continuations, elements of $\dncont$.
+\[
+    \eventloop \in \mlist{\dncont}
+\]
+
+The event loop is a list and it supports the operations defined in Section~\ref{subsubsec:semantic-list}.
+
+The event loop appears on the left and the right-hand side of all configurations, therefore we omit it from rules where the same queue just passed from one state to the other.
+We assume it is implicit and we explicitly mention the cases when the event loop on the right-hand side is not the same as the one passed in the next state.
 
 \subsubsection{Async}
 \label{subsubsec:async}
 
+Asynchronous execution in \dart{} is supported with async functions or asynchronous for in loops.
+In \kernel{} await is an expression and here we present the behaviour of invocation of asynchronous functions.
+Asynchronous for-in loops occur as statements.
+The semantics of the await expression in \kernel{} for expressions other then the above mentioned does not modify the event loop.
+Otherwise, the await expression modifies the event loop and proceeds to a state that that applies an event continuation from the event loop, i.e., an event loop configuration.
 
-
+Invocation of asynchronous functions without an await modifies the event loop, but continues with the next continuation.
 
 Notes here are for those who will rewrite the basic async specification into full async specification.
 They should be changed in the final version.
@@ -3174,14 +3214,104 @@ What to read:
 
 Along other things, the following is not considered in the basic version:
 \begin{itemize}
-    \item The labels and switch labels are omitted.
+    \item Exception handlers should be updated with a handler that completes the future.
 
-    \item The exception-related components and transitions are omitted.
+    \item Semantics for invocations of async functions other then static invocations should be added.
 
-    \item For simplicity, all functions are considered to have exactly one required positional parameter and zero named parameters.
+    \item Elements from $\textbf{FutureValue}$ should be specified.
 
 \end{itemize}
 
+If await continuation is applied to a FutureValue, it need to "complete" the future, hence it starts the event loop.
+
+When body of async is about to be executed we add to the event loop the event cont and eval the invocation to a future immediately.
+
+
+\renewcommand{\StartNK}[4]{\mathrm{StartNK}({#1},\,{#2},\,{#3},\,\ExceptionHandlersRest,\,{#4})}
+\newcommand{\CompleteFutureEK}[1]{\mathrm{CompleteFutureEK}({#1})}
+\newcommand{\AwaitReturnNK}[2]{\mathrm{AwaitReturnNK}({#1},\,{#2})}
+\newcommand{\AwaitEK}{\mathrm{AwaitEK}(\econt)}
+\newcommand{\AsyncStaticInvA}[4]{\mathrm{AsyncStaticInvA}({#1},\,{#2},\,{#3},\,\ExceptionHandlersRest,\,{#4})}
+
+\begin{figure}[Htp]
+    \begin{eqfigure}
+    \begin{align}
+        &\begin{multlined}
+            \cesktranswheresplit%
+                {\evalconf{\AwaitExpression{\expressionmeta}}{\env}{st}{cex}{cst}{\econt}}%
+                {\evalconf{\expressionmeta}{\env}{st}{cex}{cst}{\econt'}}%
+                {\text{where } \econt' = \AwaitEK}
+        \end{multlined}\label{async:await}\\
+        &\begin{multlined}
+            \cesktranswheresplit%
+                {\evalconf{\StaticInvocation{\{\membermeta\}}{\expressionsmeta}}{\env}{\strace}{\cstrace}{\cex}{\econt}}%
+                {\evallistconf{\exprs}{\env}{\strace}{\cstrace}{\cex}{\acont}}%
+                {\begin{aligned}
+                    \text{where }
+                    \acont &= \AsyncStaticInvA{\formals}{\stmt}{\strace'}{\econt},\\
+                    \strace' &= \StaticInvocation{\{\membermeta\}}{\expressionsmeta}::\strace,\\
+                    \membermeta &\text{ is an async static method with formal parameters }\formals \text{ and body }\stmt
+                  \end{aligned}}
+        \end{multlined}\label{async:static-invoc}\\
+        &\begin{multlined}
+             \cesktranswheresplit%
+                 {\acontconf{\AsyncStaticInvA{\formals}{\stmt}{\strace}{\econt}}{\val{s}}}%
+                 {\contconf{\econt}{\val}}%
+                 {\begin{aligned}
+                     \text{where }
+                     \val &= FutureValue(\loc)\\
+                     \loc &= \text{fresh location in the store}\\
+                     \eventloop_{R} &= \append(\eventloop_{L},\ncont)\\
+                     \ncont &= \StartNK{\stmt}{\env}{\strace}{\econt'}\\
+                     \econt' &= \CompleteFutureEK{\loc}\\
+                     \env &= \ext{\env_{empty}}{\formals}{\val{s}}
+                  \end{aligned}}
+        \end{multlined}\label{async:static-invoc-a}\\
+        &\begin{multlined}
+             \cesktranswheresplit%
+                 {\contconf{\AwaitEK}{\val}}%
+                 {\eventconf{\head(\eventloop)}{\eventloop'}}%
+                 {\begin{aligned}
+                     \text{where }
+                     \val &\in \textbf{FutureValue}\\
+                     \eventloop' &= \tail(\append(\eventloop, \AwaitReturnNK{\econt}{\loc})
+                 \end{aligned}}
+        \end{multlined}\label{async:econt-future}\\
+        &\begin{multlined}
+             \cesktranswhere%
+                 {\contconf{\AwaitEK}{\val}}%
+                 {\contconf{\econt}{\val}}%
+                 {\text{where }\val \notin \textbf{FutureValue}}
+        \end{multlined}\label{async:econt-value}\\
+        &\begin{multlined}
+             \cesktranswheresplit%
+                 {\eventconf{\StartNK{\stmt}{\env}{\strace}{\econt}}{\eventloop}}%
+                 {\execconf{\stmt}{\env}{[]}{[]}{\strace}{\handler}{\cex,\,\cstrace}{\econt}{\scont}}%
+                 {\text{where } \scont = \ExitSK{null}}
+        \end{multlined}\label{async:startnk}\\
+         &\begin{multlined}
+             \cesktranswheresplit%
+                 {\contconf{\CompleteFutureEK{\loc}}{\val}}%
+                 {\eventconf{\head(G)}{\tail(G)}}%
+                 {\text{where } \deref{\loc} = \val \text{ after transition}}
+        \end{multlined}\label{async:complete-future}\\
+        &\begin{multlined}
+             \cesktranswhere%
+                 {\contconf{\AwaitReturnNK{\econt}{\loc}}{\eventloop}}%
+                 {\contconf{\econt}{\deref{\loc}}}%
+                 {\text{where } \deref{\loc} \neq \emptyset}
+        \end{multlined}\label{async:await-return}\\
+        &\begin{multlined}
+             \cesktranswheresplit%
+                 {\contconf{\AwaitReturnNK{\econt}{\loc}}{\eventloop}}%
+                 {\eventconf{\head(\eventloop')}{\tail(\eventloop')}}%
+                 {\text{where } \deref{\loc} = \emptyset,\,\eventloop' = \append(\eventloop,\, \AwaitReturnNK{\econt}{\loc})}
+        \end{multlined}\label{async:await-return-fail}\\
+  \end{align}
+  \end{eqfigure}
+  \caption{The CESK-transition function for await expressions}
+  \label{fig:async}
+\end{figure}
 
 \subsubsection{Sync*}
 \label{subsubsec:syncstar}
