@@ -3224,8 +3224,12 @@ Along other things, the following is not considered in the basic version:
 
 If await continuation is applied to a FutureValue, it need to "complete" the future, hence it starts the event loop.
 
-When body of async is about to be executed we add to the event loop the event cont and eval the invocation to a future immediately.
-
+When body of async is about to be executed we add to the event loop the event continuation.
+The invocation evaluates to a future immediately.
+The future is completed eventually, when continuation from the event loop are applied.
+Additionally, we need to mention that the execution of the program completes when a final state is reached and the event loop is empty.
+Note that this implies the introduction of an exit state, which will not proceed to application of continuations from the event loop.
+Transition to this state will happen when a failure to handle an exception occurs.
 
 \renewcommand{\StartNK}[4]{\mathrm{StartNK}({#1},\,{#2},\,{#3},\,\ExceptionHandlersRest,\,{#4})}
 \newcommand{\CompleteFutureEK}[1]{\mathrm{CompleteFutureEK}({#1})}
