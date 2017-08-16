@@ -681,7 +681,7 @@ Function values capture the body, formals and the environment in which a functio
 To support recursive functions, we add a location component to the function value and store the environment in it.
 This allows us to modify the environment and add a binding to a location containing the function value for local functions.
 \[
-    \dfunval : \dformals \times \dstmt \times \dlocation
+    \dfunval : \dformals \times \dstmt \times \denv
 \]
 
 
@@ -1588,7 +1588,7 @@ Otherwise, the evaluation of the expression results with an error, as shown in \
 \label{subsubsec:function-expressions}
 
 \kernel{} supports encapsulating an executable unit of code with function expressions.
-To support function expressions we introduce $fv = \funval{\formals}{\stmt_{body}}{\loc} \in \dfunval$ as a value that has the function statement body, $\stmt_{body} \in \dstmt$, its list of formal parameters, $\formals \in \dformals$, and the environment, $\deref{\loc} = \env \in \denv$ in scope of the function expression.
+To support function expressions we introduce $fv = \funval{\formals}{\stmt_{body}}{\env} \in \dfunval$ as a value that has the function statement body, $\stmt_{body} \in \dstmt$, its list of formal parameters, $\formals \in \dformals$, and the environment, $\env \in \denv$ in scope of the function expression.
 This ensures that there are no free variables in the body of $fv$.
 
 $fv \in \dfunval$ has only one property, $call$.
@@ -2766,9 +2766,9 @@ When the current initalizer being executed is a $\FieldInitializer{\expressionme
                 {\execconf{\FunctionDeclaration{\typemeta}{\idmeta}{\formals}{}{\stmt}}{\env}{\lbls}{\clbls}{\strace}{\handler}{\cstrace,\,\cex}{\econt}{\scont}}%
                 {\contconf{\econt}{\val}}%
                 {\begin{aligned}
-                    \text{where } \val &= \funval{\stmt_{body}}{\formals}{\loc}\\
-                                  \env' &= \ext{\env}{\varmeta}{\val}\\
-                                  \deref{\loc} &= \env' \text{ after transition}\\
+                    \text{where } \env' &= \ext{\env}{\varmeta}{\nnull}\\
+                                  \val &= \funval{\stmt_{body}}{\formals}{\env'}\\
+                                  \deref{\env'(\varmeta)} &=\val \text{ after transition}\\
                                   \varmeta &= \text{a variable declaration corresponding to identifier $\idmeta$}
                 \end{aligned}}
         \end{multlined}
