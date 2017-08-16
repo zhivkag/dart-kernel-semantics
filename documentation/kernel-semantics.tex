@@ -55,6 +55,7 @@
 \DeclareMathOperator{\setter}{implicitSetter}
 \DeclareMathOperator{\lookup}{lookup}
 \DeclareMathOperator{\methodLookup}{methodLookup}
+\DeclareMathOperator{\contains}{contains}
 
 % Keywords and syntactic constructs of Dart Kernel to be used in math mode.
 \newcommand{\synt}[1]{\ensuremath{\text{\textbf{\texttt{#1}}}}}
@@ -541,18 +542,52 @@ A variable lookup consists of looking up the location of a variable from the env
 \subsection{Main Environment}
 \label{subsec:main-env}
 
-The main environment denoted as $\mainenv$ is a function that maps static and library members to locations.
-\[
-    \mainenv \in \dmenv = \dfield \rightarrow \dlocation.
-\]
-We introduce the main environment to support static and library field extraction and assignment.
+\kernel{} supports static and library fields, which are initialized when first accessed and mutations of values stored in these fields are visible in all subsequent execution of statements or evaluation of expressions.
+To support this feature, we introduce a main environment, denoted as $\mainenv$.
+
+\newcommand{\dmainenv}{\textbf{MainEnvironment}}
+
+\[\mainenv \in \dmainenv = \dmember \rightarrow \dlocation \]
+
+We define the following functions for manipulating $\mainenv$:
+
+\subsubsection{Contains}
+We define the function $\contains$ as follows:
+\begin{align*}
+    \contains &\in \dmainenv \times \dmember \rightarrow \dsembool\\
+    \contains(\mainenv, x) &=\begin{cases}
+        \true &\text{ if }x \in \textit{dom}(\mainenv)\\
+        \false &\text{ otherwise}
+    \end{cases}
+\end{align*}
+where $\textit{dom}(\mainenv)$ is the domain of the environment $\mainenv$, i.e. the set of members for which $\mainenv$ is defined.
+
+\subsubsection{Lookup}
+The function $\lookup$ is defined as follows:
+\begin{align*}
+    \lookup &\in \dmainenv \times \dmember \rightarrow \dlocation\\
+    \lookup(\mainenv, x) &= \mainenv(x)\\
+\end{align*}
+where $x \in \textit{dom}(\mainenv)$.
+Note that the function $\lookup$ is defined only for elements of $\textit{dom}(\mainenv)$.
+
+\subsubsection{Extend}
+We define the function extend as follows:
+\begin{align*}
+    &\extend \in \dmainenv \times \dmember \times \dval \rightarrow \denv\\
+    &\extend(\mainenv, x, \val) = \mainenv'\\
+    &\text{where }\\
+    &\hspace{2cm}\forall y \in \textit{dom}(\mainenv) \cup x,\hspace{2mm}\mainenv'(y) =\begin{cases}
+        \loc &\text{ if } y = x\\
+        \mainenv(y) &\text{ otherwise}\\
+    \end{cases}\\
+    &\text{and $\loc$ is a fresh location that stores the value $\val$.}
+\end{align*}
+
 This environment is visible during the execution of a \kernel{} program, therefore it should be in the left and right-hand side of all the transition presented in the paper.
 In order to simplify the transitions, we assume the main environment is implicit.
-The main environment is created before the execution of the main function and it is defined for all static and library fields.
-Similar to Section~\ref{subsec:env-definition}, static and library fields can be looked up in the main environment.
 
-For each static or library field $\field$, we define $\mainenv(\field) = \loc$, where $\loc$ is a fresh location in the store.
-In \kernel{} static and library fields are initialized when they are first accessed, hence on creation of $\mainenv$ the fresh locations will contain a special value, $\deref{\loc} = \emptyset, \loc \in \dlocation$.
+For a rule $C_1 \Rightarrow C_2$ that defines the transition from configuration $C_1$ to configuration $C_2$, we explicitly mention when the main environment in the resulting configuration $C_2$ is not the same as the one in the previous configuration $C_1$.
 
 \subsubsection{Static and Library Field Lookup}
 \label{subsubsec:static-field-lookup}
