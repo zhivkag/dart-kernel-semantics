@@ -3195,8 +3195,8 @@ Asynchronous execution in \dart{} is supported with async functions or asynchron
 In \kernel{} await is an expression and here we present the behaviour of invocation of asynchronous functions.
 Asynchronous for-in loops occur as statements.
 The semantics of the await expression in \kernel{} for expressions other then the above mentioned does not modify the event loop.
-Otherwise, the await expression modifies the event loop and proceeds to a state that that applies an event continuation from the event loop, i.e., an event loop configuration.
 
+Otherwise, the await expression modifies the event loop and proceeds to a state that that applies an event continuation from the event loop, i.e., an event loop configuration.
 Invocation of asynchronous functions without an await modifies the event loop, but continues with the next continuation.
 
 Notes here are for those who will rewrite the basic async specification into full async specification.
@@ -3222,20 +3222,25 @@ Along other things, the following is not considered in the basic version:
 
 \end{itemize}
 
-If await continuation is applied to a FutureValue, it need to "complete" the future, hence it starts the event loop.
-
-When body of async is about to be executed we add to the event loop the event continuation.
-The invocation evaluates to a future immediately.
-The future is completed eventually, when continuation from the event loop are applied.
-Additionally, we need to mention that the execution of the program completes when a final state is reached and the event loop is empty.
-Note that this implies the introduction of an exit state, which will not proceed to application of continuations from the event loop.
-Transition to this state will happen when a failure to handle an exception occurs.
-
 \renewcommand{\StartNK}[4]{\mathrm{StartNK}({#1},\,{#2},\,{#3},\,\ExceptionHandlersRest,\,{#4})}
 \newcommand{\CompleteFutureEK}[1]{\mathrm{CompleteFutureEK}({#1})}
 \newcommand{\AwaitReturnNK}[2]{\mathrm{AwaitReturnNK}({#1},\,{#2})}
 \newcommand{\AwaitEK}{\mathrm{AwaitEK}(\econt)}
 \newcommand{\AsyncStaticInvA}[4]{\mathrm{AsyncStaticInvA}({#1},\,{#2},\,{#3},\,\ExceptionHandlersRest,\,{#4})}
+
+If await continuation, $\AwaitEK$ is applied to a FutureValue, it needs to "complete" the future before returning, 
+Therefore, it adds an event continuation at the tail of the loop that captures the return continuation and the location from the store corresponding to the returned future.
+It then applies the head event continuation of the event loop.
+
+When the body of async function is about to be executed, we create a $\StartNK{\stmt}{\env}{\strace}{\econt'}$ event continuation that captures the body, the environment, the exception components and an expression continuation that completes the corresponding future.
+We append this event continuation to the event loop and the invocation evaluates to a future immediately.
+The created future value captures the location where the completed value of the future will eventually be stored.
+The future is completed eventually, when the above mentioned continuation from the event loop is applied.
+
+Additionally, we need to mention that the execution of the program completes when a final state is reached and the event loop is empty.
+Note that this implies the introduction of an exit state, which will not proceed to application of continuations from the event loop.
+Transition to this state will happen when a failure to handle an exception occurs.
+
 
 \begin{figure}[Htp]
     \begin{eqfigure}
