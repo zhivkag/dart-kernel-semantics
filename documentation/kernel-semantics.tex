@@ -1667,7 +1667,7 @@ The specific CESK-transitions for the different invocations are described in the
             \cesktranswheresplit%
                 {\evalconf{\StaticGet{\membermeta}}{\env}{\strace}{\cstrace}{\cex}{\econt}}%
                 {\contconf{\econt}{\deref{\mainenv(\membermeta)}}}%
-                {\text{where $\membermeta$ is a static field and $\deref{\mainenv(\membermeta)} \neq \emptyset$}}
+                {\text{where $\membermeta$ is a static field and $\contains(\mainenv, \membermeta) = \true$}}
             \end{multlined}
         \label{eval:staticget-var}\\
         &\begin{multlined}
@@ -1676,7 +1676,7 @@ The specific CESK-transitions for the different invocations are described in the
                 {\contconf{\econt}{\nnull}}%
                 {\begin{aligned}
                     \text{where } &\membermeta \text{ is a static field without an initializer expression},\\
-                                  &\deref{\mainenv(\membermeta) = \emptyset},\\
+                                  &\contains(\mainenv, \membermeta) = \false,\\
                                   &\deref{(\mainenv(\membermeta))} = \NullLiteral \text{ after transition}
                  \end{aligned}}
         \end{multlined}
@@ -1687,6 +1687,7 @@ The specific CESK-transitions for the different invocations are described in the
                 {\evalconf{\expressionmeta}{\env}{\strace}{\cstrace}{\cex}{\econt'}}%
                 {\begin{aligned}
                     \text{where } &\membermeta \text{ is a static field with initializer expression $\expressionmeta$},\\
+                                  &\contains(\mainenv, \membermeta) = \false,\\
                                   &\econt' = \StaticGetK
                 \end{aligned}}
         \end{multlined}
@@ -1742,16 +1743,43 @@ The specific CESK-transitions for the different invocations are described in the
 \begin{figure}[Htp]
     \begin{eqfigure}
     \begin{align}
-        &\cesktranswhere%
+        &\begin{multlined}
+        \cesktranswheresplit%
             {\contconf{\StaticGetK}{\val}}%
             {\contconf{\econt}{\val}}%
-            {\text{where $\deref{(\mainenv(\membermeta))} = \val$ after transition}}
+            {\begin{aligned}
+                \text{where }&\\
+                \mainenv^{\synt{R}} &= \extend( \mainenv^{\synt{L}},\,\membermeta,\,\val)
+                \text{ after transition}\\
+                \mainenv^{\synt{L}} &\text{ is the main environment in the starting configuration}\\
+                \mainenv^{\synt{R}} &\text{ is the main environment in the resulting configuration}
+            \end{aligned}}
+        \end{multlined}
         \label{econtconf:staticget}\\
-        &\cesktranswhere%
+        &\begin{multlined}
+        \cesktranswheresplit%
             {\contconf{\StaticSetK}{\val}}%
             {\contconf{\econt}{\val}}
-            {\text{where $\deref{(\mainenv(\membermeta))} = \val$ after transition}}
+            {\begin{aligned}
+                \text{where }
+                &\contains(\mainenv, \membermeta) = \true\\
+                &\deref{(\mainenv(\membermeta))} = \val \text{ after transition}
+            \end{aligned}}
+        \end{multlined}
         \label{econtconf:staticset-var}\\
+        &\begin{multlined}
+        \cesktranswheresplit%
+            {\contconf{\StaticSetK}{\val}}%
+            {\contconf{\econt}{\val}}
+            {\begin{aligned}
+                \text{where }
+                &\contains(\mainenv, \membermeta) = \false\\
+                &\mainenv^{\synt{R}} = \extend( \mainenv^{\synt{L}},\,\membermeta,\,\val)\\
+                &\mainenv^{\synt{L}} \text{ is the main environment in the starting configuration}\\
+                &\mainenv^{\synt{R}} \text{ is the main environment in the resulting configuration}
+            \end{aligned}}
+        \end{multlined}
+        \label{econtconf:staticset-var-new}\\
         &\begin{multlined}
         \cesktranswheresplit%
             {\contconf{\StaticSetK}{\val}}%
