@@ -2348,7 +2348,7 @@ When a $\return$ statement is missing in the statement body $\stmt$ of the insta
 \label{subsubsec:direct-instance-method-invoc}
 
 Direct method invocation allows invocation of instance method by providing directly the member method to be invoked and bypass the lookup step described in Section~\ref{subsubsec:instance-method-invoc} above.
-The evaluation of the direct instance method invocation proceeds with the evaluation of the left-hand side expression, i.e., the receiver expression as shown in \eqref{eval:dinstancemethod}.
+The evaluation of the direct instance method invocation proceeds with the evaluation of the left-hand side expression, i.e. the receiver expression as shown in \eqref{eval:dinstancemethod}.
 After the evaluation of the receiver expression to a value $\val$, the evaluation proceeds with the evaluation of the argument expressions as shown in \eqref{acontconf:dinstancemethod}.
 The argument expressions are evaluated to a list of values $\vals$.
 The evaluation of the expression continues with the execution of the statement body in the environment that binds $\this$ to a location that stores the value $\val$ and the formal parameters $\formals$ to fresh locations storing values from $\vals$ accordingly.
@@ -2399,7 +2399,7 @@ We support the following kinds of initializers:
 \end{itemize}
 
 
-A new object value is allocated only a constructor is run with $\new$, i.e., invoked, otherwise we say that the constructor is run to further initialize an already allocated object value.
+A new object value is allocated only a constructor is run with $\new$, i.e. invoked, otherwise we say that the constructor is run to further initialize an already allocated object value.
 
 Let $\new(Q(\expressionsmeta))$ be an expression invokes a constructor $Q$ to produce a new instance.
 The invocation of a constructor $Q$ proceeds by evaluating the actual argument expressions as shown in \eqref{eval:new}.
@@ -3188,13 +3188,21 @@ The event loop is a list and it supports the operations defined in Section~\ref{
 
 \subsubsection{Async}
 \label{subsubsec:async}
+% Move these macros next to the rest of the macros.
+\renewcommand{\StartNK}[4]{\mathrm{StartNK}({#1},\,{#2},\,{#3},\,\ExceptionHandlersRest,\,{#4})}
+\newcommand{\CompleteFutureEK}[1]{\mathrm{CompleteFutureEK}({#1})}
+\newcommand{\AwaitReturnNK}[2]{\mathrm{AwaitReturnNK}({#1},\,{#2})}
+\newcommand{\AwaitEK}{\mathrm{AwaitEK}(\econt)}
+\newcommand{\AsyncStaticInvA}[4]{\mathrm{AsyncStaticInvA}({#1},\,{#2},\,{#3},\,\ExceptionHandlersRest,\,{#4})}
+\newcommand{\FutureValue}[1]{\mathrm{FutureValue}(#1)}
+\newcommand{\dfuture}{\mathbf{FutureValue}}
 
 Asynchronous execution in \dart{} is supported with async functions, await expressions, and asynchronous for-in loops.
 In \kernel{} $\AwaitExpression{}$ is an expression and here we present the behaviour of invocation of asynchronous functions.
 Asynchronous \synt{for in} loops occur as statements.
-The semantics of the $\AwaitExpression{}$ expression in \kernel{} for expressions other then the above mentioned does not modify the event loop.
+The semantics of the $\AwaitExpression{}$ expression in \kernel{} for expressions that do not evaluate to an element of $\dfuture$ does not modify the event loop.
 
-Otherwise, the await expression modifies the event loop and proceeds to a state that that applies an event continuation from the event loop, i.e., an event loop configuration.
+Otherwise, the await expression modifies the event loop and proceeds to a state that that applies an event continuation from the event loop, i.e. an event loop configuration.
 Invocation of asynchronous functions without an await modifies the event loop, but continues with the next continuation.
 
 Notes here are for those who will rewrite the basic async specification into full async specification.
@@ -3217,21 +3225,13 @@ Along other things, the following is not considered in the basic version:
 
     \item Semantics for invocations of async functions other then static invocations should be added.
 
-    \item Elements from $\textbf{FutureValue}$ should be specified.
+    \item Elements from $\dfuture$ should be specified.
 
 \end{itemize}
 
-% Move these macros next to the rest of the macros.
-\renewcommand{\StartNK}[4]{\mathrm{StartNK}({#1},\,{#2},\,{#3},\,\ExceptionHandlersRest,\,{#4})}
-\newcommand{\CompleteFutureEK}[1]{\mathrm{CompleteFutureEK}({#1})}
-\newcommand{\AwaitReturnNK}[2]{\mathrm{AwaitReturnNK}({#1},\,{#2})}
-\newcommand{\AwaitEK}{\mathrm{AwaitEK}(\econt)}
-\newcommand{\AsyncStaticInvA}[4]{\mathrm{AsyncStaticInvA}({#1},\,{#2},\,{#3},\,\ExceptionHandlersRest,\,{#4})}
-\newcommand{\FutureValue}[1]{\mathrm{FutureValue}(#1)}
-\newcommand{\dfuture}{\mathbf{FutureValue}}
 
 When an await continuation, $\AwaitEK$, is applied to a $\FutureValue{\loc}$, it needs to "complete" the future before returning.
-Therefore, it adds an event continuation at the tail of the loop that captures the return continuation and the location from the store corresponding to the returned future.
+Therefore, it adds an event continuation at the tail of the event loop that captures the return continuation and the location from the store corresponding to the returned future.
 It then proceeds to the head event continuation of the event loop.
 
 When the body of async function is about to be executed, we create a $\StartNK{\stmt}{\env}{\strace}{\econt'}$ event continuation that captures the body, the environment, the exception components and an expression continuation that completes the corresponding $\FutureValue{\loc}$.
@@ -3270,7 +3270,7 @@ Transition to this state will happen when a failure to handle an exception occur
                  {\contconf{\econt}{\val}}%
                  {\begin{aligned}
                      \text{where }
-                     \val &= FutureValue(\loc)\\
+                     \val &= \FutureValue{\loc}\\
                      \loc &= \text{fresh location in the store}\\
                      \eventloop_{R} &= \append(\eventloop_{L},\ncont)\\
                      \ncont &= \StartNK{\stmt}{\env}{\strace}{\econt'}\\
@@ -3292,7 +3292,7 @@ Transition to this state will happen when a failure to handle an exception occur
              \cesktranswhere%
                  {\contconf{\AwaitEK}{\val}}%
                  {\contconf{\econt}{\val}}%
-                 {\text{where }\val \notin \textbf{FutureValue}}
+                 {\text{where }\val \notin \dfuture}
         \end{multlined}\label{async:econt-value}\\
         &\begin{multlined}
              \cesktranswheresplit%
