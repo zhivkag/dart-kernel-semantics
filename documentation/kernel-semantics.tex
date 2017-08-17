@@ -316,24 +316,25 @@ This section contains definitions of syntactic and semantic domains, helper func
     \pi_i(x) &\text{ --- the $i^{th}$ component of $x \in \ddom_1 \times \dots \times \ddom_n$}.
 \end{align*}
 
-\subsubsection{Semantic list}
-\label{subsubsec:semantic-list}
+\subsubsection{Meta list}
+\label{subsubsec:meta-list}
 
-Throughout the document we use semantic lists which represent lists of elements from some semantic domain.
+Throughout the document we use meta lists which represent lists of elements from some domain.
 We define a list $l \in \mlist{\ddom}$ and are constructed as follows:
 \begin{align*}
     [] &\text{ --- empty list}.\\
     x :: \textit{list} &\text{ --- a meta-list that is constructed by adding element $x \in \ddom$ to the head of the meta-list $list$}.
 \end{align*}
 
+\todo{Define behaviour for operations on empty list.}
 In addition of the usual $\head$ and $\tail$ operations on a list, we add $\append$ operator.
 \begin{align*}
     &\head \in \mlist{\ddom} \rightarrow \ddom\\
-    &\head(x :: \textit{list}) = x \text{ where $x :: \text{list} \in \mlist{\ddom}$ is a non empt y list}\\[2mm]
+    &\head(x :: \textit{list}) = x \text{ where $x :: \text{list} \in \mlist{\ddom}$}\\
     &\tail \in \mlist{\ddom} \rightarrow \mlist{\ddom}\\
-    &\tail(x :: \textit{list}) = list \text{ where $x :: \text{list} \in \mlist{\ddom}$ is a non empt y list}\\[2mm]
+    &\tail(x :: \textit{list}) = list \text{ where $x :: \text{list} \in \mlist{\ddom}$}\\
     &\append \in \mlist{\ddom} \times \ddom \rightarrow \mlist{\ddom}\\
-    &\append(list, x) = list ::: x \text{ where $x \in \ddom$ is added as last element of the $list \in \mlist{\ddom}$}
+    &\append(\textit{list}, x) = \textit{list'} \text{ where $x \in \ddom$ is the last element of $\textit{list}' \in \mlist{\ddom}$}\\
 \end{align*}
 
 
@@ -3175,26 +3176,23 @@ Let $F$ be a function with a body $\stmt_{body}$ and a list of formal parameters
 \subsection{Event Loop}
 \label{subsec:eventloop}
 
-\dart{} supports asynchronous execution of code with async functions and await expressions.
-We introduce an event loop to define the behaviour of asynchronous code.
+\dart{} supports asynchronous execution of code with async functions, await expressions, and asynchronous for-in loops.
+We introduce an event loop component to represent Dart's event loop.
 We denote the event loop with $\eventloop$.
-$\eventloop$ represents a list of event continuations, elements of $\dncont$.
+$\eventloop$ is a list of event continuations, elements of $\dncont$.
 \[
     \eventloop \in \mlist{\dncont}
 \]
 
 The event loop is a list and it supports the operations defined in Section~\ref{subsubsec:semantic-list}.
 
-The event loop appears on the left and the right-hand side of all configurations, therefore we omit it from rules where the same queue just passed from one state to the other.
-We assume it is implicit and we explicitly mention the cases when the event loop on the right-hand side is not the same as the one passed in the next state.
-
 \subsubsection{Async}
 \label{subsubsec:async}
 
-Asynchronous execution in \dart{} is supported with async functions or asynchronous for in loops.
-In \kernel{} await is an expression and here we present the behaviour of invocation of asynchronous functions.
-Asynchronous for-in loops occur as statements.
-The semantics of the await expression in \kernel{} for expressions other then the above mentioned does not modify the event loop.
+Asynchronous execution in \dart{} is supported with async functions, await expressions, and asynchronous for-in loops.
+In \kernel{} $\AwaitExpression{}$ is an expression and here we present the behaviour of invocation of asynchronous functions.
+Asynchronous \synt{for in} loops occur as statements.
+The semantics of the $\AwaitExpression{}$ expression in \kernel{} for expressions other then the above mentioned does not modify the event loop.
 
 Otherwise, the await expression modifies the event loop and proceeds to a state that that applies an event continuation from the event loop, i.e., an event loop configuration.
 Invocation of asynchronous functions without an await modifies the event loop, but continues with the next continuation.
@@ -3214,6 +3212,7 @@ What to read:
 
 Along other things, the following is not considered in the basic version:
 \begin{itemize}
+	\item Event loop component needs to be added to all configurations.
     \item Exception handlers should be updated with a handler that completes the future.
 
     \item Semantics for invocations of async functions other then static invocations should be added.
@@ -3222,17 +3221,20 @@ Along other things, the following is not considered in the basic version:
 
 \end{itemize}
 
+% Move these macros next to the rest of the macros.
 \renewcommand{\StartNK}[4]{\mathrm{StartNK}({#1},\,{#2},\,{#3},\,\ExceptionHandlersRest,\,{#4})}
 \newcommand{\CompleteFutureEK}[1]{\mathrm{CompleteFutureEK}({#1})}
 \newcommand{\AwaitReturnNK}[2]{\mathrm{AwaitReturnNK}({#1},\,{#2})}
 \newcommand{\AwaitEK}{\mathrm{AwaitEK}(\econt)}
 \newcommand{\AsyncStaticInvA}[4]{\mathrm{AsyncStaticInvA}({#1},\,{#2},\,{#3},\,\ExceptionHandlersRest,\,{#4})}
+\newcommand{\FutureValue}[1]{\mathrm{FutureValue}(#1)}
+\newcommand{\dfuture}{\mathbf{FutureValue}}
 
-If await continuation, $\AwaitEK$ is applied to a FutureValue, it needs to "complete" the future before returning, 
+When an await continuation, $\AwaitEK$, is applied to a $\FutureValue{\loc}$, it needs to "complete" the future before returning.
 Therefore, it adds an event continuation at the tail of the loop that captures the return continuation and the location from the store corresponding to the returned future.
-It then applies the head event continuation of the event loop.
+It then proceeds to the head event continuation of the event loop.
 
-When the body of async function is about to be executed, we create a $\StartNK{\stmt}{\env}{\strace}{\econt'}$ event continuation that captures the body, the environment, the exception components and an expression continuation that completes the corresponding future.
+When the body of async function is about to be executed, we create a $\StartNK{\stmt}{\env}{\strace}{\econt'}$ event continuation that captures the body, the environment, the exception components and an expression continuation that completes the corresponding $\FutureValue{\loc}$.
 We append this event continuation to the event loop and the invocation evaluates to a future immediately.
 The created future value captures the location where the completed value of the future will eventually be stored.
 The future is completed eventually, when the above mentioned continuation from the event loop is applied.
@@ -3279,11 +3281,11 @@ Transition to this state will happen when a failure to handle an exception occur
         &\begin{multlined}
              \cesktranswheresplit%
                  {\contconf{\AwaitEK}{\val}}%
-                 {\eventconf{\head(\eventloop)}{\eventloop'}}%
+                 {\eventconf{\head(\eventloop')}{\tail(\eventloop')}}%
                  {\begin{aligned}
                      \text{where }
-                     \val &\in \textbf{FutureValue}\\
-                     \eventloop' &= \tail(\append(\eventloop, \AwaitReturnNK{\econt}{\loc})
+                     \val &= \FutureValue{\loc}\\
+                     \eventloop' &= \append(\eventloop, \AwaitReturnNK{\econt}{\loc})
                  \end{aligned}}
         \end{multlined}\label{async:econt-future}\\
         &\begin{multlined}
