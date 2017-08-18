@@ -556,29 +556,22 @@ We define the function $\contains$ as follows:
 \begin{align*}
     \contains &\in \dmainenv \times \dmember \rightarrow \dsembool\\
     \contains(\mainenv, x) &=\begin{cases}
-        \true &\text{ if }x \in \textit{dom}(\mainenv)\\
+        \true &\text{ if }x \in \dom(\mainenv),\\
         \false &\text{ otherwise}
     \end{cases}
 \end{align*}
-where $\textit{dom}(\mainenv)$ is the domain of the environment $\mainenv$, i.e. the set of members for which $\mainenv$ is defined.
+where $\dom(\mainenv)$ is the domain of the environment $\mainenv$, i.e. the set of members for which $\mainenv$ is defined.
 
-\subsubsection{Lookup}
-The function $\lookup$ is defined as follows:
-\begin{align*}
-    \lookup &\in \dmainenv \times \dmember \rightarrow \dlocation\\
-    \lookup(\mainenv, x) &= \mainenv(x)\\
-\end{align*}
-where $x \in \textit{dom}(\mainenv)$.
-Note that the function $\lookup$ is defined only for elements of $\textit{dom}(\mainenv)$.
+We will use `\contains` as a proposition in the transition steps below, since the value produced is not used alongside the values from the semantic domains.
 
 \subsubsection{Extend}
 We define the function extend as follows:
 \begin{align*}
     &\extend \in \dmainenv \times \dmember \times \dval \rightarrow \denv\\
-    &\extend(\mainenv, x, \val) = \mainenv'\\
+    &\extend(\mainenv, x, \val) = \mainenv',\\
     &\text{where }\\
-    &\hspace{2cm}\forall y \in \textit{dom}(\mainenv) \cup x,\hspace{2mm}\mainenv'(y) =\begin{cases}
-        \loc &\text{ if } y = x\\
+    &\forall y \in \dom(\mainenv) \cup \{x\},\,\mainenv'(y) =\begin{cases}
+        \loc &\text{ if } y = x,\\
         \mainenv(y) &\text{ otherwise}\\
     \end{cases}\\
     &\text{and $\loc$ is a fresh location that stores the value $\val$.}
@@ -1667,7 +1660,7 @@ The specific CESK-transitions for the different invocations are described in the
             \cesktranswheresplit%
                 {\evalconf{\StaticGet{\membermeta}}{\env}{\strace}{\cstrace}{\cex}{\econt}}%
                 {\contconf{\econt}{\deref{\mainenv(\membermeta)}}}%
-                {\text{where $\membermeta$ is a static field and $\contains(\mainenv, \membermeta) = \true$}}
+                {\text{where $\membermeta$ is a static field and $\contains(\mainenv, \membermeta)$}}
             \end{multlined}
         \label{eval:staticget-var}\\
         &\begin{multlined}
@@ -1676,7 +1669,7 @@ The specific CESK-transitions for the different invocations are described in the
                 {\contconf{\econt}{\nnull}}%
                 {\begin{aligned}
                     \text{where } &\membermeta \text{ is a static field without an initializer expression},\\
-                                  &\contains(\mainenv, \membermeta) = \false,\\
+                                  &not \contains(\mainenv, \membermeta),\\
                                   &\deref{(\mainenv(\membermeta))} = \NullLiteral \text{ after transition}
                  \end{aligned}}
         \end{multlined}
@@ -1687,7 +1680,7 @@ The specific CESK-transitions for the different invocations are described in the
                 {\evalconf{\expressionmeta}{\env}{\strace}{\cstrace}{\cex}{\econt'}}%
                 {\begin{aligned}
                     \text{where } &\membermeta \text{ is a static field with initializer expression $\expressionmeta$},\\
-                                  &\contains(\mainenv, \membermeta) = \false,\\
+                                  &not \contains(\mainenv, \membermeta),\\
                                   &\econt' = \StaticGetK
                 \end{aligned}}
         \end{multlined}
@@ -1762,7 +1755,7 @@ The specific CESK-transitions for the different invocations are described in the
             {\contconf{\econt}{\val}}
             {\begin{aligned}
                 \text{where }
-                &\contains(\mainenv, \membermeta) = \true\\
+                &\contains(\mainenv, \membermeta),\\
                 &\deref{(\mainenv(\membermeta))} = \val \text{ after transition}
             \end{aligned}}
         \end{multlined}
@@ -1773,7 +1766,7 @@ The specific CESK-transitions for the different invocations are described in the
             {\contconf{\econt}{\val}}
             {\begin{aligned}
                 \text{where }
-                &\contains(\mainenv, \membermeta) = \false\\
+                &not \contains(\mainenv, \membermeta)\\
                 &\mainenv^{\synt{R}} = \extend( \mainenv^{\synt{L}},\,\membermeta,\,\val)\\
                 &\mainenv^{\synt{L}} \text{ is the main environment in the starting configuration}\\
                 &\mainenv^{\synt{R}} \text{ is the main environment in the resulting configuration}
