@@ -55,6 +55,7 @@
 \DeclareMathOperator{\setter}{implicitSetter}
 \DeclareMathOperator{\lookup}{lookup}
 \DeclareMathOperator{\methodLookup}{methodLookup}
+\DeclareMathOperator{\contains}{contains}
 
 % Meta-functions for operations on list
 \DeclareMathOperator{\head}{head}
@@ -565,18 +566,45 @@ A variable lookup consists of looking up the location of a variable from the env
 \subsection{Main Environment}
 \label{subsec:main-env}
 
-The main environment denoted as $\mainenv$ is a function that maps static and library members to locations.
-\[
-    \mainenv \in \dmenv = \dfield \rightarrow \dlocation.
-\]
-We introduce the main environment to support static and library field extraction and assignment.
+\kernel{} supports static and library fields, which are initialized when first accessed and mutations of values stored in these fields are visible in all subsequent execution of statements or evaluation of expressions.
+To support this feature, we introduce a main environment, denoted as $\mainenv$.
+
+\newcommand{\dmainenv}{\textbf{MainEnvironment}}
+
+\[\mainenv \in \dmainenv = \dmember \rightarrow \dlocation \]
+
+We define the following functions for manipulating $\mainenv$:
+
+\subsubsection{Contains}
+We define the function $\contains$ as follows:
+\begin{align*}
+    \contains &\in \dmainenv \times \dmember \rightarrow \dsembool\\
+    \contains(\mainenv, x) &=\begin{cases}
+        \true &\text{ if }x \in \dom(\mainenv),\\
+        \false &\text{ otherwise}
+    \end{cases}
+\end{align*}
+where $\dom(\mainenv)$ is the domain of the environment $\mainenv$, i.e. the set of members for which $\mainenv$ is defined.
+
+We will use `\contains` as a proposition in the transition steps below, since the value produced is not used alongside the values from the semantic domains.
+
+\subsubsection{Extend}
+We define the function extend as follows:
+\begin{align*}
+    &\extend \in \dmainenv \times \dmember \times \dval \rightarrow \denv\\
+    &\extend(\mainenv, x, \val) = \mainenv',\\
+    &\text{where }\\
+    &\forall y \in \dom(\mainenv) \cup \{x\},\,\mainenv'(y) =\begin{cases}
+        \loc &\text{ if } y = x,\\
+        \mainenv(y) &\text{ otherwise}\\
+    \end{cases}\\
+    &\text{and $\loc$ is a fresh location that stores the value $\val$.}
+\end{align*}
+
 This environment is visible during the execution of a \kernel{} program, therefore it should be in the left and right-hand side of all the transition presented in the paper.
 In order to simplify the transitions, we assume the main environment is implicit.
-The main environment is created before the execution of the main function and it is defined for all static and library fields.
-Similar to Section~\ref{subsec:env-definition}, static and library fields can be looked up in the main environment.
 
-For each static or library field $\field$, we define $\mainenv(\field) = \loc$, where $\loc$ is a fresh location in the store.
-In \kernel{} static and library fields are initialized when they are first accessed, hence on creation of $\mainenv$ the fresh locations will contain a special value, $\deref{\loc} = \emptyset, \loc \in \dlocation$.
+For a rule $C_1 \Rightarrow C_2$ that defines the transition from configuration $C_1$ to configuration $C_2$, we explicitly mention when the main environment in the resulting configuration $C_2$ is not the same as the one in the previous configuration $C_1$.
 
 \subsubsection{Static and Library Field Lookup}
 \label{subsubsec:static-field-lookup}
@@ -1656,7 +1684,7 @@ The specific CESK-transitions for the different invocations are described in the
             \cesktranswheresplit%
                 {\evalconf{\StaticGet{\membermeta}}{\env}{\strace}{\cstrace}{\cex}{\econt}}%
                 {\contconf{\econt}{\deref{\mainenv(\membermeta)}}}%
-                {\text{where $\membermeta$ is a static field and $\deref{\mainenv(\membermeta)} \neq \emptyset$}}
+                {\text{where $\membermeta$ is a static field and $\contains(\mainenv, \membermeta)$}}
             \end{multlined}
         \label{eval:staticget-var}\\
         &\begin{multlined}
@@ -1665,7 +1693,7 @@ The specific CESK-transitions for the different invocations are described in the
                 {\contconf{\econt}{\nnull}}%
                 {\begin{aligned}
                     \text{where } &\membermeta \text{ is a static field without an initializer expression},\\
-                                  &\deref{\mainenv(\membermeta) = \emptyset},\\
+                                  &not \contains(\mainenv, \membermeta),\\
                                   &\deref{(\mainenv(\membermeta))} = \NullLiteral \text{ after transition}
                  \end{aligned}}
         \end{multlined}
@@ -1676,6 +1704,7 @@ The specific CESK-transitions for the different invocations are described in the
                 {\evalconf{\expressionmeta}{\env}{\strace}{\cstrace}{\cex}{\econt'}}%
                 {\begin{aligned}
                     \text{where } &\membermeta \text{ is a static field with initializer expression $\expressionmeta$},\\
+                                  &not \contains(\mainenv, \membermeta),\\
                                   &\econt' = \StaticGetK
                 \end{aligned}}
         \end{multlined}
@@ -1731,16 +1760,43 @@ The specific CESK-transitions for the different invocations are described in the
 \begin{figure}[Htp]
     \begin{eqfigure}
     \begin{align}
-        &\cesktranswhere%
+        &\begin{multlined}
+        \cesktranswheresplit%
             {\contconf{\StaticGetK}{\val}}%
             {\contconf{\econt}{\val}}%
-            {\text{where $\deref{(\mainenv(\membermeta))} = \val$ after transition}}
+            {\begin{aligned}
+                \text{where }&\\
+                \mainenv^{\synt{R}} &= \extend( \mainenv^{\synt{L}},\,\membermeta,\,\val)
+                \text{ after transition}\\
+                \mainenv^{\synt{L}} &\text{ is the main environment in the starting configuration}\\
+                \mainenv^{\synt{R}} &\text{ is the main environment in the resulting configuration}
+            \end{aligned}}
+        \end{multlined}
         \label{econtconf:staticget}\\
-        &\cesktranswhere%
+        &\begin{multlined}
+        \cesktranswheresplit%
             {\contconf{\StaticSetK}{\val}}%
             {\contconf{\econt}{\val}}
-            {\text{where $\deref{(\mainenv(\membermeta))} = \val$ after transition}}
+            {\begin{aligned}
+                \text{where }
+                &\contains(\mainenv, \membermeta),\\
+                &\deref{(\mainenv(\membermeta))} = \val \text{ after transition}
+            \end{aligned}}
+        \end{multlined}
         \label{econtconf:staticset-var}\\
+        &\begin{multlined}
+        \cesktranswheresplit%
+            {\contconf{\StaticSetK}{\val}}%
+            {\contconf{\econt}{\val}}
+            {\begin{aligned}
+                \text{where }
+                &not \contains(\mainenv, \membermeta)\\
+                &\mainenv^{\synt{R}} = \extend( \mainenv^{\synt{L}},\,\membermeta,\,\val)\\
+                &\mainenv^{\synt{L}} \text{ is the main environment in the starting configuration}\\
+                &\mainenv^{\synt{R}} \text{ is the main environment in the resulting configuration}
+            \end{aligned}}
+        \end{multlined}
+        \label{econtconf:staticset-var-new}\\
         &\begin{multlined}
         \cesktranswheresplit%
             {\contconf{\StaticSetK}{\val}}%
