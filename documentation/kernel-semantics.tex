@@ -3258,33 +3258,9 @@ In \kernel{} $\AwaitExpression{}$ is an expression and here we present the behav
 Asynchronous \synt{for in} loops occur as statements.
 The semantics of the $\AwaitExpression{}$ expression in \kernel{} for expressions that do not evaluate to an element of $\dfuture$ does not modify the event loop.
 
-Otherwise, the await expression modifies the event loop and proceeds to a state that that applies an event continuation from the event loop, i.e. an event loop configuration.
-Invocation of asynchronous functions without an await modifies the event loop, but continues with the next continuation.
-
-Notes here are for those who will rewrite the basic async specification into full async specification.
-They should be changed in the final version.
-
-What to read:
-\begin{itemize}
-    \item The Event Loop and Dart \url{https://webdev.dartlang.org/articles/performance/event-loop}.
-
-    \item Dart Language Asynchrony Support: Phase 1 \url{https://www.dartlang.org/articles/language/await-async}.
-
-    \item Spicing Up Dart with Side Effects \url{http://dl.acm.org/citation.cfm?id=2747873}.
-
-\end{itemize}
-
-Along other things, the following is not considered in the basic version:
-\begin{itemize}
-	\item Event loop component needs to be added to all configurations.
-    \item Exception handlers should be updated with a handler that completes the future.
-
-    \item Semantics for invocations of async functions other then static invocations should be added.
-
-    \item Elements from $\dfuture$ should be specified.
-
-\end{itemize}
-
+Otherwise, the await expression modifies the event loop and proceeds to a state that that applies the return continuation to the newly allocated future.
+Invocation of asynchronous functions proceeds with the execution of the body of the function.
+Execution of the body of the function will be potentially suspended when an await expression in the body is executed.
 
 When an await continuation, $\AwaitEK$, is applied to a $\FutureValue{\loc}$, it needs to "complete" the future before returning.
 Therefore, it adds an event continuation at the tail of the event loop that captures the return continuation and the location from the store corresponding to the returned future.
@@ -3379,6 +3355,30 @@ Transition to this state will happen when a failure to handle an exception occur
   \caption{The CESK-transition function for await expressions}
   \label{fig:async}
 \end{figure}
+
+Notes here are for those who will rewrite the basic async specification into full async specification.
+They should be changed in the final version.
+
+What to read:
+\begin{itemize}
+    \item The Event Loop and Dart \url{https://webdev.dartlang.org/articles/performance/event-loop}.
+
+    \item Dart Language Asynchrony Support: Phase 1 \url{https://www.dartlang.org/articles/language/await-async}.
+
+    \item Spicing Up Dart with Side Effects \url{http://dl.acm.org/citation.cfm?id=2747873}.
+
+\end{itemize}
+
+Along other things, the following is not considered in the basic version:
+\begin{itemize}
+    \item Event loop component needs to be added to all configurations.
+    \item Exception handlers should be updated with a handler that completes the future.
+
+    \item Semantics for invocations of async functions other then static invocations should be added.
+
+    \item Elements from $\dfuture$ should be specified.
+
+\end{itemize}
 
 \subsubsection{Sync*}
 \label{subsubsec:syncstar}
